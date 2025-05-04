@@ -46,6 +46,12 @@ struct Lifetime {
     float value;
 };
 
+struct Weapon {
+	float cd;
+	float damage;
+	float radius;
+};
+
 struct Bullet {}; // Tag component for bullets
 
 #endif
