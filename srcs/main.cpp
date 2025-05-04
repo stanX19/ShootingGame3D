@@ -9,18 +9,6 @@ void setup_camera(Camera3D& camera) {
     camera.projection = CAMERA_PERSPECTIVE;
 }
 
-entt::entity create_player(entt::registry& registry) {
-    entt::entity player = registry.create();
-    registry.emplace<Position>(player, Vector3{ 0, 0, 0 });
-    registry.emplace<Velocity>(player, Vector3{ 0, 0, 0 });
-    registry.emplace<Rotation>(player, Vector3{ 0, 0, 0 });
-    registry.emplace<Body>(player, 1.0f, BLUE);
-    registry.emplace<HP>(player, 100, 100);
-    registry.emplace<Damage>(player, 10);
-    registry.emplace<Player>(player, PLAYER_SPEED, SHOOT_COOLDOWN, 0.0f);
-    return player;
-}
-
 void spawn_initial_enemies(entt::registry& registry) {
     for (int i = 0; i < ENEMY_COUNT; i++) {
         float x = GetRandomValue(-ARENA_SIZE + 5, ARENA_SIZE - 5);
@@ -31,7 +19,7 @@ void spawn_initial_enemies(entt::registry& registry) {
 
 void reset_game(entt::registry& registry) {
     registry.clear();
-    create_player(registry);
+    spawn_player(registry);
     spawn_initial_enemies(registry);
 }
 
@@ -44,7 +32,7 @@ int main() {
     setup_camera(camera);
 
     entt::registry registry;
-    create_player(registry);
+    spawn_player(registry);
     spawn_initial_enemies(registry);
 
     Renderer renderer(camera, registry);
@@ -67,9 +55,12 @@ int main() {
             Position& pos = playerView.get<Position>(entity);
             Rotation& rot = playerView.get<Rotation>(entity);
             Vector3 forward = GetForwardVector(rot);
-            camera.position = Vector3Add(pos.value, Vector3Scale(forward, -4.0f));
-            camera.position.y += 3.0f;
-            camera.target = Vector3Add(pos.value, Vector3Scale(forward, 10.0f));
+			Vector3 up = GetUpVector(rot); // You'll need to implement this
+
+			Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -4.0f), Vector3Scale(up, 3.0f));
+			camera.position = Vector3Add(pos.value, cameraOffset);
+			camera.up = up;
+			camera.target = Vector3Add(pos.value, Vector3Scale(forward, 10.0f));
         }
 
         // --- Render everything ---

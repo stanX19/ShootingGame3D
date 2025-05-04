@@ -1,4 +1,4 @@
-#include "shoot_3d.hpp"
+#include "utils.hpp"
 #include <cmath>
 
 // Game constants - adjusted for better gameplay (defined here as they are used in utils)
@@ -21,11 +21,29 @@ Vector3 GetForwardVector(const Rotation& rotation) {
 
 Vector3 GetRightVector(const Rotation& rotation) {
     // Right vector is perpendicular to forward and up
-    Vector3 forward = GetForwardVector(rotation);
-    return Vector3CrossProduct((Vector3) { 0, 1, 0 }, forward);
+    return Vector3CrossProduct(GetUpVector(rotation), GetForwardVector(rotation));
 }
 
 Vector3 GetUpVector() {
     // Using world up vector
     return (Vector3) { 0, 1, 0 };
+}
+
+Vector3 GetUpVector(const Rotation& rotation) {
+    float sp = sinf(rotation.value.x);
+    float cp = cosf(rotation.value.x);
+    float sy = sinf(rotation.value.y);
+    float cy = cosf(rotation.value.y);
+
+    return Vector3Normalize((Vector3) {
+        -sy * sp,  // x component
+         cp,       // y component
+        -cy * sp   // z component
+    });
+}
+
+float WrapAngle(float angle) {
+    while (angle < -PI) angle += 2.0f * PI;
+    while (angle >  PI) angle -= 2.0f * PI;
+    return angle;
 }

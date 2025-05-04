@@ -50,10 +50,10 @@ void ecs_system::player_update(entt::registry& registry, float dt) {
         if (IsKeyDown(KEY_UP))     rotation.value.x -= turnSpeed;
         if (IsKeyDown(KEY_DOWN))   rotation.value.x += turnSpeed;
 
-        rotation.value.x = Clamp(rotation.value.x, -1.5f, 1.5f);
+        rotation.value.x = WrapAngle(rotation.value.x);
 
         // Adjust speed based on input
-        const float accel = 40.0f;
+        const float accel = 20.0f;
         const float maxSpeed = player.moveSpeed;
 
         if (IsKeyDown(KEY_W)) {
@@ -72,6 +72,7 @@ void ecs_system::player_update(entt::registry& registry, float dt) {
         if ((IsKeyDown(KEY_SPACE) || IsMouseButtonDown(MOUSE_LEFT_BUTTON))
             && player.timeSinceLastShot >= player.shootCooldown) {
             shoot_bullet(registry, rotation, position);
+			player.timeSinceLastShot = 0;
         }
 
         // Stay within arena

@@ -58,16 +58,22 @@ void Renderer::Render() {
     DrawEntitiesWithShader();
     EndShaderMode();
 
-    DrawHealthBars();
     EndMode3D();
+    DrawHealthBars();
 
     // HUD
     DrawFPS(10, 10);
 
-    auto view = registry.view<Player, HP>();
-    if (view.begin() != view.end()) {
-        HP& hp = view.get<HP>(view.front());
-        DrawText(TextFormat("HP: %d/%d", hp.value, hp.maxValue), 10, 40, 20, WHITE);
+    auto playerView = registry.view<Player, HP>();
+    if (playerView.begin() != playerView.end()) {
+		int totalEntities = 0;
+		auto hittableView = registry.view<Body, Position, HP>();
+		for (auto entity : hittableView) {
+			if (hittableView.get<HP>(entity).value > 0) {
+				totalEntities++;
+			}
+		}
+		DrawText(TextFormat("Entities: %d", totalEntities), 10, 30, 20, WHITE);
         DrawText("WASD to move, Arrows to turn, LMB/Space to shoot", 10, 70, 20, WHITE);
     } else {
         const char* msg = "GAME OVER - PRESS R TO RESTART";
@@ -112,16 +118,38 @@ void Renderer::DrawEntitiesWithShader() {
     }
 }
 
+bool isInFrontOfCamera(const Vector3& entityPos, const Camera3D& camera) {
+    Vector3 cameraToEntity = Vector3Subtract(entityPos, camera.position);
+    Vector3 forward = camera.target - camera.position;
+    return Vector3DotProduct(cameraToEntity, forward) > 0;
+}
+
 void Renderer::DrawHealthBars() {
     auto view = registry.view<Position, Body, HP>();
     for (auto entity : view) {
         auto& pos = view.get<Position>(entity);
-        auto& body = view.get<Body>(entity);
         auto& hp = view.get<HP>(entity);
 
-        Vector2 screen = GetWorldToScreen(Vector3Add(pos.value, { 0, body.radius * 2, 0 }), camera);
-        float w = 40, h = 4, pct = (float)hp.value / hp.maxValue;
-		DrawRectangle(screen.x - w / 2, screen.y, w, h, GRAY);
-		DrawRectangle(screen.x - w / 2, screen.y, w * pct, h, GREEN);
+		if (hp.value == hp.maxValue)
+			continue;
+		if (!isInFrontOfCamera(pos.value, camera))
+			continue;
+        // Project entity position to screen space
+        Vector2 screen = GetWorldToScreen(pos.value, camera);
+
+        // Offset the health bar *upward* in screen space (pixels), not world space
+        screen.y -= 20; // pixels above entity, tweak as needed
+
+        // Optional: Don't draw off-screen
+        if (screen.x < 0 || screen.x > GetScreenWidth() ||
+            screen.y < 0 || screen.y > GetScreenHeight()) continue;
+
+        float w = 40, h = 4;
+        float pct = (float)hp.value / hp.maxValue;
+
+        DrawRectangle(screen.x - w / 2, screen.y, w, h, GRAY);
+        DrawRectangle(screen.x - w / 2, screen.y, w * pct, h, GREEN);
     }
 }
+
+

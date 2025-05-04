@@ -13,11 +13,13 @@
 Vector3 GetForwardVector(const Rotation& rotation);
 Vector3 GetRightVector(const Rotation& rotation);
 Vector3 GetUpVector();
+Vector3 GetUpVector(const Rotation& rotation);
 
 // Game systems
 void spawn_bullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, int damage, Color color);
 void spawn_enemy(entt::registry& registry, const Vector3& pos);
 void spawn_debris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
+entt::entity spawn_player(entt::registry& registry);
 
 namespace ecs_system {
 	void player_update(entt::registry& registry, float dt);
