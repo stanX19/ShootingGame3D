@@ -1,5 +1,7 @@
 #include "shoot_3d.hpp"
 
+#define MOUSE_SENSITIVITY 0.1f
+
 void ecs_system::player_move(entt::registry &registry, float dt)
 {
 	auto view = registry.view<Player, Position, Rotation, Velocity>();
@@ -16,7 +18,7 @@ void ecs_system::player_move(entt::registry &registry, float dt)
 		float speed = Vector3Length(vel);
 
 		// Turn speed reduces with movement speed
-		float turnSpeed = MOUSE_SENSITIVITY / (1.0f + speed / PLAYER_SPEED * 5.0f);
+		float turnSpeed = MOUSE_SENSITIVITY / (1.0f + speed / player.moveSpeed * 5.0f);
 		int uprightFactor = (Vector3DotProduct(GetUpVector(rotation), GetUpVector()) >= 0)? 1: -1;
 
 		if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))

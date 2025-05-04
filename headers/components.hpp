@@ -40,8 +40,6 @@ struct Player {
 
 struct Enemy {
     float moveSpeed;
-    float attackCooldown;
-    float timeSinceLastAttack;
 };
 
 struct Lifetime {

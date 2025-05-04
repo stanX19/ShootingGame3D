@@ -9,6 +9,8 @@
 #include <cmath>
 #include <iostream>
 
+#define ARENA_SIZE 200.0f
+
 // Utility functions
 Vector3 GetForwardVector(const Rotation& rotation);
 Vector3 GetRightVector(const Rotation& rotation);
@@ -20,7 +22,8 @@ void spawn_bullet(entt::registry& registry, const Vector3& pos, const Vector3& d
 void spawn_enemy(entt::registry& registry, const Vector3& pos);
 void spawn_debris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
 entt::entity spawn_player(entt::registry& registry);
-void emplace_bullet_weapon(entt::registry& registry, entt::entity entity);
+void emplace_weapon_machine_gun(entt::registry& registry, entt::entity entity);
+void emplace_weapon_basic(entt::registry& registry, entt::entity entity);
 
 namespace ecs_system {
 	void player_move(entt::registry& registry, float dt);

@@ -8,5 +8,6 @@ void spawn_enemy(entt::registry& registry, const Vector3& pos) {
     registry.emplace<Body>(enemy, 1.0f, GREEN);
     registry.emplace<HP>(enemy, 100.0f, 100.0f);
     registry.emplace<Damage>(enemy, 50.0f);
-    registry.emplace<Enemy>(enemy, ENEMY_SPEED, ENEMY_ATTACK_COOLDOWN, 0.0f);
+    registry.emplace<Enemy>(enemy, 10.0f);
+	emplace_weapon_basic(registry, enemy);
 }

@@ -9,18 +9,10 @@ void setup_camera(Camera3D& camera) {
     camera.projection = CAMERA_PERSPECTIVE;
 }
 
-void spawn_initial_enemies(entt::registry& registry) {
-    for (int i = 0; i < ENEMY_COUNT; i++) {
-        float x = GetRandomValue(-ARENA_SIZE + 5, ARENA_SIZE - 5);
-        float z = GetRandomValue(-ARENA_SIZE + 5, ARENA_SIZE - 5);
-        spawn_enemy(registry, Vector3{ x, 0, z });
-    }
-}
 
 void reset_game(entt::registry& registry) {
     registry.clear();
     spawn_player(registry);
-    spawn_initial_enemies(registry);
 }
 
 int main() {
@@ -33,8 +25,7 @@ int main() {
 
     entt::registry registry;
     spawn_player(registry);
-    spawn_initial_enemies(registry);
-
+	
     Renderer renderer(camera, registry);
 
     while (!WindowShouldClose()) {
