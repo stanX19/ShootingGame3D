@@ -20,17 +20,19 @@ void spawn_bullet(entt::registry& registry, const Vector3& pos, const Vector3& d
 void spawn_enemy(entt::registry& registry, const Vector3& pos);
 void spawn_debris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
 entt::entity spawn_player(entt::registry& registry);
+void emplace_bullet_weapon(entt::registry& registry, entt::entity entity);
 
 namespace ecs_system {
-	void player_update(entt::registry& registry, float dt);
+	void player_move(entt::registry& registry, float dt);
+	void player_aim(entt::registry& registry);
 	void enemy_update(entt::registry& registry, float dt);
+	void enemy_respawn(entt::registry& registry);
 	void entity_movement(entt::registry& registry, float dt);
 	void entity_collision(entt::registry& registry);
 	void entity_lifetime(entt::registry& registry, float dt);
 	void hp_cleanup(entt::registry& registry);
-	void enemy_respawn(entt::registry& registry);
-	void ammo_reload(entt::registry& registry, float dt);
 	void hp_regen(entt::registry& registry, float dt);
+	void ammo_reload(entt::registry& registry, float dt);
 	void weapon_update(entt::registry& registry, float dt);
 }
 

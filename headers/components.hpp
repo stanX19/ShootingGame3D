@@ -36,8 +36,6 @@ struct Damage {
 
 struct Player {
     float moveSpeed;
-    float shootCooldown;
-    float timeSinceLastShot;
 };
 
 struct Enemy {

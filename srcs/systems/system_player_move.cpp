@@ -1,39 +1,8 @@
 #include "shoot_3d.hpp"
 
-static void shoot_bullet(entt::registry &registry, Rotation &rotation, Position &position)
+void ecs_system::player_move(entt::registry &registry, float dt)
 {
-	Vector3 shootDir = GetForwardVector(rotation);
-	Vector3 bestDir = shootDir;
-	float bestDot = cosf(DEG2RAD * 30.0f); // 30° cone
-	float closestDist = 100.0f;		       // max assist distance
-
-	auto enemyView = registry.view<Enemy, Position, HP>();
-	for (auto enemyEntity : enemyView)
-	{
-		Position &enemyPos = enemyView.get<Position>(enemyEntity);
-		HP &enemyHp = enemyView.get<HP>(enemyEntity);
-		if (enemyHp.value <= 0)
-			continue;
-
-		Vector3 toEnemy = Vector3Subtract(enemyPos.value, position.value);
-		float dist = Vector3Length(toEnemy);
-		Vector3 dirToEnemy = Vector3Normalize(toEnemy);
-
-		float dot = Vector3DotProduct(shootDir, dirToEnemy);
-		if (dot > bestDot && dist < closestDist)
-		{
-			bestDir = dirToEnemy;
-			closestDist = dist;
-		}
-	}
-
-	Vector3 spawnPos = Vector3Add(position.value, Vector3Scale(bestDir, 2.0f));
-	spawn_bullet(registry, spawnPos, bestDir, BULLET_DAMAGE, BLUE);
-}
-
-void ecs_system::player_update(entt::registry &registry, float dt)
-{
-	auto view = registry.view<Player, Position, Rotation, Velocity, HP>();
+	auto view = registry.view<Player, Position, Rotation, Velocity>();
 
 	for (auto entity : view)
 	{
@@ -41,8 +10,6 @@ void ecs_system::player_update(entt::registry &registry, float dt)
 		Position &position = view.get<Position>(entity);
 		Rotation &rotation = view.get<Rotation>(entity);
 		Velocity &velocity = view.get<Velocity>(entity);
-
-		player.timeSinceLastShot += dt;
 
 		// Calculate current speed (scalar)
 		Vector3 vel = velocity.value;
@@ -81,13 +48,6 @@ void ecs_system::player_update(entt::registry &registry, float dt)
 		// Apply new velocity aligned with current facing
 		Vector3 forward = GetForwardVector(rotation);
 		velocity.value = Vector3Scale(forward, speed);
-
-		// Shooting
-		if ((IsKeyDown(KEY_SPACE) || IsMouseButtonDown(MOUSE_LEFT_BUTTON)) && player.timeSinceLastShot >= player.shootCooldown)
-		{
-			shoot_bullet(registry, rotation, position);
-			player.timeSinceLastShot = 0;
-		}
 
 		// Stay within arena
 		position.value.x = Clamp(position.value.x, -ARENA_SIZE, ARENA_SIZE);

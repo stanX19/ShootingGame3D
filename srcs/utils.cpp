@@ -1,9 +1,6 @@
 #include "utils.hpp"
 #include <cmath>
 
-// Game constants - adjusted for better gameplay (defined here as they are used in utils)
-
-
 // Utility functions for direction vectors
 Vector3 GetForwardVector(const Rotation& rotation) {
     // Calculate forward vector using sine and cosine directly for more reliable results
@@ -51,5 +48,13 @@ float WrapAngle(float angle) {
     while (angle < -PI) angle += 2.0f * PI;
     while (angle >  PI) angle -= 2.0f * PI;
     return angle;
+}
+
+Vector3 vectorToRotation(const Vector3& dir) {
+    Vector3 rot;
+    rot.x = -asinf(dir.y);                    // Inverted pitch
+    rot.y = atan2f(-dir.x, -dir.z);           // Inverted yaw to match -Z forward
+    rot.z = 0.0f;
+    return rot;
 }
 

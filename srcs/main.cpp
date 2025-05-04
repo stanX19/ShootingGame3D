@@ -41,7 +41,8 @@ int main() {
         float dt = GetFrameTime();
 
         // --- Update systems ---
-        ecs_system::player_update(registry, dt);
+        ecs_system::player_move(registry, dt);
+        ecs_system::player_aim(registry);
         ecs_system::enemy_update(registry, dt);
         ecs_system::entity_movement(registry, dt);
         ecs_system::entity_collision(registry);
@@ -49,6 +50,8 @@ int main() {
         ecs_system::entity_lifetime(registry, dt);
         ecs_system::hp_cleanup(registry);
         ecs_system::enemy_respawn(registry);
+        ecs_system::ammo_reload(registry, dt);
+        ecs_system::weapon_update(registry, dt);
 
         // --- Camera follow player ---
         auto playerView = registry.view<Player, Position, Rotation>();
@@ -58,7 +61,7 @@ int main() {
             Vector3 forward = GetForwardVector(rot);
 			Vector3 up = GetUpVector(rot); // You'll need to implement this
 
-			Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -4.0f), Vector3Scale(up, 3.0f));
+			Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -10.0f), Vector3Scale(up, 5.0f));
 			camera.position = Vector3Add(pos.value, cameraOffset);
 			camera.up = up;
 			camera.target = Vector3Add(pos.value, Vector3Scale(forward, 10.0f));

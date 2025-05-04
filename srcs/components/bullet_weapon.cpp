@@ -1,9 +1,9 @@
 #include "shoot_3d.hpp"
 
-void add_bullet_weapon_with_ammo(entt::registry& registry, entt::entity entity) {
+void emplace_bullet_weapon(entt::registry& registry, entt::entity entity) {
     BulletWeapon weapon;
     weapon.firing = false;
-    weapon.shootCooldown = 0.2f;
+    weapon.shootCooldown = 0.1f;
     weapon.timeSinceLastShot = 0.0f;
 
     weapon.bulletData.hp = 1.0f;
@@ -18,7 +18,7 @@ void add_bullet_weapon_with_ammo(entt::registry& registry, entt::entity entity) 
     ammo.maxValue = 30;
 
     AmmoReload reload;
-    reload.value = 5.0f; // ammo/sec
+    reload.value = 3.0f;  // reload per second
 
     registry.emplace_or_replace<BulletWeapon>(entity, weapon);
     registry.emplace_or_replace<Ammo>(entity, ammo);
