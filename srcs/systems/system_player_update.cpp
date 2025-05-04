@@ -4,8 +4,8 @@ static void shoot_bullet(entt::registry &registry, Rotation &rotation, Position 
 {
 	Vector3 shootDir = GetForwardVector(rotation);
 	Vector3 bestDir = shootDir;
-	float bestDot = cosf(DEG2RAD * 10.0f); // 10° cone
-	float closestDist = 1000.0f;		   // max assist distance
+	float bestDot = cosf(DEG2RAD * 30.0f); // 30° cone
+	float closestDist = 100.0f;		       // max assist distance
 
 	auto enemyView = registry.view<Enemy, Position, HP>();
 	for (auto enemyEntity : enemyView)

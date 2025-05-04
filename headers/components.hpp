@@ -22,12 +22,16 @@ struct Body {
 };
 
 struct HP {
-    int value;
-    int maxValue;
+    float value;
+    float maxValue;
+};
+
+struct HPRegen {
+    float value;  // health regen per second
 };
 
 struct Damage {
-    int value;
+    float value;
 };
 
 struct Player {
@@ -46,11 +50,35 @@ struct Lifetime {
     float value;
 };
 
-struct Weapon {
-	float cd;
-	float damage;
-	float radius;
+
+// weapon components
+struct BulletWeapon {
+	struct {
+		float hp;
+		float dmg;
+		float speed;
+		float rad;
+		Color color;
+		float lifetime;
+	} bulletData;
+	bool firing;
+    float shootCooldown;
+    float timeSinceLastShot;
 };
+
+struct AimRotation {
+    Vector3 value; // pitch, yaw, roll in radians
+};
+
+struct Ammo {
+	float value;
+	float maxValue;
+};
+
+struct AmmoReload {
+	float value;
+};
+// end of weapon components
 
 struct Bullet {}; // Tag component for bullets
 

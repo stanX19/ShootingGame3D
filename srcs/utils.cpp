@@ -7,10 +7,15 @@
 // Utility functions for direction vectors
 Vector3 GetForwardVector(const Rotation& rotation) {
     // Calculate forward vector using sine and cosine directly for more reliable results
-    float sp = sinf(rotation.value.x);
-    float cp = cosf(rotation.value.x);
-    float sy = sinf(rotation.value.y);
-    float cy = cosf(rotation.value.y);
+    return GetForwardVector(rotation.value);
+}
+
+Vector3 GetForwardVector(const Vector3& rotationValue) {
+    // Calculate forward vector using sine and cosine directly for more reliable results
+    float sp = sinf(rotationValue.x);
+    float cp = cosf(rotationValue.x);
+    float sy = sinf(rotationValue.y);
+    float cy = cosf(rotationValue.y);
 
     return Vector3Normalize((Vector3) {
         -sy * cp,   // x component
@@ -47,3 +52,4 @@ float WrapAngle(float angle) {
     while (angle >  PI) angle -= 2.0f * PI;
     return angle;
 }
+

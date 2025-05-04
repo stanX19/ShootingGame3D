@@ -5,6 +5,7 @@
 
 // Utility functions
 Vector3 GetForwardVector(const Rotation& rotation);
+Vector3 GetForwardVector(const Vector3& rotationValue);
 Vector3 GetRightVector(const Rotation& rotation);
 Vector3 GetUpVector();
 Vector3 GetUpVector(const Rotation& rotation);

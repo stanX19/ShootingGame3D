@@ -1,13 +1,13 @@
 #include "shoot_3d.hpp"
 
 
-void ecs_system::entity_cleanup(entt::registry& registry) {
+void ecs_system::hp_cleanup(entt::registry& registry) {
     auto view = registry.view<HP>();
     std::vector<entt::entity> toDestroy;
 
     for (auto entity : view) {
         HP& hp = view.get<HP>(entity);
-        if (hp.value <= 0) {
+        if (hp.value <= 0.001f) {
             toDestroy.push_back(entity);
         }
     }

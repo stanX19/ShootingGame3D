@@ -45,8 +45,9 @@ int main() {
         ecs_system::enemy_update(registry, dt);
         ecs_system::entity_movement(registry, dt);
         ecs_system::entity_collision(registry);
+        ecs_system::hp_regen(registry, dt);
         ecs_system::entity_lifetime(registry, dt);
-        ecs_system::entity_cleanup(registry);
+        ecs_system::hp_cleanup(registry);
         ecs_system::enemy_respawn(registry);
 
         // --- Camera follow player ---
