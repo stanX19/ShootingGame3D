@@ -34,7 +34,8 @@ int main() {
         // --- Update systems ---
         ecs_system::player_move(registry, dt);
         ecs_system::player_aim(registry);
-        ecs_system::enemy_update(registry, dt);
+        ecs_system::enemy_move(registry, dt);
+        ecs_system::enemy_aim(registry);
         ecs_system::entity_movement(registry, dt);
         ecs_system::entity_collision(registry);
         ecs_system::hp_regen(registry, dt);

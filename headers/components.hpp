@@ -35,11 +35,15 @@ struct Damage {
 };
 
 struct Player {
-    float moveSpeed;
+	
 };
 
 struct Enemy {
-    float moveSpeed;
+	
+};
+
+struct MaxSpeed {
+    float value;
 };
 
 struct Lifetime {
@@ -60,6 +64,10 @@ struct BulletWeapon {
 	bool firing;
     float shootCooldown;
     float timeSinceLastShot;
+};
+
+struct AimTarget {
+    std::optional<entt::entity> value;
 };
 
 struct AimRotation {

@@ -4,21 +4,21 @@
 
 void ecs_system::player_move(entt::registry &registry, float dt)
 {
-	auto view = registry.view<Player, Position, Rotation, Velocity>();
+	auto view = registry.view<Player, Position, Rotation, Velocity, MaxSpeed>();
 
 	for (auto entity : view)
 	{
-		Player &player = view.get<Player>(entity);
 		Position &position = view.get<Position>(entity);
 		Rotation &rotation = view.get<Rotation>(entity);
 		Velocity &velocity = view.get<Velocity>(entity);
+		MaxSpeed &maxSpeed = view.get<MaxSpeed>(entity);
 
 		// Calculate current speed (scalar)
 		Vector3 vel = velocity.value;
 		float speed = Vector3Length(vel);
 
 		// Turn speed reduces with movement speed
-		float turnSpeed = MOUSE_SENSITIVITY / (1.0f + speed / player.moveSpeed * 5.0f);
+		float turnSpeed = MOUSE_SENSITIVITY / (1.0f + speed / maxSpeed.value * 5.0f);
 		int uprightFactor = (Vector3DotProduct(GetUpVector(rotation), GetUpVector()) >= 0)? 1: -1;
 
 		if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
@@ -34,7 +34,6 @@ void ecs_system::player_move(entt::registry &registry, float dt)
 
 		// Adjust speed based on input
 		const float accel = 20.0f;
-		const float maxSpeed = player.moveSpeed;
 
 		if (IsKeyDown(KEY_W))
 		{
@@ -45,7 +44,7 @@ void ecs_system::player_move(entt::registry &registry, float dt)
 			speed -= accel * dt;
 		}
 
-		speed = Clamp(speed, 0, maxSpeed);
+		speed = Clamp(speed, 0, maxSpeed.value);
 
 		// Apply new velocity aligned with current facing
 		Vector3 forward = GetForwardVector(rotation);

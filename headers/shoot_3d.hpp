@@ -28,7 +28,8 @@ void emplace_weapon_basic(entt::registry& registry, entt::entity entity);
 namespace ecs_system {
 	void player_move(entt::registry& registry, float dt);
 	void player_aim(entt::registry& registry);
-	void enemy_update(entt::registry& registry, float dt);
+	void enemy_move(entt::registry& registry, float dt);
+	void enemy_aim(entt::registry& registry);
 	void enemy_respawn(entt::registry& registry);
 	void entity_movement(entt::registry& registry, float dt);
 	void entity_collision(entt::registry& registry);
