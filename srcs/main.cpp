@@ -12,7 +12,7 @@ void setup_camera(Camera3D& camera) {
 
 void reset_game(entt::registry& registry) {
     registry.clear();
-    spawn_player(registry);
+    spawnPlayer(registry);
 }
 
 int main() {
@@ -24,7 +24,7 @@ int main() {
     setup_camera(camera);
 
     entt::registry registry;
-    spawn_player(registry);
+    spawnPlayer(registry);
 	
     Renderer renderer(camera, registry);
 
@@ -32,18 +32,20 @@ int main() {
         float dt = GetFrameTime();
 
         // --- Update systems ---
-        ecs_system::player_move(registry, dt);
-        ecs_system::player_aim(registry);
-        ecs_system::enemy_move(registry, dt);
-        ecs_system::enemy_aim(registry);
-        ecs_system::entity_movement(registry, dt);
-        ecs_system::entity_collision(registry);
-        ecs_system::hp_regen(registry, dt);
-        ecs_system::entity_lifetime(registry, dt);
-        ecs_system::hp_cleanup(registry);
-        ecs_system::enemy_respawn(registry);
-        ecs_system::ammo_reload(registry, dt);
-        ecs_system::weapon_update(registry, dt);
+        ecs_systems::playerMoveControl(registry, dt);
+        ecs_systems::playerShootControl(registry);
+        ecs_systems::playerAimTarget(registry);
+        ecs_systems::enemyMoveControl(registry, dt);
+        ecs_systems::enemyAimTarget(registry);
+        ecs_systems::enemyMovement(registry, dt);
+        ecs_systems::entityCollision(registry);
+        ecs_systems::hpRegen(registry, dt);
+        ecs_systems::entityLifetime(registry, dt);
+        ecs_systems::hpCleanup(registry);
+        ecs_systems::enemyRespawn(registry);
+		ecs_systems::bulletTargetAim(registry);
+        ecs_systems::ammoReload(registry, dt);
+        ecs_systems::bulletWeaponShoot(registry, dt);
 
         // --- Camera follow player ---
         auto playerView = registry.view<Player, Position, Rotation>();

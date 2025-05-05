@@ -17,27 +17,31 @@ Vector3 GetRightVector(const Rotation& rotation);
 Vector3 GetUpVector();
 Vector3 GetUpVector(const Rotation& rotation);
 
-// Game systems
-void spawn_bullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, float damage, Color color);
-void spawn_enemy(entt::registry& registry, const Vector3& pos);
-void spawn_debris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
-entt::entity spawn_player(entt::registry& registry);
-void emplace_weapon_machine_gun(entt::registry& registry, entt::entity entity);
-void emplace_weapon_basic(entt::registry& registry, entt::entity entity);
+void spawBullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, float damage, Color color);
+void spawnEnemy(entt::registry& registry, const Vector3& pos);
+void spawnEliteEnemy(entt::registry& registry, const Vector3& pos);
+void spawnDebris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
+entt::entity spawnPlayer(entt::registry& registry);
+void emplaceWeaponMachine_gun(entt::registry& registry, entt::entity entity);
+void emplaceWeaponBasic(entt::registry& registry, entt::entity entity);
+bool aimTargetExists(entt::registry& registry, AimTarget &target);
 
-namespace ecs_system {
-	void player_move(entt::registry& registry, float dt);
-	void player_aim(entt::registry& registry);
-	void enemy_move(entt::registry& registry, float dt);
-	void enemy_aim(entt::registry& registry);
-	void enemy_respawn(entt::registry& registry);
-	void entity_movement(entt::registry& registry, float dt);
-	void entity_collision(entt::registry& registry);
-	void entity_lifetime(entt::registry& registry, float dt);
-	void hp_cleanup(entt::registry& registry);
-	void hp_regen(entt::registry& registry, float dt);
-	void ammo_reload(entt::registry& registry, float dt);
-	void weapon_update(entt::registry& registry, float dt);
+// Game systems
+namespace ecs_systems {
+	void playerMoveControl(entt::registry& registry, float dt);
+	void playerShootControl(entt::registry &registry);
+	void playerAimTarget(entt::registry& registry);
+	void enemyMoveControl(entt::registry& registry, float dt);
+	void enemyAimTarget(entt::registry& registry);
+	void enemyRespawn(entt::registry& registry);
+	void enemyMovement(entt::registry& registry, float dt);
+	void entityCollision(entt::registry& registry);
+	void entityLifetime(entt::registry& registry, float dt);
+	void hpCleanup(entt::registry& registry);
+	void hpRegen(entt::registry& registry, float dt);
+	void ammoReload(entt::registry& registry, float dt);
+	void bulletWeaponShoot(entt::registry& registry, float dt);
+	void bulletTargetAim(entt::registry &registry);
 }
 
 #endif // SHOOT_3D_HPP

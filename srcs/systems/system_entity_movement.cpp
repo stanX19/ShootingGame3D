@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-void ecs_system::entity_movement(entt::registry& registry, float dt) {
+void ecs_systems::enemyMovement(entt::registry& registry, float dt) {
     auto view = registry.view<Position, Velocity>();
     for (auto entity : view) {
         Position& position = view.get<Position>(entity);

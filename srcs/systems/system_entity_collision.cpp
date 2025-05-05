@@ -5,7 +5,7 @@
 #include <cmath>
 
 // Main system function - fixed to handle all collisions
-void ecs_system::entity_collision(entt::registry& registry) {
+void ecs_systems::entityCollision(entt::registry& registry) {
     auto damageView = registry.view<Position, Body, Damage>();
     auto hpView = registry.view<Position, Body, HP>();
     

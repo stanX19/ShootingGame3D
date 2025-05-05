@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-void ecs_system::hp_regen(entt::registry& registry, float dt) {
+void ecs_systems::hpRegen(entt::registry& registry, float dt) {
     auto view = registry.view<HP, HPRegen>();
 
     for (auto entity : view) {

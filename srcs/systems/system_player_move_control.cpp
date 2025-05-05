@@ -2,7 +2,7 @@
 
 #define MOUSE_SENSITIVITY 0.1f
 
-void ecs_system::player_move(entt::registry &registry, float dt)
+void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 {
 	auto view = registry.view<Player, Position, Rotation, Velocity, MaxSpeed>();
 

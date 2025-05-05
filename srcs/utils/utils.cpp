@@ -50,7 +50,7 @@ float WrapAngle(float angle) {
     return angle;
 }
 
-Vector3 vectorToRotation(const Vector3& dir) {
+Vector3 vector3ToRotation(const Vector3& dir) {
     Vector3 rot;
     rot.x = -asinf(dir.y);                    // Inverted pitch
     rot.y = atan2f(-dir.x, -dir.z);           // Inverted yaw to match -Z forward

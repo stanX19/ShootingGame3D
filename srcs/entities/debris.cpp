@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-void spawn_debris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan) {
+void spawnDebris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan) {
     for (int i = 0; i < count; ++i) {
         entt::entity debris = registry.create();
 

@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-void ecs_system::enemy_move(entt::registry& registry, float dt) {
+void ecs_systems::enemyMoveControl(entt::registry& registry, float dt) {
     (void)dt;
 
     auto playerView = registry.view<Player, Position>();
@@ -23,7 +23,7 @@ void ecs_system::enemy_move(entt::registry& registry, float dt) {
         Vector3 direction = Vector3Normalize(toPlayer);
 
         // Use utility to convert direction to rotation
-        rotation.value = vectorToRotation(direction);
+        rotation.value = vector3ToRotation(direction);
 
         // Move toward player if not too close
         if (dist > 10.0f) {
@@ -31,8 +31,6 @@ void ecs_system::enemy_move(entt::registry& registry, float dt) {
         } else {
             velocity.value = { 0, 0, 0 };
         }
-
-        // Fire if in range
     }
 }
 

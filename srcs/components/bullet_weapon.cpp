@@ -5,7 +5,7 @@ static Color getColor(entt::registry& registry, entt::entity entity) {
 	return (registry.any_of<Body>(entity))? colorRevert(original): WHITE;
 }
 
-void emplace_weapon_machine_gun(entt::registry& registry, entt::entity entity) {
+void emplaceWeaponMachine_gun(entt::registry& registry, entt::entity entity) {
     BulletWeapon weapon;
     weapon.firing = false;
     weapon.shootCooldown = 0.1f;
@@ -30,7 +30,7 @@ void emplace_weapon_machine_gun(entt::registry& registry, entt::entity entity) {
     registry.emplace_or_replace<AmmoReload>(entity, reload);
 }
 
-void emplace_weapon_basic(entt::registry& registry, entt::entity entity) {
+void emplaceWeaponBasic(entt::registry& registry, entt::entity entity) {
     BulletWeapon weapon;
     weapon.firing = false;
     weapon.shootCooldown = 1.0f;

@@ -1,11 +1,12 @@
 #include "shoot_3d.hpp"
 
-static Vector3 calculate_aim_rotation(entt::registry &registry, Rotation &rotation, Position &position)
+static entt::entity calculateAimTarget(entt::registry &registry, Rotation &rotation, Position &position)
 {
 	Vector3 shootDir = GetForwardVector(rotation);
 	Vector3 bestDir = shootDir;
 	float bestDot = cosf(DEG2RAD * 30.0f); // 30° cone
 	float closestDist = 100.0f;			   // max assist distance
+	entt::entity bestTarget = entt::null;
 
 	auto enemyView = registry.view<Enemy, Position, HP>();
 	for (auto enemyEntity : enemyView)
@@ -24,28 +25,24 @@ static Vector3 calculate_aim_rotation(entt::registry &registry, Rotation &rotati
 		{
 			bestDir = dirToEnemy;
 			closestDist = dist;
+			bestTarget = enemyEntity;
 		}
 	}
-
-	return vectorToRotation(bestDir);
+	return bestTarget;
 }
 
-void ecs_system::player_aim(entt::registry &registry)
+void ecs_systems::playerAimTarget(entt::registry &registry)
 {
-	auto view = registry.view<Player, Position, Rotation, AimRotation, BulletWeapon>();
+	auto view = registry.view<Player, Position, Rotation, AimTarget>();
 
 	for (auto entity : view)
 	{
 		Position &position = view.get<Position>(entity);
 		Rotation &rotation = view.get<Rotation>(entity);
-		AimRotation &aimRotation = view.get<AimRotation>(entity);
-		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
+		AimTarget &aimTarget = view.get<AimTarget>(entity);
 
-		bulletWeapon.firing = (IsKeyDown(KEY_SPACE) || IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-
-		if (!bulletWeapon.firing)
-			continue;
-
-		aimRotation.value = calculate_aim_rotation(registry, rotation, position);
+		aimTarget.entity = calculateAimTarget(registry, rotation, position);
 	}
 }
+
+

@@ -4,56 +4,70 @@
 #include "includes.hpp"
 
 // Components
-struct Position {
-    Vector3 value;
+struct Position
+{
+	Vector3 value;
 };
 
-struct Velocity {
-    Vector3 value;
+struct Velocity
+{
+	Vector3 value;
 };
 
-struct Rotation {
-    Vector3 value; // pitch, yaw, roll in radians
+struct Rotation
+{
+	Vector3 value; // pitch, yaw, roll in radians
 };
 
-struct Body {
-    float radius;
-    Color color;
+struct Body
+{
+	float radius;
+	Color color;
 };
 
-struct HP {
-    float value;
-    float maxValue;
+struct HP
+{
+	float value;
+	float maxValue;
 };
 
-struct HPRegen {
-    float value;  // health regen per second
+struct HPRegen
+{
+	float value; // health regen per second
 };
 
-struct Damage {
-    float value;
+struct Damage
+{
+	float value;
 };
 
-struct Player {
-	
+struct Player
+{
 };
 
-struct Enemy {
-	
+struct Enemy
+{
 };
 
-struct MaxSpeed {
-    float value;
+struct EliteEnemy
+{
 };
 
-struct Lifetime {
-    float value;
+struct MaxSpeed
+{
+	float value;
 };
 
+struct Lifetime
+{
+	float value;
+};
 
 // weapon components
-struct BulletWeapon {
-	struct {
+struct BulletWeapon
+{
+	struct
+	{
 		float hp;
 		float dmg;
 		float speed;
@@ -62,28 +76,34 @@ struct BulletWeapon {
 		float lifetime;
 	} bulletData;
 	bool firing;
-    float shootCooldown;
-    float timeSinceLastShot;
+	float shootCooldown;
+	float timeSinceLastShot;
 };
 
-struct AimTarget {
-    std::optional<entt::entity> value;
+struct AimTarget
+{
+	entt::entity entity = entt::null;
 };
 
-struct AimRotation {
-    Vector3 value; // pitch, yaw, roll in radians
+struct AimRotation
+{
+	Vector3 value; // pitch, yaw, roll in radians
 };
 
-struct Ammo {
+struct Ammo
+{
 	float value;
 	float maxValue;
 };
 
-struct AmmoReload {
+struct AmmoReload
+{
 	float value;
 };
 // end of weapon components
 
-struct Bullet {}; // Tag component for bullets
+struct Bullet
+{
+}; // Tag component for bullets
 
 #endif

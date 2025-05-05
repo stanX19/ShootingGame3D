@@ -10,7 +10,7 @@ Vector3 GetRightVector(const Rotation& rotation);
 Vector3 GetUpVector();
 Vector3 GetUpVector(const Rotation& rotation);
 float WrapAngle(float angle);
-Vector3 vectorToRotation(const Vector3& dir);
+Vector3 vector3ToRotation(const Vector3& dir);
 Color colorMix(Color a, Color b, float weightA = 1.0f, float weightB = 1.0f);
 Color colorRevert(Color a);
 Vector3 calculateLeadDirection(const Vector3 &shooterPos, const Vector3 &targetPos, const Vector3 &targetVel, float projectileSpeed);

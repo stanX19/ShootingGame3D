@@ -1,7 +1,7 @@
 #include "shoot_3d.hpp"
 
 // deprecated
-void spawn_bullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, float damage, Color color) {
+void spawBullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, float damage, Color color) {
     entt::entity bullet = registry.create();
     registry.emplace<Position>(bullet, pos);
     registry.emplace<Velocity>(bullet, Vector3Scale(dir, 40.0f));

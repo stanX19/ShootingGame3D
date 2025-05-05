@@ -1,7 +1,7 @@
 #include "shoot_3d.hpp"
 
 
-void ecs_system::hp_cleanup(entt::registry& registry) {
+void ecs_systems::hpCleanup(entt::registry& registry) {
     auto view = registry.view<HP>();
     std::vector<entt::entity> toDestroy;
 
@@ -18,7 +18,7 @@ void ecs_system::hp_cleanup(entt::registry& registry) {
         if (registry.all_of<Position, Body>(entity)) {
             const Position& pos = registry.get<Position>(entity);
             const Body& body = registry.get<Body>(entity);
-            spawn_debris(registry, pos.value, body.radius, body.color);
+            spawnDebris(registry, pos.value, body.radius, body.color);
         }
 
         registry.destroy(entity);

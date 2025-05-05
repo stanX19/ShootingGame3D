@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-void ecs_system::entity_lifetime(entt::registry& registry, float dt) {
+void ecs_systems::entityLifetime(entt::registry& registry, float dt) {
     auto view = registry.view<Lifetime>();
     std::vector<entt::entity> toDestroy;
 

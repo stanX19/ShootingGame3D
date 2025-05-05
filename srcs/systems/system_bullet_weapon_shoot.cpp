@@ -10,7 +10,7 @@ static Vector3 getEntityAim(entt::registry& registry, entt::entity e) {
 	return {0, 0, 1}; // Default forward
 }
 
-void ecs_system::weapon_update(entt::registry& registry, float dt) {
+void ecs_systems::bulletWeaponShoot(entt::registry& registry, float dt) {
     auto view = registry.view<BulletWeapon, Position>();
 
     for (auto entity : view) {
@@ -37,13 +37,14 @@ void ecs_system::weapon_update(entt::registry& registry, float dt) {
         // Spawn bullet
         entt::entity bullet = registry.create();
 
+		float rad = registry.any_of<Body>(entity)? registry.get<Body>(entity).radius + weapon.bulletData.rad + 0.001f: 0.0f;
         // Use weapon's bulletData for initialization
-        registry.emplace<Position>(bullet, Position{Vector3Add(pos.value, Vector3Scale(dir, 2.0f))});
+        registry.emplace<Position>(bullet, Position{Vector3Add(pos.value, Vector3Scale(dir, rad))});
         registry.emplace<Velocity>(bullet, Velocity{Vector3Scale(dir, weapon.bulletData.speed)});
         registry.emplace<HP>(bullet, HP{weapon.bulletData.hp, weapon.bulletData.hp});
         registry.emplace<Damage>(bullet, Damage{weapon.bulletData.dmg});
         registry.emplace<Body>(bullet, Body{weapon.bulletData.rad, weapon.bulletData.color});
-        registry.emplace<Lifetime>(bullet, weapon.bulletData.lifetime); // hardcoded, or add to bulletData
+        registry.emplace<Lifetime>(bullet, weapon.bulletData.lifetime);
 
         weapon.timeSinceLastShot = 0.0f;
     }
