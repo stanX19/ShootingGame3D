@@ -41,6 +41,10 @@ struct Damage
 	float value;
 };
 
+struct Asteroid
+{
+};
+
 struct Player
 {
 };
@@ -61,6 +65,12 @@ struct MaxSpeed
 struct Lifetime
 {
 	float value;
+};
+
+struct DisappearBound
+{
+	Vector3 start;
+	Vector3 end;
 };
 
 // weapon components

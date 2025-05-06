@@ -2,7 +2,7 @@
 
 #define ENEMY_COUNT 5
 
-Vector3 randomPosInField() {
+static Vector3 randomPosInField() {
 	float x = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
 	float z = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
 	float y = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);

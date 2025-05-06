@@ -12,7 +12,11 @@ void ecs_systems::bulletTargetAim(entt::registry &registry)
 		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
 
 		if (!aimTargetExists(registry, aimTarget))
+		{
+			if (registry.all_of<Rotation>(entity))
+				aimRotation.value = registry.get<Rotation>(entity).value;
 			continue;
+		}
 		if (!registry.all_of<Position, Velocity>(aimTarget.entity))
 			continue;
 		Position &targetPosition = registry.get<Position>(aimTarget.entity);

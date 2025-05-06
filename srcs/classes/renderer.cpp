@@ -112,14 +112,14 @@ void Renderer::DrawEntitiesWithShader() {
         if (registry.all_of<Rotation>(entity)) {
             auto& rot = registry.get<Rotation>(entity);
             Vector3 forward = GetForwardVector(rot);
-            Vector3 end = Vector3Add(pos.value, Vector3Scale(forward, body.radius * 2));
+            Vector3 end = pos.value + forward * (body.radius * 2);
             DrawLine3D(pos.value, end, WHITE);
         }
     }
 }
 
 bool isInFrontOfCamera(const Vector3& entityPos, const Camera3D& camera) {
-    Vector3 cameraToEntity = Vector3Subtract(entityPos, camera.position);
+    Vector3 cameraToEntity = entityPos - camera.position;
     Vector3 forward = camera.target - camera.position;
     return Vector3DotProduct(cameraToEntity, forward) > 0;
 }

@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-static Vector3 getEntityAim(entt::registry& registry, entt::entity e) {
+static Vector3 getEntityAimNormalized(entt::registry& registry, entt::entity e) {
 	if (registry.all_of<AimRotation>(e)) {
 		return GetForwardVector(registry.get<AimRotation>(e).value);
 	}
@@ -32,15 +32,15 @@ void ecs_systems::bulletWeaponShoot(entt::registry& registry, float dt) {
         }
 
         // Determine aim direction
-        Vector3 dir = getEntityAim(registry, entity);
+        Vector3 dir = getEntityAimNormalized(registry, entity);
 
         // Spawn bullet
         entt::entity bullet = registry.create();
 
 		float rad = registry.any_of<Body>(entity)? registry.get<Body>(entity).radius + weapon.bulletData.rad + 0.001f: 0.0f;
         // Use weapon's bulletData for initialization
-        registry.emplace<Position>(bullet, Position{Vector3Add(pos.value, Vector3Scale(dir, rad))});
-        registry.emplace<Velocity>(bullet, Velocity{Vector3Scale(dir, weapon.bulletData.speed)});
+        registry.emplace<Position>(bullet, Position{pos.value + dir * rad});
+        registry.emplace<Velocity>(bullet, Velocity{dir * weapon.bulletData.speed});
         registry.emplace<HP>(bullet, HP{weapon.bulletData.hp, weapon.bulletData.hp});
         registry.emplace<Damage>(bullet, Damage{weapon.bulletData.dmg});
         registry.emplace<Body>(bullet, Body{weapon.bulletData.rad, weapon.bulletData.color});

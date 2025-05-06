@@ -22,6 +22,9 @@ void spawnEnemy(entt::registry& registry, const Vector3& pos);
 void spawnEliteEnemy(entt::registry& registry, const Vector3& pos);
 void spawnDebris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
 entt::entity spawnPlayer(entt::registry& registry);
+void spawnAsteroid(entt::registry& registry, const Vector3& pos, const Vector3& dir);
+void spawnAsteroid(entt::registry& registry, const Vector3& pos, const Vector3& dir, float rad);
+
 void emplaceWeaponMachine_gun(entt::registry& registry, entt::entity entity);
 void emplaceWeaponBasic(entt::registry& registry, entt::entity entity);
 bool aimTargetExists(entt::registry& registry, AimTarget &target);
@@ -42,6 +45,8 @@ namespace ecs_systems {
 	void ammoReload(entt::registry& registry, float dt);
 	void bulletWeaponShoot(entt::registry& registry, float dt);
 	void bulletTargetAim(entt::registry &registry);
+	void asteroidRespawn(entt::registry &registry);
+	void cleanOutOfBound(entt::registry &registry);	
 }
 
 #endif // SHOOT_3D_HPP

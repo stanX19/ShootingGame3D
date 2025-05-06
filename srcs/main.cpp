@@ -43,6 +43,8 @@ int main() {
         ecs_systems::entityLifetime(registry, dt);
         ecs_systems::hpCleanup(registry);
         ecs_systems::enemyRespawn(registry);
+        ecs_systems::cleanOutOfBound(registry);
+        ecs_systems::asteroidRespawn(registry);
 		ecs_systems::bulletTargetAim(registry);
         ecs_systems::ammoReload(registry, dt);
         ecs_systems::bulletWeaponShoot(registry, dt);
@@ -55,10 +57,11 @@ int main() {
             Vector3 forward = GetForwardVector(rot);
 			Vector3 up = GetUpVector(rot); // You'll need to implement this
 
-			Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -10.0f), Vector3Scale(up, 5.0f));
-			camera.position = Vector3Add(pos.value, cameraOffset);
+			// Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -10.0f), Vector3Scale(up, 5.0f));
+			Vector3 cameraOffset = forward * -10 + up * 5;
+			camera.position = pos.value + cameraOffset;
 			camera.up = up;
-			camera.target = Vector3Add(pos.value, Vector3Scale(forward, 10.0f));
+			camera.target = pos.value + forward * 10.0f;
         }
 
         // --- Render everything ---

@@ -5,6 +5,6 @@ void ecs_systems::enemyMovement(entt::registry& registry, float dt) {
     for (auto entity : view) {
         Position& position = view.get<Position>(entity);
         Velocity& velocity = view.get<Velocity>(entity);
-        position.value = Vector3Add(position.value, Vector3Scale(velocity.value, dt));
+        position.value = position.value + velocity.value * dt;
     }
 }

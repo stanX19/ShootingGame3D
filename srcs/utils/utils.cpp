@@ -1,6 +1,6 @@
 #include "utils.hpp"
 #include <cmath>
-
+#include <iostream>
 // Utility functions for direction vectors
 Vector3 GetForwardVector(const Rotation& rotation) {
     // Calculate forward vector using sine and cosine directly for more reliable results
@@ -80,4 +80,13 @@ Color colorRevert(Color a) {
     result.b = (unsigned char)(255 - a.b);
     result.a = (unsigned char)(a.a);
     return result;
+}
+
+float randomFloat(float min = -1.0f, float max = 1.0f) {
+    return min + static_cast<float>(std::rand()) / (static_cast<float>(RAND_MAX) / (max - min));
+}
+
+Vector3 randomUnitVector3() {
+    Vector3 v{ randomFloat(), randomFloat(), randomFloat() };
+    return Vector3Normalize(v);
 }
