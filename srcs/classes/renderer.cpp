@@ -52,7 +52,7 @@ void Renderer::Render() {
     ClearBackground(BLACK);
 
     BeginMode3D(camera);
-    DrawGrid(ARENA_SIZE * 2, 10);
+    DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
 
     BeginShaderMode(shader);
     DrawEntitiesWithShader();

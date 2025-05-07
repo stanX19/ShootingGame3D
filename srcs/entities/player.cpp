@@ -9,9 +9,9 @@ entt::entity spawnPlayer(entt::registry& registry) {
     registry.emplace<HP>(player, 300.0f, 300.0f);
     registry.emplace<HPRegen>(player, 10.0f);
     registry.emplace<Damage>(player, 50.0f);
-    registry.emplace<MaxSpeed>(player, 25.0f);
+    registry.emplace<MaxSpeed>(player, 40.0f);
     registry.emplace<Player>(player);
-	emplaceWeaponMachine_gun(registry, player);
+	emplaceWeaponMachineGun(registry, player);
     registry.emplace<AimRotation>(player, Vector3{ 0, 0, 0 });
     registry.emplace<AimTarget>(player, entt::null);
     return player;

@@ -5,7 +5,7 @@ static Color getColor(entt::registry& registry, entt::entity entity) {
 	return (registry.any_of<Body>(entity))? colorRevert(original): WHITE;
 }
 
-void emplaceWeaponMachine_gun(entt::registry& registry, entt::entity entity) {
+void emplaceWeaponMachineGun(entt::registry& registry, entt::entity entity) {
     BulletWeapon weapon;
     weapon.firing = false;
     weapon.shootCooldown = 0.1f;
@@ -19,8 +19,8 @@ void emplaceWeaponMachine_gun(entt::registry& registry, entt::entity entity) {
     weapon.bulletData.lifetime = 10.0f;
 
     Ammo ammo;
-    ammo.value = 30.0f;
-    ammo.maxValue = 30;
+    ammo.value = 5.0f;
+    ammo.maxValue = 15;
 
     AmmoReload reload;
     reload.value = 3.0f;  // reload per second

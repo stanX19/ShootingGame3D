@@ -25,7 +25,7 @@ entt::entity spawnPlayer(entt::registry& registry);
 void spawnAsteroid(entt::registry& registry, const Vector3& pos, const Vector3& dir);
 void spawnAsteroid(entt::registry& registry, const Vector3& pos, const Vector3& dir, float rad);
 
-void emplaceWeaponMachine_gun(entt::registry& registry, entt::entity entity);
+void emplaceWeaponMachineGun(entt::registry& registry, entt::entity entity);
 void emplaceWeaponBasic(entt::registry& registry, entt::entity entity);
 bool aimTargetExists(entt::registry& registry, AimTarget &target);
 

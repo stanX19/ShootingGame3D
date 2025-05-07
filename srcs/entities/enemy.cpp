@@ -21,13 +21,13 @@ void spawnEliteEnemy(entt::registry& registry, const Vector3& pos) {
     registry.emplace<Velocity>(enemy, Vector3{ 0, 0, 0 });
     registry.emplace<Rotation>(enemy, Vector3{ 0, 0, 0 });
     registry.emplace<Body>(enemy, 3.0f, LIME);
-    registry.emplace<HP>(enemy, 300.0f, 300.0f);
+    registry.emplace<HP>(enemy, 150.0f, 150.0f);
     registry.emplace<HPRegen>(enemy, 5.0f);
     registry.emplace<Damage>(enemy, 50.0f);
-    registry.emplace<MaxSpeed>(enemy, 10.0f);
+    registry.emplace<MaxSpeed>(enemy, 15.0f);
     registry.emplace<Enemy>(enemy);
     registry.emplace<EliteEnemy>(enemy);
-	emplaceWeaponMachine_gun(registry, enemy);
+	emplaceWeaponMachineGun(registry, enemy);
     registry.emplace<AimTarget>(enemy, entt::null);
     registry.emplace<AimRotation>(enemy, Vector3{ 0, 0, 0 });
 }
