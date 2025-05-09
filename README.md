@@ -4,13 +4,13 @@ A fast-paced 3D space shooting game built using [raylib](https://www.raylib.com/
 
 ## 🎮 Features
 
-- 🌌 Fully 3D space environment
-- 🧠 ECS architecture using `entt`
-- 🔫 Player and enemy shooting with accurate aim assist
-- 💥 Real-time collisions, HP, and regeneration
-- 🌟 Custom shaders for lighting effects  
-- 🚀 Dynamic camera for realistic flight simulation 
-- 🪐 Asteroid spawning and debris effects
+- Fully 3D space environment
+- ECS architecture using `entt`
+- Player and enemy shooting with accurate aim assist
+- Real-time collisions, HP, and regeneration
+- Custom shaders for lighting effects  
+- Dynamic camera for realistic flight simulation 
+- Asteroid spawning and debris effects
 
 ## 🕹️ Controls
 
@@ -27,10 +27,10 @@ A fast-paced 3D space shooting game built using [raylib](https://www.raylib.com/
 ![Gameplay](assets/snapshots/img_2.png)
 
 ### Enemy Lock-on and Targeting
-![Targeting](assets/img_1.png)
+![Targeting](assets/snapshots/img_1.png)
 
 ### Game Over Screen
-![Game Over](assets/img_3.png)
+![Game Over](assets/snapshots/img_3.png)
 
 ## Getting Started
 
