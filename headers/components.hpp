@@ -112,6 +112,11 @@ struct AmmoReload
 };
 // end of weapon components
 
+struct PlayerTargetable
+{
+	int distance = 3000;
+};
+
 struct Bullet
 {
 }; // Tag component for bullets

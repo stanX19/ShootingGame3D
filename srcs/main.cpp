@@ -47,7 +47,7 @@ static void resetGame(entt::registry& registry) {
 }
 
 int main() {
-    InitWindow(1280, 720, "3D Space Shooter");
+    InitWindow(1600, 900, "3D Space Shooter");
     SetTargetFPS(60);
     DisableCursor();
 
@@ -75,6 +75,7 @@ int main() {
         ecs_systems::hpCleanup(registry);
         ecs_systems::enemyRespawn(registry);
         ecs_systems::cleanOutOfBound(registry);
+        ecs_systems::updatePlayerTargetable(registry);
         ecs_systems::asteroidRespawn(registry);
 		ecs_systems::bulletTargetAim(registry);
         ecs_systems::ammoReload(registry, dt);

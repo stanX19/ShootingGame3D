@@ -46,7 +46,8 @@ namespace ecs_systems {
 	void bulletWeaponShoot(entt::registry& registry, float dt);
 	void bulletTargetAim(entt::registry &registry);
 	void asteroidRespawn(entt::registry &registry);
-	void cleanOutOfBound(entt::registry &registry);	
+	void cleanOutOfBound(entt::registry &registry);
+	void updatePlayerTargetable(entt::registry &registry);	
 }
 
 #endif // SHOOT_3D_HPP

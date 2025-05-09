@@ -29,6 +29,7 @@ private:
     void SetupShaderUniforms();
     void DrawEntitiesWithShader();
     void DrawHealthBars();
+    void DrawTargetable();
 };
 
 #endif
