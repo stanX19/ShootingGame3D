@@ -11,12 +11,12 @@ struct Position
 
 struct Velocity
 {
-	Vector3 value;
+	Vector3 value = { 0, 0, 0 };
 };
 
 struct Rotation
 {
-	Vector3 value; // pitch, yaw, roll in radians
+	Quaternion value = QuaternionIdentity();
 };
 
 struct Body
@@ -95,7 +95,7 @@ struct AimTarget
 	entt::entity entity = entt::null;
 };
 
-struct AimRotation
+struct AimDirection
 {
 	Vector3 value; // pitch, yaw, roll in radians
 };

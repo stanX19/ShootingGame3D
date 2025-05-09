@@ -1,11 +1,11 @@
 #include "shoot_3d.hpp"
 
 static Vector3 getEntityAimNormalized(entt::registry& registry, entt::entity e) {
-	if (registry.all_of<AimRotation>(e)) {
-		return GetForwardVector(registry.get<AimRotation>(e).value);
+	if (registry.all_of<AimDirection>(e)) {
+		return registry.get<AimDirection>(e).value;
 	}
 	if (registry.all_of<Rotation>(e)) {
-		return GetForwardVector(registry.get<Rotation>(e).value);
+		return GetForwardVector(registry.get<Rotation>(e));
 	}
 	return {0, 0, 1}; // Default forward
 }

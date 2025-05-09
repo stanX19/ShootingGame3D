@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-#define MOUSE_SENSITIVITY 0.1f
+#define MOUSE_SENSITIVITY 2.5f
 
 void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 {
@@ -19,22 +19,22 @@ void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 
 		// Turn speed reduces with movement speed
 		float turnSpeed = MOUSE_SENSITIVITY / (1.0f + speed / maxSpeed.value * 5.0f);
-		int uprightFactor = (Vector3DotProduct(GetUpVector(rotation), GetUpVector()) >= 0)? 1: -1;
+		Quaternion newRotation = rotation.value;
 
-		if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-			rotation.value.y -= turnSpeed * uprightFactor;
-		if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-			rotation.value.y += turnSpeed * uprightFactor;
+		if (IsKeyDown(KEY_RIGHT))
+			newRotation = RotateAroundAxis(newRotation, GetUpVector(rotation), -turnSpeed * dt);
+		if (IsKeyDown(KEY_LEFT))
+			newRotation = RotateAroundAxis(newRotation, GetUpVector(rotation), turnSpeed * dt);
 		if (IsKeyDown(KEY_UP))
-			rotation.value.x -= turnSpeed;
+			newRotation = RotateAroundAxis(newRotation, GetRightVector(rotation), turnSpeed * dt);
 		if (IsKeyDown(KEY_DOWN))
-			rotation.value.x += turnSpeed;
-		if (IsKeyDown(KEY_Q))
-			rotation.value.z -= turnSpeed;
-		if (IsKeyDown(KEY_E))
-			rotation.value.z += turnSpeed;
+			newRotation = RotateAroundAxis(newRotation, GetRightVector(rotation), -turnSpeed * dt);
+		if (IsKeyDown(KEY_A))
+			newRotation = RotateAroundAxis(newRotation, GetForwardVector(rotation), -turnSpeed * dt);
+		if (IsKeyDown(KEY_D))
+			newRotation = RotateAroundAxis(newRotation, GetForwardVector(rotation), turnSpeed * dt);
 
-		rotation.value.x = WrapAngle(rotation.value.x);
+		rotation.value = newRotation;
 
 		// Adjust speed based on input
 		const float accel = 20.0f;
@@ -51,8 +51,7 @@ void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 		speed = Clamp(speed, 0, maxSpeed.value);
 
 		// Apply new velocity aligned with current facing
-		Vector3 forward = GetForwardVector(rotation);
-		velocity.value = Vector3Scale(forward, speed);
+		velocity.value = Vector3Scale(GetForwardVector(rotation), speed);
 
 		// Stay within arena
 		position.value.x = Clamp(position.value.x, -ARENA_SIZE, ARENA_SIZE);

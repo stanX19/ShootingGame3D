@@ -60,7 +60,7 @@ void Renderer::Render()
 	ClearBackground(BLACK);
 
 	BeginMode3D(camera);
-	DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
+	// DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
 
 	BeginShaderMode(shader);
 	DrawEntitiesWithShader();
@@ -124,10 +124,10 @@ void Renderer::DrawEntitiesWithShader()
 
 		DrawSphere(pos.value, body.radius, body.color);
 
-		if (registry.all_of<Rotation>(entity))
+		if (registry.all_of<AimDirection>(entity))
 		{
-			auto &rot = registry.get<Rotation>(entity);
-			Vector3 forward = GetForwardVector(rot);
+			auto &dir = registry.get<AimDirection>(entity);
+			Vector3 forward = Vector3Normalize(dir.value);
 			Vector3 end = pos.value + forward * (body.radius * 2);
 			DrawLine3D(pos.value, end, WHITE);
 		}
@@ -153,13 +153,10 @@ void Renderer::DrawHealthBars()
 			continue;
 		if (!isInFrontOfCamera(pos.value, camera))
 			continue;
-		// Project entity position to screen space
 		Vector2 screen = GetWorldToScreen(pos.value, camera);
 
-		// Offset the health bar *upward* in screen space (pixels), not world space
-		screen.y -= 20; // pixels above entity, tweak as needed
+		screen.y -= 20;
 
-		// Optional: Don't draw off-screen
 		if (screen.x < 0 || screen.x > GetScreenWidth() ||
 			screen.y < 0 || screen.y > GetScreenHeight())
 			continue;
@@ -184,9 +181,6 @@ void Renderer::DrawTargetable()
 	Vector3 camUp = Vector3CrossProduct(camRight, camForward);
 
 	Vector2 screenCenter = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
-	float halfFovY = camera.fovy * DEG2RAD / 2.0f;
-	float aspectRatio = (float)GetScreenWidth() / (float)GetScreenHeight();
-	float tanHalfFovY = tanf(halfFovY);
 
 	for (auto entity : view)
 	{
@@ -205,8 +199,8 @@ void Renderer::DrawTargetable()
 
 		if (behind)
 		{
-			screenPos.x = (local.x / (local.z * tanHalfFovY * aspectRatio)) * 0.5f + 0.5f;
-			screenPos.y = (-local.y / (local.z * tanHalfFovY)) * 0.5f + 0.5f;
+			screenPos.x = local.x * 0.5f + 0.5f;
+			screenPos.y = local.y * 0.5f + 0.5f;
 			screenPos.x *= GetScreenWidth();
 			screenPos.y *= GetScreenHeight();
 		}
@@ -219,9 +213,9 @@ void Renderer::DrawTargetable()
 			Vector2 left = { -unitDir.y, unitDir.x };
 
 			DrawTriangle(
-				arrowLoc + unitDir * 20,
-				arrowLoc - left * 10,
-				arrowLoc + left * 10,
+				arrowLoc + unitDir * 10,
+				arrowLoc - left * 5,
+				arrowLoc + left * 5,
 				RED);
 			continue;
 		}
@@ -231,13 +225,14 @@ void Renderer::DrawTargetable()
 
 		if (entity == targetedEntity)
 		{
-			float innerRad = 17 + 1500.0f / targetable.distance;
-			DrawRingLines(screenPos, innerRad, innerRad + 3, 90, 180, 12, MAROON);
-			DrawRingLines(screenPos, innerRad, innerRad + 3, 270, 360, 12, MAROON);
-			DrawLine(screenPos.x + innerRad + 4, screenPos.y, screenPos.x + innerRad + 7, screenPos.y, SKYBLUE);
-			DrawLine(screenPos.x + innerRad - 4, screenPos.y, screenPos.x + innerRad - 7, screenPos.y, SKYBLUE);
-			DrawLine(screenPos.x, screenPos.y + innerRad + 4, screenPos.x, screenPos.y + innerRad + 7, SKYBLUE);
-			DrawLine(screenPos.x, screenPos.y + innerRad - 4, screenPos.x, screenPos.y + innerRad - 7, SKYBLUE);
+			float innerRad = 17 + 5000.0f / targetable.distance;
+			Color aimColor = MAROON;
+			DrawRingLines(screenPos, innerRad, innerRad + 2, 90, 180, 12, aimColor);
+			DrawRingLines(screenPos, innerRad, innerRad + 2, 270, 360, 12, aimColor);
+			DrawLine(screenPos.x + innerRad + 2, screenPos.y, screenPos.x + innerRad + 7, screenPos.y, aimColor);
+			DrawLine(screenPos.x - innerRad - 2, screenPos.y, screenPos.x - innerRad - 7, screenPos.y, aimColor);
+			DrawLine(screenPos.x, screenPos.y + innerRad + 2, screenPos.x, screenPos.y + innerRad + 7, aimColor);
+			DrawLine(screenPos.x, screenPos.y - innerRad - 2, screenPos.x, screenPos.y - innerRad - 7, aimColor);
 		}
 
 		char txt[32];

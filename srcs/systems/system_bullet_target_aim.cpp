@@ -2,19 +2,19 @@
 
 void ecs_systems::bulletTargetAim(entt::registry &registry)
 {
-	auto view = registry.view<Position, AimRotation, AimTarget, BulletWeapon>();
+	auto view = registry.view<Position, AimDirection, AimTarget, BulletWeapon>();
 
 	for (auto entity : view)
 	{
 		Position &position = view.get<Position>(entity);
-		AimRotation &aimRotation = view.get<AimRotation>(entity);
+		AimDirection &aimDirection = view.get<AimDirection>(entity);
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
 		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
 
 		if (!aimTargetExists(registry, aimTarget))
 		{
 			if (registry.all_of<Rotation>(entity))
-				aimRotation.value = registry.get<Rotation>(entity).value;
+				aimDirection.value = GetForwardVector(registry.get<Rotation>(entity));
 			continue;
 		}
 		if (!registry.all_of<Position, Velocity>(aimTarget.entity))
@@ -22,12 +22,11 @@ void ecs_systems::bulletTargetAim(entt::registry &registry)
 		Position &targetPosition = registry.get<Position>(aimTarget.entity);
 		Velocity &targetVelocity = registry.get<Velocity>(aimTarget.entity);
 
-		Vector3 leadDirection = calculateLeadDirection(
+		aimDirection.value = calculateLeadDirection(
 			position.value,
 			targetPosition.value,
 			targetVelocity.value,
 			bulletWeapon.bulletData.speed
 		);
-		aimRotation.value = vector3ToRotation(leadDirection);
 	}
 }

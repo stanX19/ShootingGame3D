@@ -2,46 +2,22 @@
 #include <cmath>
 #include <iostream>
 // Utility functions for direction vectors
+
 Vector3 GetForwardVector(const Rotation& rotation) {
-    // Calculate forward vector using sine and cosine directly for more reliable results
-    return GetForwardVector(rotation.value);
-}
-
-Vector3 GetForwardVector(const Vector3& rotationValue) {
-    // Calculate forward vector using sine and cosine directly for more reliable results
-    float sp = sinf(rotationValue.x);
-    float cp = cosf(rotationValue.x);
-    float sy = sinf(rotationValue.y);
-    float cy = cosf(rotationValue.y);
-
-    return Vector3Normalize((Vector3) {
-        -sy * cp,   // x component
-        -sp,        // y component
-        -cy * cp    // z component
-    });
-}
-
-Vector3 GetRightVector(const Rotation& rotation) {
-    // Right vector is perpendicular to forward and up
-    return Vector3CrossProduct(GetUpVector(rotation), GetForwardVector(rotation));
-}
-
-Vector3 GetUpVector() {
-    // Using world up vector
-    return (Vector3) { 0, 1, 0 };
+    return Vector3Transform({0, 0, -1}, QuaternionToMatrix(rotation.value));
 }
 
 Vector3 GetUpVector(const Rotation& rotation) {
-    float sp = sinf(rotation.value.x);
-    float cp = cosf(rotation.value.x);
-    float sy = sinf(rotation.value.y);
-    float cy = cosf(rotation.value.y);
+    return Vector3Transform({0, 1, 0}, QuaternionToMatrix(rotation.value));
+}
 
-    return Vector3Normalize((Vector3) {
-        -sy * sp,  // x component
-         cp,       // y component
-        -cy * sp   // z component
-    });
+Vector3 GetRightVector(const Rotation& rotation) {
+    return Vector3Transform({1, 0, 0}, QuaternionToMatrix(rotation.value));
+}
+
+Quaternion RotateAroundAxis(const Quaternion& current, const Vector3& axis, float angle) {
+    Quaternion q = QuaternionFromAxisAngle(Vector3Normalize(axis), angle);
+    return QuaternionNormalize(QuaternionMultiply(q, current));
 }
 
 float WrapAngle(float angle) {
@@ -50,12 +26,19 @@ float WrapAngle(float angle) {
     return angle;
 }
 
-Vector3 vector3ToRotation(const Vector3& dir) {
-    Vector3 rot;
-    rot.x = -asinf(dir.y);                    // Inverted pitch
-    rot.y = atan2f(-dir.x, -dir.z);           // Inverted yaw to match -Z forward
-    rot.z = 0.0f;
-    return rot;
+Quaternion vector3ToRotation(const Vector3& forward, Vector3 up) {
+    Vector3 f = Vector3Normalize(forward);
+    Vector3 r = Vector3Normalize(Vector3CrossProduct(up, f));
+    Vector3 u = Vector3CrossProduct(f, r);
+
+    Matrix m = {
+        r.x, r.y, r.z, 0.0f,
+        u.x, u.y, u.z, 0.0f,
+        f.x, f.y, f.z, 0.0f,
+        0,   0,   0,   1.0f
+    };
+
+    return QuaternionNormalize(QuaternionFromMatrix(m));
 }
 
 Color colorMix(Color a, Color b, float weightA, float weightB) {
