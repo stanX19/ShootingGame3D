@@ -7,7 +7,10 @@ void ecs_systems::enemyRespawn(entt::registry &registry)
 	auto eliteView = registry.view<EliteEnemy>();
 	if (eliteView.size() == 0)
 	{
-		spawnEliteEnemy(registry, randomPosInField());
+		if (rand() % 2)
+			spawnEliteEnemy(registry, randomPosInField());
+		else
+			spawnFastEliteEnemy(registry, randomPosInField());
 	}
 
 	auto enemyView = registry.view<Enemy>();

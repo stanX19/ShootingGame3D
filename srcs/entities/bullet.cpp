@@ -1,5 +1,6 @@
 #include "shoot_3d.hpp"
 
+static const Vector3 arenaVec = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
 // deprecated
 void spawBullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, float damage, Color color) {
     entt::entity bullet = registry.create();
@@ -8,6 +9,7 @@ void spawBullet(entt::registry& registry, const Vector3& pos, const Vector3& dir
     registry.emplace<Body>(bullet, 0.2f, color);
     registry.emplace<Damage>(bullet, damage);
     registry.emplace<Lifetime>(bullet, 10.0f);
+    registry.emplace<DisappearBound>(bullet, arenaVec * -2, arenaVec * 2);
     registry.emplace<HP>(bullet, 1.0f, 1.0f);
     registry.emplace<Bullet>(bullet);
 }

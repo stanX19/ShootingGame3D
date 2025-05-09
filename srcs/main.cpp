@@ -20,7 +20,7 @@ static void setup_camera(Camera3D& camera) {
     camera.position = Vector3{ 0.0f, 1.0f, 4.0f };
     camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
     camera.up = Vector3{ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 70.0f;
+    camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 }
 
@@ -33,10 +33,16 @@ static void camaraFollowPlayer(entt::registry& registry, Camera3D &camera) {
 		Vector3 up = GetUpVector(rot);
 
 		// Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -10.0f), Vector3Scale(up, 5.0f));
-		Vector3 cameraOffset = forward * -10 + up * 5;
-		camera.position = pos.value + cameraOffset;
-		camera.up = up;
-		camera.target = pos.value + forward * 10.0f;
+		if (!IsKeyDown(KEY_RIGHT_SHIFT)) {
+			camera.position = pos.value + forward * -10 + up * 5;
+			camera.up = up;
+			camera.target = pos.value + forward * 10.0f;
+		} else {
+			camera.position = pos.value + forward * 10 + up * 5;
+			camera.up = up;
+			camera.target = pos.value + forward * -10.0f;
+		}
+		
 	}
 }
 

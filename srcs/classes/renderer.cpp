@@ -46,8 +46,8 @@ void Renderer::LoadShaderWithFallback()
 void Renderer::SetupShaderUniforms()
 {
 	Vector3 lightDir = Vector3Normalize(Vector3{-1.0f, -1.0f, -0.5f});
-	Vector3 lightColor = {1.0f, 0.0f, 0.0f};
-	Vector3 ambientColor = {0.0f, 0.0f, 1.0f};
+	Vector3 lightColor = {1.0f, 1.0f, 1.0f};
+	Vector3 ambientColor = {0.2f, 0.2f, 0.2f};
 
 	SetShaderValue(shader, lightDirLoc, &lightDir, SHADER_UNIFORM_VEC3);
 	SetShaderValue(shader, lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
@@ -103,27 +103,30 @@ void Renderer::DrawEntitiesWithShader()
 	auto view = registry.view<Position, Body>();
 	for (auto entity : view)
 	{
-		Position &pos = view.get<Position>(entity);
-		Body &body = view.get<Body>(entity);
+        const Position &pos = view.get<Position>(entity);
+        const Body &body = view.get<Body>(entity);
 
-		float colorVec[4] = {
+        float color[4] = {
 			body.color.r / 255.0f,
 			body.color.g / 255.0f,
 			body.color.b / 255.0f,
-			body.color.a / 255.0f};
+			body.color.a / 255.0f
+		};
 
-		Matrix matModel = MatrixTranslate(pos.value.x, pos.value.y, pos.value.z);
-		Matrix view = GetCameraMatrix(camera);
-		Matrix projection = MatrixPerspective(45.0f * DEG2RAD, GetScreenWidth() / (float)GetScreenHeight(), 0.1f, 1000.0f);
-		Matrix vp = MatrixMultiply(projection, view);
-		Matrix mvp = MatrixMultiply(vp, matModel);
+		SetShaderValue(shader, objectColorLoc, color, SHADER_UNIFORM_VEC4);
 
-		SetShaderValueMatrix(shader, modelLoc, matModel);
-		SetShaderValueMatrix(shader, mvpLoc, mvp);
-		SetShaderValue(shader, objectColorLoc, colorVec, SHADER_UNIFORM_VEC4);
+        Matrix model = MatrixTranslate(pos.value.x, pos.value.y, pos.value.z);
+        Matrix viewMat = GetCameraMatrix(camera);
+        Matrix projMat = MatrixPerspective(45.0f * DEG2RAD, GetScreenWidth() / (float)GetScreenHeight(), 0.1f, 1000.0f);
+        Matrix mvp = MatrixMultiply(MatrixMultiply(projMat, viewMat), model);
 
-		DrawSphere(pos.value, body.radius, body.color);
+        SetShaderValueMatrix(shader, modelLoc, model);
+        SetShaderValueMatrix(shader, mvpLoc, mvp);
+		// std::cout << "Entity " << (int)entity << " Color: " 
+        //   << color[0] << ", " << color[1] << ", " << color[2] << "\n";
 
+        DrawSphere(pos.value, body.radius, body.color);
+    }
 		// if (registry.all_of<Rotation>(entity))
 		// {
 		// 	auto &rot = registry.get<Rotation>(entity);
@@ -133,7 +136,6 @@ void Renderer::DrawEntitiesWithShader()
 		// 	end = pos.value + GetUpVector(rot) * (body.radius * 10);
 		// 	DrawLine3D(pos.value, end, GREEN);
 		// }
-	}
 }
 
 bool isInFrontOfCamera(const Vector3 &entityPos, const Camera3D &camera)

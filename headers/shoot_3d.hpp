@@ -19,6 +19,7 @@ Vector3 GetUpVector(const Rotation& rotation);
 
 void spawBullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, float damage, Color color);
 void spawnEnemy(entt::registry& registry, const Vector3& pos);
+void spawnFastEliteEnemy(entt::registry& registry, const Vector3& pos);
 void spawnEliteEnemy(entt::registry& registry, const Vector3& pos);
 void spawnDebris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
 entt::entity spawnPlayer(entt::registry& registry);
@@ -27,7 +28,6 @@ void spawnAsteroid(entt::registry& registry, const Vector3& pos, const Vector3& 
 
 void emplaceWeaponMachineGun(entt::registry& registry, entt::entity entity);
 void emplaceWeaponBasic(entt::registry& registry, entt::entity entity);
-bool aimTargetExists(entt::registry& registry, AimTarget &target);
 
 // Game systems
 namespace ecs_systems {
