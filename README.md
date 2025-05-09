@@ -19,6 +19,7 @@ A fast-paced 3D space shooting game built using [raylib](https://www.raylib.com/
 | Move           | `W`, `S` |
 | Rotate (pitch/yaw/roll) | Arrow keys, `A`, `D` |
 | Shoot          | `Space` or `Left Mouse Button` |
+| Look Back      | `Shift` |
 | Restart        | `R` |
 
 ## 📸 Snapshots
