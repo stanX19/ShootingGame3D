@@ -14,6 +14,7 @@ void ecs_systems::updatePlayerTargetable(entt::registry &registry) {
 		PlayerTargetable &playerTargetable = view.get<PlayerTargetable>(entity);
 		Position &position = view.get<Position>(entity);
 
-		playerTargetable.distance = Vector3Length(playerPos - position.value) * 100;
+		playerTargetable.toSelf = position.value - playerPos;
+		playerTargetable.distance = Vector3Length(playerTargetable.toSelf) * 100;
 	}
 }

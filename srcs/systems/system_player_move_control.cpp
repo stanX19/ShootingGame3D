@@ -29,6 +29,10 @@ void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 			rotation.value.x -= turnSpeed;
 		if (IsKeyDown(KEY_DOWN))
 			rotation.value.x += turnSpeed;
+		if (IsKeyDown(KEY_Q))
+			rotation.value.z -= turnSpeed;
+		if (IsKeyDown(KEY_E))
+			rotation.value.z += turnSpeed;
 
 		rotation.value.x = WrapAngle(rotation.value.x);
 

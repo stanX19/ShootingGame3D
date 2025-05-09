@@ -30,8 +30,8 @@ static void camaraFollowPlayer(entt::registry& registry, Camera3D &camera) {
 		Position& pos = playerView.get<Position>(entity);
 		Rotation& rot = playerView.get<Rotation>(entity);
 		Vector3 forward = GetForwardVector(rot);
-		Vector3 up = GetUpVector(rot); // You'll need to implement this
-
+		Vector3 up = GetUpVector(rot);
+		
 		// Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -10.0f), Vector3Scale(up, 5.0f));
 		Vector3 cameraOffset = forward * -10 + up * 5;
 		camera.position = pos.value + cameraOffset;

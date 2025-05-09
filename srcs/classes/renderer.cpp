@@ -179,31 +179,69 @@ void Renderer::DrawTargetable()
 
 	entt::entity targetedEntity = playerView.begin() != playerView.end() ? playerView.get<AimTarget>(*playerView.begin()).entity : entt::null;
 
+	Vector3 camForward = Vector3Normalize(camera.target - camera.position);
+	Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
+	Vector3 camUp = Vector3CrossProduct(camRight, camForward);
+
+	Vector2 screenCenter = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+	float halfFovY = camera.fovy * DEG2RAD / 2.0f;
+	float aspectRatio = (float)GetScreenWidth() / (float)GetScreenHeight();
+	float tanHalfFovY = tanf(halfFovY);
+
 	for (auto entity : view)
 	{
-		auto &pos = view.get<Position>(entity);
-		auto &targetable = view.get<PlayerTargetable>(entity);
+		const auto &pos = view.get<Position>(entity);
+		const auto &targetable = view.get<PlayerTargetable>(entity);
 
-		if (!isInFrontOfCamera(pos.value, camera))
-			continue;
-		// Project entity position to screen space
-		Vector2 screen = GetWorldToScreen(pos.value, camera);
+		Vector3 toTarget = targetable.toSelf;
+		Vector3 local;
+		local.x = Vector3DotProduct(toTarget, camRight);
+		local.y = Vector3DotProduct(toTarget, camUp);
+		local.z = Vector3DotProduct(toTarget, camForward);
 
-		// Optional: Don't draw off-screen
-		if (screen.x < 0 || screen.x > GetScreenWidth() || screen.y < 0 || screen.y > GetScreenHeight())
+		bool behind = local.z <= 0;
+
+		Vector2 screenPos = GetWorldToScreen(pos.value, camera);
+
+		if (behind)
+		{
+			screenPos.x = (local.x / (local.z * tanHalfFovY * aspectRatio)) * 0.5f + 0.5f;
+			screenPos.y = (-local.y / (local.z * tanHalfFovY)) * 0.5f + 0.5f;
+			screenPos.x *= GetScreenWidth();
+			screenPos.y *= GetScreenHeight();
+		}
+
+		if (behind || screenPos.x < 0 || screenPos.x > GetScreenWidth() || screenPos.y < 0 || screenPos.y > GetScreenHeight())
+		{
+			Vector2 relToCenter = screenPos - screenCenter;
+			Vector2 unitDir = Vector2Normalize(relToCenter);
+			Vector2 arrowLoc = screenCenter + unitDir * 250;
+			Vector2 left = { -unitDir.y, unitDir.x };
+
+			DrawTriangle(
+				arrowLoc + unitDir * 20,
+				arrowLoc - left * 10,
+				arrowLoc + left * 10,
+				RED);
 			continue;
+		}
+
+		DrawCircleLines(screenPos.x, screenPos.y, 15, RED);
+		DrawCircleLines(screenPos.x, screenPos.y, 16, RED);
 
 		if (entity == targetedEntity)
 		{
-			float innerRad = 15 * 2000.0f / targetable.distance;
-			DrawCircleLines(screen.x, screen.y, innerRad, ORANGE);
-			DrawCircleLines(screen.x, screen.y, innerRad + 1, RED);
-			DrawCircleLines(screen.x, screen.y, innerRad + 2, MAROON);
+			float innerRad = 17 + 1500.0f / targetable.distance;
+			DrawRingLines(screenPos, innerRad, innerRad + 3, 90, 180, 12, MAROON);
+			DrawRingLines(screenPos, innerRad, innerRad + 3, 270, 360, 12, MAROON);
+			DrawLine(screenPos.x + innerRad + 4, screenPos.y, screenPos.x + innerRad + 7, screenPos.y, SKYBLUE);
+			DrawLine(screenPos.x + innerRad - 4, screenPos.y, screenPos.x + innerRad - 7, screenPos.y, SKYBLUE);
+			DrawLine(screenPos.x, screenPos.y + innerRad + 4, screenPos.x, screenPos.y + innerRad + 7, SKYBLUE);
+			DrawLine(screenPos.x, screenPos.y + innerRad - 4, screenPos.x, screenPos.y + innerRad - 7, SKYBLUE);
 		}
-		DrawCircleLines(screen.x, screen.y, 15, RED);
-		DrawCircleLines(screen.x, screen.y, 16, RED);
+
 		char txt[32];
 		snprintf(txt, sizeof(txt), "%im", targetable.distance);
-		DrawText(txt, screen.x + 20, screen.y + 10, 20, MAROON);
+		DrawText(txt, screenPos.x + 20, screenPos.y + 10, 20, MAROON);
 	}
 }

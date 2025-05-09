@@ -115,6 +115,7 @@ struct AmmoReload
 struct PlayerTargetable
 {
 	int distance = 3000;
+	Vector3 toSelf = {0, 0, 0};
 };
 
 struct Bullet
