@@ -14,8 +14,8 @@ void spawnDebris(entt::registry& registry, const Vector3& position, float origin
         float speed = 5.0f + ((float)rand() / RAND_MAX) * 5.0f;
         Vector3 velocity = dir * speed;
 
-        // Radius shrinks with speed but is proportional to original size
-        float radius = originalRadius * (0.05f + 0.5f / speed); // clamp-like scaling
+        // fast = small
+        float radius = originalRadius * (0.05f + 0.5f / speed);
 
         registry.emplace<Position>(debris, position);
         registry.emplace<Body>(debris, radius, originalColor);

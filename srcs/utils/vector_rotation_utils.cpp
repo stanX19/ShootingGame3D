@@ -2,7 +2,7 @@
 #include "shoot_3d.hpp"
 #include <cmath>
 #include <iostream>
-// Utility functions for direction vectors
+
 
 Vector3 GetForwardVector(const Rotation &rotation)
 {

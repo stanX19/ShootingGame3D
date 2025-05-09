@@ -13,11 +13,9 @@ void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 		MaxSpeed &maxSpeed = view.get<MaxSpeed>(entity);
 		TurnSpeed &turnSpeed = view.get<TurnSpeed>(entity);
 
-		// Calculate current speed (scalar)
 		Vector3 vel = velocity.value;
-		float speed = Vector3Length(vel);
+		float speed = Vector3Length(vel);  // current speed
 
-		// Turn speed reduces with movement speed
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / maxSpeed.value * 5.0f)  * dt;
 		Quaternion newRotation = rotation.value;
 
@@ -36,7 +34,7 @@ void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 
 		rotation.value = newRotation;
 
-		// Adjust speed based on input
+		// TODO: change to engine thrust component
 		const float accel = 20.0f;
 
 		if (IsKeyDown(KEY_W))
@@ -50,7 +48,6 @@ void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 
 		speed = Clamp(speed, 0, maxSpeed.value);
 
-		// Apply new velocity aligned with current facing
 		velocity.value = Vector3Scale(GetForwardVector(rotation), speed);
 
 		// Stay within arena

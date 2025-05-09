@@ -102,7 +102,7 @@ struct AimTarget
 
 struct AimDirection
 {
-	Vector3 value; // pitch, yaw, roll in radians
+	Vector3 value;
 };
 
 struct Ammo

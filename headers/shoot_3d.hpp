@@ -14,7 +14,6 @@
 // Utility functions
 Vector3 GetForwardVector(const Rotation& rotation);
 Vector3 GetRightVector(const Rotation& rotation);
-Vector3 GetUpVector();
 Vector3 GetUpVector(const Rotation& rotation);
 
 void spawBullet(entt::registry& registry, const Vector3& pos, const Vector3& dir, float damage, Color color);

@@ -6,7 +6,6 @@ void ecs_systems::enemyMoveControl(entt::registry &registry, float dt)
 	if (playerView.begin() == playerView.end())
 		return;
 
-	// Get the first player's position (assuming single-player)
 	Position playerPos = playerView.get<Position>(*playerView.begin());
 
 	auto enemyView = registry.view<Enemy, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
@@ -24,11 +23,9 @@ void ecs_systems::enemyMoveControl(entt::registry &registry, float dt)
 
 		Quaternion targetRotation = vector3ToRotation(toPlayer);
 
-		// Calculate current speed (scalar)
 		Vector3 vel = velocity.value;
 		float speed = Vector3Length(vel);
 
-		// Turn speed reduces with movement speed (same as player)
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / maxSpeed.value * 5.0f) * dt;
 		rotation.value = QuaternionSlerp(rotation.value, targetRotation, std::min(turnSpeedDt, 1.0f));
 
@@ -39,6 +36,6 @@ void ecs_systems::enemyMoveControl(entt::registry &registry, float dt)
 		}
 		// else targetSpeed = 0
 		float newSpeed = Clamp(speed + Clamp(targetSpeed - speed, -20 * dt, 20 * dt), 0, maxSpeed.value);
-		velocity.value = GetForwardVector(rotation) * newSpeed; // Move at new speed
-	}
+		velocity.value = GetForwardVector(rotation) * newSpeed;
+	}//
 }

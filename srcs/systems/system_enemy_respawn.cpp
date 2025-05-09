@@ -14,7 +14,7 @@ void ecs_systems::enemyRespawn(entt::registry &registry)
 	}
 
 	auto enemyView = registry.view<Enemy>();
-	int enemiesToSpawn = ENEMY_COUNT - (int)enemyView.size(); // Cast to int
+	int enemiesToSpawn = ENEMY_COUNT - (int)enemyView.size();
 
 	for (int i = 0; i < enemiesToSpawn; i++)
 	{

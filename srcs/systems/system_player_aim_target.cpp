@@ -4,7 +4,7 @@ static entt::entity calculateAimTarget(entt::registry &registry, Rotation &rotat
 {
 	Vector3 shootDir = GetForwardVector(rotation);
 	Vector3 bestDir = shootDir;
-	float bestDot = cosf(DEG2RAD * 30.0f); // 30° cone
+	float bestDot = cosf(DEG2RAD * 20.0f); // 20° cone
 	float closestDist = 200.0f;			   // max assist distance
 	entt::entity bestTarget = entt::null;
 

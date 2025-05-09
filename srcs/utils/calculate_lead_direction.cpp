@@ -32,8 +32,8 @@ Vector3 calculateLeadDirection(
 	if (interceptTime < 0.0f)
 		interceptTime = fmaxf(t1, t2); // try the other root
 
-	if (interceptTime < 0.0f)
-		return Vector3Normalize(toTarget); // still invalid
+	if (interceptTime < 0.0f)  // still invalid
+		return Vector3Normalize(toTarget);
 
 	Vector3 aimPos = targetPos + targetVel * interceptTime;
 	return Vector3Normalize(aimPos - shooterPos);
