@@ -124,13 +124,15 @@ void Renderer::DrawEntitiesWithShader()
 
 		DrawSphere(pos.value, body.radius, body.color);
 
-		if (registry.all_of<AimDirection>(entity))
-		{
-			auto &dir = registry.get<AimDirection>(entity);
-			Vector3 forward = Vector3Normalize(dir.value);
-			Vector3 end = pos.value + forward * (body.radius * 2);
-			DrawLine3D(pos.value, end, WHITE);
-		}
+		// if (registry.all_of<Rotation>(entity))
+		// {
+		// 	auto &rot = registry.get<Rotation>(entity);
+		// 	Vector3 forward = GetForwardVector(rot);
+		// 	Vector3 end = pos.value + forward * (body.radius * 100);
+		// 	DrawLine3D(pos.value, end, WHITE);
+		// 	end = pos.value + GetUpVector(rot) * (body.radius * 10);
+		// 	DrawLine3D(pos.value, end, GREEN);
+		// }
 	}
 }
 

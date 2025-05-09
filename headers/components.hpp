@@ -62,6 +62,11 @@ struct MaxSpeed
 	float value;
 };
 
+struct TurnSpeed
+{
+	float value;
+};
+
 struct Lifetime
 {
 	float value;
