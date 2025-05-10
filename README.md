@@ -25,13 +25,13 @@ A fast-paced 3D space shooting game built using [raylib](https://www.raylib.com/
 ## 📸 Snapshots
 
 ### Gameplay View
-![Gameplay](assets/snapshots/img_2.png)
+![Gameplay](assets/snapshots/img_7.png)
 
 ### Enemy Lock-on and Targeting
-![Targeting](assets/snapshots/img_1.png)
+![Targeting](assets/snapshots/img_6.png)
 
 ### Game Over Screen
-![Game Over](assets/snapshots/img_3.png)
+![Game Over](assets/snapshots/img_8.png)
 
 ## Getting Started
 

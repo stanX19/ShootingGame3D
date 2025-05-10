@@ -35,7 +35,7 @@ static void camaraFollowPlayer(entt::registry& registry, Camera3D &camera) {
 		Vector3 up = GetUpVector(rot);
 
 		// Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -10.0f), Vector3Scale(up, 5.0f));
-		if (IsKeyDown(KEY_RIGHT_SHIFT) || IsKeyDown(KEY_LEFT_SHIFT)) {
+		if (IsKeyDown(KEY_RIGHT_SHIFT)) {
 			camera.position = pos.value + forward * 10 + up * 5;
 			camera.up = up;
 			camera.target = pos.value + forward * -10.0f;

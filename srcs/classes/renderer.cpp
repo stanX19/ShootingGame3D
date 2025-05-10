@@ -12,7 +12,7 @@ Renderer::~Renderer()
 {
 	if (shader.id != 0)
 	{
-		UnloadShader(shader);
+		// UnloadShader(shader);  // this seg faults idk why
 		shader = {0, NULL};
 	}
 }

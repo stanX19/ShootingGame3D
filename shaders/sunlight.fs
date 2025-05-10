@@ -6,7 +6,7 @@ in vec3 fragLightDir;
 
 out vec4 finalColor;
 
-uniform vec3 lightColor;         // Light color (e.g., 1.0, 1.0, 0.9)
+uniform vec3 lightColor; 
 
 uniform vec4 colDiffuse;         // Object base color from material
 
