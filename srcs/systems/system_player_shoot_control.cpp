@@ -1,7 +1,7 @@
 #include "shoot_3d.hpp"
 
 void ecs_systems::playerShootControl(entt::registry &registry) {
-	auto view = registry.view<Player, BulletWeapon>();
+	auto view = registry.view<tag::Player, BulletWeapon>();
 
 	for (auto entity : view)
 	{

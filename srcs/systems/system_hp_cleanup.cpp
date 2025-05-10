@@ -15,9 +15,9 @@ void ecs_systems::hpCleanup(entt::registry& registry) {
     for (auto entity : toDestroy) {
         if (!registry.valid(entity)) continue;
 
-        if (registry.all_of<Position, Body>(entity)) {
+        if (registry.all_of<Position, RenderBody>(entity)) {
             const Position& pos = registry.get<Position>(entity);
-            const Body& body = registry.get<Body>(entity);
+            const RenderBody& body = registry.get<RenderBody>(entity);
             spawnDebris(registry, pos.value, body.radius, body.color);
         }
 

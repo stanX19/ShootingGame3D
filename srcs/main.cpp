@@ -6,13 +6,15 @@ static void spawnSunAndStars(entt::registry& registry) {
 	Position pos = {randomUnitVector3() * ARENA_SIZE * 14};
 	float rad = GetRandomValue(ARENA_SIZE * 7, ARENA_SIZE * 10);
 	registry.emplace<Position>(sun2, pos);
-	registry.emplace<Body>(sun2, rad, Color{105, 205, 255, 255});
+	registry.emplace<RenderBody>(sun2, rad, Color{105, 205, 255, 255});
+	registry.emplace<tag::LightSource>(sun2, rad, Color{105, 205, 255, 255});
+	
 	// stars
 	for (int i = 0; i < 100; i++) {
 		entt::entity entity = registry.create();
 
 		registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 10);
-		registry.emplace<Body>(entity, GetRandomValue(10, 30) / 10.0f, WHITE);
+		registry.emplace<RenderBody>(entity, GetRandomValue(10, 30) / 10.0f, WHITE);
 	}
 }
 
@@ -25,7 +27,7 @@ static void setup_camera(Camera3D& camera) {
 }
 
 static void camaraFollowPlayer(entt::registry& registry, Camera3D &camera) {
-	auto playerView = registry.view<Player, Position, Rotation>();
+	auto playerView = registry.view<tag::Player, Position, Rotation>();
 	for (auto entity : playerView) {
 		Position& pos = playerView.get<Position>(entity);
 		Rotation& rot = playerView.get<Rotation>(entity);

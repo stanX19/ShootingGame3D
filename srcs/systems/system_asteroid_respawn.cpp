@@ -8,7 +8,7 @@ static Vector3 randomPosOffField() {
 
 void ecs_systems::asteroidRespawn(entt::registry &registry)
 {
-	auto asteroidView = registry.view<Asteroid>();
+	auto asteroidView = registry.view<tag::Asteroid>();
 	int asteroidsToSpawn = ASTEROID_COUNT - (int)asteroidView.size();
 
 	for (int i = 0; i < asteroidsToSpawn; i += 10)

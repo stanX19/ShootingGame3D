@@ -19,39 +19,30 @@ Renderer::~Renderer()
 
 void Renderer::LoadShaderWithFallback()
 {
-	shader = LoadShader(NULL, NULL);
-	return; // custom shader not working
-
 	shader = LoadShader("shaders/sunlight.vs", "shaders/sunlight.fs");
 	if (shader.id == 0)
 	{
 		TraceLog(LOG_WARNING, "Custom shader failed to load. Using default shader.");
 		shader = LoadShader(NULL, NULL);
+		return ;
 	}
 
-	modelLoc = GetShaderLocation(shader, "matModel");
-	mvpLoc = GetShaderLocation(shader, "mvp");
-	lightDirLoc = GetShaderLocation(shader, "lightDirection");
-	lightColorLoc = GetShaderLocation(shader, "lightColor");
-	ambientColorLoc = GetShaderLocation(shader, "ambientColor");
-	objectColorLoc = GetShaderLocation(shader, "objectColor");
-
-	if (lightDirLoc < 0 || lightColorLoc < 0 || ambientColorLoc < 0 || objectColorLoc < 0)
-	{
-		TraceLog(LOG_WARNING, "Custom shader Location failed to load. Using default shader.");
-		shader = LoadShader(NULL, NULL);
-	}
+	Mesh sphereMesh = GenMeshSphere(1.0f, 64, 64);
+	sphereModel = LoadModelFromMesh(sphereMesh);
+	sphereModel.materials[0].shader = shader;
+	
 }
 
 void Renderer::SetupShaderUniforms()
 {
-	Vector3 lightDir = Vector3Normalize(Vector3{-1.0f, -1.0f, -0.5f});
-	Vector3 lightColor = {1.0f, 1.0f, 1.0f};
-	Vector3 ambientColor = {0.2f, 0.2f, 0.2f};
+	lightPosLoc = GetShaderLocation(shader, "lightPosition");
+	lightColorLoc = GetShaderLocation(shader, "lightColor");
 
-	SetShaderValue(shader, lightDirLoc, &lightDir, SHADER_UNIFORM_VEC3);
+	Vector3 lightPos = { 100000, 100000, 100000 };
+	SetShaderValue(shader, lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
+
+	Vector3 lightColor = { 1.0f, 1.0f, 1.0f };
 	SetShaderValue(shader, lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
-	SetShaderValue(shader, ambientColorLoc, &ambientColor, SHADER_UNIFORM_VEC3);
 }
 
 void Renderer::Render()
@@ -62,9 +53,9 @@ void Renderer::Render()
 	BeginMode3D(camera);
 	// DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
 
-	BeginShaderMode(shader);
+    HandleLightSource();
+	DrawEntitiesWithoutShader();
 	DrawEntitiesWithShader();
-	EndShaderMode();
 
 	EndMode3D();
 	DrawHealthBars();
@@ -73,11 +64,18 @@ void Renderer::Render()
 	// HUD
 	DrawFPS(10, 10);
 
-	auto playerView = registry.view<Player, HP>();
+	DrawTexts();
+
+	EndDrawing();
+}
+
+void Renderer::DrawTexts() {
+	auto playerView = registry.view<tag::Player, HP>();
+
 	if (playerView.begin() != playerView.end())
 	{
 		int totalEntities = 0;
-		auto hittableView = registry.view<Body, Position, HP>();
+		auto hittableView = registry.view<CollisionBody, Position, HP>();
 		for (auto entity : hittableView)
 		{
 			if (hittableView.get<HP>(entity).value > 0)
@@ -94,48 +92,61 @@ void Renderer::Render()
 		int w = MeasureText(msg, 40);
 		DrawText(msg, GetScreenWidth() / 2 - w / 2, GetScreenHeight() / 2, 40, RED);
 	}
-
-	EndDrawing();
 }
 
-void Renderer::DrawEntitiesWithShader()
+void Renderer::HandleLightSource()
 {
-	auto view = registry.view<Position, Body>();
+	auto view = registry.view<Position, RenderBody, tag::LightSource>();
+
 	for (auto entity : view)
 	{
         const Position &pos = view.get<Position>(entity);
-        const Body &body = view.get<Body>(entity);
+        const RenderBody &body = view.get<RenderBody>(entity);
 
-        float color[4] = {
-			body.color.r / 255.0f,
-			body.color.g / 255.0f,
-			body.color.b / 255.0f,
-			body.color.a / 255.0f
-		};
+		Vector3 color = {body.color.r / 255.0f, body.color.g / 255.0f, body.color.b / 255.0f};
+		SetShaderValue(shader, lightPosLoc, &pos.value, SHADER_UNIFORM_VEC3);
+		SetShaderValue(shader, lightColorLoc, &color, SHADER_UNIFORM_VEC3);
+		break ;
+    }
+}
 
-		SetShaderValue(shader, objectColorLoc, color, SHADER_UNIFORM_VEC4);
+void Renderer::DrawEntitiesWithoutShader()
+{
+	auto view = registry.view<Position, RenderBody>(entt::exclude<tag::Shaded>);
 
-        Matrix model = MatrixTranslate(pos.value.x, pos.value.y, pos.value.z);
-        Matrix viewMat = GetCameraMatrix(camera);
-        Matrix projMat = MatrixPerspective(45.0f * DEG2RAD, GetScreenWidth() / (float)GetScreenHeight(), 0.1f, 1000.0f);
-        Matrix mvp = MatrixMultiply(MatrixMultiply(projMat, viewMat), model);
-
-        SetShaderValueMatrix(shader, modelLoc, model);
-        SetShaderValueMatrix(shader, mvpLoc, mvp);
-		// std::cout << "Entity " << (int)entity << " Color: " 
-        //   << color[0] << ", " << color[1] << ", " << color[2] << "\n";
-
+	for (auto entity : view)
+	{
+        const Position &pos = view.get<Position>(entity);
+        const RenderBody &body = view.get<RenderBody>(entity);
         DrawSphere(pos.value, body.radius, body.color);
     }
-		// if (registry.all_of<Rotation>(entity))
-		// {
-		// 	auto &rot = registry.get<Rotation>(entity);
-		// 	Vector3 forward = GetForwardVector(rot);
-		// 	Vector3 end = pos.value + forward * (body.radius * 100);
-		// 	DrawLine3D(pos.value, end, WHITE);
-		// 	end = pos.value + GetUpVector(rot) * (body.radius * 10);
-		// 	DrawLine3D(pos.value, end, GREEN);
-		// }
+}
+
+// if (registry.all_of<Rotation>(entity))
+// {
+// 	auto &rot = registry.get<Rotation>(entity);
+// 	Vector3 forward = GetForwardVector(rot);
+// 	Vector3 end = pos.value + forward * (body.radius * 100);
+// 	DrawLine3D(pos.value, end, WHITE);
+// 	end = pos.value + GetUpVector(rot) * (body.radius * 10);
+// 	DrawLine3D(pos.value, end, GREEN);
+// }
+
+void Renderer::DrawEntitiesWithShader()
+{
+	BeginShaderMode(shader);
+
+	auto view = registry.view<Position, RenderBody, tag::Shaded>();
+	for (auto entity : view)
+	{
+        const Position &pos = view.get<Position>(entity);
+        const RenderBody &body = view.get<RenderBody>(entity);
+
+        Vector3 scale = { body.radius, body.radius, body.radius };
+        DrawModelEx(sphereModel, pos.value, {0, 1, 0}, 0.0f, scale, body.color);
+    }
+
+	EndShaderMode();
 }
 
 bool isInFrontOfCamera(const Vector3 &entityPos, const Camera3D &camera)
@@ -147,7 +158,7 @@ bool isInFrontOfCamera(const Vector3 &entityPos, const Camera3D &camera)
 
 void Renderer::DrawHealthBars()
 {
-	auto view = registry.view<Position, Body, HP>();
+	auto view = registry.view<Position, CollisionBody, HP>();
 	for (auto entity : view)
 	{
 		auto &pos = view.get<Position>(entity);
@@ -176,7 +187,7 @@ void Renderer::DrawHealthBars()
 void Renderer::DrawTargetable()
 {
 	auto view = registry.view<Position, PlayerTargetable>();
-	auto playerView = registry.view<Player, AimTarget>();
+	auto playerView = registry.view<tag::Player, AimTarget>();
 
 	entt::entity targetedEntity = playerView.begin() != playerView.end() ? playerView.get<AimTarget>(*playerView.begin()).entity : entt::null;
 

@@ -2,14 +2,14 @@
 
 void ecs_systems::enemyAimTarget(entt::registry &registry)
 {
-	auto playerView = registry.view<Player, Position>();
+	auto playerView = registry.view<tag::Player, Position>();
 	if (playerView.begin() == playerView.end())
 		return;
 
 	entt::entity player = *playerView.begin();
 	Position playerPos = playerView.get<Position>(player);
 
-	auto view = registry.view<Enemy, Position, BulletWeapon, AimTarget>();
+	auto view = registry.view<tag::Enemy, Position, BulletWeapon, AimTarget>();
 
 	for (auto entity : view)
 	{

@@ -36,15 +36,18 @@ void ecs_systems::bulletWeaponShoot(entt::registry &registry, float dt)
 			ammo.value = std::max(ammo.value - 1.0f, 0.0f);
 		}
 		Vector3 dir = getEntityAimNormalized(registry, entity);
-		entt::entity bullet = registry.create();
-		float rad = registry.any_of<Body>(entity) ? registry.get<Body>(entity).radius + weapon.bulletData.rad + 0.001f : 0.0f;
-
-		registry.emplace<Position>(bullet, Position{pos.value + dir * rad});
-		registry.emplace<Velocity>(bullet, Velocity{dir * weapon.bulletData.speed});
-		registry.emplace<HP>(bullet, HP{weapon.bulletData.hp, weapon.bulletData.hp});
-		registry.emplace<Damage>(bullet, Damage{weapon.bulletData.dmg});
-		registry.emplace<Body>(bullet, Body{weapon.bulletData.rad, weapon.bulletData.color});
-		registry.emplace<Lifetime>(bullet, weapon.bulletData.lifetime);
+		float rad = registry.any_of<CollisionBody>(entity) ? registry.get<CollisionBody>(entity).radius + weapon.bulletData.rad + 0.001f : 0.0f;
+		
+		spawnBullet(
+			registry,
+			Position{pos.value + dir * rad},
+			Velocity{dir * weapon.bulletData.speed},
+			HP{weapon.bulletData.hp, weapon.bulletData.hp},
+			Damage{weapon.bulletData.dmg},
+			weapon.bulletData.rad,
+			weapon.bulletData.color,
+			Lifetime{weapon.bulletData.lifetime}
+		);
 
 		weapon.timeSinceLastShot = 0.0f;
 	}

@@ -3,7 +3,7 @@
 
 void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
 {
-	auto view = registry.view<Player, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
+	auto view = registry.view<tag::Player, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
 
 	for (auto entity : view)
 	{

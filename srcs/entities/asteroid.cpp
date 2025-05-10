@@ -13,13 +13,16 @@ void spawnAsteroid(entt::registry &registry, const Vector3 &pos, const Vector3 &
 	for (int i = 0; i < 10; i++)
 	{
 		entt::entity asteroid = registry.create();
-		Vector3 subPos = i == 0 ? pos : pos + randomUnitVector3() * rad;
-		float subRad = i == 0 ? rad : GetRandomValue(rad / 5, rad / 2);
+		Vector3 subPos = (i == 0) ? pos : pos + randomUnitVector3() * rad;
+		float subRad = (i == 0) ? rad : GetRandomValue(rad / 5, rad / 2);
+		// unsigned char brightness = GetRandomValue(40, 60);
 		registry.emplace<Position>(asteroid, subPos);
 		registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
-		registry.emplace<Body>(asteroid, subRad, i == 0 ? (Color){ 60, 60, 60, 255 } : (Color){ 40, 40, 40, 255 });
+		registry.emplace<CollisionBody>(asteroid, subRad);
+		registry.emplace<RenderBody>(asteroid, subRad, (i == 0)? Color{ 40, 40, 40, 255 } : Color{ 60, 60, 60, 255 });
 		registry.emplace<Damage>(asteroid, 10.0f);
 		registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
-		registry.emplace<Asteroid>(asteroid);
+		registry.emplace<tag::Asteroid>(asteroid);
+		registry.emplace<tag::Shaded>(asteroid);
 	}
 }

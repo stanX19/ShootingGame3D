@@ -2,13 +2,13 @@
 
 void ecs_systems::enemyMoveControl(entt::registry &registry, float dt)
 {
-	auto playerView = registry.view<Player, Position>();
+	auto playerView = registry.view<tag::Player, Position>();
 	if (playerView.begin() == playerView.end())
 		return;
 
 	Position playerPos = playerView.get<Position>(*playerView.begin());
 
-	auto enemyView = registry.view<Enemy, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
+	auto enemyView = registry.view<tag::Enemy, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
 
 	for (auto entity : enemyView)
 	{

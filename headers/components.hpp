@@ -19,7 +19,12 @@ struct Rotation
 	Quaternion value = QuaternionIdentity();
 };
 
-struct Body
+struct CollisionBody
+{
+	float radius;
+};
+
+struct RenderBody
 {
 	float radius;
 	Color color;
@@ -39,22 +44,6 @@ struct HPRegen
 struct Damage
 {
 	float value;
-};
-
-struct Asteroid
-{
-};
-
-struct Player
-{
-};
-
-struct Enemy
-{
-};
-
-struct EliteEnemy
-{
 };
 
 struct MaxSpeed
@@ -123,8 +112,17 @@ struct PlayerTargetable
 	Vector3 toSelf = {0, 0, 0};
 };
 
-struct Bullet
-{
-}; // Tag component for bullets
+namespace tag {
+	struct Asteroid {};
+	struct Player {};
+	struct Enemy {};
+	struct EliteEnemy {};
+	struct Bullet {};
+
+	struct LightSource {};
+	struct Shaded {};
+}
+
+
 
 #endif

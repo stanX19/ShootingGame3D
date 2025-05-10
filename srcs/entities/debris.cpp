@@ -18,9 +18,10 @@ void spawnDebris(entt::registry& registry, const Vector3& position, float origin
         float radius = originalRadius * (0.05f + 0.5f / speed);
 
         registry.emplace<Position>(debris, position);
-        registry.emplace<Body>(debris, radius, originalColor);
+        registry.emplace<RenderBody>(debris, radius, originalColor);
         registry.emplace<Velocity>(debris, velocity);
         registry.emplace<Lifetime>(debris, lifespan);
+    	registry.emplace<tag::Shaded>(debris);
     }
 }
 

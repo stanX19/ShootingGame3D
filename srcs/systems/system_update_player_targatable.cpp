@@ -1,7 +1,7 @@
 #include "shoot_3d.hpp"
 
 void ecs_systems::updatePlayerTargetable(entt::registry &registry) {
-	auto playerView = registry.view<Player, Position>();
+	auto playerView = registry.view<tag::Player, Position>();
 
 	if (playerView.begin() == playerView.end())
 		return ;

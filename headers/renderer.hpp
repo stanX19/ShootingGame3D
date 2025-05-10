@@ -18,18 +18,19 @@ private:
     entt::registry& registry;
     Shader shader;
 	
-	int modelLoc;
-	int mvpLoc;
-    int lightDirLoc;
-    int lightColorLoc;
-    int ambientColorLoc;
-    int objectColorLoc;
+	Model sphereModel;
+	int lightPosLoc;
+	int lightColorLoc;
+	int ambientStrengthLoc;
 
     void LoadShaderWithFallback();
     void SetupShaderUniforms();
     void DrawEntitiesWithShader();
+    void DrawEntitiesWithoutShader();
+    void HandleLightSource();
     void DrawHealthBars();
     void DrawTargetable();
+    void DrawTexts();
 };
 
 #endif

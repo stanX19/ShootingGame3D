@@ -5,19 +5,19 @@
 #include <cmath>
 
 void ecs_systems::entityCollision(entt::registry& registry) {
-    auto damageView = registry.view<Position, Body, Damage>();
-    auto hpView = registry.view<Position, Body, HP>();
+    auto damageView = registry.view<Position, CollisionBody, Damage>();
+    auto hpView = registry.view<Position, CollisionBody, HP>();
     
     for (auto attacker : damageView) {
         const auto& posA = damageView.get<Position>(attacker).value;
-        const auto& bodyA = damageView.get<Body>(attacker);
+        const auto& bodyA = damageView.get<CollisionBody>(attacker);
         const auto& dmg = damageView.get<Damage>(attacker);
         
         for (auto target : hpView) {
             if (attacker == target) continue;
             
             const auto& posB = hpView.get<Position>(target).value;
-            const auto& bodyB = hpView.get<Body>(target);
+            const auto& bodyB = hpView.get<CollisionBody>(target);
             
             Vector3 diff = Vector3Subtract(posA, posB);
             float distSq = Vector3LengthSqr(diff);

@@ -1,8 +1,9 @@
 #include "shoot_3d.hpp"
 
 static Color getColor(entt::registry& registry, entt::entity entity) {
-	Color &original = registry.get<Body>(entity).color;
-	return (registry.any_of<Body>(entity))? colorRevert(original): WHITE;
+	if (registry.any_of<RenderBody>(entity))
+		return colorMix(colorRevert(registry.get<RenderBody>(entity).color), WHITE, 1.0f, 0.5f);
+	return WHITE;
 }
 
 void emplaceWeaponMachineGun(entt::registry& registry, entt::entity entity) {
@@ -12,9 +13,9 @@ void emplaceWeaponMachineGun(entt::registry& registry, entt::entity entity) {
     weapon.timeSinceLastShot = 0.0f;
 
     weapon.bulletData.hp = 1.0f;
-    weapon.bulletData.dmg = 20.0f;
+    weapon.bulletData.dmg = 10.0f;
     weapon.bulletData.speed = 60.0f;
-    weapon.bulletData.rad = 0.2f;
+    weapon.bulletData.rad = 0.05f;
     weapon.bulletData.color = getColor(registry, entity);
     weapon.bulletData.lifetime = 10.0f;
 
@@ -39,7 +40,7 @@ void emplaceWeaponBasic(entt::registry& registry, entt::entity entity) {
     weapon.bulletData.hp = 1.0f;
     weapon.bulletData.dmg = 10.0f;
     weapon.bulletData.speed = 40.0f;
-    weapon.bulletData.rad = 0.2f;
+    weapon.bulletData.rad = 0.075f;
     weapon.bulletData.color = getColor(registry, entity);
     weapon.bulletData.lifetime = 10.0f;
 

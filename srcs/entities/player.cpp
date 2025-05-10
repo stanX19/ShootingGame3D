@@ -5,15 +5,18 @@ entt::entity spawnPlayer(entt::registry& registry) {
     registry.emplace<Position>(player, Vector3{ 0, 0, 0 });
     registry.emplace<Velocity>(player);
     registry.emplace<Rotation>(player);
-    registry.emplace<Body>(player, 1.0f, BLUE);
+    registry.emplace<CollisionBody>(player, 1.0f);
+    registry.emplace<RenderBody>(player, 1.0f, BLUE);
     registry.emplace<HP>(player, 300.0f, 300.0f);
     registry.emplace<HPRegen>(player, 10.0f);
     registry.emplace<Damage>(player, 50.0f);
     registry.emplace<MaxSpeed>(player, 40.0f);
     registry.emplace<TurnSpeed>(player, 2.5f);
-    registry.emplace<Player>(player);
 	emplaceWeaponMachineGun(registry, player);
     registry.emplace<AimTarget>(player);
     registry.emplace<AimDirection>(player);
+	
+    registry.emplace<tag::Shaded>(player);
+    registry.emplace<tag::Player>(player);
     return player;
 }
