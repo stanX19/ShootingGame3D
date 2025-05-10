@@ -14,7 +14,7 @@ void emplaceWeaponMachineGun(entt::registry& registry, entt::entity entity) {
 
     weapon.bulletData.hp = 1.0f;
     weapon.bulletData.dmg = 10.0f;
-    weapon.bulletData.speed = 60.0f;
+    weapon.bulletData.speed = 100.0f;
     weapon.bulletData.rad = 0.05f;
     weapon.bulletData.color = getColor(registry, entity);
     weapon.bulletData.lifetime = 10.0f;
@@ -39,7 +39,7 @@ void emplaceWeaponBasic(entt::registry& registry, entt::entity entity) {
 
     weapon.bulletData.hp = 1.0f;
     weapon.bulletData.dmg = 10.0f;
-    weapon.bulletData.speed = 40.0f;
+    weapon.bulletData.speed = 60.0f;
     weapon.bulletData.rad = 0.075f;
     weapon.bulletData.color = getColor(registry, entity);
     weapon.bulletData.lifetime = 10.0f;

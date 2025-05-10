@@ -46,9 +46,9 @@ void spawnFastEliteEnemy(entt::registry& registry, const Vector3& pos) {
     registry.emplace_or_replace<CollisionBody>(enemy, 1.0f);
     registry.emplace_or_replace<RenderBody>(enemy, 1.0f, LIME);
     registry.emplace_or_replace<HP>(enemy, 80.0f, 80.0f);
-    registry.emplace_or_replace<HPRegen>(enemy, 2.5f);
+    registry.emplace_or_replace<HPRegen>(enemy, 7.5f);
     registry.emplace_or_replace<MaxSpeed>(enemy, 40.0f);
-    registry.emplace_or_replace<TurnSpeed>(enemy, 7.5f);
+    registry.emplace_or_replace<TurnSpeed>(enemy, 5.0f);
 
 	emplaceWeaponMachineGun(registry, enemy);
 

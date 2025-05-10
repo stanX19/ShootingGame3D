@@ -7,25 +7,26 @@ void ecs_systems::enemyAimTarget(entt::registry &registry)
 		return;
 
 	entt::entity player = *playerView.begin();
-	Position playerPos = playerView.get<Position>(player);
 
-	auto view = registry.view<tag::Enemy, Position, BulletWeapon, AimTarget>();
+	auto view = registry.view<tag::Enemy, Position, Rotation, BulletWeapon, AimTarget>();
 
 	for (auto entity : view)
 	{
 		Position &position = view.get<Position>(entity);
+		Rotation &rotation = view.get<Rotation>(entity);
 		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
 
-		Vector3 toPlayer = Vector3Subtract(playerPos.value, position.value);
-		float dist = Vector3Length(toPlayer);
-
-		bulletWeapon.firing = (dist < 100.0f);
-
-		if (!bulletWeapon.firing)
-			continue;
-
 		if (!aimTargetExists(registry, aimTarget))
 			aimTarget.entity = player;
+
+		if (!registry.all_of<Position>(aimTarget.entity))
+			continue;
+		
+		Vector3 targetPos = registry.get<Position>(aimTarget.entity).value;
+		Vector3 toTarget = targetPos - position.value;
+		float dist = Vector3Length(toTarget);
+
+		bulletWeapon.firing = (dist < 100.0f) && Vector3DotProduct(GetForwardVector(rotation), Vector3Normalize(toTarget)) > cosf(DEG2RAD * 20.0f);
 	}
 }
