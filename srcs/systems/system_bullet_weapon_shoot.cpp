@@ -42,7 +42,7 @@ void ecs_systems::bulletWeaponShoot(entt::registry &registry, float dt)
 			registry,
 			Position{pos.value + dir * rad},
 			Velocity{dir * weapon.bulletData.speed},
-			HP{weapon.bulletData.hp, weapon.bulletData.hp},
+			HP{weapon.bulletData.hp},
 			Damage{weapon.bulletData.dmg},
 			weapon.bulletData.rad,
 			weapon.bulletData.color,

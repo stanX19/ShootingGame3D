@@ -1,0 +1,34 @@
+1. add models to spaceships
+	- rename Rotation BodyRotation 
+	- add component CameraRotation {quat}
+		- fly left BodyRotation tilt left, right tilt right
+		- player control follow camara
+		- use camara to update bodyRot in player move control
+	- rename renderbody to ModelSphere {rad, color}
+	- add component ModelMesh {meshId}
+2. Trail tag for rendering, will draw a line trail for objects previous positions
+	- add struct to record previous positions
+3. Replace Enemy with enum Faction
+	- 
+	- add Tag AIControl for autoaim
+4. replace aim target with AimTarget {
+	entity
+	locktime
+	lockedOn
+}; if in cone for locktime > radar.locktime then lock
+
+5. struct Radar {
+	detectDistance
+	lockAngle
+	lockDistance
+	lockTime
+}
+6. make calculateAimTarget receive is target [&](Entity &other) {}
+7. enemy shoot control if locked: weapon shoot
+8. aim assist only start when locked, use previous positions instead of straight prediction
+9. Anchor {
+	entity
+	vec3 relpos
+	quat relrot
+}; // pos = parentPos + relpos * parentQuat; rot = parnetRot * relrot
+10. make constants be read from .conf files instead of hardcoded

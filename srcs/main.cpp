@@ -14,7 +14,7 @@ static void spawnSunAndStars(entt::registry& registry) {
 		entt::entity entity = registry.create();
 
 		registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 10);
-		registry.emplace<RenderBody>(entity, GetRandomValue(10, 30) / 10.0f, WHITE);
+		registry.emplace<RenderBody>(entity, GetRandomValue(10, 30) * 20.0f / ARENA_SIZE, WHITE);
 	}
 }
 
@@ -75,8 +75,8 @@ int main() {
         ecs_systems::playerAimTarget(registry);
         ecs_systems::enemyMoveControl(registry, dt);
         ecs_systems::enemyAimTarget(registry);
-        ecs_systems::enemyMovement(registry, dt);
-        ecs_systems::entityCollision(registry);
+        ecs_systems::entityMovement(registry, dt);
+        ecs_systems::entityCollision(registry, dt);
         ecs_systems::hpRegen(registry, dt);
         ecs_systems::entityLifetime(registry, dt);
         ecs_systems::hpCleanup(registry);

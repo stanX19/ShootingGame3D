@@ -20,7 +20,7 @@ void spawnAsteroid(entt::registry &registry, const Vector3 &pos, const Vector3 &
 		registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		registry.emplace<CollisionBody>(asteroid, subRad);
 		registry.emplace<RenderBody>(asteroid, subRad, (i == 0)? Color{ 40, 40, 40, 255 } : Color{ 60, 60, 60, 255 });
-		registry.emplace<Damage>(asteroid, 10.0f);
+		registry.emplace<Damage>(asteroid, 1000.0f);
 		registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
 		registry.emplace<tag::Asteroid>(asteroid);
 		registry.emplace<tag::Shaded>(asteroid);

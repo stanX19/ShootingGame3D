@@ -34,6 +34,8 @@ struct HP
 {
 	float value;
 	float maxValue;
+
+	HP(float val): value(val), maxValue(val) {}
 };
 
 struct HPRegen

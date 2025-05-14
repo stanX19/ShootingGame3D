@@ -3,13 +3,12 @@
 #include "includes.hpp"
 #include "components.hpp"
 #include "constants.hpp"
+#include "constants.hpp"
 #include "utils.hpp"
 #include <vector>
 #include <string>
 #include <cmath>
 #include <iostream>
-
-#define ARENA_SIZE 200.0f
 
 // Utility functions
 Vector3 GetForwardVector(const Rotation &rotation);
@@ -28,6 +27,7 @@ void spawnAsteroid(entt::registry &registry, const Vector3 &pos, const Vector3 &
 
 void emplaceWeaponMachineGun(entt::registry &registry, entt::entity entity);
 void emplaceWeaponBasic(entt::registry &registry, entt::entity entity);
+void emplaceWeaponSniper(entt::registry &registry, entt::entity entity);
 
 // Game systems
 namespace ecs_systems
@@ -38,8 +38,8 @@ namespace ecs_systems
 	void enemyMoveControl(entt::registry &registry, float dt);
 	void enemyAimTarget(entt::registry &registry);
 	void enemyRespawn(entt::registry &registry);
-	void enemyMovement(entt::registry &registry, float dt);
-	void entityCollision(entt::registry &registry);
+	void entityMovement(entt::registry &registry, float dt);
+	void entityCollision(entt::registry& registry, float dt);
 	void entityLifetime(entt::registry &registry, float dt);
 	void hpCleanup(entt::registry &registry);
 	void hpRegen(entt::registry &registry, float dt);
