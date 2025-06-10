@@ -1,3 +1,4 @@
 *.o
+*.d
 shooting_game_3d
 includes/*/repo/
