@@ -30,9 +30,11 @@ private:
     std::vector<Model> models;
     std::unordered_map<std::string, t_mesh_id> loadedFromFile; // filepath -> id
 	std::unordered_map<std::string, t_mesh_id> proceduralCache;
-	
-	template<typename... Args>
-	bool paramExists(const std::string& keyBase, t_mesh_id& outId, Args&&... args);
+
+	template <typename... Args>
+	std::string generateCacheKey(const std::string &keyBase, Args&&... args) const;
+	template <typename Func, typename... Args>
+	t_mesh_id createAndAddModel(const std::string& keyBase, Func modelGenerator, Args&&... args);
 };
 
 #endif

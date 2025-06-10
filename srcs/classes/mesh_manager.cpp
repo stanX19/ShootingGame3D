@@ -1,3 +1,11 @@
+#include <sstream>
+#include <string>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <filesystem>
+#include <iostream>
 #include "mesh_manager.hpp"
 
 MeshManager::MeshManager() {}
@@ -7,6 +15,7 @@ MeshManager::~MeshManager()
 	unloadAll();
 }
 
+
 t_mesh_id MeshManager::loadModel(const std::string &filePath)
 {
 	auto it = loadedFromFile.find(filePath);
@@ -15,7 +24,14 @@ t_mesh_id MeshManager::loadModel(const std::string &filePath)
 		return it->second;
 	}
 
-	Model model = LoadModel(filePath.c_str());
+	std::string orginalPath = std::filesystem::current_path();
+	std::filesystem::path modelPath = std::filesystem::path(filePath);
+	
+	// go into the directory for reading, then exit
+	std::filesystem::current_path(modelPath.parent_path());
+	Model model = LoadModel(modelPath.filename().c_str());
+	std::filesystem::current_path(orginalPath);
+
 	models.push_back(model);
 	t_mesh_id id = models.size() - 1;
 	loadedFromFile[filePath] = id;
@@ -24,38 +40,26 @@ t_mesh_id MeshManager::loadModel(const std::string &filePath)
 
 t_mesh_id MeshManager::createBox(float width, float height, float length)
 {
-	t_mesh_id cachedID;
-	if (paramExists("box", cachedID, width, height, length))
-		return cachedID;
-
-	Mesh mesh = GenMeshCube(width, height, length);
-	Model model = LoadModelFromMesh(mesh);
-	models.push_back(model);
-	return models.size() - 1;
+	return createAndAddModel("box", [=]()
+							 {
+		Mesh mesh = GenMeshCube(width, height, length);
+		return LoadModelFromMesh(mesh); }, width, height, length);
 }
 
 t_mesh_id MeshManager::createSphere(float radius, int rings, int slices)
 {
-	t_mesh_id cachedID;
-	if (paramExists("sphere", cachedID, radius, rings, slices))
-		return cachedID;
-
-	Mesh mesh = GenMeshSphere(radius, rings, slices);
-	Model model = LoadModelFromMesh(mesh);
-	models.push_back(model);
-	return models.size() - 1;
+	return createAndAddModel("sphere", [=]()
+							 {
+		Mesh mesh = GenMeshSphere(radius, rings, slices);
+		return LoadModelFromMesh(mesh); }, radius, rings, slices);
 }
 
 t_mesh_id MeshManager::createPlane(float width, float length, int resX, int resZ)
 {
-	t_mesh_id cachedID;
-	if (paramExists("plane", cachedID, width, length, resX, resZ))
-		return cachedID;
-
-	Mesh mesh = GenMeshPlane(width, length, resX, resZ);
-	Model model = LoadModelFromMesh(mesh);
-	models.push_back(model);
-	return models.size() - 1;
+	return createAndAddModel("plane", [=]()
+							 {
+		Mesh mesh = GenMeshPlane(width, length, resX, resZ);
+		return LoadModelFromMesh(mesh); }, width, length, resX, resZ);
 }
 
 Model &MeshManager::getModel(t_mesh_id id)
@@ -83,6 +87,7 @@ void MeshManager::unloadAll()
 		UnloadModel(model);
 	}
 	models.clear();
+	proceduralCache.clear();
 	loadedFromFile.clear();
 }
 
@@ -92,24 +97,28 @@ bool MeshManager::isValid(t_mesh_id id) const
 }
 
 template <typename... Args>
-bool MeshManager::paramExists(const std::string &keyBase, t_mesh_id &outId, Args &&...args)
+std::string MeshManager::generateCacheKey(const std::string &keyBase, Args &&...args) const
 {
 	std::stringstream ss;
-	
-	ss << std::fixed << std::setprecision(3);
-	ss << keyBase;
-
-	// Expands to (ss << "_" << arg1), (ss << "_" << arg2), (ss << "_" << arg3)
+	ss << std::fixed << std::setprecision(3) << keyBase;
 	((ss << "_" << args), ...);
+	return ss.str();
+}
 
-	std::string key = ss.str();
+template <typename Func, typename... Args>
+t_mesh_id MeshManager::createAndAddModel(const std::string &keyBase, Func modelGenerator, Args &&...args)
+{
+	std::string key = generateCacheKey(keyBase, args...);
 
 	auto it = proceduralCache.find(key);
 	if (it != proceduralCache.end())
 	{
-		outId = it->second;
-		return true;
+		return it->second;
 	}
 
-	return false;
+	Model model = modelGenerator(); // Call the generator function
+	t_mesh_id id = models.size();
+	models.push_back(model);
+	proceduralCache[key] = id;
+	return id;
 }
