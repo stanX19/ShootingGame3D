@@ -25,13 +25,18 @@ int main() {
     t_mesh_id plane = meshManager.createPlane(4.0f, 4.0f, 4, 4);
 
     std::cout << "Start of load" << "\n";
+	// 	t_mesh_id ship = meshManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
 	t_mesh_id ship = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
     std::cout << "End of load" << "\n";
+	t_mesh_id ship_id_2 = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
+
     // Print results
     std::cout << "Box1 ID: " << box1 << "\n";
     std::cout << "Box2 ID (should match Box1): " << box2 << "\n";
     std::cout << "Sphere1 ID: " << sphere1 << "\n";
     std::cout << "Sphere2 ID: " << sphere2 << "\n";
+    std::cout << "Ship1 ID: " << ship << "\n";
+    std::cout << "Ship2 ID: " << ship_id_2 << "\n";
     std::cout << "Plane ID: " << plane << "\n";
 
     // Main render loop
@@ -43,7 +48,7 @@ int main() {
         BeginMode3D(camera);
 
         DrawModel(meshManager.getModel(box1), { -2.0f, 0.0f, 0.0f }, 1.0f, RED);
-        DrawModel(meshManager.getModel(ship), { 0.0f, 0.0f, 0.0f }, 1.0f, GREEN);
+        DrawModel(meshManager.getModel(ship), { 0.0f, 0.0f, 0.0f }, 1.0f, WHITE);
         DrawModel(meshManager.getModel(plane), { 0.0f, -1.0f, 0.0f }, 1.0f, LIGHTGRAY);
 
         EndMode3D();

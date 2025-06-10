@@ -23,14 +23,19 @@ t_mesh_id MeshManager::loadModel(const std::string &filePath)
 	{
 		return it->second;
 	}
+	std::filesystem::path originalPath = std::filesystem::current_path();  // use path not string
+	std::filesystem::path modelPath = std::filesystem::absolute(filePath);
+	std::filesystem::path modelDir = modelPath.parent_path();
+	std::filesystem::path modelFile = modelPath.filename();
 
-	std::string orginalPath = std::filesystem::current_path();
-	std::filesystem::path modelPath = std::filesystem::path(filePath);
-	
-	// go into the directory for reading, then exit
-	std::filesystem::current_path(modelPath.parent_path());
-	Model model = LoadModel(modelPath.filename().c_str());
-	std::filesystem::current_path(orginalPath);
+	if (!std::filesystem::exists(modelDir))
+	{
+		throw std::runtime_error("Model directory does not exist: " + modelDir.string());
+	}
+
+	std::filesystem::current_path(modelDir);
+	Model model = LoadModel(modelFile.string().c_str());
+	std::filesystem::current_path(originalPath);
 
 	models.push_back(model);
 	t_mesh_id id = models.size() - 1;
