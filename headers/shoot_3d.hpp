@@ -4,16 +4,17 @@
 #include "components.hpp"
 #include "constants.hpp"
 #include "constants.hpp"
+#include "mesh_manager.hpp"
 #include "utils.hpp"
 #include <vector>
 #include <string>
 #include <cmath>
 #include <iostream>
 
-// Utility functions
-Vector3 GetForwardVector(const Rotation &rotation);
-Vector3 GetRightVector(const Rotation &rotation);
-Vector3 GetUpVector(const Rotation &rotation);
+struct GameContext {
+	MeshManager meshManager;
+	entt::registry &registry;
+};
 
 void spawnBullet(entt::registry &registry, Position pos, Velocity velocity, HP hp,
 				 Damage damage, float rad, Color color, Lifetime lifetime);
@@ -39,7 +40,7 @@ namespace ecs_systems
 	void enemyAimTarget(entt::registry &registry);
 	void enemyRespawn(entt::registry &registry);
 	void entityMovement(entt::registry &registry, float dt);
-	void entityCollision(entt::registry& registry, float dt);
+	void entityCollision(entt::registry &registry, float dt);
 	void entityLifetime(entt::registry &registry, float dt);
 	void hpCleanup(entt::registry &registry);
 	void hpRegen(entt::registry &registry, float dt);
