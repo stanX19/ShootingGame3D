@@ -32,3 +32,13 @@
 	quat relrot
 }; // pos = parentPos + relpos * parentQuat; rot = parnetRot * relrot
 10. make constants be read from .conf files instead of hardcoded
+11. Weapon as entity
+	- IsFiring
+	- BulletWeaponData
+	- Anchor
+	- AimDirection
+	- AimTargetLocData
+	- AimTarget
+	- tags: 2 modes (systems)
+		--> ParentControlledAim: parent updates AimTarget
+		--> AIControlledWeapon: updates AimTarget automatically
