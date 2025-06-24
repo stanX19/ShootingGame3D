@@ -1,8 +1,8 @@
 #include "renderer.hpp"
 #include <iostream>
 
-Renderer::Renderer(Camera3D &cam, entt::registry &reg)
-	: camera(cam), registry(reg)
+Renderer::Renderer(Camera3D &cam, GameContext &context)
+	: camera(cam), context(context)
 {
 	LoadShaderWithFallback();
 	SetupShaderUniforms();
@@ -70,12 +70,12 @@ void Renderer::Render()
 }
 
 void Renderer::DrawTexts() {
-	auto playerView = registry.view<tag::Player, HP>();
+	auto playerView = context.registry.view<tag::Player, HP>();
 
 	if (playerView.begin() != playerView.end())
 	{
 		int totalEntities = 0;
-		auto hittableView = registry.view<CollisionBody, Position, HP>();
+		auto hittableView = context.registry.view<CollisionBody, Position, HP>();
 		for (auto entity : hittableView)
 		{
 			if (hittableView.get<HP>(entity).value > 0)
@@ -96,7 +96,7 @@ void Renderer::DrawTexts() {
 
 void Renderer::HandleLightSource()
 {
-	auto view = registry.view<Position, RenderBody, tag::LightSource>();
+	auto view = context.registry.view<Position, RenderBody, tag::LightSource>();
 
 	for (auto entity : view)
 	{
@@ -112,7 +112,7 @@ void Renderer::HandleLightSource()
 
 void Renderer::DrawEntitiesWithoutShader()
 {
-	auto view = registry.view<Position, RenderBody>(entt::exclude<tag::Shaded>);
+	auto view = context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded>);
 
 	for (auto entity : view)
 	{
@@ -122,9 +122,9 @@ void Renderer::DrawEntitiesWithoutShader()
     }
 }
 
-// if (registry.all_of<Rotation>(entity))
+// if (context.registry.all_of<Rotation>(entity))
 // {
-// 	auto &rot = registry.get<Rotation>(entity);
+// 	auto &rot = context.registry.get<Rotation>(entity);
 // 	Vector3 forward = GetForwardVector(rot);
 // 	Vector3 end = pos.value + forward * (body.radius * 100);
 // 	DrawLine3D(pos.value, end, WHITE);
@@ -136,7 +136,7 @@ void Renderer::DrawEntitiesWithShader()
 {
 	BeginShaderMode(shader);
 
-	auto view = registry.view<Position, RenderBody, tag::Shaded>();
+	auto view = context.registry.view<Position, RenderBody, tag::Shaded>();
 	for (auto entity : view)
 	{
         const Position &pos = view.get<Position>(entity);
@@ -158,7 +158,7 @@ bool isInFrontOfCamera(const Vector3 &entityPos, const Camera3D &camera)
 
 void Renderer::DrawHealthBars()
 {
-	auto view = registry.view<Position, CollisionBody, HP>();
+	auto view = context.registry.view<Position, CollisionBody, HP>();
 	for (auto entity : view)
 	{
 		auto &pos = view.get<Position>(entity);
@@ -186,8 +186,8 @@ void Renderer::DrawHealthBars()
 
 void Renderer::DrawTargetable()
 {
-	auto view = registry.view<Position, PlayerTargetable>();
-	auto playerView = registry.view<tag::Player, AimTarget>();
+	auto view = context.registry.view<Position, PlayerTargetable>();
+	auto playerView = context.registry.view<tag::Player, AimTarget>();
 
 	entt::entity targetedEntity = playerView.begin() != playerView.end() ? playerView.get<AimTarget>(*playerView.begin()).entity : entt::null;
 

@@ -1,13 +1,13 @@
 #include "shoot_3d.hpp"
 
-static Color getColor(entt::registry &registry, entt::entity entity)
+static Color getColor(GameContext &context, entt::entity entity)
 {
-	if (registry.any_of<RenderBody>(entity))
-		return colorMix(colorRevert(registry.get<RenderBody>(entity).color), WHITE, 1.0f, 0.5f);
+	if (context.registry.any_of<RenderBody>(entity))
+		return colorMix(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 1.0f, 0.5f);
 	return WHITE;
 }
 
-void emplaceWeaponMachineGun(entt::registry &registry, entt::entity entity)
+void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 {
 	BulletWeapon weapon;
 	weapon.firing = false;
@@ -18,7 +18,7 @@ void emplaceWeaponMachineGun(entt::registry &registry, entt::entity entity)
 	weapon.bulletData.dmg = 1000.0f;
 	weapon.bulletData.speed = 100.0f;
 	weapon.bulletData.rad = 0.05f;
-	weapon.bulletData.color = getColor(registry, entity);
+	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
 
 	Ammo ammo;
@@ -28,12 +28,12 @@ void emplaceWeaponMachineGun(entt::registry &registry, entt::entity entity)
 	AmmoReload reload;
 	reload.value = 3.0f; // reload per second
 
-	registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	registry.emplace_or_replace<Ammo>(entity, ammo);
-	registry.emplace_or_replace<AmmoReload>(entity, reload);
+	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Ammo>(entity, ammo);
+	context.registry.emplace_or_replace<AmmoReload>(entity, reload);
 }
 
-void emplaceWeaponSniper(entt::registry &registry, entt::entity entity)
+void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 {
 	BulletWeapon weapon;
 	weapon.firing = false;
@@ -44,13 +44,13 @@ void emplaceWeaponSniper(entt::registry &registry, entt::entity entity)
 	weapon.bulletData.dmg = 5000.0f;
 	weapon.bulletData.speed = 200.0f;
 	weapon.bulletData.rad = 0.2f;
-	weapon.bulletData.color = getColor(registry, entity);
+	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
 
-	registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 }
 
-void emplaceWeaponBasic(entt::registry &registry, entt::entity entity)
+void emplaceWeaponBasic(GameContext &context, entt::entity entity)
 {
 	BulletWeapon weapon;
 	weapon.firing = false;
@@ -61,8 +61,8 @@ void emplaceWeaponBasic(entt::registry &registry, entt::entity entity)
 	weapon.bulletData.dmg = 1000.0f;
 	weapon.bulletData.speed = 60.0f;
 	weapon.bulletData.rad = 0.075f;
-	weapon.bulletData.color = getColor(registry, entity);
+	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
 
-	registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 }

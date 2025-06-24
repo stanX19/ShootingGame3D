@@ -1,7 +1,7 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::ammoReload(entt::registry& registry, float dt) {
-    auto view = registry.view<Ammo, AmmoReload>();
+void ecs_systems::ammoReload(GameContext &context, float dt) {
+    auto view = context.registry.view<Ammo, AmmoReload>();
 
     for (auto entity : view) {
         Ammo& ammo = view.get<Ammo>(entity);

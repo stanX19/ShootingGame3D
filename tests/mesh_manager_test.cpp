@@ -7,7 +7,7 @@ int main() {
     InitWindow(800, 600, "MeshManager Test");
     SetTargetFPS(60);
     Camera camera;
-    camera.position = Vector3{ 0.0f, 1.0f, 4.0f };
+    camera.position = Vector3{ 0.0f, 3.0f, 4.0f } * 2;
     camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
     camera.up = Vector3{ 0.0f, 1.0f, 0.0f };
     camera.fovy = 45.0f;
@@ -47,8 +47,8 @@ int main() {
         ClearBackground(RAYWHITE);
         BeginMode3D(camera);
 
-        DrawModel(meshManager.getModel(box1), { -2.0f, 0.0f, 0.0f }, 1.0f, RED);
-        DrawModel(meshManager.getModel(ship), { 0.0f, 0.0f, 0.0f }, 1.0f, WHITE);
+        DrawModel(meshManager.getModel(sphere1), { -0.0f, 0.0f, 0.0f }, 1.0f, RED);
+        DrawModel(meshManager.getModel(ship), { 0.0f, 0.0f, 0.0f }, 0.4f, WHITE);
         DrawModel(meshManager.getModel(plane), { 0.0f, -1.0f, 0.0f }, 1.0f, LIGHTGRAY);
 
         EndMode3D();

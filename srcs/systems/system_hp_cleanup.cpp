@@ -1,8 +1,8 @@
 #include "shoot_3d.hpp"
 
 
-void ecs_systems::hpCleanup(entt::registry& registry) {
-    auto view = registry.view<HP>();
+void ecs_systems::hpCleanup(GameContext &context) {
+    auto view = context.registry.view<HP>();
     std::vector<entt::entity> toDestroy;
 
     for (auto entity : view) {
@@ -13,14 +13,14 @@ void ecs_systems::hpCleanup(entt::registry& registry) {
     }
 
     for (auto entity : toDestroy) {
-        if (!registry.valid(entity)) continue;
+        if (!context.registry.valid(entity)) continue;
 
-        if (registry.all_of<Position, RenderBody>(entity)) {
-            const Position& pos = registry.get<Position>(entity);
-            const RenderBody& body = registry.get<RenderBody>(entity);
-            spawnDebris(registry, pos.value, body.radius, body.color);
+        if (context.registry.all_of<Position, RenderBody>(entity)) {
+            const Position& pos = context.registry.get<Position>(entity);
+            const RenderBody& body = context.registry.get<RenderBody>(entity);
+            spawnDebris(context, pos.value, body.radius, body.color);
         }
 
-        registry.destroy(entity);
+        context.registry.destroy(entity);
     }
 }

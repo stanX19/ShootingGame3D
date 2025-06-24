@@ -45,26 +45,26 @@ t_mesh_id MeshManager::loadModel(const std::string &filePath)
 
 t_mesh_id MeshManager::createBox(float width, float height, float length)
 {
-	return createAndAddModel("box", [=]()
-							 {
+	return createAndAddModel("box", [=]() {
 		Mesh mesh = GenMeshCube(width, height, length);
-		return LoadModelFromMesh(mesh); }, width, height, length);
+		return LoadModelFromMesh(mesh);
+	}, width, height, length);
 }
 
 t_mesh_id MeshManager::createSphere(float radius, int rings, int slices)
 {
-	return createAndAddModel("sphere", [=]()
-							 {
+	return createAndAddModel("sphere", [=]() {
 		Mesh mesh = GenMeshSphere(radius, rings, slices);
-		return LoadModelFromMesh(mesh); }, radius, rings, slices);
+		return LoadModelFromMesh(mesh);
+	}, radius, rings, slices);
 }
 
 t_mesh_id MeshManager::createPlane(float width, float length, int resX, int resZ)
 {
-	return createAndAddModel("plane", [=]()
-							 {
+	return createAndAddModel("plane", [=]() {
 		Mesh mesh = GenMeshPlane(width, length, resX, resZ);
-		return LoadModelFromMesh(mesh); }, width, length, resX, resZ);
+		return LoadModelFromMesh(mesh);
+	}, width, length, resX, resZ);
 }
 
 Model &MeshManager::getModel(t_mesh_id id)

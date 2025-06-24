@@ -1,8 +1,8 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::bulletTargetAim(entt::registry &registry)
+void ecs_systems::bulletTargetAim(GameContext &context)
 {
-	auto view = registry.view<Position, AimDirection, AimTarget, BulletWeapon>();
+	auto view = context.registry.view<Position, AimDirection, AimTarget, BulletWeapon>();
 
 	for (auto entity : view)
 	{
@@ -11,16 +11,16 @@ void ecs_systems::bulletTargetAim(entt::registry &registry)
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
 		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
 
-		if (!aimTargetExists(registry, aimTarget))
+		if (!aimTargetExists(context, aimTarget))
 		{
-			if (registry.all_of<Rotation>(entity))
-				aimDirection.value = GetForwardVector(registry.get<Rotation>(entity));
+			if (context.registry.all_of<Rotation>(entity))
+				aimDirection.value = GetForwardVector(context.registry.get<Rotation>(entity));
 			continue;
 		}
-		if (!registry.all_of<Position, Velocity>(aimTarget.entity))
+		if (!context.registry.all_of<Position, Velocity>(aimTarget.entity))
 			continue;
-		Position &targetPosition = registry.get<Position>(aimTarget.entity);
-		Velocity &targetVelocity = registry.get<Velocity>(aimTarget.entity);
+		Position &targetPosition = context.registry.get<Position>(aimTarget.entity);
+		Velocity &targetVelocity = context.registry.get<Velocity>(aimTarget.entity);
 
 		aimDirection.value = calculateLeadDirection(
 			position.value,

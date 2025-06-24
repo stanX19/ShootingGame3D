@@ -1,13 +1,13 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::updatePlayerTargetable(entt::registry &registry) {
-	auto playerView = registry.view<tag::Player, Position>();
+void ecs_systems::updatePlayerTargetable(GameContext &context) {
+	auto playerView = context.registry.view<tag::Player, Position>();
 
 	if (playerView.begin() == playerView.end())
 		return ;
 
 	Vector3 playerPos = playerView.get<Position>(*playerView.begin()).value;
-	auto view = registry.view<PlayerTargetable, Position>();
+	auto view = context.registry.view<PlayerTargetable, Position>();
 
 	for (auto entity : view)
 	{

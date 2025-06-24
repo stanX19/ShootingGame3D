@@ -1,6 +1,6 @@
 #include "shoot_3d.hpp"
 
-static entt::entity calculateAimTarget(entt::registry &registry, Rotation &rotation, Position &position)
+static entt::entity calculateAimTarget(GameContext &context, Rotation &rotation, Position &position)
 {
 	Vector3 fowardDir = GetForwardVector(rotation);
 	Vector3 bestDir = fowardDir;
@@ -8,7 +8,7 @@ static entt::entity calculateAimTarget(entt::registry &registry, Rotation &rotat
 	float closestDist = 200.0f;			   // max assist distance
 	entt::entity bestTarget = entt::null;
 
-	auto enemyView = registry.view<tag::Enemy, Position, HP>();
+	auto enemyView = context.registry.view<tag::Enemy, Position, HP>();
 	for (auto enemyEntity : enemyView)
 	{
 		Position &enemyPos = enemyView.get<Position>(enemyEntity);
@@ -31,9 +31,9 @@ static entt::entity calculateAimTarget(entt::registry &registry, Rotation &rotat
 	return bestTarget;
 }
 
-void ecs_systems::playerAimTarget(entt::registry &registry)
+void ecs_systems::playerAimTarget(GameContext &context)
 {
-	auto view = registry.view<tag::Player, Position, Rotation, AimTarget>();
+	auto view = context.registry.view<tag::Player, Position, Rotation, AimTarget>();
 
 	for (auto entity : view)
 	{
@@ -41,7 +41,7 @@ void ecs_systems::playerAimTarget(entt::registry &registry)
 		Rotation &rotation = view.get<Rotation>(entity);
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
 
-		aimTarget.entity = calculateAimTarget(registry, rotation, position);
+		aimTarget.entity = calculateAimTarget(context, rotation, position);
 	}
 }
 

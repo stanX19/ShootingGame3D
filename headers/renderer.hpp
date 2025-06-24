@@ -5,17 +5,18 @@
 #include "components.hpp"
 #include "constants.hpp"
 #include "utils.hpp"
+#include "game_context.hpp"
 
 class Renderer {
 public:
-    Renderer(Camera3D& camera, entt::registry& registry);
+    Renderer(Camera3D& camera, GameContext &context);
     ~Renderer();
 
     void Render();
 
 private:
     Camera3D& camera;
-    entt::registry& registry;
+    GameContext &context;
     Shader shader;
 	
 	Model sphereModel;

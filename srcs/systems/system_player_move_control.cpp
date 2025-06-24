@@ -1,9 +1,9 @@
 #include "shoot_3d.hpp"
 
 
-void ecs_systems::playerMoveControl(entt::registry &registry, float dt)
+void ecs_systems::playerMoveControl(GameContext &context, float dt)
 {
-	auto view = registry.view<tag::Player, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
+	auto view = context.registry.view<tag::Player, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
 
 	for (auto entity : view)
 	{

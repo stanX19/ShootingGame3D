@@ -1,7 +1,7 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::hpRegen(entt::registry& registry, float dt) {
-    auto view = registry.view<HP, HPRegen>();
+void ecs_systems::hpRegen(GameContext &context, float dt) {
+    auto view = context.registry.view<HP, HPRegen>();
 
     for (auto entity : view) {
         HP& hp = view.get<HP>(entity);

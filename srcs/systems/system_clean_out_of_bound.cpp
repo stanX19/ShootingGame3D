@@ -1,8 +1,8 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::cleanOutOfBound(entt::registry &registry)
+void ecs_systems::cleanOutOfBound(GameContext &context)
 {
-	auto view = registry.view<DisappearBound, Position>();
+	auto view = context.registry.view<DisappearBound, Position>();
 	std::vector<entt::entity> toDestroy;
 
 	for (auto entity : view)
@@ -25,9 +25,9 @@ void ecs_systems::cleanOutOfBound(entt::registry &registry)
 
 	for (auto entity : toDestroy)
 	{
-		if (registry.valid(entity))
+		if (context.registry.valid(entity))
 		{
-			registry.destroy(entity);
+			context.registry.destroy(entity);
 		}
 	}
 }

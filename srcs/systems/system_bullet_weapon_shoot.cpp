@@ -1,21 +1,21 @@
 #include "shoot_3d.hpp"
 
-static Vector3 getEntityAimNormalized(entt::registry &registry, entt::entity e)
+static Vector3 getEntityAimNormalized(GameContext &context, entt::entity e)
 {
-	if (registry.all_of<AimDirection>(e))
+	if (context.registry.all_of<AimDirection>(e))
 	{
-		return registry.get<AimDirection>(e).value;
+		return context.registry.get<AimDirection>(e).value;
 	}
-	if (registry.all_of<Rotation>(e))
+	if (context.registry.all_of<Rotation>(e))
 	{
-		return GetForwardVector(registry.get<Rotation>(e));
+		return GetForwardVector(context.registry.get<Rotation>(e));
 	}
 	return {0, 0, 1}; // Default forward
 }
 
-void ecs_systems::bulletWeaponShoot(entt::registry &registry, float dt)
+void ecs_systems::bulletWeaponShoot(GameContext &context, float dt)
 {
-	auto view = registry.view<BulletWeapon, Position>();
+	auto view = context.registry.view<BulletWeapon, Position>();
 
 	for (auto entity : view)
 	{
@@ -27,19 +27,19 @@ void ecs_systems::bulletWeaponShoot(entt::registry &registry, float dt)
 		if (!weapon.firing || weapon.timeSinceLastShot < weapon.shootCooldown)
 			continue;
 
-		if (registry.any_of<Ammo>(entity))
+		if (context.registry.any_of<Ammo>(entity))
 		{
-			auto &ammo = registry.get<Ammo>(entity);
+			auto &ammo = context.registry.get<Ammo>(entity);
 			if (ammo.value < 1.0f)
 				continue;
 
 			ammo.value = std::max(ammo.value - 1.0f, 0.0f);
 		}
-		Vector3 dir = getEntityAimNormalized(registry, entity);
-		float rad = registry.any_of<CollisionBody>(entity) ? registry.get<CollisionBody>(entity).radius + weapon.bulletData.rad + 0.001f : 0.0f;
+		Vector3 dir = getEntityAimNormalized(context, entity);
+		float rad = context.registry.any_of<CollisionBody>(entity) ? context.registry.get<CollisionBody>(entity).radius + weapon.bulletData.rad + 0.001f : 0.0f;
 		
 		spawnBullet(
-			registry,
+			context,
 			Position{pos.value + dir * rad},
 			Velocity{dir * weapon.bulletData.speed},
 			HP{weapon.bulletData.hp},

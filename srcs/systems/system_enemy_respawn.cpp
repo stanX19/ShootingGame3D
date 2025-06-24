@@ -2,22 +2,22 @@
 
 #define ENEMY_COUNT 5
 
-void ecs_systems::enemyRespawn(entt::registry &registry)
+void ecs_systems::enemyRespawn(GameContext &context)
 {
-	auto eliteView = registry.view<tag::EliteEnemy>();
+	auto eliteView = context.registry.view<tag::EliteEnemy>();
 	if (eliteView.size() == 0)
 	{
 		if (rand() % 2)
-			spawnEliteEnemy(registry, randomPosInField());
+			spawnEliteEnemy(context, randomPosInField());
 		else
-			spawnFastEliteEnemy(registry, randomPosInField());
+			spawnFastEliteEnemy(context, randomPosInField());
 	}
 
-	auto enemyView = registry.view<tag::Enemy>();
+	auto enemyView = context.registry.view<tag::Enemy>();
 	int enemiesToSpawn = ENEMY_COUNT - (int)enemyView.size();
 
 	for (int i = 0; i < enemiesToSpawn; i++)
 	{
-		spawnEnemy(registry, randomPosInField());
+		spawnEnemy(context, randomPosInField());
 	}
 }

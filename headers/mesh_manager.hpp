@@ -2,9 +2,6 @@
 #define MESH_MANAGER_HPP
 
 #include "includes.hpp"
-#include "components.hpp"
-#include "constants.hpp"
-#include "utils.hpp"
 
 using t_mesh_id = size_t;
 

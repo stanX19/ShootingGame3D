@@ -1,20 +1,20 @@
 #include "shoot_3d.hpp"
 #include "renderer.hpp"
 
-static void spawnSunAndStars(entt::registry& registry) {
-	entt::entity sun2 = registry.create();
+static void spawnSunAndStars(GameContext &context) {
+	entt::entity sun2 = context.registry.create();
 	Position pos = {randomUnitVector3() * ARENA_SIZE * 14};
 	float rad = GetRandomValue(ARENA_SIZE * 7, ARENA_SIZE * 10);
-	registry.emplace<Position>(sun2, pos);
-	registry.emplace<RenderBody>(sun2, rad, Color{105, 205, 255, 255});
-	registry.emplace<tag::LightSource>(sun2, rad, Color{105, 205, 255, 255});
+	context.registry.emplace<Position>(sun2, pos);
+	context.registry.emplace<RenderBody>(sun2, rad, Color{105, 205, 255, 255});
+	context.registry.emplace<tag::LightSource>(sun2, rad, Color{105, 205, 255, 255});
 	
 	// stars
 	for (int i = 0; i < 100; i++) {
-		entt::entity entity = registry.create();
+		entt::entity entity = context.registry.create();
 
-		registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 10);
-		registry.emplace<RenderBody>(entity, GetRandomValue(10, 30) * 20.0f / ARENA_SIZE, WHITE);
+		context.registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 10);
+		context.registry.emplace<RenderBody>(entity, GetRandomValue(10, 30) * 20.0f / ARENA_SIZE, WHITE);
 	}
 }
 
@@ -26,8 +26,8 @@ static void setup_camera(Camera3D& camera) {
     camera.projection = CAMERA_PERSPECTIVE;
 }
 
-static void camaraFollowPlayer(entt::registry& registry, Camera3D &camera) {
-	auto playerView = registry.view<tag::Player, Position, Rotation>();
+static void camaraFollowPlayer(GameContext &context, Camera3D &camera) {
+	auto playerView = context.registry.view<tag::Player, Position, Rotation>();
 	for (auto entity : playerView) {
 		Position& pos = playerView.get<Position>(entity);
 		Rotation& rot = playerView.get<Rotation>(entity);
@@ -47,10 +47,10 @@ static void camaraFollowPlayer(entt::registry& registry, Camera3D &camera) {
 	}
 }
 
-static void resetGame(entt::registry& registry) {
-    registry.clear();
-    spawnPlayer(registry);
-	spawnSunAndStars(registry);
+static void resetGame(GameContext &context) {
+    context.registry.clear();
+    spawnPlayer(context);
+	spawnSunAndStars(context);
 }
 
 int main() {
@@ -61,38 +61,38 @@ int main() {
     Camera3D camera;
     setup_camera(camera);
 
-    entt::registry registry;
-    resetGame(registry);
+    GameContext context;
+	resetGame(context);
 	
-    Renderer renderer(camera, registry);
+    Renderer renderer(camera, context);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
         // --- Update systems ---
-        ecs_systems::playerMoveControl(registry, dt);
-        ecs_systems::playerShootControl(registry);
-        ecs_systems::playerAimTarget(registry);
-        ecs_systems::enemyMoveControl(registry, dt);
-        ecs_systems::enemyAimTarget(registry);
-        ecs_systems::entityMovement(registry, dt);
-        ecs_systems::entityCollision(registry, dt);
-        ecs_systems::hpRegen(registry, dt);
-        ecs_systems::entityLifetime(registry, dt);
-        ecs_systems::hpCleanup(registry);
-        ecs_systems::enemyRespawn(registry);
-        ecs_systems::cleanOutOfBound(registry);
-        ecs_systems::updatePlayerTargetable(registry);
-        ecs_systems::asteroidRespawn(registry);
-		ecs_systems::bulletTargetAim(registry);
-        ecs_systems::ammoReload(registry, dt);
-        ecs_systems::bulletWeaponShoot(registry, dt);
+        ecs_systems::playerMoveControl(context, dt);
+        ecs_systems::playerShootControl(context);
+        ecs_systems::playerAimTarget(context);
+        ecs_systems::enemyMoveControl(context, dt);
+        ecs_systems::enemyAimTarget(context);
+        ecs_systems::entityMovement(context, dt);
+        ecs_systems::entityCollision(context, dt);
+        ecs_systems::hpRegen(context, dt);
+        ecs_systems::entityLifetime(context, dt);
+        ecs_systems::hpCleanup(context);
+        ecs_systems::enemyRespawn(context);
+        ecs_systems::cleanOutOfBound(context);
+        ecs_systems::updatePlayerTargetable(context);
+        ecs_systems::asteroidRespawn(context);
+		ecs_systems::bulletTargetAim(context);
+        ecs_systems::ammoReload(context, dt);
+        ecs_systems::bulletWeaponShoot(context, dt);
 
-        camaraFollowPlayer(registry, camera);
+        camaraFollowPlayer(context, camera);
         renderer.Render();
 
 		if (IsKeyPressed(KEY_R)) {
-			resetGame(registry);
+			resetGame(context);
 		}		
 
         DrawFPS(10, 10);

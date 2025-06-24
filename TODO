@@ -1,11 +1,8 @@
 1. add models to spaceships
-	- rename Rotation BodyRotation 
 	- add component CameraRotation {quat}
 		- fly left BodyRotation tilt left, right tilt right
 		- player control follow camara
 		- use camara to update bodyRot in player move control
-	- rename renderbody to ModelSphere {rad, color}
-	- add component ModelMesh {meshId}
 2. Trail tag for rendering, will draw a line trail for objects previous positions
 	- add struct to record previous positions
 3. Replace Enemy with enum Faction
@@ -40,5 +37,7 @@
 	- AimTargetLocData
 	- AimTarget
 	- tags: 2 modes (systems)
-		--> ParentControlledAim: parent updates AimTarget
+		--> ParentControlledAim: dont do anything parent updates AimTarget
 		--> AIControlledWeapon: updates AimTarget automatically
+11. Collision tags
+12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::EnemyAIControl

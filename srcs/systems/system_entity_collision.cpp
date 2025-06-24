@@ -26,7 +26,7 @@ static bool hadCollision(const Vector3 &posA, const Vector3 &velA, const Vector3
 	return ((t1 >= 0.0f && t1 <= 1.0f) || (t2 >= 0.0f && t2 <= 1.0f));
 }
 
-void ecs_systems::entityCollision(entt::registry &registry, float dt)
+void ecs_systems::entityCollision(GameContext &context, float dt)
 {
 	// Step 1: Collect attacking and target entities
 	struct EntityData
@@ -40,15 +40,15 @@ void ecs_systems::entityCollision(entt::registry &registry, float dt)
 
 	std::vector<EntityData> entities;
 
-	auto view = registry.view<Position, CollisionBody>();
+	auto view = context.registry.view<Position, CollisionBody>();
 	for (auto entity : view)
 	{
 		entities.emplace_back(EntityData{
 			entity,
 			view.get<Position>(entity).value,
-			registry.all_of<Velocity>(entity)? registry.get<Velocity>(entity).value * dt: Vector3{0, 0, 0},
+			context.registry.all_of<Velocity>(entity)? context.registry.get<Velocity>(entity).value * dt: Vector3{0, 0, 0},
 			view.get<CollisionBody>(entity).radius,
-			registry.all_of<Damage>(entity)? registry.get<Damage>(entity).value * dt: 0,
+			context.registry.all_of<Damage>(entity)? context.registry.get<Damage>(entity).value * dt: 0,
 		});
 	}
 
@@ -75,9 +75,9 @@ void ecs_systems::entityCollision(entt::registry &registry, float dt)
 	// Step 3: Apply damage in bulk (deferred)
 	for (const auto &[target, damage] : damageMap)
 	{
-		if (registry.all_of<HP>(target))
+		if (context.registry.all_of<HP>(target))
 		{
-			auto &hp = registry.get<HP>(target);
+			auto &hp = context.registry.get<HP>(target);
 			hp.value -= damage;
 		}
 	}

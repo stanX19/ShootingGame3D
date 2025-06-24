@@ -2,17 +2,17 @@
 
 static const Vector3 arenaVec = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
 
-void spawnBullet(entt::registry &registry, Position pos, Velocity velocity, HP hp,
+void spawnBullet(GameContext &context, Position pos, Velocity velocity, HP hp,
 				 Damage damage, float rad, Color color, Lifetime lifetime)
 {
-	entt::entity bullet = registry.create();
-	registry.emplace<Position>(bullet, pos);
-	registry.emplace<Velocity>(bullet, velocity);
-	registry.emplace<CollisionBody>(bullet, rad);
-	registry.emplace<RenderBody>(bullet, rad, color);
-	registry.emplace<Damage>(bullet, damage);
-	registry.emplace<Lifetime>(bullet, lifetime);
-	registry.emplace<DisappearBound>(bullet, arenaVec * -2, arenaVec * 2);
-	registry.emplace<HP>(bullet, hp);
-	registry.emplace<tag::Bullet>(bullet);
+	entt::entity bullet = context.registry.create();
+	context.registry.emplace<Position>(bullet, pos);
+	context.registry.emplace<Velocity>(bullet, velocity);
+	context.registry.emplace<CollisionBody>(bullet, rad);
+	context.registry.emplace<RenderBody>(bullet, rad, color);
+	context.registry.emplace<Damage>(bullet, damage);
+	context.registry.emplace<Lifetime>(bullet, lifetime);
+	context.registry.emplace<DisappearBound>(bullet, arenaVec * -2, arenaVec * 2);
+	context.registry.emplace<HP>(bullet, hp);
+	context.registry.emplace<tag::Bullet>(bullet);
 }

@@ -1,14 +1,14 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::enemyMoveControl(entt::registry &registry, float dt)
+void ecs_systems::enemyMoveControl(GameContext &context, float dt)
 {
-	auto playerView = registry.view<tag::Player, Position>();
+	auto playerView = context.registry.view<tag::Player, Position>();
 	if (playerView.begin() == playerView.end())
 		return;
 
 	Position playerPos = playerView.get<Position>(*playerView.begin());
 
-	auto enemyView = registry.view<tag::Enemy, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
+	auto enemyView = context.registry.view<tag::Enemy, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
 
 	for (auto entity : enemyView)
 	{

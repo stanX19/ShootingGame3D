@@ -1,14 +1,14 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::enemyAimTarget(entt::registry &registry)
+void ecs_systems::enemyAimTarget(GameContext &context)
 {
-	auto playerView = registry.view<tag::Player, Position>();
+	auto playerView = context.registry.view<tag::Player, Position>();
 	if (playerView.begin() == playerView.end())
 		return;
 
 	entt::entity player = *playerView.begin();
 
-	auto view = registry.view<tag::Enemy, Position, Rotation, BulletWeapon, AimTarget>();
+	auto view = context.registry.view<tag::Enemy, Position, Rotation, BulletWeapon, AimTarget>();
 
 	for (auto entity : view)
 	{
@@ -17,13 +17,13 @@ void ecs_systems::enemyAimTarget(entt::registry &registry)
 		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
 
-		if (!aimTargetExists(registry, aimTarget))
+		if (!aimTargetExists(context, aimTarget))
 			aimTarget.entity = player;
 
-		if (!registry.all_of<Position>(aimTarget.entity))
+		if (!context.registry.all_of<Position>(aimTarget.entity))
 			continue;
 		
-		Vector3 targetPos = registry.get<Position>(aimTarget.entity).value;
+		Vector3 targetPos = context.registry.get<Position>(aimTarget.entity).value;
 		Vector3 toTarget = targetPos - position.value;
 		float dist = Vector3Length(toTarget);
 

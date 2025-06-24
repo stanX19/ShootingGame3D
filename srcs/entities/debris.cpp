@@ -1,8 +1,8 @@
 #include "shoot_3d.hpp"
 
-void spawnDebris(entt::registry& registry, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan) {
+void spawnDebris(GameContext &context, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan) {
     for (int i = 0; i < count; ++i) {
-        entt::entity debris = registry.create();
+        entt::entity debris = context.registry.create();
 
         Vector3 dir = {
             (float)rand() / RAND_MAX * 2.0f - 1.0f,
@@ -17,11 +17,11 @@ void spawnDebris(entt::registry& registry, const Vector3& position, float origin
         // fast = small
         float radius = originalRadius * (0.05f + 0.5f / speed);
 
-        registry.emplace<Position>(debris, position);
-        registry.emplace<RenderBody>(debris, radius, originalColor);
-        registry.emplace<Velocity>(debris, velocity);
-        registry.emplace<Lifetime>(debris, lifespan);
-    	registry.emplace<tag::Shaded>(debris);
+        context.registry.emplace<Position>(debris, position);
+        context.registry.emplace<RenderBody>(debris, radius, originalColor);
+        context.registry.emplace<Velocity>(debris, velocity);
+        context.registry.emplace<Lifetime>(debris, lifespan);
+    	context.registry.emplace<tag::Shaded>(debris);
     }
 }
 

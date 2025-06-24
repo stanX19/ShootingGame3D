@@ -1,7 +1,7 @@
 #include "shoot_3d.hpp"
 
-void ecs_systems::entityLifetime(entt::registry& registry, float dt) {
-    auto view = registry.view<Lifetime>();
+void ecs_systems::entityLifetime(GameContext &context, float dt) {
+    auto view = context.registry.view<Lifetime>();
     std::vector<entt::entity> toDestroy;
 
     for (auto entity : view) {
@@ -14,8 +14,8 @@ void ecs_systems::entityLifetime(entt::registry& registry, float dt) {
     }
 
     for (auto entity : toDestroy) {
-        if (registry.valid(entity)) {
-            registry.destroy(entity);
+        if (context.registry.valid(entity)) {
+            context.registry.destroy(entity);
         }
     }
 }
