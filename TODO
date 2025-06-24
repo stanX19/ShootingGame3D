@@ -9,7 +9,7 @@
 	- 
 	- add Tag AIControl for autoaim
 4. replace aim target with AimTarget {
-	entity
+	entity+
 	locktime
 	lockedOn
 }; if in cone for locktime > radar.locktime then lock
@@ -43,3 +43,9 @@
 	- seperate collision detection and actual processing: tags
 	- seperate death logic of different entities using tags
 12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::EnemyAIControl
+13. model_manager apply scaling to model when loading such that new scale reflects real scale (compared to unit sphere)
+14. UI
+	- speed bar
+	- thrust bar
+	- ammo label
+15. Realistic physics, no more breaking in vacum
