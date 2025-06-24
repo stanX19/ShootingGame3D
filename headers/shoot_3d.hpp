@@ -4,7 +4,7 @@
 #include "components.hpp"
 #include "constants.hpp"
 #include "constants.hpp"
-#include "mesh_manager.hpp"
+#include "model_manager.hpp"
 #include "game_context.hpp"
 #include "utils.hpp"
 #include <vector>
@@ -49,6 +49,7 @@ namespace ecs_systems
 	void asteroidRespawn(GameContext &context);
 	void cleanOutOfBound(GameContext &context);
 	void updatePlayerTargetable(GameContext &context);
+	void model_rotation_sync(GameContext &context); 
 }
 
 #endif // SHOOT_3D_HPP

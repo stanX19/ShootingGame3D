@@ -86,3 +86,23 @@ Vector3 randomPosInField()
 	float y = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
 	return Vector3{x, y, z};
 }
+
+
+// unit quaternion, uniform
+Quaternion randomRotation()
+{
+    float u1 = randomFloat(0.0f, 1.0f);
+    float u2 = randomFloat(0.0f, 2.0f * PI);
+    float u3 = randomFloat(0.0f, 2.0f * PI);
+
+    float sqrt1 = sqrtf(1.0f - u1);
+    float sqrt2 = sqrtf(u1);
+
+    Quaternion q;
+    q.x = sqrt1 * sinf(u2);
+    q.y = sqrt1 * cosf(u2);
+    q.z = sqrt2 * sinf(u3);
+    q.w = sqrt2 * cosf(u3);
+
+    return QuaternionNormalize(q); // Just in case
+}

@@ -110,17 +110,6 @@ void Renderer::HandleLightSource()
     }
 }
 
-void Renderer::DrawEntitiesWithoutShader()
-{
-	auto view = context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded>);
-
-	for (auto entity : view)
-	{
-        const Position &pos = view.get<Position>(entity);
-        const RenderBody &body = view.get<RenderBody>(entity);
-        DrawSphere(pos.value, body.radius, body.color);
-    }
-}
 
 // if (context.registry.all_of<Rotation>(entity))
 // {
@@ -132,6 +121,30 @@ void Renderer::DrawEntitiesWithoutShader()
 // 	DrawLine3D(pos.value, end, GREEN);
 // }
 
+void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body)
+{
+	Model &model = context.meshManager.getModel(body.modelID);
+	Vector3 scale = { body.scale, body.scale, body.scale };
+	Vector3 axis;
+	float angle;
+	QuaternionToAxisAngle(body.rotation, &axis, &angle);
+	// std::cout << "Entity rotation axis: (" << axis.x << ", " << axis.y << ", " << axis.z
+	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
+	DrawModelEx(model, pos.value + body.translation, axis, angle * RAD2DEG, scale, body.color);
+}
+
+void Renderer::DrawEntitiesWithoutShader()
+{
+	auto view = context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded>);
+
+	for (auto entity : view)
+	{
+        const Position &pos = view.get<Position>(entity);
+        const RenderBody &body = view.get<RenderBody>(entity);
+		DrawEntityModel(pos, body);
+    }
+}
+
 void Renderer::DrawEntitiesWithShader()
 {
 	BeginShaderMode(shader);
@@ -142,8 +155,7 @@ void Renderer::DrawEntitiesWithShader()
         const Position &pos = view.get<Position>(entity);
         const RenderBody &body = view.get<RenderBody>(entity);
 
-        Vector3 scale = { body.radius, body.radius, body.radius };
-        DrawModelEx(sphereModel, pos.value, {0, 1, 0}, 0.0f, scale, body.color);
+		DrawEntityModel(pos, body);
     }
 
 	EndShaderMode();

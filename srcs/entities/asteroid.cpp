@@ -9,6 +9,7 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 {
 	float speed = GetRandomValue(3, 10);
 	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 2, ARENA_SIZE * 2, ARENA_SIZE * 2};
+	t_model_id asteroidModel = context.meshManager.createSphere();
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -19,7 +20,9 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 		context.registry.emplace<Position>(asteroid, subPos);
 		context.registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		context.registry.emplace<CollisionBody>(asteroid, subRad);
-		context.registry.emplace<RenderBody>(asteroid, subRad, (i == 0)? Color{ 40, 40, 40, 255 } : Color{ 60, 60, 60, 255 });
+		context.registry.emplace<RenderBody>(asteroid,
+			RenderBody{asteroidModel, subRad, (i == 0)? Color{ 40, 40, 40, 255 } : Color{ 60, 60, 60, 255 }}
+		);
 		context.registry.emplace<Damage>(asteroid, 10000.0f);
 		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
 		context.registry.emplace<tag::Asteroid>(asteroid);

@@ -6,17 +6,17 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
-#include "mesh_manager.hpp"
+#include "model_manager.hpp"
 
-MeshManager::MeshManager() {}
+ModelManager::ModelManager() {}
 
-MeshManager::~MeshManager()
+ModelManager::~ModelManager()
 {
 	unloadAll();
 }
 
 
-t_mesh_id MeshManager::loadModel(const std::string &filePath)
+t_model_id ModelManager::loadModel(const std::string &filePath)
 {
 	auto it = loadedFromFile.find(filePath);
 	if (it != loadedFromFile.end())
@@ -38,12 +38,12 @@ t_mesh_id MeshManager::loadModel(const std::string &filePath)
 	std::filesystem::current_path(originalPath);
 
 	models.push_back(model);
-	t_mesh_id id = models.size() - 1;
+	t_model_id id = models.size() - 1;
 	loadedFromFile[filePath] = id;
 	return id;
 }
 
-t_mesh_id MeshManager::createBox(float width, float height, float length)
+t_model_id ModelManager::createBox(float width, float height, float length)
 {
 	return createAndAddModel("box", [=]() {
 		Mesh mesh = GenMeshCube(width, height, length);
@@ -51,15 +51,16 @@ t_mesh_id MeshManager::createBox(float width, float height, float length)
 	}, width, height, length);
 }
 
-t_mesh_id MeshManager::createSphere(float radius, int rings, int slices)
+t_model_id ModelManager::createSphere(int rings, int slices, float radius)
 {
+	// assert(radius == 1.0);  // radius should be handled using scale
 	return createAndAddModel("sphere", [=]() {
 		Mesh mesh = GenMeshSphere(radius, rings, slices);
 		return LoadModelFromMesh(mesh);
 	}, radius, rings, slices);
 }
 
-t_mesh_id MeshManager::createPlane(float width, float length, int resX, int resZ)
+t_model_id ModelManager::createPlane(float width, float length, int resX, int resZ)
 {
 	return createAndAddModel("plane", [=]() {
 		Mesh mesh = GenMeshPlane(width, length, resX, resZ);
@@ -67,7 +68,7 @@ t_mesh_id MeshManager::createPlane(float width, float length, int resX, int resZ
 	}, width, length, resX, resZ);
 }
 
-Model &MeshManager::getModel(t_mesh_id id)
+Model &ModelManager::getModel(t_model_id id)
 {
 	if (!isValid(id))
 	{
@@ -76,7 +77,7 @@ Model &MeshManager::getModel(t_mesh_id id)
 	return models[id];
 }
 
-const Model &MeshManager::getModel(t_mesh_id id) const
+const Model &ModelManager::getModel(t_model_id id) const
 {
 	if (!isValid(id))
 	{
@@ -85,7 +86,7 @@ const Model &MeshManager::getModel(t_mesh_id id) const
 	return models[id];
 }
 
-void MeshManager::unloadAll()
+void ModelManager::unloadAll()
 {
 	for (auto &model : models)
 	{
@@ -96,13 +97,13 @@ void MeshManager::unloadAll()
 	loadedFromFile.clear();
 }
 
-bool MeshManager::isValid(t_mesh_id id) const
+bool ModelManager::isValid(t_model_id id) const
 {
 	return id < models.size();
 }
 
 template <typename... Args>
-std::string MeshManager::generateCacheKey(const std::string &keyBase, Args &&...args) const
+std::string ModelManager::generateCacheKey(const std::string &keyBase, Args &&...args) const
 {
 	std::stringstream ss;
 	ss << std::fixed << std::setprecision(3) << keyBase;
@@ -111,7 +112,7 @@ std::string MeshManager::generateCacheKey(const std::string &keyBase, Args &&...
 }
 
 template <typename Func, typename... Args>
-t_mesh_id MeshManager::createAndAddModel(const std::string &keyBase, Func modelGenerator, Args &&...args)
+t_model_id ModelManager::createAndAddModel(const std::string &keyBase, Func modelGenerator, Args &&...args)
 {
 	std::string key = generateCacheKey(keyBase, args...);
 
@@ -122,7 +123,7 @@ t_mesh_id MeshManager::createAndAddModel(const std::string &keyBase, Func modelG
 	}
 
 	Model model = modelGenerator(); // Call the generator function
-	t_mesh_id id = models.size();
+	t_model_id id = models.size();
 	models.push_back(model);
 	proceduralCache[key] = id;
 	return id;

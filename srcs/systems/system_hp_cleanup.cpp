@@ -17,8 +17,8 @@ void ecs_systems::hpCleanup(GameContext &context) {
 
         if (context.registry.all_of<Position, RenderBody>(entity)) {
             const Position& pos = context.registry.get<Position>(entity);
-            const RenderBody& body = context.registry.get<RenderBody>(entity);
-            spawnDebris(context, pos.value, body.radius, body.color);
+            const RenderBody& renderBody = context.registry.get<RenderBody>(entity);
+            spawnDebris(context, pos.value, renderBody.scale, renderBody.color);
         }
 
         context.registry.destroy(entity);

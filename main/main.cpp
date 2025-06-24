@@ -4,17 +4,21 @@
 static void spawnSunAndStars(GameContext &context) {
 	entt::entity sun2 = context.registry.create();
 	Position pos = {randomUnitVector3() * ARENA_SIZE * 14};
+	t_model_id sunModel = context.meshManager.createSphere(64, 64);
 	float rad = GetRandomValue(ARENA_SIZE * 7, ARENA_SIZE * 10);
+
 	context.registry.emplace<Position>(sun2, pos);
-	context.registry.emplace<RenderBody>(sun2, rad, Color{105, 205, 255, 255});
+	context.registry.emplace<RenderBody>(sun2, sunModel, rad, Color{105, 205, 255, 255});
 	context.registry.emplace<tag::LightSource>(sun2, rad, Color{105, 205, 255, 255});
 	
 	// stars
+	t_model_id starsModel = context.meshManager.createSphere();
+
 	for (int i = 0; i < 100; i++) {
 		entt::entity entity = context.registry.create();
 
 		context.registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 10);
-		context.registry.emplace<RenderBody>(entity, GetRandomValue(10, 30) * 20.0f / ARENA_SIZE, WHITE);
+		context.registry.emplace<RenderBody>(entity, starsModel, GetRandomValue(10, 30) * 20.0f / ARENA_SIZE, WHITE);
 	}
 }
 
@@ -87,6 +91,7 @@ int main() {
 		ecs_systems::bulletTargetAim(context);
         ecs_systems::ammoReload(context, dt);
         ecs_systems::bulletWeaponShoot(context, dt);
+		ecs_systems::model_rotation_sync(context);
 
         camaraFollowPlayer(context, camera);
         renderer.Render();
@@ -97,6 +102,7 @@ int main() {
 
         DrawFPS(10, 10);
     }
+	context.meshManager.unloadAll();
     CloseWindow();
     return 0;
 }

@@ -19,6 +19,7 @@ Color colorRevert(Color a);
 Vector3 calculateLeadDirection(const Vector3 &shooterPos, const Vector3 &targetPos, const Vector3 &targetVel, float projectileSpeed);
 Vector3 randomUnitVector3();
 Vector3 randomPosInField();
+Quaternion randomRotation();
 std::string getParentPath(const std::string &path);
 std::string GetFileName(const std::string &path);
 #endif

@@ -26,6 +26,7 @@ private:
 
     void LoadShaderWithFallback();
     void SetupShaderUniforms();
+	void DrawEntityModel(const Position &pos, const RenderBody &body);
     void DrawEntitiesWithShader();
     void DrawEntitiesWithoutShader();
     void HandleLightSource();

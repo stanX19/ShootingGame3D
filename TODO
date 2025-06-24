@@ -37,7 +37,9 @@
 	- AimTargetLocData
 	- AimTarget
 	- tags: 2 modes (systems)
-		--> ParentControlledAim: dont do anything parent updates AimTarget
-		--> AIControlledWeapon: updates AimTarget automatically
-11. Collision tags
+		--> ParentControlledAim: dont do anything, parent updates AimTarget
+		--> AIControlledWeapon: updates AimTarget automatically using rotation
+11. Collision
+	- seperate collision detection and actual processing: tags
+	- seperate death logic of different entities using tags
 12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::EnemyAIControl

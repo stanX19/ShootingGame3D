@@ -1,7 +1,9 @@
 #include "shoot_3d.hpp"
 
 void spawnDebris(GameContext &context, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan) {
-    for (int i = 0; i < count; ++i) {
+    t_model_id debrisModel = context.meshManager.createBox();
+	
+	for (int i = 0; i < count; ++i) {
         entt::entity debris = context.registry.create();
 
         Vector3 dir = {
@@ -18,7 +20,7 @@ void spawnDebris(GameContext &context, const Vector3& position, float originalRa
         float radius = originalRadius * (0.05f + 0.5f / speed);
 
         context.registry.emplace<Position>(debris, position);
-        context.registry.emplace<RenderBody>(debris, radius, originalColor);
+        context.registry.emplace<RenderBody>(debris, RenderBody{debrisModel, radius, originalColor, Vector3{0.0f, 0.0f, 0.0f}, randomRotation()});
         context.registry.emplace<Velocity>(debris, velocity);
         context.registry.emplace<Lifetime>(debris, lifespan);
     	context.registry.emplace<tag::Shaded>(debris);

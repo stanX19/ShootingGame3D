@@ -2,7 +2,7 @@
 #define COMPONENTS_HPP
 
 #include "includes.hpp"
-#include "mesh_manager.hpp"
+#include "model_manager.hpp"
 
 // Components
 struct Position
@@ -27,16 +27,11 @@ struct CollisionBody
 
 struct RenderBody
 {
-	float radius;
-	Color color;
-};
-
-struct ModelData
-{
-	t_mesh_id modelID;
-    Vector3 translation;
-    Quaternion rotation;
-    Vector3 scale;
+	t_model_id modelID;
+    float scale = 1.0;
+	Color color = WHITE;
+    Vector3 translation = {0.0f, 0.0f, 0.0f};
+    Quaternion rotation = {0.0f, 0.0f, 0.0f, 1.0f};
 };
 
 struct HP

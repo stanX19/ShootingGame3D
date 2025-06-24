@@ -17,8 +17,8 @@ void main()
     vec4 worldPos = matModel * vec4(vertexPosition, 1.0);
     fragPosition = worldPos.xyz;
 
-    fragNormal = mat3(matNormal) * vertexNormal;  // Transform normal correctly
-    gl_Position = mvp * vec4(vertexPosition, 1.0);
+    fragNormal = mat3(matNormal) * vertexNormal;
+	gl_Position = mvp * matModel * vec4(vertexPosition, 1.0);
 
     // Calculate the vector from the vertex to the light source.
     fragLightDir = lightPosition - worldPos.xyz;
