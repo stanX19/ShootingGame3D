@@ -9,7 +9,7 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 {
 	float speed = GetRandomValue(3, 10);
 	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 2, ARENA_SIZE * 2, ARENA_SIZE * 2};
-	t_model_id asteroidModel = context.meshManager.createSphere();
+	t_model_id asteroidModel = context.meshManager.createSphere(64, 64);
 
 	for (int i = 0; i < 10; i++)
 	{
