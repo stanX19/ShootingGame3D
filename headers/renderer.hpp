@@ -18,12 +18,14 @@ private:
     Camera3D& camera;
     GameContext &context;
     Shader shader;
+    Shader defaultShader;
 	
 	Model sphereModel;
 	int lightPosLoc;
 	int lightColorLoc;
 	int ambientStrengthLoc;
 
+    void LoadDefaultShader();
     void LoadShaderWithFallback();
     void SetupShaderUniforms();
 	void DrawEntityModel(const Position &pos, const RenderBody &body);

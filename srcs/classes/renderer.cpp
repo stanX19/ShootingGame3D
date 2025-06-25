@@ -4,6 +4,7 @@
 Renderer::Renderer(Camera3D &cam, GameContext &context)
 	: camera(cam), context(context)
 {
+	LoadDefaultShader();
 	LoadShaderWithFallback();
 	SetupShaderUniforms();
 }
@@ -15,6 +16,11 @@ Renderer::~Renderer()
 		// UnloadShader(shader);  // this seg faults idk why
 		shader = {0, NULL};
 	}
+}
+
+void Renderer::LoadDefaultShader()
+{
+	defaultShader = LoadShader(NULL, NULL);
 }
 
 void Renderer::LoadShaderWithFallback()
@@ -124,6 +130,7 @@ void Renderer::HandleLightSource()
 void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body)
 {
 	Model &model = context.meshManager.getModel(body.modelID);
+
 	Vector3 scale = { body.scale, body.scale, body.scale };
 	Vector3 axis;
 	float angle;
@@ -141,6 +148,8 @@ void Renderer::DrawEntitiesWithoutShader()
 	{
         const Position &pos = view.get<Position>(entity);
         const RenderBody &body = view.get<RenderBody>(entity);
+		context.meshManager.getModel(body.modelID).materials[0].shader = defaultShader;
+		
 		DrawEntityModel(pos, body);
     }
 }
@@ -154,6 +163,7 @@ void Renderer::DrawEntitiesWithShader()
 	{
         const Position &pos = view.get<Position>(entity);
         const RenderBody &body = view.get<RenderBody>(entity);
+		context.meshManager.getModel(body.modelID).materials[0].shader = shader;
 
 		DrawEntityModel(pos, body);
     }

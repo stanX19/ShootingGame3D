@@ -27,8 +27,8 @@ int main() {
 
     std::cout << "Start of load" << "\n";
 	// 	t_model_id ship = meshManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
-	// t_model_id ship = meshManager.loadModel("assets/Models/spaceship_custom_100/spaceship.obj");
-	t_model_id ship = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
+	t_model_id ship = meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.glb");
+	// t_model_id ship = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
     std::cout << "End of load" << "\n";
 	t_model_id ship_id_2 = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
 
@@ -49,8 +49,8 @@ int main() {
         ClearBackground(RAYWHITE);
         BeginMode3D(camera);
 
-        DrawModel(meshManager.getModel(sphere1), { -10.0f, 0.0f, 0.0f }, 1.0f, Color{ 230, 41, 55, 105 });
-        DrawModel(meshManager.getModel(ship), { 0.0f, 0.0f, 0.0f }, 0.4f, WHITE);
+        DrawModel(meshManager.getModel(sphere1), { -0.0f, 0.0f, 0.0f }, 1.0f, Color{ 230, 41, 55, 105 });
+        DrawModel(meshManager.getModel(ship), { 0.0f, 0.0f, 0.0f }, 1.0f, GREEN);
         DrawModel(meshManager.getModel(plane), { 0.0f, -1.0f, 0.0f }, 1.0f, LIGHTGRAY);
 
         EndMode3D();
