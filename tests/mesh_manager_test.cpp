@@ -27,7 +27,7 @@ int main() {
 
     std::cout << "Start of load" << "\n";
 	// 	t_model_id ship = meshManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
-	t_model_id ship = meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.glb");
+	t_model_id ship = meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
 	// t_model_id ship = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
     std::cout << "End of load" << "\n";
 	t_model_id ship_id_2 = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");

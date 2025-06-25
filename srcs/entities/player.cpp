@@ -4,7 +4,7 @@ entt::entity spawnPlayer(GameContext &context) {
     entt::entity player = context.registry.create();
 
 	// t_model_id shipModel = context.meshManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
-	t_model_id shipModel = context.meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.glb");
+	t_model_id shipModel = context.meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
     context.registry.emplace<Position>(player, Vector3{ 0, 0, 0 });
     context.registry.emplace<Velocity>(player);
     context.registry.emplace<Rotation>(player);
