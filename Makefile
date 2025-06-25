@@ -45,26 +45,21 @@ test: $(TESTBINDIR) $(OBJS) $(TESTOBJS)
 		./$$test_exec || exit 1; \
 	done
 	
-
-$(OBJDIRS):
+$(OBJDIRS) $(TESTBINDIR):
 	mkdir -p $@
 	@echo "$(UP)$(FLUSH)$(UP)$(FLUSH)$(UP)"
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIRS)
 	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $@
 
-$(TESTBINDIR)/%: $(TESTDIR)/%.cpp $(OBJS) $(TESTBINDIR)
+$(TESTBINDIR)/%: $(TESTDIR)/%.cpp $(OBJS) | $(TESTBINDIR)
 	$(CC) $(CFLAGS) $(IFLAGS) $< $(OBJS) $(LFLAGS) -o $@
-
-$(TESTBINDIR):
-	mkdir -p $(TESTBINDIR)
 
 clean:
 	@$(RM) $(OBJS) $(OBJS:.o=.d)
 
 fclean:	clean
 	@$(RM) $(NAME)
-	@$(RM) $(TESTDIR)
 	@$(RM) $(OBJDIRS)
 	@$(RM) ./a.out
 

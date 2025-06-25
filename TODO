@@ -5,9 +5,22 @@
 		- use camara to update bodyRot in player move control
 2. Trail tag for rendering, will draw a line trail for objects previous positions
 	- add struct to record previous positions
-3. Replace Enemy with enum Faction
-	- 
-	- add Tag AIControl for autoaim
+3. tags::faction::{
+		ally,
+		enemy,
+		other1,
+		other2,
+	}
+	enemies = registry.view<tag::Targetable>(entt::exclude<MyTag>)
+
+	// abusing std::tuple, std::apply, and fold expression and decltype to iterate through types
+	using AllFactionTags = std::tuple<Ally, Enemy, Neutral, Other1, Other2>;
+	AllFactionTags allFactionTags;
+
+	std::apply([&](auto... tag_type) { ( {
+		enemies registry.view<decltype(tag_type)>(entt::exclude<decltype(tag_type)>)
+	}, ...) }, allFactionTags)
+
 4. replace aim target with AimTarget {
 	entity+
 	locktime
@@ -42,7 +55,7 @@
 11. Collision
 	- seperate collision detection and actual processing: tags
 	- seperate death logic of different entities using tags
-12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::EnemyAIControl
+12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::AIControl
 13. model_manager apply scaling to model when loading such that new scale reflects real scale (compared to unit sphere)
 14. UI
 	- speed bar
