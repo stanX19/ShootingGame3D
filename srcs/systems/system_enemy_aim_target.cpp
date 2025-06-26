@@ -1,4 +1,5 @@
-#include "shoot_3d.hpp"
+#include "systems.hpp"
+#include "utils.hpp"
 
 void ecs_systems::enemyAimTarget(GameContext &context)
 {
@@ -8,13 +9,12 @@ void ecs_systems::enemyAimTarget(GameContext &context)
 
 	entt::entity player = *playerView.begin();
 
-	auto view = context.registry.view<tag::Enemy, Position, Rotation, BulletWeapon, AimTarget>();
+	auto view = context.registry.view<tag::Enemy, Position, Rotation, AimTarget, tag::weapon::IsWeapon>();
 
 	for (auto entity : view)
 	{
 		Position &position = view.get<Position>(entity);
 		Rotation &rotation = view.get<Rotation>(entity);
-		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
 
 		if (!aimTargetExists(context, aimTarget))
@@ -27,6 +27,10 @@ void ecs_systems::enemyAimTarget(GameContext &context)
 		Vector3 toTarget = targetPos - position.value;
 		float dist = Vector3Length(toTarget);
 
-		bulletWeapon.firing = (dist < 100.0f) && Vector3DotProduct(GetForwardVector(rotation), Vector3Normalize(toTarget)) > cosf(DEG2RAD * 20.0f);
+		if ((dist < 100.0f) && Vector3DotProduct(GetForwardVector(rotation), Vector3Normalize(toTarget)) > cosf(DEG2RAD * 20.0f)) {
+			context.registry.emplace_or_replace<tag::weapon::IsFiring>(entity);
+		} else {
+			context.registry.remove<tag::weapon::IsFiring>(entity);
+		}
 	}
 }

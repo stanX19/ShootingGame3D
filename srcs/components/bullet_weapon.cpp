@@ -1,4 +1,5 @@
-#include "shoot_3d.hpp"
+#include "entities.hpp"
+#include "utils.hpp"
 
 static Color getColor(GameContext &context, entt::entity entity)
 {
@@ -10,9 +11,6 @@ static Color getColor(GameContext &context, entt::entity entity)
 void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 {
 	BulletWeapon weapon;
-	weapon.firing = false;
-	weapon.shootCooldown = 0.1f;
-	weapon.timeSinceLastShot = 0.0f;
 
 	weapon.bulletData.hp = 1.0f;
 	weapon.bulletData.dmg = 1000.0f;
@@ -21,24 +19,18 @@ void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
 
-	Ammo ammo;
-	ammo.value = 5.0f;
-	ammo.maxValue = 15;
-
-	AmmoReload reload;
-	reload.value = 3.0f; // reload per second
-
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, ammo);
-	context.registry.emplace_or_replace<AmmoReload>(entity, reload);
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0, 15});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{3.0});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
+	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+    context.registry.emplace_or_replace<AimTarget>(entity);
+    context.registry.emplace_or_replace<AimDirection>(entity);
 }
 
 void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 {
 	BulletWeapon weapon;
-	weapon.firing = false;
-	weapon.shootCooldown = 2.0f;
-	weapon.timeSinceLastShot = 0.0f;
 
 	weapon.bulletData.hp = 50.0f;
 	weapon.bulletData.dmg = 5000.0f;
@@ -48,14 +40,15 @@ void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	weapon.bulletData.lifetime = 10.0f;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.0});
+	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+    context.registry.emplace_or_replace<AimTarget>(entity);
+    context.registry.emplace_or_replace<AimDirection>(entity);
 }
 
 void emplaceWeaponBasic(GameContext &context, entt::entity entity)
 {
 	BulletWeapon weapon;
-	weapon.firing = false;
-	weapon.shootCooldown = 0.5f;
-	weapon.timeSinceLastShot = 0.0f;
 
 	weapon.bulletData.hp = 1.0f;
 	weapon.bulletData.dmg = 1000.0f;
@@ -65,4 +58,8 @@ void emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	weapon.bulletData.lifetime = 10.0f;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
+	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+    context.registry.emplace_or_replace<AimTarget>(entity);
+    context.registry.emplace_or_replace<AimDirection>(entity);
 }

@@ -1,12 +1,14 @@
-#include "shoot_3d.hpp"
+#include "systems.hpp"
 
 void ecs_systems::playerShootControl(GameContext &context) {
-	auto view = context.registry.view<tag::Player, BulletWeapon>();
+	auto view = context.registry.view<tag::Player, tag::weapon::IsWeapon>();
 
 	for (auto entity : view)
 	{
-		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
-
-		bulletWeapon.firing = (IsKeyDown(KEY_SPACE) || IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+		if (IsKeyDown(KEY_SPACE) || IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+			context.registry.emplace_or_replace<tag::weapon::IsFiring>(entity);
+		} else {
+			context.registry.remove<tag::weapon::IsFiring>(entity);
+		}
 	}
 }

@@ -1,4 +1,7 @@
-#include "shoot_3d.hpp"
+#include "systems.hpp"
+#include "utils.hpp"
+#include "constants.hpp"
+#include "entities.hpp"
 
 #define ASTEROID_COUNT 50
 

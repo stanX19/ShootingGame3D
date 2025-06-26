@@ -47,7 +47,6 @@
 	- BulletWeaponData
 	- Anchor
 	- AimDirection
-	- AimTargetLocData
 	- AimTarget
 	- tags: 2 modes (systems)
 		--> ParentControlledAim: dont do anything, parent updates AimTarget

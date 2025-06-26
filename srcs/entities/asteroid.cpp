@@ -1,4 +1,6 @@
-#include "shoot_3d.hpp"
+#include "entities.hpp"
+#include "utils.hpp"
+#include "constants.hpp"
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {

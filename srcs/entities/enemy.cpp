@@ -1,4 +1,4 @@
-#include "shoot_3d.hpp"
+#include "entities.hpp"
 
 entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	entt::entity enemy = context.registry.create();
@@ -16,21 +16,21 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
     context.registry.emplace<MaxSpeed>(enemy, 10.0f);
     context.registry.emplace<TurnSpeed>(enemy, 2.5f);
     context.registry.emplace<PlayerTargetable>(enemy);
-    context.registry.emplace<AimTarget>(enemy, entt::null);
-    context.registry.emplace<AimDirection>(enemy);
 	
     context.registry.emplace<tag::Enemy>(enemy);
     context.registry.emplace<tag::Shaded>(enemy);
+    context.registry.emplace<tag::RotationSyncModel>(enemy);
 	return enemy;
 }
 
-void spawnEnemy(GameContext &context, const Vector3& pos) {
+entt::entity spawnEnemy(GameContext &context, const Vector3& pos) {
     entt::entity enemy = spawnBaseEnemy(context, pos);
 
 	emplaceWeaponBasic(context, enemy);
+	return enemy;
 }
 
-void spawnEliteEnemy(GameContext &context, const Vector3& pos) {
+entt::entity spawnEliteEnemy(GameContext &context, const Vector3& pos) {
     entt::entity enemy = spawnBaseEnemy(context, pos);
 
 	float radius = 3.0f;
@@ -45,9 +45,10 @@ void spawnEliteEnemy(GameContext &context, const Vector3& pos) {
 	emplaceWeaponSniper(context, enemy);
 
     context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
+	return enemy;
 }
 
-void spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
+entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
     entt::entity enemy = spawnBaseEnemy(context, pos);
 
 	float radius = 2.0f;
@@ -63,4 +64,5 @@ void spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
 	emplaceWeaponMachineGun(context, enemy);
 
     context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
+	return enemy;
 }

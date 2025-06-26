@@ -34,7 +34,7 @@ ARGV		=
 run: all
 	./$(NAME) $(ARGV)
 
-$(NAME): $(OBJDIRS) $(OBJS)
+$(NAME): $(OBJDIRS) $(OBJS) $(MAINCPP)
 	$(CC) $(CFLAGS) $(OBJS) $(MAINCPP) $(IFLAGS) $(LFLAGS) -o $(NAME)
 
 all: $(NAME)

@@ -1,4 +1,5 @@
-#include "shoot_3d.hpp"
+#include "entities.hpp"
+#include "constants.hpp"
 
 static const Vector3 arenaVec = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
 

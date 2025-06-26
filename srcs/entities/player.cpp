@@ -1,4 +1,15 @@
-#include "shoot_3d.hpp"
+#include "entities.hpp"
+
+
+static void addConnectedWeapons(GameContext &context, entt::entity &player, Color color) {
+	entt::entity weapon1 = spawnTurret(context, color);
+	context.registry.emplace_or_replace<PositionAnchor>(weapon1, PositionAnchor{player, {4, 0, 0}});
+	context.registry.emplace_or_replace<RotationAnchor>(weapon1, RotationAnchor{player});
+	entt::entity weapon2 = spawnTurret(context, color);
+	context.registry.emplace_or_replace<PositionAnchor>(weapon2, PositionAnchor{player, {-4, 0, 0}});
+	context.registry.emplace_or_replace<RotationAnchor>(weapon2, RotationAnchor{player});
+}
+
 
 entt::entity spawnPlayer(GameContext &context) {
     entt::entity player = context.registry.create();
@@ -15,11 +26,11 @@ entt::entity spawnPlayer(GameContext &context) {
     context.registry.emplace<Damage>(player, 5000.0f);
     context.registry.emplace<MaxSpeed>(player, 40.0f);
     context.registry.emplace<TurnSpeed>(player, 2.5f);
-	emplaceWeaponMachineGun(context, player);
-    context.registry.emplace<AimTarget>(player);
-    context.registry.emplace<AimDirection>(player);
 	
     context.registry.emplace<tag::Shaded>(player);
     context.registry.emplace<tag::Player>(player);
+    context.registry.emplace<tag::RotationSyncModel>(player);
+
+	addConnectedWeapons(context, player, SKYBLUE);
     return player;
 }

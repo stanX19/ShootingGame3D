@@ -1,4 +1,5 @@
-#include "shoot_3d.hpp"
+#include "entities.hpp"
+#include "utils.hpp"
 
 void spawnDebris(GameContext &context, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan) {
     t_model_id debrisModel = context.meshManager.createBox();

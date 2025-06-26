@@ -7,7 +7,7 @@
 // Components
 struct Position
 {
-	Vector3 value;
+	Vector3 value = {0, 0, 0};
 };
 
 struct Velocity
@@ -17,7 +17,7 @@ struct Velocity
 
 struct Rotation
 {
-	Quaternion value = QuaternionIdentity();
+	Quaternion value = QuaternionUnitX;
 };
 
 struct CollisionBody
@@ -33,6 +33,17 @@ struct RenderBody
     Vector3 translation = {0.0f, 0.0f, 0.0f};
     Quaternion rotation = {0.0f, 0.0f, 0.0f, 1.0f};
 };
+
+struct PositionAnchor {
+    entt::entity parent;
+    Vector3 relpos;
+};
+
+struct RotationAnchor {
+    entt::entity parent;
+    Quaternion relrot = QuaternionUnitX;
+};
+
 
 struct HP
 {
@@ -74,6 +85,16 @@ struct DisappearBound
 };
 
 // weapon components
+struct AimTarget
+{
+	entt::entity entity = entt::null;
+};
+
+struct AimDirection
+{
+	Vector3 value = {0, 1, 0};
+};
+
 struct BulletWeapon
 {
 	struct
@@ -85,19 +106,11 @@ struct BulletWeapon
 		Color color;
 		float lifetime;
 	} bulletData;
-	bool firing;
+};
+
+struct WeaponCooldown {
 	float shootCooldown;
-	float timeSinceLastShot;
-};
-
-struct AimTarget
-{
-	entt::entity entity = entt::null;
-};
-
-struct AimDirection
-{
-	Vector3 value;
+	float timeSinceLastShot = 0.0f;
 };
 
 struct Ammo
@@ -109,6 +122,16 @@ struct Ammo
 struct AmmoReload
 {
 	float value;
+};
+
+struct JustFired
+{
+	float ammoCount;
+};
+
+struct WeaponParent
+{
+	entt::entity parent;
 };
 // end of weapon components
 
@@ -124,9 +147,17 @@ namespace tag {
 	struct Enemy {};
 	struct EliteEnemy {};
 	struct Bullet {};
-
+	namespace weapon {
+		struct IsWeapon {};
+		struct ParentControlledAim {};	// dont do anything, parent updates AimTarget
+		struct AIControlledAim {};		// updates AimTarget automatically using rotation
+		struct IsFiring {};
+		struct CanFire {};
+	};
 	struct LightSource {};
 	struct Shaded {};
+	struct RotationSyncModel {};
+	struct AimDirectionSyncModel {};
 }
 
 
