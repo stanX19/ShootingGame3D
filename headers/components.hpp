@@ -49,6 +49,10 @@ struct RotationAnchor {
     Quaternion relrot = QuaternionUnitX;
 };
 
+struct DeathAnchor {
+    entt::entity parent;
+    float delay;
+};
 
 struct HP
 {
@@ -78,9 +82,15 @@ struct TurnSpeed
 	float value;
 };
 
-struct Lifetime
+struct Lifespan
 {
 	float value;
+};
+
+struct DelayedDamage
+{
+	float timeRemaining;
+	float damage;
 };
 
 struct DisappearBound
@@ -152,10 +162,14 @@ namespace tag {
 	struct Enemy {};
 	struct EliteEnemy {};
 	struct Bullet {};
+	struct Targetable {};
 	namespace weapon {
 		struct IsWeapon {};
-		struct ParentControlledAim {};	// dont do anything, parent updates AimTarget
-		struct AIControlledAim {};		// updates AimTarget automatically using rotation
+		struct ParentControlledAim {};		// dont do anything, parent updates AimTarget
+		struct AIControlledAim {};			// updates AimTarget automatically using rotation; TODO; need to do factions first
+		struct PlayerControlledShoot {};	// read keyboard or mouse inputs
+		struct AIControlledShoot {};		// decide IsFiring using distance and angle; TODO
+		struct ParentControlledShoot {};	// follow parent firing
 		struct IsFiring {};
 		struct CanFire {};
 	};
@@ -163,6 +177,7 @@ namespace tag {
 	struct Shaded {};
 	struct RotationSyncModel {};
 	struct AimDirectionSyncModel {};
+	struct GetVelOnAnchorDeath {};
 }
 
 

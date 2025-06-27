@@ -3,9 +3,10 @@
 
 static void spawnSunAndStars(GameContext &context) {
 	entt::entity sun2 = context.registry.create();
-	Position pos = {randomUnitVector3() * ARENA_SIZE * 14};
-	t_model_id sunModel = context.meshManager.createSphere(64, 64);
-	float rad = GetRandomValue(ARENA_SIZE * 7, ARENA_SIZE * 10);
+	Position pos = {randomUnitVector3() * ARENA_SIZE * 3};
+	// t_model_id sunModel = context.meshManager.loadModel("assets/Models/sun/sun.glb");
+	t_model_id sunModel = context.meshManager.createSphere(128, 128);
+	float rad = GetRandomValue(ARENA_SIZE * 0.8, ARENA_SIZE * 1.5);
 
 	context.registry.emplace<Position>(sun2, pos);
 	context.registry.emplace<RenderBody>(sun2, sunModel, rad, Color{105, 205, 255, 255});
@@ -18,7 +19,7 @@ static void spawnSunAndStars(GameContext &context) {
 		entt::entity entity = context.registry.create();
 
 		context.registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 10);
-		context.registry.emplace<RenderBody>(entity, starsModel, GetRandomValue(10, 30) * 20.0f / ARENA_SIZE, WHITE);
+		context.registry.emplace<RenderBody>(entity, starsModel, (GetRandomValue(30, 50) * ARENA_SIZE / 4000.0f), WHITE);
 	}
 }
 
@@ -30,26 +31,30 @@ static void setup_camera(Camera3D& camera) {
     camera.projection = CAMERA_PERSPECTIVE;
 }
 
-static void camaraFollowPlayer(GameContext &context, Camera3D &camera) {
-	auto playerView = context.registry.view<tag::Player, Position, Rotation>();
-	for (auto entity : playerView) {
-		Position& pos = playerView.get<Position>(entity);
-		Rotation& rot = playerView.get<Rotation>(entity);
-		Vector3 forward = GetForwardVector(rot);
-		Vector3 up = GetUpVector(rot);
+static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt) {
+    auto playerView = context.registry.view<tag::Player, Position, Rotation>();
+    for (auto entity : playerView) {
+        Position& pos = playerView.get<Position>(entity);
+        Rotation& rot = playerView.get<Rotation>(entity);
+        Vector3 forward = GetForwardVector(rot);
+        Vector3 up = GetUpVector(rot);
 
-		// Vector3 cameraOffset = Vector3Add(Vector3Scale(forward, -10.0f), Vector3Scale(up, 5.0f));
-		if (IsKeyDown(KEY_RIGHT_SHIFT)) {
-			camera.position = pos.value + forward * 10 + up * 5;
-			camera.up = up;
-			camera.target = pos.value + forward * -10.0f;
-		} else {
-			camera.position = pos.value + forward * -10 + up * 5;
-			camera.up = up;
-			camera.target = pos.value + forward * 10.0f;
-		}
-	}
+        // Choose follow direction
+        bool shift = IsKeyDown(KEY_RIGHT_SHIFT);
+        Vector3 desiredPosition = pos.value + (shift ? forward * 10.0f : forward * -10.0f) + up * 5.0f;
+        Vector3 desiredTarget   = pos.value + (shift ? forward * -10.0f : forward * 10.0f);
+
+        float smoothing = 12.0f;  // greater --> greater lerp
+        float lerp = 1.0f - std::exp(-smoothing * dt);
+
+        // Smooth camera motion
+        camera.position = Vector3Lerp(camera.position, desiredPosition, lerp);
+        camera.target = Vector3Lerp(camera.target, desiredTarget, lerp);
+        camera.up = Vector3Lerp(camera.up, up, lerp);
+    }
 }
+
+
 
 static void resetGame(GameContext &context) {
     context.registry.clear();
@@ -83,25 +88,28 @@ int main() {
         ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context);
         ecs_systems::entityCollision(context, dt);
-
-        ecs_systems::hpRegen(context, dt);
+		
         ecs_systems::entityLifetime(context, dt);
+        ecs_systems::delayedDamage(context, dt);
         ecs_systems::hpCleanup(context);
-        ecs_systems::enemyRespawn(context);
+        ecs_systems::hpRegen(context, dt);
         ecs_systems::cleanOutOfBound(context);
-        ecs_systems::updatePlayerTargetable(context);
+		ecs_systems::entityAnchorRelease(context, dt);
+        ecs_systems::enemyRespawn(context);
+        ecs_systems::updatePlayerTargetable(context); // TODO: remove this and put into camera
         ecs_systems::asteroidRespawn(context);
 
         ecs_systems::ammoReload(context, dt);
 		ecs_systems::bulletTargetAim(context);
 		ecs_systems::weaponParentControlAim(context);
+		ecs_systems::weaponParentControlShoot(context);
 		ecs_systems::weaponUpdateCooldown(context, dt);
 		ecs_systems::weaponUpdateCanFire(context);
         ecs_systems::bulletWeaponShoot(context);
 		ecs_systems::weaponUpdateFireStatus(context);
 
 		ecs_systems::syncModelRotation(context);
-        camaraFollowPlayer(context, camera);
+        camaraFollowPlayer(context, camera, dt);
         renderer.Render();
 
 		if (IsKeyPressed(KEY_R)) {

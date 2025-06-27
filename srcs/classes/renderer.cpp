@@ -224,6 +224,8 @@ void Renderer::DrawTargetable()
 		const auto &pos = view.get<Position>(entity);
 		const auto &targetable = view.get<PlayerTargetable>(entity);
 
+		if (targetable.distance > 4500)
+			continue;
 		Vector3 toTarget = targetable.toSelf;
 		Vector3 local;
 		local.x = Vector3DotProduct(toTarget, camRight);

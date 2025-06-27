@@ -7,6 +7,7 @@ void ecs_systems::entityAnchor(GameContext& context) {
 		if (parentView.contains(anchor.parent)) {
 			const auto& parentPos = parentView.get<Position>(anchor.parent).value;
 			const auto& parentRot = parentView.get<Rotation>(anchor.parent).value;
+			context.registry.emplace_or_replace<PrevPosition>(entity, pos.value);
 			pos.value = parentPos + Vector3RotateByQuaternion(anchor.relpos, parentRot);
 		}
 	}

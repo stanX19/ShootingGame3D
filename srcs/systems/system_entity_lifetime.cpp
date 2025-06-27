@@ -1,11 +1,11 @@
 #include "systems.hpp"
 
 void ecs_systems::entityLifetime(GameContext &context, float dt) {
-    auto view = context.registry.view<Lifetime>();
+    auto view = context.registry.view<Lifespan>();
     std::vector<entt::entity> toDestroy;
 
     for (auto entity : view) {
-        Lifetime& lifetime = view.get<Lifetime>(entity);
+        Lifespan& lifetime = view.get<Lifespan>(entity);
         lifetime.value -= dt;
 
         if (lifetime.value <= 0) {

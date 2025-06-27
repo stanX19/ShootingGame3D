@@ -1,8 +1,3 @@
-1. add models to spaceships
-	- add component CameraRotation {quat}
-		- fly left BodyRotation tilt left, right tilt right
-		- player control follow camara
-		- use camara to update bodyRot in player move control
 2. Trail tag for rendering, will draw a line trail for objects previous positions
 	- add struct to record previous positions
 3. tags::faction::{
@@ -21,8 +16,8 @@
 		enemies registry.view<decltype(tag_type)>(entt::exclude<decltype(tag_type)>)
 	}, ...) }, allFactionTags)
 
-4. replace aim target with AimTarget {
-	entity+
+4. replace AimTarget with AimTarget {
+	entity
 	locktime
 	lockedOn
 }; if in cone for locktime > radar.locktime then lock
@@ -33,31 +28,19 @@
 	lockDistance
 	lockTime
 }
-6. make calculateAimTarget receive is target [&](Entity &other) {}
 7. enemy shoot control if locked: weapon shoot
 8. aim assist only start when locked, use previous positions instead of straight prediction
-9. Anchor {
-	entity
-	vec3 relpos
-	quat relrot
-}; // pos = parentPos + relpos * parentQuat; rot = parnetRot * relrot
 10. make constants be read from .conf files instead of hardcoded
-11. Weapon as entity
-	- IsFiring
-	- BulletWeaponData
-	- Anchor
-	- AimDirection
-	- AimTarget
-	- tags: 2 modes (systems)
-		--> ParentControlledAim: dont do anything, parent updates AimTarget
-		--> AIControlledWeapon: updates AimTarget automatically using rotation
 11. Collision
-	- seperate collision detection and actual processing: tags
+	- seperate collision detection and actual processing
 	- seperate death logic of different entities using tags
 12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::AIControl
 13. model_manager apply scaling to model when loading such that new scale reflects real scale (compared to unit sphere)
 14. UI
 	- speed bar
 	- thrust bar
-	- ammo label
+	- ammo circle label
+	- cross at center
+	- huge circle centered, below direction arrows
 15. Realistic physics, no more breaking in vacum
+16. Have another system to assign bitwise faction value

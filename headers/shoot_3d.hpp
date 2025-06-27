@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <algorithm>
 #include <iostream>
 
 #endif // SHOOT_3D_HPP

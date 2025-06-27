@@ -66,3 +66,25 @@ entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
     context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
 	return enemy;
 }
+
+entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos) {
+    entt::entity enemy = spawnBaseEnemy(context, pos);
+
+	float radius = 15.0f;
+    context.registry.emplace_or_replace<CollisionBody>(enemy, radius);
+	RenderBody &renderBody = context.registry.get<RenderBody>(enemy);
+    renderBody.color = Color{191, 245, 66, 255};
+	renderBody.scale = radius * 0.4;
+    context.registry.emplace_or_replace<HP>(enemy, 1000.0f);
+    context.registry.emplace_or_replace<HPRegen>(enemy, 50.0f);
+    context.registry.emplace_or_replace<MaxSpeed>(enemy, 10.0f);
+    context.registry.emplace_or_replace<TurnSpeed>(enemy, 1.0f);
+
+	emplaceWeaponSniper(context, enemy);
+	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, +radius * 0.8f, -2}));
+	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, -radius * 0.8f, -2}));
+	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, +radius * 0.8f, -2}));
+	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, -radius * 0.8f, -2}));
+    context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
+	return enemy;
+}

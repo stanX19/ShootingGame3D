@@ -22,7 +22,7 @@ void ecs_systems::bulletWeaponShoot(GameContext &context)
 			Damage{weapon.bulletData.dmg},
 			weapon.bulletData.rad,
 			weapon.bulletData.color,
-			Lifetime{weapon.bulletData.lifetime}
+			Lifespan{weapon.bulletData.lifetime}
 		);
 		
 		context.registry.emplace_or_replace<JustFired>(entity, JustFired{1});
