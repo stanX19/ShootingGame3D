@@ -44,6 +44,8 @@ test: $(TESTBINDIR) $(OBJS) $(TESTOBJS)
 		echo "Running $$test_exec..."; \
 		./$$test_exec || exit 1; \
 	done
+
+testbin: $(TESTBINDIR) $(OBJS) $(TESTOBJS)
 	
 $(OBJDIRS) $(TESTBINDIR):
 	mkdir -p $@
@@ -73,5 +75,5 @@ push:
 code:
 	find $(SRCDIR) $(HEADER_DIR) -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec cat {} + > ../code.txt
 
-.PHONY: all clean fclean re bonus push
+.PHONY: all clean fclean re bonus push test run_test
 -include $(OBJS:.o=.d)

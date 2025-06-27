@@ -10,6 +10,11 @@ struct Position
 	Vector3 value = {0, 0, 0};
 };
 
+struct PrevPosition
+{
+	Vector3 value;
+};
+
 struct Velocity
 {
 	Vector3 value = { 0, 0, 0 };

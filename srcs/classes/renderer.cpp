@@ -76,7 +76,7 @@ void Renderer::Render()
 }
 
 void Renderer::DrawTexts() {
-	auto playerView = context.registry.view<tag::Player, HP>();
+	auto playerView = context.registry.view<tag::Player>();
 
 	if (playerView.begin() != playerView.end())
 	{

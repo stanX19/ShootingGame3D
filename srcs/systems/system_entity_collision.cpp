@@ -3,10 +3,11 @@
 #include <vector>
 #include <tuple>
 #include <cmath>
+#include <iostream>
 
 static bool hadCollision(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance)
 {
-	Vector3 relPos = (posA - velA) - (posB - velB);
+	Vector3 relPos = posA - posB;
 	Vector3 relVel = velA - velB;
 
 	float a = Vector3DotProduct(relVel, relVel);
@@ -16,14 +17,14 @@ static bool hadCollision(const Vector3 &posA, const Vector3 &velA, const Vector3
 	float discriminant = b * b - 4 * a * c;
 
 	if (discriminant < 0.0f || a == 0.0f) // if no solution or no relative movement
-		return (c == 0.0);				  // return (is currently overlaping)
+		return (c <= 0.0001);				  // return (is currently overlaping)
 
 	float sqrtD = sqrtf(discriminant);
 	float t1 = (-b - sqrtD) / (2.0f * a);
 	float t2 = (-b + sqrtD) / (2.0f * a);
 
 	// Collision happens during the frame
-	return ((t1 >= 0.0f && t1 <= 1.0f) || (t2 >= 0.0f && t2 <= 1.0f));
+	return ((t1 >= 0.0f && t1 <= 1.0f) || (t2 >= 0.0f && t2 <= 1.0f)) || c <= 0.0001;
 }
 
 void ecs_systems::entityCollision(GameContext &context, float dt)
@@ -36,19 +37,30 @@ void ecs_systems::entityCollision(GameContext &context, float dt)
 		Vector3 velocity;
 		float radius;
 		float damage;
+		int faction;
 	};
 
 	std::vector<EntityData> entities;
 
-	auto view = context.registry.view<Position, CollisionBody>();
-	for (auto entity : view)
+	for (auto [entity, position, body] : context.registry.view<Position, CollisionBody>().each())
 	{
+		Vector3 velocity = {0, 0, 0};
+		PrevPosition *prevPosPtr = context.registry.try_get<PrevPosition>(entity);
+		if (prevPosPtr)
+			velocity = position.value - prevPosPtr->value;
+
+		float damage = 0;
+		Damage *dmgPtr = context.registry.try_get<Damage>(entity);
+		if (dmgPtr)
+			damage = dmgPtr->value * dt;
+
 		entities.emplace_back(EntityData{
 			entity,
-			view.get<Position>(entity).value,
-			context.registry.all_of<Velocity>(entity)? context.registry.get<Velocity>(entity).value * dt: Vector3{0, 0, 0},
-			view.get<CollisionBody>(entity).radius,
-			context.registry.all_of<Damage>(entity)? context.registry.get<Damage>(entity).value * dt: 0,
+			position.value - velocity,
+			velocity,
+			body.radius,
+			damage,
+			(context.registry.any_of<tag::Bullet>(entity) << 0),
 		});
 	}
 
@@ -63,11 +75,15 @@ void ecs_systems::entityCollision(GameContext &context, float dt)
 		{
 			const auto &B = entities[j];
 			
+			if ((A.faction & B.faction) != 0)  // allied faction
+				continue;
+
 			float combinedRadius = A.radius + B.radius;
 			if (hadCollision(A.position, A.velocity, B.position, B.velocity, combinedRadius))
 			{
 				damageMap[B.id] += A.damage;
 				damageMap[A.id] += B.damage;
+				// std::cout << "Collided: " << static_cast<int>(A.id) << ' ' << (int)B.id << std::endl; 
 			}
 		}
 	}
@@ -75,10 +91,11 @@ void ecs_systems::entityCollision(GameContext &context, float dt)
 	// Step 3: Apply damage in bulk (deferred)
 	for (const auto &[target, damage] : damageMap)
 	{
-		if (context.registry.all_of<HP>(target))
+		HP *hpPtr = context.registry.try_get<HP>(target);
+		if (hpPtr)
 		{
-			auto &hp = context.registry.get<HP>(target);
-			hp.value -= damage;
+			hpPtr->value -= damage;
+			// std::cout << "HP: " << hpPtr->value << "; damaged " << damage << std::endl;
 		}
 	}
 }
