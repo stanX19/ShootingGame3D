@@ -24,13 +24,14 @@ namespace ecs_systems
 	void ammoReload(GameContext &context, float dt);
 	void bulletTargetAim(GameContext &context);
 	void bulletWeaponShoot(GameContext &context);
-	void WeaponUpdateCanFire(GameContext &context);
-	void WeaponUpdateFireStatus(GameContext &context);
-	void WeaponUpdateCooldown(GameContext &context, float dt);
+	void weaponParentControlAim(GameContext &context);
+	void weaponUpdateCanFire(GameContext &context);
+	void weaponUpdateFireStatus(GameContext &context);
+	void weaponUpdateCooldown(GameContext &context, float dt);
 	void asteroidRespawn(GameContext &context);
 	void cleanOutOfBound(GameContext &context);
 	void updatePlayerTargetable(GameContext &context);
-	void sync_model_rotation(GameContext &context); 
+	void syncModelRotation(GameContext &context); 
 }
 
 #endif // SYSTEMS_HPP

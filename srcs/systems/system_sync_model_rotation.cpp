@@ -1,22 +1,33 @@
 #include "systems.hpp"
 #include "utils.hpp"
 
-void ecs_systems::sync_model_rotation(GameContext &context) {
-    auto view1 = context.registry.view<Rotation, RenderBody, tag::RotationSyncModel>();
+static void rotationSyncModel(GameContext &context) {
+    auto view = context.registry.view<Rotation, RenderBody, tag::RotationSyncModel>();
+    for (auto entity : view) {
+        Rotation& rotation = view.get<Rotation>(entity);
+        RenderBody& body = view.get<RenderBody>(entity);
+        body.rotation = rotation.value;
+    }
+}
 
-    for (auto entity : view1) {
-        Rotation& rotation = view1.get<Rotation>(entity);
-		RenderBody& body = view1.get<RenderBody>(entity);
-		
-		body.rotation = rotation.value;
+static void aimDirectionSyncModel(GameContext &context) {
+    auto viewAimOnly = context.registry.view<AimDirection, RenderBody, tag::AimDirectionSyncModel>(entt::exclude<Rotation>);
+    for (auto entity : viewAimOnly) {
+        AimDirection& aim = viewAimOnly.get<AimDirection>(entity);
+        RenderBody& body = viewAimOnly.get<RenderBody>(entity);
+        body.rotation = vector3ToRotation(aim.value);
     }
 
-    auto view2 = context.registry.view<AimDirection, RenderBody, tag::AimDirectionSyncModel>();
-
-    for (auto entity : view2) {
-        AimDirection& aimDirection = view2.get<AimDirection>(entity);
-		RenderBody& body = view2.get<RenderBody>(entity);
-		
-		body.rotation = vector3ToRotation(aimDirection.value);
+    auto viewAimAndRot = context.registry.view<AimDirection, Rotation, RenderBody, tag::AimDirectionSyncModel>();
+    for (auto entity : viewAimAndRot) {
+        AimDirection& aim = viewAimAndRot.get<AimDirection>(entity);
+        Rotation& rotation = viewAimAndRot.get<Rotation>(entity);
+        RenderBody& body = viewAimAndRot.get<RenderBody>(entity);
+        body.rotation = vector3ToRotation(aim.value, rotation.value);
     }
+}
+
+void ecs_systems::syncModelRotation(GameContext &context) {
+    rotationSyncModel(context);
+    aimDirectionSyncModel(context);
 }

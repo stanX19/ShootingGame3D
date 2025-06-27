@@ -19,6 +19,21 @@ Vector3 GetRightVector(const Rotation &rotation)
 	return Vector3Transform({1, 0, 0}, QuaternionToMatrix(rotation.value));
 }
 
+Vector3 GetForwardVector(const Quaternion &rotation)
+{
+	return Vector3Transform({0, 0, 1}, QuaternionToMatrix(rotation));
+}
+
+Vector3 GetUpVector(const Quaternion &rotation)
+{
+	return Vector3Transform({0, 1, 0}, QuaternionToMatrix(rotation));
+}
+
+Vector3 GetRightVector(const Quaternion &rotation)
+{
+	return Vector3Transform({1, 0, 0}, QuaternionToMatrix(rotation));
+}
+
 Quaternion RotateAroundAxis(const Quaternion &current, const Vector3 &axis, float angle)
 {
 	Quaternion q = QuaternionFromAxisAngle(Vector3Normalize(axis), angle);
@@ -40,6 +55,31 @@ Quaternion vector3ToRotation(const Vector3 &vec)
 	float yaw = atan2f(dir.x, dir.z);
 	float pitch = -asinf(dir.y);
 	return QuaternionFromEuler(pitch, yaw, 0);
+}
+
+Quaternion vector3ToRotation(const Vector3& vec, const Vector3& up)
+{
+    Vector3 dir = Vector3Normalize(vec);
+    Vector3 right = Vector3Normalize(Vector3CrossProduct(up, dir));
+    Vector3 correctedUp = Vector3CrossProduct(dir, right);
+
+    Matrix mat = {
+        right.x,    right.y,    right.z,    0.0f,
+        correctedUp.x, correctedUp.y, correctedUp.z, 0.0f,
+        dir.x,      dir.y,      dir.z,      0.0f,
+        0.0f,       0.0f,       0.0f,       1.0f
+    };
+
+    return QuaternionFromMatrix(mat);
+}
+
+Quaternion vector3ToRotation(const Vector3& newForward, const Quaternion &baseRotation)
+{
+    Vector3 forward = Vector3Normalize(newForward);
+    Vector3 oldForward = GetForwardVector(baseRotation);
+
+    Quaternion deltaRot = QuaternionFromVector3ToVector3(oldForward, forward);
+    return QuaternionMultiply(deltaRot, baseRotation);
 }
 
 // in degrees [0, 180]

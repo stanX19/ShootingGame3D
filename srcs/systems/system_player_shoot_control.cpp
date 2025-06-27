@@ -1,7 +1,7 @@
 #include "systems.hpp"
 
 void ecs_systems::playerShootControl(GameContext &context) {
-	auto view = context.registry.view<tag::Player, tag::weapon::IsWeapon>();
+	auto view = context.registry.view<tag::Player>();
 
 	for (auto entity : view)
 	{

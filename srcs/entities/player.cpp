@@ -1,15 +1,28 @@
 #include "entities.hpp"
+#include "utils.hpp"
 
+namespace {
+	Vector3 left = {1, 0, 0};
+	Vector3 up = {0, 1, 0};
 
-static void addConnectedWeapons(GameContext &context, entt::entity &player, Color color) {
-	entt::entity weapon1 = spawnTurret(context, color);
-	context.registry.emplace_or_replace<PositionAnchor>(weapon1, PositionAnchor{player, {4, 0, 0}});
-	context.registry.emplace_or_replace<RotationAnchor>(weapon1, RotationAnchor{player});
-	entt::entity weapon2 = spawnTurret(context, color);
-	context.registry.emplace_or_replace<PositionAnchor>(weapon2, PositionAnchor{player, {-4, 0, 0}});
-	context.registry.emplace_or_replace<RotationAnchor>(weapon2, RotationAnchor{player});
+	void addTurretAt(GameContext &context, entt::entity &player, Color color, Vector3 relpos) {
+		entt::entity weapon = spawnTurret(context, color);
+		context.registry.emplace_or_replace<PositionAnchor>(weapon, PositionAnchor{player, relpos});
+		context.registry.emplace_or_replace<RotationAnchor>(weapon, RotationAnchor{player});
+
+		context.registry.emplace_or_replace<WeaponParent>(weapon, WeaponParent{player});
+		context.registry.emplace_or_replace<tag::weapon::ParentControlledAim>(weapon);
+	}
+
+	void addWeapons(GameContext &context, entt::entity &player, Color color) {
+    	context.registry.emplace<AimTarget>(player);
+		addTurretAt(context, player, color, left * 3 + up * 0.5);
+		addTurretAt(context, player, color, left * -3 + up * 0.5);
+		addTurretAt(context, player, color, left * 3 + up * -0.5);
+		addTurretAt(context, player, color, left * -3 + up * -0.5);
+		emplaceWeaponSniper(context, player);
+	}
 }
-
 
 entt::entity spawnPlayer(GameContext &context) {
     entt::entity player = context.registry.create();
@@ -30,7 +43,7 @@ entt::entity spawnPlayer(GameContext &context) {
     context.registry.emplace<tag::Shaded>(player);
     context.registry.emplace<tag::Player>(player);
     context.registry.emplace<tag::RotationSyncModel>(player);
-
-	addConnectedWeapons(context, player, SKYBLUE);
+	
+	addWeapons(context, player, SKYBLUE);
     return player;
 }

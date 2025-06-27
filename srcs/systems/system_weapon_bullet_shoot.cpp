@@ -12,7 +12,7 @@ void ecs_systems::bulletWeaponShoot(GameContext &context)
 		Vector3 &dir = view.get<AimDirection>(entity).value;
 
 		// Vector3 dir = getEntityAimNormalized(context, entity);
-		float rad = context.registry.any_of<CollisionBody>(entity) ? context.registry.get<CollisionBody>(entity).radius + weapon.bulletData.rad + 0.001f : 0.0f;
+		float rad = context.registry.any_of<CollisionBody>(entity) ? context.registry.get<CollisionBody>(entity).radius + weapon.bulletData.rad + 1.0f : 0.0f;
 		
 		spawnBullet(
 			context,

@@ -79,9 +79,11 @@ int main() {
         ecs_systems::playerAimTarget(context);
         ecs_systems::enemyMoveControl(context, dt);
         ecs_systems::enemyAimTarget(context);
+
         ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context);
         ecs_systems::entityCollision(context, dt);
+
         ecs_systems::hpRegen(context, dt);
         ecs_systems::entityLifetime(context, dt);
         ecs_systems::hpCleanup(context);
@@ -89,13 +91,16 @@ int main() {
         ecs_systems::cleanOutOfBound(context);
         ecs_systems::updatePlayerTargetable(context);
         ecs_systems::asteroidRespawn(context);
+
         ecs_systems::ammoReload(context, dt);
 		ecs_systems::bulletTargetAim(context);
-		ecs_systems::WeaponUpdateCooldown(context, dt);
-		ecs_systems::WeaponUpdateCanFire(context);
+		ecs_systems::weaponParentControlAim(context);
+		ecs_systems::weaponUpdateCooldown(context, dt);
+		ecs_systems::weaponUpdateCanFire(context);
         ecs_systems::bulletWeaponShoot(context);
-		ecs_systems::WeaponUpdateFireStatus(context);
-		ecs_systems::sync_model_rotation(context);
+		ecs_systems::weaponUpdateFireStatus(context);
+
+		ecs_systems::syncModelRotation(context);
         camaraFollowPlayer(context, camera);
         renderer.Render();
 
