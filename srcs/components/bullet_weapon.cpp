@@ -1,10 +1,10 @@
 #include "entities.hpp"
 #include "utils.hpp"
 
-static Color getColor(GameContext &context, entt::entity entity)
+static Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity)
 {
-	if (context.registry.any_of<RenderBody>(entity))
-		return colorMix(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 1.0f, 0.5f);
+	// if (context.registry.any_of<RenderBody>(entity))
+	// 	return colorMix(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 1.0f, 0.5f);
 	return WHITE;
 }
 

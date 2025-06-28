@@ -6,10 +6,13 @@ A fast-paced 3D space shooting game built using [raylib](https://www.raylib.com/
 
 - Fully 3D space environment
 - ECS architecture using `entt`
-- Player and enemy shooting with accurate aim assist
-- Real-time collisions, HP, and regeneration
-- Custom shaders for lighting effects  
-- Dynamic camera for realistic flight simulation 
+- Player vs enemy shooting with accurate aim assist
+- Real-time collisions, explosions, and accurate physics
+- Custom shaders for lighting effects
+- Intuitive and informative in-game HUD
+- Multiple weapons available
+- Varied enemy types with unique behaviors
+- Dynamic camera for realistic flight simulation
 - Asteroid spawning and debris effects
 
 ## 🕹️ Controls
@@ -25,13 +28,13 @@ A fast-paced 3D space shooting game built using [raylib](https://www.raylib.com/
 ## 📸 Snapshots
 
 ### Gameplay View
-![Gameplay](assets/snapshots/img_7.png)
+![Gameplay](assets/snapshots/img_6.png)
 
-### Enemy Lock-on and Targeting
-![Targeting](assets/snapshots/img_6.png)
+### Intense Shooting
+![Targeting](assets/snapshots/img_7.png)
 
 ### Game Over Screen
-![Game Over](assets/snapshots/img_8.png)
+![Game Over](assets/snapshots/img_4.png)
 
 ## Getting Started
 
@@ -54,12 +57,20 @@ By default `make` is `make run`
 
 ## 🛠️ Project Structure
 
-Source
-- `main.cpp` - Entry point, handles game loop
-- `utils.cpp` - Vector and helper functions
-- `srcs/classes/renderer.cpp` - All rendering logic, shaders, UI overlays
-- `srcs/systems/*` - ECS systems like movement, collisions, shooting
-
-Headers
-- `headers/components.hpp` - All ECS components like Position, HP, Weapon, etc.
-- `shoot_3d.hpp` - Main header file
+```
+headers/						// Structs, classes, and function declarations  
+includes/						// Third-party libraries: raylib, entt  
+main/main.cpp					// Game entry point and main loop  
+srcs/
+  └── components/				// Component utility functions  
+  └── entities/					// Entity creation and setup  
+  └── systems/					// ECS systems (e.g. movement, shooting)  
+  └── utils/					// Helper and utility functions  
+  └── classes/
+        ├── model_manager.cpp   // Model loading and caching  
+        └── renderer.cpp        // Rendering, UI, and shader logic  
+shaders/						// GLSL shader files  
+assets/models/					// 3D models used in the game  
+assets/snapshots/				// Screenshots and visuals  
+tests/							// Unit tests
+```
