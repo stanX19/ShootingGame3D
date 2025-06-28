@@ -64,10 +64,12 @@ void Renderer::Render()
 	DrawEntitiesWithShader();
 
 	EndMode3D();
+
 	DrawHealthBars();
 	DrawTargetable();
 
 	// HUD
+	DrawHUD();
 	DrawFPS(10, 10);
 
 	DrawTexts();
@@ -218,7 +220,7 @@ void Renderer::DrawTargetable()
 	Vector3 camUp = Vector3CrossProduct(camRight, camForward);
 
 	Vector2 screenCenter = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
-
+	float uiFrameRadius = GetUIFrameRadius();
 	for (auto entity : view)
 	{
 		const auto &pos = view.get<Position>(entity);
@@ -248,7 +250,7 @@ void Renderer::DrawTargetable()
 		{
 			Vector2 relToCenter = screenPos - screenCenter;
 			Vector2 unitDir = Vector2Normalize(relToCenter);
-			Vector2 arrowLoc = screenCenter + unitDir * 250;
+			Vector2 arrowLoc = screenCenter + unitDir * (uiFrameRadius - 10);
 			Vector2 left = { -unitDir.y, unitDir.x };
 
 			DrawTriangle(
@@ -278,4 +280,259 @@ void Renderer::DrawTargetable()
 		snprintf(txt, sizeof(txt), "%im", targetable.distance);
 		DrawText(txt, screenPos.x + 20, screenPos.y + 10, 20, MAROON);
 	}
+}
+
+void Renderer::DrawHUD()
+{
+    // Draw the main UI frame first (background)
+    DrawMainUIFrame();
+    
+    // Draw individual UI elements
+    DrawSpeedBar();
+    // DrawThrustBar();
+    DrawAmmoCircle();
+    DrawCrosshair();
+}
+
+Vector2 Renderer::GetUIFrameCenter() const
+{
+    return {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+}
+
+float Renderer::GetUIFrameRadius() const
+{
+    return fminf(GetScreenWidth(), GetScreenHeight()) * 0.25f;
+}
+
+void Renderer::DrawMainUIFrame()
+{
+    Vector2 center = GetUIFrameCenter();
+    float radius = GetUIFrameRadius();
+    // Main UI frame - large arc covering most of the lower half
+    float startAngle = 45.0f - 90.0f;  // Start from bottom-left
+    float endAngle = 315.0f - 90.0f;    // End at bottom-right
+    
+    // Draw multiple concentric arcs for depth and style
+    DrawRingLines(center, radius - 3, radius, startAngle, endAngle, 64, ColorAlpha(SKYBLUE, 0.8f));
+    // DrawRingLines(center, radius - 15, radius - 10, startAngle + 2, endAngle - 2, 48, ColorAlpha(BLUE, 0.6f));
+    // DrawRingLines(center, radius - 22, radius - 17, startAngle + 4, endAngle - 4, 32, ColorAlpha(DARKBLUE, 0.4f));
+    
+    // // Inner decorative rings
+    // DrawRingLines(center, radius * 0.85f, radius * 0.85f + 2, startAngle + 5, endAngle - 5, 48, ColorAlpha(SKYBLUE, 0.9f));
+    // DrawRingLines(center, radius * 0.75f, radius * 0.75f + 1, startAngle + 8, endAngle - 8, 32, ColorAlpha(SKYBLUE, 0.6f));
+    
+    // Add tick marks like a speedometer
+    for (int i = 0; i <= 10; i++) {
+        float tickAngle = startAngle + (endAngle - startAngle) * i / 10.0f;
+        float tickRadius1 = radius - 5;
+        float tickRadius2 = (i % 2 == 0) ? radius - 10 : radius - 15; // Longer ticks for even numbers
+        
+        float angleRad = tickAngle * DEG2RAD;
+        Vector2 tickStart = {center.x + cosf(angleRad) * tickRadius1, center.y + sinf(angleRad) * tickRadius1};
+        Vector2 tickEnd = {center.x + cosf(angleRad) * tickRadius2, center.y + sinf(angleRad) * tickRadius2};
+        
+        DrawLineEx(tickStart, tickEnd, 2.0f, ColorAlpha(SKYBLUE, 0.7f));
+    }
+}
+
+void Renderer::DrawSpeedBar()
+{
+    auto playerView = context.registry.view<tag::Player, Velocity, MaxSpeed>();
+    if (playerView.begin() == playerView.end()) return;
+    
+    auto entity = *playerView.begin();
+    const auto& velocity = playerView.get<Velocity>(entity);
+    const auto& maxSpeed = playerView.get<MaxSpeed>(entity);
+    
+    float currentSpeed = Vector3Length(velocity.value);
+    float speedRatio = fminf(currentSpeed / maxSpeed.value, 1.0f);
+    
+    // Position on the left side of the screen
+    Vector2 barPos = GetUIFrameCenter() + Vector2{-GetUIFrameRadius() - 50.0f, -50};
+    Vector2 barSize = {20, 100};
+    
+    // Background
+    DrawRectangleRounded({barPos.x - 2, barPos.y - 2, barSize.x + 4, barSize.y + 4}, 0.2f, 8, ColorAlpha(DARKGRAY, 0.8f));
+    DrawRectangleRounded({barPos.x, barPos.y, barSize.x, barSize.y}, 0.2f, 8, ColorAlpha(BLACK, 0.6f));
+    
+    // Speed bar fill
+    float fillHeight = barSize.y * speedRatio;
+    Color speedColor = speedRatio > 0.9f ? RED : (speedRatio > 0.7f ? ORANGE : GREEN);
+    DrawRectangleRounded({barPos.x, barPos.y + barSize.y - fillHeight, barSize.x, fillHeight}, 0.2f, 8, speedColor);
+    
+    // Label
+    DrawText("SPD", barPos.x - 5, barPos.y - 25, 16, WHITE);
+    
+    // Speed value
+    char speedText[16];
+    snprintf(speedText, sizeof(speedText), "%.0f", currentSpeed);
+    DrawText(speedText, barPos.x - 10, barPos.y + barSize.y + 5, 14, WHITE);
+}
+
+void Renderer::DrawThrustBar()
+{
+    auto playerView = context.registry.view<tag::Player, Velocity>();
+    if (playerView.begin() == playerView.end()) return;
+    
+    // For thrust, we'll use a simple representation based on current acceleration
+    // You might want to add a Thrust component for more accurate representation
+    float thrustRatio = 0.7f; // Placeholder - replace with actual thrust calculation
+    
+    // Position on the right side of the screen
+    Vector2 barPos = {GetScreenWidth() - 70.0f, GetScreenHeight() - 150.0f};
+    Vector2 barSize = {20.0f, 100.0f};
+    
+    // Background
+    DrawRectangleRounded({barPos.x - 2, barPos.y - 2, barSize.x + 4, barSize.y + 4}, 0.2f, 8, ColorAlpha(DARKGRAY, 0.8f));
+    DrawRectangleRounded({barPos.x, barPos.y, barSize.x, barSize.y}, 0.2f, 8, ColorAlpha(BLACK, 0.6f));
+    
+    // Thrust bar fill
+    float fillHeight = barSize.y * thrustRatio;
+    Color thrustColor = thrustRatio > 0.8f ? YELLOW : (thrustRatio > 0.5f ? ORANGE : BLUE);
+    DrawRectangleRounded({barPos.x, barPos.y + barSize.y - fillHeight, barSize.x, fillHeight}, 0.2f, 8, thrustColor);
+    
+    // Label
+    DrawText("THR", barPos.x - 5, barPos.y - 25, 16, WHITE);
+    
+    // Thrust percentage
+    char thrustText[16];
+    snprintf(thrustText, sizeof(thrustText), "%.0f%%", thrustRatio * 100);
+    DrawText(thrustText, barPos.x - 15, barPos.y + barSize.y + 5, 14, WHITE);
+}
+
+void Renderer::DrawAmmoCircle()
+{
+    auto playerView = context.registry.view<tag::Player>();
+    if (playerView.begin() == playerView.end()) return;
+    
+    auto playerEntity = *playerView.begin();
+    
+    // Collect all weapons with ammo for this player
+    auto weaponView = context.registry.view<WeaponParent, Ammo>();
+    std::vector<std::pair<float, float>> weaponAmmo; // pairs of (current, max)
+    
+    for (auto weaponEntity : weaponView) {
+        if (weaponView.get<WeaponParent>(weaponEntity).parent == playerEntity) {
+            const auto& ammo = weaponView.get<Ammo>(weaponEntity);
+            weaponAmmo.push_back({ammo.value, ammo.maxValue});
+        }
+    }
+
+    if (weaponAmmo.size() > 6) {
+        weaponAmmo.resize(6);
+    }
+    
+    if (weaponAmmo.empty())
+		return;
+    
+    Vector2 frameCenter = GetUIFrameCenter();
+    float frameRadius = GetUIFrameRadius();
+    float circleRadius = 15;
+
+    std::vector<Vector2> positions;
+    
+    int weaponsPerSide = (weaponAmmo.size() + 1) / 2; // Ceiling division
+    int leftSideWeapons = weaponsPerSide;
+    int rightSideWeapons = weaponAmmo.size() - leftSideWeapons;
+    
+    // Bottom left positions
+    float leftStartAngle = 220.0f - 90.0f; // Start angle for left side
+    float leftAngleRange = 10.0f;  // Angle range for left side weapons
+    
+    for (int i = 0; i < leftSideWeapons; i++) {
+        float angle = leftStartAngle + (leftAngleRange * i / std::max(1, leftSideWeapons - 1));
+        float angleRad = angle * DEG2RAD;
+        float distance = frameRadius + 60; // Distance from frame center
+        
+        Vector2 pos = {
+            frameCenter.x + cosf(angleRad) * distance,
+            frameCenter.y + sinf(angleRad) * distance
+        };
+        positions.push_back(pos);
+    }
+    
+    // Bottom right positions
+    float rightStartAngle = 140.0f - 90.0f; // Start angle for right side
+    float rightAngleRange = 10.0f;  // Angle range for right side weapons
+    
+    for (int i = 0; i < rightSideWeapons; i++) {
+        float angle = rightStartAngle - (rightAngleRange * i / std::max(1, rightSideWeapons - 1));
+        float angleRad = angle * DEG2RAD;
+        float distance = frameRadius + 60; // Distance from frame center
+        
+        Vector2 pos = {
+            frameCenter.x + cosf(angleRad) * distance,
+            frameCenter.y + sinf(angleRad) * distance
+        };
+        positions.push_back(pos);
+    }
+    
+    // Draw each weapon's ammo circle
+    for (size_t i = 0; i < weaponAmmo.size() && i < positions.size(); i++) {
+        Vector2 circleCenter = positions[i];
+        float currentAmmo = weaponAmmo[i].first;
+        float maxAmmo = weaponAmmo[i].second;
+        float ammoRatio = maxAmmo > 0 ? currentAmmo / maxAmmo : 0.0f;
+        
+        // Background circle
+        DrawRingLines(circleCenter, circleRadius - 2, circleRadius + 2, 0, 360, 24, ColorAlpha(DARKGRAY, 0.8f));
+        DrawRingLines(circleCenter, circleRadius - 1, circleRadius + 1, 0, 360, 24, ColorAlpha(BLACK, 0.6f));
+        
+        // Ammo arc (starts from top, goes clockwise)
+        float startAngle = 0 - 90.0f; // Start from top
+        float endAngle = startAngle + (360 * ammoRatio);
+        Color ammoColor = ammoRatio > 0.3f ? SKYBLUE : (ammoRatio > 0.1f ? YELLOW : RED);
+        
+        if (ammoRatio > 0) {
+            DrawRingLines(circleCenter, circleRadius - 3, circleRadius + 3, startAngle, endAngle, 32, ammoColor);
+        }
+        
+        // Center text - show current ammo
+        char ammoText[16];
+        snprintf(ammoText, sizeof(ammoText), "%.0f", currentAmmo);
+        int textWidth = MeasureText(ammoText, 14);
+        DrawText(ammoText, circleCenter.x - textWidth/2, circleCenter.y - 7, 14, WHITE);
+        
+        // Weapon number indicator (small number at top of circle)
+        char weaponNum[4];
+        snprintf(weaponNum, sizeof(weaponNum), "%zu", i + 1);
+        int numWidth = MeasureText(weaponNum, 10);
+        DrawText(weaponNum, circleCenter.x - numWidth/2, circleCenter.y - circleRadius - 15, 10, LIGHTGRAY);
+        
+        // Optional: Draw connection line to main UI frame for visual coherence
+        float connectionAngle = atan2f(circleCenter.y - frameCenter.y, circleCenter.x - frameCenter.x);
+        Vector2 frameEdge = {
+            frameCenter.x + cosf(connectionAngle) * (frameRadius - 10),
+            frameCenter.y + sinf(connectionAngle) * (frameRadius - 10)
+        };
+        Vector2 circleEdge = {
+            circleCenter.x - cosf(connectionAngle) * (circleRadius + 8),
+            circleCenter.y - sinf(connectionAngle) * (circleRadius + 8)
+        };
+        DrawLineEx(frameEdge, circleEdge, 1.0f, ColorAlpha(SKYBLUE, 0.3f));
+    }
+}
+
+void Renderer::DrawCrosshair()
+{
+    Vector2 center = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+    
+    // Main crosshair
+    float size = 15;
+    float gap = 5;
+    float thickness = 2;
+    
+    // Horizontal lines
+    DrawRectangle(center.x - size - gap, center.y - thickness/2, size, thickness, WHITE);
+    DrawRectangle(center.x + gap, center.y - thickness/2, size, thickness, WHITE);
+    
+    // Vertical lines
+    DrawRectangle(center.x - thickness/2, center.y - size - gap, thickness, size, WHITE);
+    DrawRectangle(center.x - thickness/2, center.y + gap, thickness, size, WHITE);
+    
+    // Center dot
+    DrawCircle(center.x, center.y, 2, RED);
+    
+    // Optional: outer crosshair ring for better visibility
+    // DrawRingLines(center, 25, 27, 0, 360, 32, ColorAlpha(WHITE, 0.3f));
 }

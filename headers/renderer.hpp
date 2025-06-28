@@ -35,6 +35,16 @@ private:
     void DrawHealthBars();
     void DrawTargetable();
     void DrawTexts();
+
+	void DrawSpeedBar();
+    void DrawThrustBar();
+    void DrawAmmoCircle();
+    void DrawCrosshair();
+    void DrawMainUIFrame();
+    void DrawHUD();
+    
+    Vector2 GetUIFrameCenter() const;
+    float GetUIFrameRadius() const;
 };
 
 #endif
