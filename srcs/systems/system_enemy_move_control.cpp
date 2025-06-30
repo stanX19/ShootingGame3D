@@ -30,7 +30,7 @@ void ecs_systems::enemyMoveControl(GameContext &context, float dt)
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / maxSpeed.value * 5.0f) * dt;
 		rotation.value = QuaternionSlerp(rotation.value, targetRotation, std::min(turnSpeedDt, 1.0f));
 
-		float targetSpeed = maxSpeed.value * (0.2 + 0.8 * (180 - angleDifference(targetRotation, rotation.value)) / 180);
+		float targetSpeed = maxSpeed.value * (0.5 + 0.5 * (180 - angleDifference(targetRotation, rotation.value)) / 180);
 
 		float newSpeed = Clamp(speed + Clamp(targetSpeed - speed, -20 * dt, 20 * dt), 0, maxSpeed.value);
 		velocity.value = GetForwardVector(rotation) * newSpeed;

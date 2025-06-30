@@ -22,7 +22,7 @@ static void linkWithParent(GameContext &context, entt::entity &turret, entt::ent
 	context.registry.emplace_or_replace<PositionAnchor>(turret, PositionAnchor{parent, relpos});
 	context.registry.emplace_or_replace<RotationAnchor>(turret, RotationAnchor{parent});
 	context.registry.emplace_or_replace<WeaponParent>(turret, WeaponParent{parent});
-	context.registry.emplace_or_replace<DeathAnchor>(turret, DeathAnchor{parent, 2});
+	context.registry.emplace_or_replace<DeathAnchor>(turret, DeathAnchor{parent, 0.75});
 }
 
 entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color) {

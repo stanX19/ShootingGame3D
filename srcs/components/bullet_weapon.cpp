@@ -33,14 +33,34 @@ void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	BulletWeapon weapon;
 
 	weapon.bulletData.hp = 50.0f;
-	weapon.bulletData.dmg = 5000.0f;
+	weapon.bulletData.dmg = 2500.0f;
 	weapon.bulletData.speed = 300.0f;
 	weapon.bulletData.rad = 0.2f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.0});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.75});
+	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+    context.registry.emplace_or_replace<AimTarget>(entity);
+    context.registry.emplace_or_replace<AimDirection>(entity);
+}
+
+void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
+{
+	BulletWeapon weapon;
+
+	weapon.bulletData.hp = 50.0f;
+	weapon.bulletData.dmg = 2500.0f;
+	weapon.bulletData.speed = 300.0f;
+	weapon.bulletData.rad = 0.2f;
+	weapon.bulletData.color = getColor(context, entity);
+	weapon.bulletData.lifetime = 10.0f;
+
+	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0, 5});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.50});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
     context.registry.emplace_or_replace<AimTarget>(entity);
     context.registry.emplace_or_replace<AimDirection>(entity);

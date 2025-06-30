@@ -1,5 +1,6 @@
 #include "renderer.hpp"
 #include <iostream>
+#include <algorithm>
 
 Renderer::Renderer(Camera3D &cam, GameContext &context)
 	: camera(cam), context(context)
@@ -379,7 +380,7 @@ void Renderer::DrawSpeedBar()
 	// Current speed value
 	char speedText[16];
 	snprintf(speedText, sizeof(speedText), "%.0f", currentSpeed);
-	Vector2 valuePos = {center.x + cosf(labelAngleRad) * labelRadius - MeasureText(speedText, 11), 
+	Vector2 valuePos = {center.x + cosf(labelAngleRad) * labelRadius - MeasureText(speedText, 14), 
 					    center.y + sinf(labelAngleRad) * labelRadius + 10};
 	DrawText(speedText, valuePos.x, valuePos.y, 14, SKYBLUE);
 	
@@ -437,22 +438,32 @@ void Renderer::DrawAmmoCircle()
 	auto playerEntity = *playerView.begin();
 	
 	// Collect all weapons with ammo for this player
-	auto weaponView = context.registry.view<WeaponParent, Ammo>();
 	std::vector<std::pair<float, float>> weaponAmmo; // pairs of (current, max)
-	
-	for (auto weaponEntity : weaponView) {
-		if (weaponView.get<WeaponParent>(weaponEntity).parent == playerEntity) {
-			const auto& ammo = weaponView.get<Ammo>(weaponEntity);
+
+	if (auto ammoPtr = context.registry.try_get<Ammo>(playerEntity)) {
+		weaponAmmo.push_back({ammoPtr->value, ammoPtr->maxValue});
+	} else if (auto cooldownPtr = context.registry.try_get<WeaponCooldown>(playerEntity)) {
+		weaponAmmo.push_back({std::min(1.0f, cooldownPtr->timeSinceLastShot / cooldownPtr->shootCooldown), 1.0});
+	}
+
+	for (auto [weaponEntity, weaponParent, ammo] : context.registry.view<WeaponParent, Ammo>().each()) {
+		if (weaponParent.parent == playerEntity) {
 			weaponAmmo.push_back({ammo.value, ammo.maxValue});
 		}
 	}
 
-	if (weaponAmmo.size() > 6) {
-		weaponAmmo.resize(6);
+	for (auto [weaponEntity, weaponParent, cooldown] : context.registry.view<WeaponParent, WeaponCooldown>(entt::exclude<Ammo>).each()) {
+		if (weaponParent.parent == playerEntity) {
+			weaponAmmo.push_back({std::min(1.0f, cooldown.timeSinceLastShot / cooldown.shootCooldown), 1.0});
+		}
 	}
-	
+
 	if (weaponAmmo.empty())
 		return;
+	
+	if (weaponAmmo.size() > 8) {
+		weaponAmmo.resize(8);
+	}
 	
 	Vector2 frameCenter = GetUIFrameCenter();
 	float frameRadius = GetUIFrameRadius();
@@ -466,10 +477,10 @@ void Renderer::DrawAmmoCircle()
 	
 	// Bottom left positions
 	float leftStartAngle = 240.0f - 90.0f; // Start angle for left side
-	float leftAngleRange = 10.0f;  // Angle range for left side weapons
+	float leftGapAngle = 10.0f;  // Angle range for left side weapons
 	
 	for (int i = 0; i < leftSideWeapons; i++) {
-		float angle = leftStartAngle + (leftAngleRange * i / std::max(1, leftSideWeapons - 1));
+		float angle = leftStartAngle + (leftGapAngle * i);
 		float angleRad = angle * DEG2RAD;
 		float distance = frameRadius + 60; // Distance from frame center
 		
@@ -479,13 +490,15 @@ void Renderer::DrawAmmoCircle()
 		};
 		positions.push_back(pos);
 	}
+
+	std::reverse(positions.begin(), positions.end());
 	
 	// Bottom right positions
 	float rightStartAngle = 120.0f - 90.0f; // Start angle for right side
-	float rightAngleRange = 10.0f;  // Angle range for right side weapons
+	float rightGapAngle = 10.0f;  // Angle range for right side weapons
 	
 	for (int i = 0; i < rightSideWeapons; i++) {
-		float angle = rightStartAngle - (rightAngleRange * i / std::max(1, rightSideWeapons - 1));
+		float angle = rightStartAngle - (rightGapAngle * i);
 		float angleRad = angle * DEG2RAD;
 		float distance = frameRadius + 60; // Distance from frame center
 		
