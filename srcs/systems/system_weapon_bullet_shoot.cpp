@@ -1,15 +1,25 @@
 #include "systems.hpp"
 #include "entities.hpp"
+#include "utils.hpp"
+#include <random>
 
 void ecs_systems::bulletWeaponShoot(GameContext &context)
 {
+	static std::mt19937 rng(std::random_device{}());
+	
 	auto view = context.registry.view<BulletWeapon, Position, AimDirection, tag::weapon::IsFiring, tag::weapon::CanFire>();
 
 	for (auto entity : view)
 	{
 		auto &weapon = view.get<BulletWeapon>(entity);
-		Vector3 &pos = view.get<Position>(entity).value;
-		Vector3 &dir = view.get<AimDirection>(entity).value;
+		Vector3 pos = view.get<Position>(entity).value;
+		Vector3 dir = view.get<AimDirection>(entity).value;
+
+		// shaking, assume dir is normalised
+		std::uniform_real_distribution<float> dist(0, weapon.bulletData.spreadSin);
+		Vector3 offest = Vector3Normalize(Vector3CrossProduct(randomUnitVector3(), Vector3Normalize(dir))) * dist(rng);
+		std::cout << weapon.bulletData.spreadSin << std::endl;
+		dir = Vector3Normalize(dir + offest);
 
 		// Vector3 dir = getEntityAimNormalized(context, entity);
 		float rad = context.registry.any_of<CollisionBody>(entity) ? context.registry.get<CollisionBody>(entity).radius + weapon.bulletData.rad + 1.0f : 0.0f;

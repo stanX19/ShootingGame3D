@@ -337,7 +337,9 @@ void Renderer::DrawSpeedBar()
 	const auto& maxSpeed = playerView.get<MaxSpeed>(entity);
 	
 	float currentSpeed = Vector3Length(velocity.value);
-	float speedRatio = fminf(currentSpeed / maxSpeed.value, 1.0f);
+	// float speedRatio = std::min(1.0f, 1.156f * (1 - std::exp(-2 * currentSpeed / maxSpeed.value)));
+	float speedRatio = currentSpeed / maxSpeed.value;
+	speedRatio = speedRatio > 0.5? 0.8 + 0.2 * ((speedRatio - 0.5) / 0.5): speedRatio / 0.5 * 0.8;
 	
 	Vector2 center = GetUIFrameCenter();
 	float frameRadius = GetUIFrameRadius();
@@ -356,15 +358,18 @@ void Renderer::DrawSpeedBar()
 				  startAngle, startAngle + maxAngleRange, 32, ColorAlpha(BLACK, 0.6f));
 	
 	// Interpolate between light blue and lime based on speed ratio
-	// Color speedColor = ColorLerp(BLUE, SKYBLUE, speedRatio);// std::pow(speedRatio, 2));
-	Color speedColor = ColorLerp(SKYBLUE, ORANGE, std::pow(speedRatio, 7));
+	// Color speedColor = ColorLerp(BLUE, SKYBLUE, speedRatio);
+	// Color speedColor = ColorLerp(SKYBLUE, ORANGE, std::pow(speedRatio, 5));
+	// Color speedColor = speedRatio > 0.8? ColorLerp(ORANGE, RED, (speedRatio - 0.8) / 0.2): SKYBLUE;
+	Color speedColor = speedRatio > 0.8? ORANGE: SKYBLUE;
 	if (speedRatio > 0) {
 		DrawRingLines(center, speedBarRadius - speedBarThickness/2 + 1, speedBarRadius + speedBarThickness/2 - 1, 
 					  startAngle, startAngle + currentAngleRange, 32, speedColor);
-		
+		// DrawRingLines(center, speedBarRadius - speedBarThickness/2 + 2, speedBarRadius + speedBarThickness/2 - 2, 
+		// 			  startAngle, startAngle + currentAngleRange, 32, speedColor);
 	}
 	// Add a glowing effect for high speeds
-	if (speedRatio > 0.8f) {
+	if (speedRatio > 0.75f) {
 		DrawRingLines(center, speedBarRadius - speedBarThickness/2, speedBarRadius + speedBarThickness/2, 
 						startAngle, startAngle + currentAngleRange, 32, ColorAlpha(speedColor, 0.5f));
 	}
@@ -382,7 +387,7 @@ void Renderer::DrawSpeedBar()
 	snprintf(speedText, sizeof(speedText), "%.0f", currentSpeed);
 	Vector2 valuePos = {center.x + cosf(labelAngleRad) * labelRadius - MeasureText(speedText, 14), 
 					    center.y + sinf(labelAngleRad) * labelRadius + 10};
-	DrawText(speedText, valuePos.x, valuePos.y, 14, SKYBLUE);
+	DrawText(speedText, valuePos.x, valuePos.y, 14, speedColor);
 	
 	// Speed limit indicator
 	if (maxSpeed.value > 0) {

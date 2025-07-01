@@ -14,13 +14,14 @@ void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 
 	weapon.bulletData.hp = 1.0f;
 	weapon.bulletData.dmg = 1000.0f;
-	weapon.bulletData.speed = 200.0f;
+	weapon.bulletData.speed = 400.0f;
 	weapon.bulletData.rad = 0.05f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
+	weapon.bulletData.spreadSin = std::sin(1.25 * DEG2RAD);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0, 15});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0, 30});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{3.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
@@ -34,10 +35,11 @@ void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 
 	weapon.bulletData.hp = 50.0f;
 	weapon.bulletData.dmg = 2500.0f;
-	weapon.bulletData.speed = 300.0f;
+	weapon.bulletData.speed = 600.0f;
 	weapon.bulletData.rad = 0.2f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
+	weapon.bulletData.spreadSin = std::sin(0.10 * DEG2RAD);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.75});
@@ -52,15 +54,16 @@ void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 
 	weapon.bulletData.hp = 50.0f;
 	weapon.bulletData.dmg = 2500.0f;
-	weapon.bulletData.speed = 300.0f;
+	weapon.bulletData.speed = 600.0f;
 	weapon.bulletData.rad = 0.2f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
+	weapon.bulletData.spreadSin = std::sin(0.20 * DEG2RAD);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0, 5});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.50});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.00});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
     context.registry.emplace_or_replace<AimTarget>(entity);
     context.registry.emplace_or_replace<AimDirection>(entity);
@@ -72,13 +75,14 @@ void emplaceWeaponBasic(GameContext &context, entt::entity entity)
 
 	weapon.bulletData.hp = 1.0f;
 	weapon.bulletData.dmg = 1000.0f;
-	weapon.bulletData.speed = 120.0f;
+	weapon.bulletData.speed = 240.0f;
 	weapon.bulletData.rad = 0.075f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
+	weapon.bulletData.spreadSin = std::sin(0.50 * DEG2RAD);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
     context.registry.emplace_or_replace<AimTarget>(entity);
     context.registry.emplace_or_replace<AimDirection>(entity);

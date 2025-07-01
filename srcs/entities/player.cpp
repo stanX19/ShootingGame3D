@@ -6,20 +6,21 @@ namespace {
 	Vector3 up = {0, 1, 0};
 	Vector3 front = {0, 0, 1};
 
-	void addTurretAt(GameContext &context, Color color, entt::entity &player, Vector3 relpos) {
-		entt::entity turret = spawnLinkedTurret(context, color, player, relpos);
-		emplaceWeaponMachineGun(context, turret);
-	}
+	// void addTurretAt(GameContext &context, Color color, entt::entity &player, Vector3 relpos) {
+	// 	entt::entity turret = spawnLinkedTurret(context, color, player, relpos);
+	// 	emplaceWeaponMachineGun(context, turret);
+	// }
 
 	void addWeapons(GameContext &context, entt::entity &player, Color color) {
     	context.registry.emplace<AimTarget>(player);
 		context.registry.emplace<tag::weapon::AIControlledAim>(player);
 		context.registry.emplace<tag::weapon::PlayerControlledShoot>(player);
-		addTurretAt(context, color, player, left * 3 + up * 0.5 + front * -1);
-		addTurretAt(context, color, player, left * -3 + up * 0.5 + front * -1);
-		addTurretAt(context, color, player, left * 3 + up * -0.5 + front * -1);
-		addTurretAt(context, color, player, left * -3 + up * -0.5 + front * -1);
-		emplaceWeaponSniper(context, player);
+		int subWeapons = GetRandomValue(0, 1000);
+		emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
+		emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
+		emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
+		emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
+		emplaceRandomWeapon(context, player);
 	}
 }
 
@@ -36,7 +37,7 @@ entt::entity spawnPlayer(GameContext &context) {
     context.registry.emplace<HP>(player, 800.0f);
     context.registry.emplace<HPRegen>(player, 20.0f);
     context.registry.emplace<Damage>(player, 5000.0f);
-    context.registry.emplace<MaxSpeed>(player, 100.0f);
+    context.registry.emplace<MaxSpeed>(player, 150.0f);
     context.registry.emplace<TurnSpeed>(player, 3.0f);
 	
     context.registry.emplace<tag::Shaded>(player);

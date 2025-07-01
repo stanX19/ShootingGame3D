@@ -25,6 +25,9 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 void emplaceWeaponMachineGun(GameContext &context, entt::entity entity);
 void emplaceWeaponBasic(GameContext &context, entt::entity entity);
 void emplaceWeaponSniper(GameContext &context, entt::entity entity);
+void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity);
 
+void emplaceRandomWeapon(GameContext &context, entt::entity turret);
+void emplaceRandomWeapon(GameContext &context, entt::entity turret, int value);
 
 #endif // ENTITIES_HPP

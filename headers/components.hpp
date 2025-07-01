@@ -120,6 +120,7 @@ struct BulletWeapon
 		float rad;
 		Color color;
 		float lifetime;
+		float spreadSin = 0.0;
 	} bulletData;
 };
 
