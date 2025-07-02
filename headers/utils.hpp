@@ -27,4 +27,7 @@ Vector3 randomPosInField();
 Quaternion randomRotation();
 std::string getParentPath(const std::string &path);
 std::string GetFileName(const std::string &path);
+
+Vector2 getMouseRatioRelCenter();
+Vector2 getMouseDirectionNormalized(float clampRatio = 1.0);
 #endif

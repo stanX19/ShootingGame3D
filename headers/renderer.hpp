@@ -41,6 +41,7 @@ private:
     void DrawAmmoCircle();
     void DrawCrosshair();
     void DrawMainUIFrame();
+    void DrawCursorArrow();
     void DrawHUD();
     
     Vector2 GetUIFrameCenter() const;

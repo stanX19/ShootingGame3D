@@ -42,7 +42,10 @@ entt::entity spawnEliteEnemy(GameContext &context, const Vector3& pos) {
     context.registry.emplace_or_replace<HPRegen>(enemy, 10.0f);
     context.registry.emplace_or_replace<MaxSpeed>(enemy, 5.0f);
 
-	emplaceWeaponSniper(context, enemy);
+	emplaceRandomWeapon(context, enemy);
+	int subWeapons = GetRandomValue(0, 1000);
+	emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, 0, 0}), subWeapons);
+	emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, 0, 0}), subWeapons);
 
     context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
 	return enemy;
@@ -61,7 +64,10 @@ entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
     context.registry.emplace_or_replace<MaxSpeed>(enemy, 40.0f);
     context.registry.emplace_or_replace<TurnSpeed>(enemy, 3.5f);
 
-	emplaceWeaponMachineGun(context, enemy);
+	emplaceRandomWeapon(context, enemy);
+	int subWeapons = GetRandomValue(0, 1000);
+	emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, 0, 0}), subWeapons);
+	emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, 0, 0}), subWeapons);
 
     context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
 	return enemy;
@@ -80,7 +86,7 @@ entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos) {
     context.registry.emplace_or_replace<MaxSpeed>(enemy, 10.0f);
     context.registry.emplace_or_replace<TurnSpeed>(enemy, 1.0f);
 
-	emplaceWeaponSniper(context, enemy);
+	emplaceRandomWeapon(context, enemy);
 	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, +radius * 0.8f, -2}));
 	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, -radius * 0.8f, -2}));
 	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, +radius * 0.8f, -2}));

@@ -23,7 +23,7 @@ void spawnDebris(GameContext &context, const Vector3& position, float originalRa
         context.registry.emplace<Position>(debris, position);
         context.registry.emplace<RenderBody>(debris, RenderBody{debrisModel, radius, originalColor, Vector3{0.0f, 0.0f, 0.0f}, randomRotation()});
         context.registry.emplace<Velocity>(debris, velocity);
-        context.registry.emplace<Lifespan>(debris, lifespan);
+        context.registry.emplace<Lifespan>(debris, lifespan + GetRandomValue(0, 200) / 100.0f);
     	context.registry.emplace<tag::Shaded>(debris);
     }
 }

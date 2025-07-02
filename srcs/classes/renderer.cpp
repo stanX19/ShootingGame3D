@@ -66,9 +66,6 @@ void Renderer::Render()
 
 	EndMode3D();
 
-	DrawHealthBars();
-	DrawTargetable();
-
 	// HUD
 	DrawHUD();
 	DrawFPS(10, 10);
@@ -204,6 +201,7 @@ void Renderer::DrawHealthBars()
 		float w = 40, h = 4;
 		float pct = (float)hp.value / hp.maxValue;
 
+		DrawRectangle(screen.x - w / 2 - 1, screen.y - 1, w + 2, h + 2, DARKGRAY);
 		DrawRectangle(screen.x - w / 2, screen.y, w, h, GRAY);
 		DrawRectangle(screen.x - w / 2, screen.y, w * pct, h, GREEN);
 	}
@@ -285,14 +283,19 @@ void Renderer::DrawTargetable()
 
 void Renderer::DrawHUD()
 {
-	// Draw the main UI frame first (background)
+	DrawHealthBars();
+	DrawTargetable();
+
+	auto playerView = context.registry.view<tag::Player>();
+	if (playerView.begin() == playerView.end())
+		return;
+		
 	DrawMainUIFrame();
-	
-	// Draw individual UI elements
 	DrawSpeedBar();
 	// DrawThrustBar();
 	DrawAmmoCircle();
 	DrawCrosshair();
+	DrawCursorArrow();
 }
 
 Vector2 Renderer::GetUIFrameCenter() const
@@ -360,8 +363,8 @@ void Renderer::DrawSpeedBar()
 	// Interpolate between light blue and lime based on speed ratio
 	// Color speedColor = ColorLerp(BLUE, SKYBLUE, speedRatio);
 	// Color speedColor = ColorLerp(SKYBLUE, ORANGE, std::pow(speedRatio, 5));
-	// Color speedColor = speedRatio > 0.8? ColorLerp(ORANGE, RED, (speedRatio - 0.8) / 0.2): SKYBLUE;
-	Color speedColor = speedRatio > 0.8? ORANGE: SKYBLUE;
+	Color speedColor = speedRatio > 0.8? ColorLerp(ORANGE, RED, (speedRatio - 0.8) / 0.2): SKYBLUE;
+	// Color speedColor = speedRatio > 0.8? ORANGE: SKYBLUE;
 	if (speedRatio > 0) {
 		DrawRingLines(center, speedBarRadius - speedBarThickness/2 + 1, speedBarRadius + speedBarThickness/2 - 1, 
 					  startAngle, startAngle + currentAngleRange, 32, speedColor);
@@ -369,7 +372,7 @@ void Renderer::DrawSpeedBar()
 		// 			  startAngle, startAngle + currentAngleRange, 32, speedColor);
 	}
 	// Add a glowing effect for high speeds
-	if (speedRatio > 0.75f) {
+	if (speedRatio > 0.7f) {
 		DrawRingLines(center, speedBarRadius - speedBarThickness/2, speedBarRadius + speedBarThickness/2, 
 						startAngle, startAngle + currentAngleRange, 32, ColorAlpha(speedColor, 0.5f));
 	}
@@ -570,4 +573,86 @@ void Renderer::DrawCrosshair()
 	
 	// Optional: outer crosshair ring for better visibility
 	// DrawRingLines(center, 25, 27, 0, 360, 32, ColorAlpha(WHITE, 0.3f));
+}
+
+
+void Renderer::DrawCursorArrow()
+{
+    Vector2 mousePos = GetMousePosition();
+    Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+    
+    // Calculate direction and distance
+    Vector2 direction = Vector2Subtract(mousePos, screenCenter);
+    float distance = Vector2Length(direction);
+    
+    if (distance > 0) {
+        Vector2 normalizedDir = Vector2Normalize(direction);
+        
+        // Animation parameters
+        static float animationTime = 0.0f;
+        animationTime += GetFrameTime() * 1.0f; // Speed multiplier
+        
+        // Arrow properties
+        float arrowSpacing = 40.0f;          // Distance between arrows
+        float arrowSpeed = 200.0f;           // Pixels per second
+        int numArrows = (int)(distance / arrowSpacing) + 1;
+        
+        // Draw animated arrows
+        for (int i = 0; i < numArrows; i++) {
+            // Calculate arrow position with animation offset
+            float baseOffset = i * arrowSpacing;
+            float animOffset = fmod(animationTime * arrowSpeed, arrowSpacing);
+            float totalOffset = baseOffset + animOffset;
+            
+            // Skip arrows that have passed the mouse position
+            if (totalOffset >= distance) continue;
+            
+            Vector2 arrowPos = Vector2Add(screenCenter, 
+                Vector2Scale(normalizedDir, totalOffset));
+            
+            // Arrow size and fade based on progress
+            float progress = totalOffset / distance;
+            float alpha = 1.0f - (progress * 0.3f); // Fade slightly toward mouse
+            float arrowSize = 8.0f * (1.0f - progress * 0.2f); // Shrink slightly
+            
+            // Draw arrow (triangle pointing toward mouse)
+            Vector2 arrowTip = Vector2Add(arrowPos, Vector2Scale(normalizedDir, arrowSize));
+            Vector2 arrowLeft = Vector2Add(arrowPos, 
+                Vector2Scale(Vector2Rotate(normalizedDir, -2.5f), arrowSize * 0.6f));
+            Vector2 arrowRight = Vector2Add(arrowPos, 
+                Vector2Scale(Vector2Rotate(normalizedDir, 2.5f), arrowSize * 0.6f));
+            
+            Color arrowColor = ColorAlpha(SKYBLUE, alpha * 0.9f);
+            Color arrowBorder = ColorAlpha(DARKBLUE, alpha * 0.7f);
+            
+            // Draw arrow border (slightly offset)
+            DrawTriangle(Vector2Add(arrowTip, {1, 1}), 
+                        Vector2Add(arrowLeft, {1, 1}), 
+                        Vector2Add(arrowRight, {1, 1}), 
+                        arrowBorder);
+            
+            // Draw main arrow
+            DrawTriangle(arrowTip, arrowLeft, arrowRight, arrowColor);
+        }
+    }
+    
+    // Draw base line (optional, more subtle)
+    float lineThickness = 1.0f;
+    Color lineColor = ColorAlpha(SKYBLUE, 0.3f);
+    DrawLineEx(screenCenter, mousePos, lineThickness, lineColor);
+    
+    // Draw circle at mouse position
+    float circleRadius = 8.0f;
+    Color circleColor = WHITE;
+    Color circleBorder = ColorAlpha(BLACK, 0.8f);
+    
+    // Draw border first (slightly larger circle)
+    DrawCircleV(mousePos, circleRadius + 1, circleBorder);
+    // Draw main circle
+    DrawCircleV(mousePos, circleRadius, circleColor);
+    DrawCircleV(mousePos, 2.0f, SKYBLUE);
+    
+    // Draw center indicator
+    DrawCircleV(screenCenter, 4.0f, ColorAlpha(SKYBLUE, 0.8f));
+    DrawCircleV(screenCenter, 2.0f, WHITE);
 }

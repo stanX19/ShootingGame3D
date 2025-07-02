@@ -121,6 +121,7 @@ struct BulletWeapon
 		Color color;
 		float lifetime;
 		float spreadSin = 0.0;
+		int bulletCount = 1;
 	} bulletData;
 };
 

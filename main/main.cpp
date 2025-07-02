@@ -60,12 +60,13 @@ static void resetGame(GameContext &context) {
     context.registry.clear();
     spawnPlayer(context);
 	spawnSunAndStars(context);
+	SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
 }
 
 int main() {
     InitWindow(1600, 900, "3D Space Shooter");
     SetTargetFPS(60);
-    DisableCursor();
+    // HideCursor();
 
     Camera3D camera;
     setup_camera(camera);
