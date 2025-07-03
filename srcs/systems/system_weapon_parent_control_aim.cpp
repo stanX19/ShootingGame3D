@@ -3,7 +3,7 @@
 
 void ecs_systems::weaponParentControlAim(GameContext& context) {
     auto aimTargetView = context.registry.view<AimTarget>();
-	auto view = context.registry.view<WeaponParent, AimTarget, tag::weapon::ParentControlledAim>();
+	auto view = context.registry.view<WeaponParent, AimTarget, tag::weapon::FollowParentAim>();
 
 	for (auto entity : view) {
 		auto& wParent = view.get<WeaponParent>(entity);

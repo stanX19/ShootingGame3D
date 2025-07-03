@@ -27,7 +27,7 @@ void ecs_systems::enemyAimTarget(GameContext &context)
 		Vector3 toTarget = targetPos - position.value;
 		float dist = Vector3Length(toTarget);
 
-		if ((dist < 250.0f) && Vector3DotProduct(GetForwardVector(rotation), Vector3Normalize(toTarget)) > cosf(DEG2RAD * 20.0f)) {
+		if ((dist < 350.0f) && Vector3DotProduct(GetForwardVector(rotation), Vector3Normalize(toTarget)) > cosf(DEG2RAD * 20.0f)) {
 			context.registry.emplace_or_replace<tag::weapon::IsFiring>(entity);
 		} else {
 			context.registry.remove<tag::weapon::IsFiring>(entity);

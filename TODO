@@ -36,11 +36,6 @@
 	- seperate death logic of different entities using tags
 12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::AIControl
 13. model_manager apply scaling to model when loading such that new scale reflects real scale (compared to unit sphere)
-14. UI
-	- speed bar
-	- thrust bar
-	- ammo circle label
-	- cross at center
-	- huge circle centered, below direction arrows
 15. Realistic physics, no more breaking in vacum
 16. Have another system to assign bitwise faction value
+17. number control for weapon firing

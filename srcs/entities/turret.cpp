@@ -28,15 +28,15 @@ static void linkWithParent(GameContext &context, entt::entity &turret, entt::ent
 entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color) {
     entt::entity turret = spawnBaseTurret(context, color);
     context.registry.emplace<tag::weapon::AIControlledAim>(turret);
-	context.registry.emplace<tag::weapon::AIControlledShoot>(turret);
+	context.registry.emplace<tag::weapon::AIControlledFire>(turret);
     return turret;
 }
 
 entt::entity spawnLinkedTurret(GameContext &context, Color color, entt::entity &parent, Vector3 relpos) {
 	entt::entity turret = spawnBaseTurret(context, color);
 	linkWithParent(context, turret, parent, relpos);
-	context.registry.emplace<tag::weapon::ParentControlledAim>(turret);
-	context.registry.emplace<tag::weapon::ParentControlledShoot>(turret);
+	context.registry.emplace<tag::weapon::FollowParentAim>(turret);
+	context.registry.emplace<tag::weapon::FollowParentFire>(turret);
 	
 	return turret;
 }
@@ -45,7 +45,7 @@ entt::entity spawnLinkedAutoTurret(GameContext &context, Color color, entt::enti
 	entt::entity turret = spawnBaseTurret(context, color);
 	linkWithParent(context, turret, parent, relpos);
 	context.registry.emplace<tag::weapon::AIControlledAim>(turret);
-	context.registry.emplace<tag::weapon::AIControlledShoot>(turret);
+	context.registry.emplace<tag::weapon::AIControlledFire>(turret);
 
 	return turret;
 }

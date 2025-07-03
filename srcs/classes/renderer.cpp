@@ -76,9 +76,7 @@ void Renderer::Render()
 }
 
 void Renderer::DrawTexts() {
-	auto playerView = context.registry.view<tag::Player>();
-
-	if (playerView.begin() != playerView.end())
+	if (context.registry.valid(context.currentPlayer))
 	{
 		int totalEntities = 0;
 		auto hittableView = context.registry.view<CollisionBody, Position, HP>();
@@ -90,7 +88,9 @@ void Renderer::DrawTexts() {
 			}
 		}
 		DrawText(TextFormat("Entities: %d", totalEntities), 10, 30, 20, WHITE);
-		DrawText("WASD to move, Arrows to turn, LMB/Space to shoot", 10, 70, 20, WHITE);
+		DrawText("Move: W S or Right click", 10, 50, 20, WHITE);
+		DrawText("Turn: Arrows or Mouse cursor", 10, 70, 20, WHITE);
+		DrawText("Fire: Space or Left click", 10, 90, 20, WHITE);
 	}
 	else
 	{
@@ -210,9 +210,8 @@ void Renderer::DrawHealthBars()
 void Renderer::DrawTargetable()
 {
 	auto view = context.registry.view<Position, PlayerTargetable>();
-	auto playerView = context.registry.view<tag::Player, AimTarget>();
-
-	entt::entity targetedEntity = playerView.begin() != playerView.end() ? playerView.get<AimTarget>(*playerView.begin()).entity : entt::null;
+	AimTarget *aimTargetPtr = context.registry.try_get<AimTarget>(context.currentPlayer);
+	entt::entity targetedEntity = aimTargetPtr? aimTargetPtr->entity: entt::null;
 
 	Vector3 camForward = Vector3Normalize(camera.target - camera.position);
 	Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
@@ -220,12 +219,16 @@ void Renderer::DrawTargetable()
 
 	Vector2 screenCenter = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
 	float uiFrameRadius = GetUIFrameRadius();
+
+	static float animationAngle = 0.0f;
+	animationAngle = WrapAngle(animationAngle + GetFrameTime() * 3.0f); // Adjust blink speed
+
 	for (auto entity : view)
 	{
 		const auto &pos = view.get<Position>(entity);
 		const auto &targetable = view.get<PlayerTargetable>(entity);
 
-		if (targetable.distance > 4500)
+		if (targetable.distance > 7500)
 			continue;
 		Vector3 toTarget = targetable.toSelf;
 		Vector3 local;
@@ -239,14 +242,16 @@ void Renderer::DrawTargetable()
 
 		if (behind)
 		{
-			screenPos.x = local.x * 0.5f + 0.5f;
-			screenPos.y = local.y * 0.5f + 0.5f;
+			screenPos.x = local.x;
+			screenPos.y = local.y;
 			screenPos.x *= GetScreenWidth();
 			screenPos.y *= GetScreenHeight();
 		}
 
 		if (behind || screenPos.x < 0 || screenPos.x > GetScreenWidth() || screenPos.y < 0 || screenPos.y > GetScreenHeight())
 		{
+			if (targetable.distance > 5500)
+				continue;
 			Vector2 relToCenter = screenPos - screenCenter;
 			Vector2 unitDir = Vector2Normalize(relToCenter);
 			Vector2 arrowLoc = screenCenter + unitDir * (uiFrameRadius + 20);
@@ -267,8 +272,8 @@ void Renderer::DrawTargetable()
 		{
 			float innerRad = 17 + 5000.0f / targetable.distance;
 			Color aimColor = MAROON;
-			DrawRingLines(screenPos, innerRad, innerRad + 2, 90, 180, 12, aimColor);
-			DrawRingLines(screenPos, innerRad, innerRad + 2, 270, 360, 12, aimColor);
+			DrawRingLines(screenPos, innerRad, innerRad + 2, 90 + animationAngle, 180 + animationAngle, 12, aimColor);
+			DrawRingLines(screenPos, innerRad, innerRad + 2, 270 + animationAngle, 360 + animationAngle, 12, aimColor);
 			DrawLine(screenPos.x + innerRad + 2, screenPos.y, screenPos.x + innerRad + 7, screenPos.y, aimColor);
 			DrawLine(screenPos.x - innerRad - 2, screenPos.y, screenPos.x - innerRad - 7, screenPos.y, aimColor);
 			DrawLine(screenPos.x, screenPos.y + innerRad + 2, screenPos.x, screenPos.y + innerRad + 7, aimColor);
@@ -286,8 +291,7 @@ void Renderer::DrawHUD()
 	DrawHealthBars();
 	DrawTargetable();
 
-	auto playerView = context.registry.view<tag::Player>();
-	if (playerView.begin() == playerView.end())
+	if (!context.registry.valid(context.currentPlayer))
 		return;
 		
 	DrawMainUIFrame();
@@ -296,6 +300,7 @@ void Renderer::DrawHUD()
 	DrawAmmoCircle();
 	DrawCrosshair();
 	DrawCursorArrow();
+	DrawCollisionWarning();
 }
 
 Vector2 Renderer::GetUIFrameCenter() const
@@ -332,12 +337,12 @@ void Renderer::DrawMainUIFrame()
 
 void Renderer::DrawSpeedBar()
 {
-	auto playerView = context.registry.view<tag::Player, Velocity, MaxSpeed>();
-	if (playerView.begin() == playerView.end()) return;
+	if (!context.registry.all_of<Velocity, MaxSpeed>(context.currentPlayer))
+		return ;
 	
-	auto entity = *playerView.begin();
-	const auto& velocity = playerView.get<Velocity>(entity);
-	const auto& maxSpeed = playerView.get<MaxSpeed>(entity);
+	entt::entity entity = context.currentPlayer;
+	const auto& velocity = context.registry.get<Velocity>(entity);
+	const auto& maxSpeed = context.registry.get<MaxSpeed>(entity);
 	
 	float currentSpeed = Vector3Length(velocity.value);
 	// float speedRatio = std::min(1.0f, 1.156f * (1 - std::exp(-2 * currentSpeed / maxSpeed.value)));
@@ -409,8 +414,8 @@ void Renderer::DrawSpeedBar()
 
 void Renderer::DrawThrustBar()
 {
-	auto playerView = context.registry.view<tag::Player, Velocity>();
-	if (playerView.begin() == playerView.end()) return;
+	if (!context.registry.all_of<Velocity>(context.currentPlayer))
+		return ;
 	
 	// For thrust, we'll use a simple representation based on current acceleration
 	// You might want to add a Thrust component for more accurate representation
@@ -440,28 +445,26 @@ void Renderer::DrawThrustBar()
 
 void Renderer::DrawAmmoCircle()
 {
-	auto playerView = context.registry.view<tag::Player>();
-	if (playerView.begin() == playerView.end()) return;
-	
-	auto playerEntity = *playerView.begin();
+	if (!context.registry.valid(context.currentPlayer))
+		return;
 	
 	// Collect all weapons with ammo for this player
 	std::vector<std::pair<float, float>> weaponAmmo; // pairs of (current, max)
 
-	if (auto ammoPtr = context.registry.try_get<Ammo>(playerEntity)) {
+	if (auto ammoPtr = context.registry.try_get<Ammo>(context.currentPlayer)) {
 		weaponAmmo.push_back({ammoPtr->value, ammoPtr->maxValue});
-	} else if (auto cooldownPtr = context.registry.try_get<WeaponCooldown>(playerEntity)) {
+	} else if (auto cooldownPtr = context.registry.try_get<WeaponCooldown>(context.currentPlayer)) {
 		weaponAmmo.push_back({std::min(1.0f, cooldownPtr->timeSinceLastShot / cooldownPtr->shootCooldown), 1.0});
 	}
 
 	for (auto [weaponEntity, weaponParent, ammo] : context.registry.view<WeaponParent, Ammo>().each()) {
-		if (weaponParent.parent == playerEntity) {
+		if (weaponParent.parent == context.currentPlayer) {
 			weaponAmmo.push_back({ammo.value, ammo.maxValue});
 		}
 	}
 
 	for (auto [weaponEntity, weaponParent, cooldown] : context.registry.view<WeaponParent, WeaponCooldown>(entt::exclude<Ammo>).each()) {
-		if (weaponParent.parent == playerEntity) {
+		if (weaponParent.parent == context.currentPlayer) {
 			weaponAmmo.push_back({std::min(1.0f, cooldown.timeSinceLastShot / cooldown.shootCooldown), 1.0});
 		}
 	}
@@ -617,10 +620,8 @@ void Renderer::DrawCursorArrow()
             
             // Draw arrow (triangle pointing toward mouse)
             Vector2 arrowTip = Vector2Add(arrowPos, Vector2Scale(normalizedDir, arrowSize));
-            Vector2 arrowLeft = Vector2Add(arrowPos, 
-                Vector2Scale(Vector2Rotate(normalizedDir, -2.5f), arrowSize * 0.6f));
-            Vector2 arrowRight = Vector2Add(arrowPos, 
-                Vector2Scale(Vector2Rotate(normalizedDir, 2.5f), arrowSize * 0.6f));
+            Vector2 arrowLeft = Vector2Add(arrowPos, Vector2Scale(Vector2Rotate(normalizedDir, -2.5f), arrowSize * 0.6f));
+            Vector2 arrowRight = Vector2Add(arrowPos, Vector2Scale(Vector2Rotate(normalizedDir, 2.5f), arrowSize * 0.6f));
             
             Color arrowColor = ColorAlpha(SKYBLUE, alpha * 0.9f);
             Color arrowBorder = ColorAlpha(DARKBLUE, alpha * 0.7f);
@@ -655,4 +656,97 @@ void Renderer::DrawCursorArrow()
     // Draw center indicator
     DrawCircleV(screenCenter, 4.0f, ColorAlpha(SKYBLUE, 0.8f));
     DrawCircleV(screenCenter, 2.0f, WHITE);
+}
+
+void Renderer::DrawCollisionWarning() {
+	const static float warningTime = 5.0f;
+	const static float warningDist = 10.0f;
+	std::vector<Vector3> warnings;
+	auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
+	
+	if (!posA || !velA || !bodyA)
+    	return;
+	// Find all potential collision positions
+	for (auto [other, posB, velB, bodyB, dmgB] : context.registry.view<Position, Velocity, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
+		if (context.currentPlayer == other)
+			continue;
+		
+		if (willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime)) {
+			warnings.push_back(posB.value);
+		}
+	}
+	for (auto [other, posB, bodyB, dmgB] : context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet, Velocity>).each()) {
+		if (context.currentPlayer == other)
+			continue;
+		
+		if (willCollide(posA->value, velA->value, posB.value, Vector3Zero(), bodyA->radius + bodyB.radius + warningDist, warningTime)) {
+			warnings.push_back(posB.value);
+		}
+	}
+
+	if (warnings.empty())
+		return;
+
+	// Display proximity alert text
+	const char* alertMsg = "PROXIMITY ALERT";
+	int msgWidth = MeasureText(alertMsg, 24);
+	Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
+	
+	// Blinking effect for urgency
+	static float blinkTimer = 0.0f;
+	blinkTimer += GetFrameTime() * 6.0f; // Adjust blink speed
+	float alpha = 0.7f + 0.3f * sinf(blinkTimer);
+	
+	// Draw alert background
+	DrawRectangle(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha * 0.3f));
+	DrawRectangleLines(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha));
+	
+	// Draw alert text
+	DrawText(alertMsg, alertPos.x, alertPos.y, 24, ColorAlpha(RED, alpha));
+
+	// Draw warning indicators for each collision threat
+	Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+	float uiFrameRadius = GetUIFrameRadius();
+	
+	for (const Vector3& warningPos : warnings) {
+		Vector2 screenPos = GetWorldToScreen(warningPos, camera);
+		bool isOnScreen = (screenPos.x >= 0 && screenPos.x <= GetScreenWidth() && 
+						   screenPos.y >= 0 && screenPos.y <= GetScreenHeight() &&
+						   isInFrontOfCamera(warningPos, camera));
+		
+		if (isOnScreen) {
+			// Draw on-screen warning indicator
+			float pulseRadius = 20.0f + 10.0f * sinf(blinkTimer * 2.0f);
+			DrawCircleLines(screenPos.x, screenPos.y, pulseRadius, ColorAlpha(RED, alpha));
+			DrawCircleLines(screenPos.x, screenPos.y, pulseRadius + 2, ColorAlpha(YELLOW, alpha * 0.7f));
+			
+			// Warning symbol (exclamation mark)
+			DrawText("!", screenPos.x - 4, screenPos.y - 10, 20, ColorAlpha(RED, alpha));
+		} else {
+			// Draw off-screen warning indicator
+			Vector3 toWarning = warningPos - camera.position;
+			Vector3 camForward = Vector3Normalize(camera.target - camera.position);
+			Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
+			Vector3 camUp = Vector3CrossProduct(camRight, camForward);
+			
+			// Project warning direction to screen space
+			Vector3 local;
+			local.x = Vector3DotProduct(toWarning, camRight);
+			local.y = Vector3DotProduct(toWarning, camUp);
+			local.z = Vector3DotProduct(toWarning, camForward);
+			
+			// Calculate screen edge indicator position
+			Vector2 directionToWarning = {local.x, local.y};
+			
+			directionToWarning = Vector2Normalize(directionToWarning);
+
+			// Distance text
+			float distance = Vector3Length(toWarning);
+			char distText[32];
+			snprintf(distText, sizeof(distText), "%.0fm", distance);
+			int textWidth = MeasureText(distText, 16);
+			Vector2 textPos = screenCenter + directionToWarning * (uiFrameRadius + 50);
+			DrawText(distText, textPos.x - textWidth/2, textPos.y - 8, 16, ColorAlpha(RED, alpha));
+		}
+	}
 }

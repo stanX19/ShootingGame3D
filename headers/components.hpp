@@ -167,11 +167,13 @@ namespace tag {
 	struct Targetable {};
 	namespace weapon {
 		struct IsWeapon {};
-		struct ParentControlledAim {};		// dont do anything, parent updates AimTarget
+		struct ParentControlledAim {};		// dont do anything, parent updates AimTarget; TODO
+		struct FollowParentAim {};			// follows parent's AimTarget
 		struct AIControlledAim {};			// updates AimTarget automatically using rotation; TODO; need to do factions first
-		struct PlayerControlledShoot {};	// read keyboard or mouse inputs
-		struct AIControlledShoot {};		// decide IsFiring using distance and angle; TODO
-		struct ParentControlledShoot {};	// follow parent firing
+		struct PlayerControlledFire {};		// read keyboard or mouse inputs
+		struct ParentControlledFire {};		// dont do anything, parent updates AimTarget; TODO
+		struct AIControlledFire {};			// decide IsFiring using distance and angle; TODO
+		struct FollowParentFire {};			// follow parent firing
 		struct IsFiring {};
 		struct CanFire {};
 	};

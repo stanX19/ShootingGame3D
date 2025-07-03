@@ -42,6 +42,7 @@ private:
     void DrawCrosshair();
     void DrawMainUIFrame();
     void DrawCursorArrow();
+    void DrawCollisionWarning();
     void DrawHUD();
     
     Vector2 GetUIFrameCenter() const;

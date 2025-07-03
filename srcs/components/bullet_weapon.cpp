@@ -4,7 +4,7 @@
 static Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity)
 {
 	// if (context.registry.any_of<RenderBody>(entity))
-	// 	return colorMix(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 1.0f, 0.5f);
+	// 	return colorLerp(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 0.4);
 	return WHITE;
 }
 
@@ -35,7 +35,7 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 
 	weapon.bulletData.hp = 1.0f;
 	weapon.bulletData.dmg = 500.0f;
-	weapon.bulletData.speed = 200.0f;
+	weapon.bulletData.speed = 400.0f;
 	weapon.bulletData.rad = 0.025f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
@@ -43,8 +43,8 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = 20;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0, 3});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.0});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0, 5});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
     context.registry.emplace_or_replace<AimTarget>(entity);

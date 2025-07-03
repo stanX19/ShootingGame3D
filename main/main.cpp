@@ -32,26 +32,25 @@ static void setup_camera(Camera3D& camera) {
 }
 
 static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt) {
-    auto playerView = context.registry.view<tag::Player, Position, Rotation>();
-    for (auto entity : playerView) {
-        Position& pos = playerView.get<Position>(entity);
-        Rotation& rot = playerView.get<Rotation>(entity);
-        Vector3 forward = GetForwardVector(rot);
-        Vector3 up = GetUpVector(rot);
+	if (!context.registry.valid(context.currentPlayer))
+		return ;
+	Position& pos = context.registry.get<Position>(context.currentPlayer);
+	Rotation& rot = context.registry.get<Rotation>(context.currentPlayer);
+	Vector3 forward = GetForwardVector(rot);
+	Vector3 up = GetUpVector(rot);
 
-        // Choose follow direction
-        bool shift = IsKeyDown(KEY_RIGHT_SHIFT);
-        Vector3 desiredPosition = pos.value + (shift ? forward * 10.0f : forward * -10.0f) + up * 5.0f;
-        Vector3 desiredTarget   = pos.value + (shift ? forward * -10.0f : forward * 10.0f);
+	// Choose follow direction
+	bool shift = IsKeyDown(KEY_RIGHT_SHIFT);
+	Vector3 desiredPosition = pos.value + (shift ? forward * 10.0f : forward * -10.0f) + up * 5.0f;
+	Vector3 desiredTarget   = pos.value + (shift ? forward * -10.0f : forward * 10.0f);
 
-        float smoothing = 12.0f;  // greater --> greater lerp
-        float lerp = 1.0f - std::exp(-smoothing * dt);
+	float smoothing = 12.0f;  // greater --> greater lerp
+	float lerp = 1.0f - std::exp(-smoothing * dt);
 
-        // Smooth camera motion
-        camera.position = Vector3Lerp(camera.position, desiredPosition, lerp);
-        camera.target = Vector3Lerp(camera.target, desiredTarget, lerp);
-        camera.up = Vector3Lerp(camera.up, up, lerp);
-    }
+	// Smooth camera motion
+	camera.position = Vector3Lerp(camera.position, desiredPosition, lerp);
+	camera.target = Vector3Lerp(camera.target, desiredTarget, lerp);
+	camera.up = Vector3Lerp(camera.up, up, lerp);
 }
 
 
@@ -83,6 +82,7 @@ int main() {
         ecs_systems::playerMoveControl(context, dt);
         ecs_systems::playerShootControl(context);
         ecs_systems::playerAimTarget(context);
+        // ecs_systems::playerRespawn(context);
         ecs_systems::enemyMoveControl(context, dt);
         ecs_systems::enemyAimTarget(context);
 

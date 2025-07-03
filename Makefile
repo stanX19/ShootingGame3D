@@ -22,7 +22,7 @@ IFLAGS		:= -I. $(HEADERS_INC)
 LFLAGS		= -Lincludes/raylib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 CC			= g++
-CFLAGS		= -std=c++20 -Wall -Wextra -Werror -MMD -MP -fmax-errors=3 #-g3 -fsanitize=address
+CFLAGS		= -std=c++20 -Wall -Wextra -Werror -MMD -MP -fmax-errors=3 #-g3 # -fsanitize=address
 AR			= ar -rcs
 RM			= rm -rf
 UP			= \033[1A

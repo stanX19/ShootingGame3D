@@ -1,31 +1,10 @@
 #include "systems.hpp"
+#include "utils.hpp"
 #include <unordered_map>
 #include <vector>
 #include <tuple>
 #include <cmath>
 #include <iostream>
-
-static bool hadCollision(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance)
-{
-	Vector3 relPos = posA - posB;
-	Vector3 relVel = velA - velB;
-
-	float a = Vector3DotProduct(relVel, relVel);
-	float b = 2.0f * Vector3DotProduct(relPos, relVel);
-	float c = Vector3DotProduct(relPos, relPos) - collisionDistance * collisionDistance;
-
-	float discriminant = b * b - 4 * a * c;
-
-	if (discriminant < 0.0f || a == 0.0f) // if no solution or no relative movement
-		return (c <= 0.0001);				  // return (is currently overlaping)
-
-	float sqrtD = sqrtf(discriminant);
-	float t1 = (-b - sqrtD) / (2.0f * a);
-	float t2 = (-b + sqrtD) / (2.0f * a);
-
-	// Collision happens during the frame
-	return ((t1 >= 0.0f && t1 <= 1.0f) || (t2 >= 0.0f && t2 <= 1.0f)) || c <= 0.0001;
-}
 
 void ecs_systems::entityCollision(GameContext &context, float dt)
 {
@@ -79,7 +58,7 @@ void ecs_systems::entityCollision(GameContext &context, float dt)
 				continue;
 
 			float combinedRadius = A.radius + B.radius;
-			if (hadCollision(A.position, A.velocity, B.position, B.velocity, combinedRadius))
+			if (willCollide(A.position, A.velocity, B.position, B.velocity, combinedRadius, 1.0))
 			{
 				damageMap[B.id] += A.damage;
 				damageMap[A.id] += B.damage;

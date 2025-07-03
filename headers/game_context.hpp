@@ -6,6 +6,7 @@
 struct GameContext {
 	ModelManager meshManager;
 	entt::registry registry;
+	entt::entity currentPlayer = entt::null;
 };
 
 #endif  // GAME_CONTEXT_HPP

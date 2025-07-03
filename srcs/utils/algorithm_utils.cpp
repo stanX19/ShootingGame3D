@@ -1,8 +1,27 @@
 #include "utils.hpp"
+#include "includes.hpp"
 
-#include "raymath.h"
-#include <cmath>
-#include <optional>
+bool willCollide(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance, float maxDt)
+{
+	Vector3 relPos = posA - posB;
+	Vector3 relVel = velA - velB;
+
+	float a = Vector3DotProduct(relVel, relVel);
+	float b = 2.0f * Vector3DotProduct(relPos, relVel);
+	float c = Vector3DotProduct(relPos, relPos) - collisionDistance * collisionDistance;
+
+	float discriminant = b * b - 4 * a * c;
+
+	if (discriminant < 0.0f || a == 0.0f) // if no solution or no relative movement
+		return (c <= 0.0001);				  // return (is currently overlaping)
+
+	float sqrtD = sqrtf(discriminant);
+	float t1 = (-b - sqrtD) / (2.0f * a);
+	float t2 = (-b + sqrtD) / (2.0f * a);
+
+	// Collision happens during the frame or is already colliding
+	return (t1 <= maxDt && t2 >= 0.0f);
+}
 
 Vector3 calculateLeadDirection(
 	const Vector3 &shooterPos,

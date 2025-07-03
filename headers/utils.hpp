@@ -14,17 +14,22 @@ Vector3 GetUpVector(const Quaternion &rotation);
 Quaternion vector3ToRotation(const Vector3& forward);
 Quaternion vector3ToRotation(const Vector3& forward, const Vector3& up);
 Quaternion vector3ToRotation(const Vector3& newForward, const Quaternion &baseRotation);
+Vector3 randomUnitVector3();
+Vector3 randomPosInField();
+Quaternion randomRotation();
+
 float angleDifference(const Quaternion& a, const Quaternion& b);
 float angleDifference(const Rotation& a, const Rotation& b);
 float angleDifference(const Quaternion& a, const Rotation& b);
 float angleDifference(const Rotation& a, const Quaternion& b);
 float WrapAngle(float angle);
-Color colorMix(Color a, Color b, float weightA = 1.0f, float weightB = 1.0f);
+
+// color
 Color colorRevert(Color a);
+
+// algorithms
 Vector3 calculateLeadDirection(const Vector3 &shooterPos, const Vector3 &targetPos, const Vector3 &targetVel, float projectileSpeed);
-Vector3 randomUnitVector3();
-Vector3 randomPosInField();
-Quaternion randomRotation();
+bool willCollide(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance, float maxDt);
 std::string getParentPath(const std::string &path);
 std::string GetFileName(const std::string &path);
 

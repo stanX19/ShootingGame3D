@@ -12,6 +12,7 @@ namespace ecs_systems
 	void playerMoveControl(GameContext &context, float dt);
 	void playerShootControl(GameContext &context);
 	void playerAimTarget(GameContext &context);
+	void playerRespawn(GameContext &context);
 	void enemyMoveControl(GameContext &context, float dt);
 	void enemyAimTarget(GameContext &context);
 	void enemyRespawn(GameContext &context);

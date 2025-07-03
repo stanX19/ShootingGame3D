@@ -3,7 +3,7 @@
 #include "entities.hpp"
 #include "constants.hpp"
 
-#define ENEMY_COUNT 10
+#define ENEMY_COUNT 6
 
 static Vector3 generateSpawnPos(const Vector3 &playerPos) {
 	return playerPos + randomUnitVector3() * (ARENA_SIZE * 0.5f);
@@ -18,7 +18,7 @@ void ecs_systems::enemyRespawn(GameContext &context)
 	}
 
 	auto eliteView = context.registry.view<tag::EliteEnemy>();
-	for (size_t i = 0; i < 5 - eliteView.size(); i++)
+	for (size_t i = 0; i < 3 - eliteView.size(); i++)
 	{
 		if (rand() % 3 == 1)
 			spawnEliteEnemy(context, generateSpawnPos(playerPos));
