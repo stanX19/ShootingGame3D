@@ -50,7 +50,7 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt)
 	// Smooth camera motion
 	camera.position = Vector3Lerp(camera.position, desiredPosition, lerp);
 	camera.target = Vector3Lerp(camera.target, desiredTarget, lerp);
-	camera.up = Vector3Lerp(camera.up, up, lerp);
+	camera.up = Vector3Lerp(camera.up, up, lerp * 0.05);
 }
 
 static void resetGame(GameContext &context) {
@@ -89,7 +89,7 @@ int main() {
         float dt = GetFrameTime();
 
         // --- Update systems ---
-        ecs_systems::playerMoveControl(context, dt);
+        ecs_systems::playerMoveControl(context, dt, camera);
         ecs_systems::playerShootControl(context);
         ecs_systems::playerAimTarget(context);
         // ecs_systems::playerRespawn(context);

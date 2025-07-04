@@ -9,7 +9,7 @@ bool aimTargetExists(GameContext &context, AimTarget &target);
 // Game systems
 namespace ecs_systems
 {
-	void playerMoveControl(GameContext &context, float dt);
+	void playerMoveControl(GameContext &context, float dt, const Camera3D &camera);
 	void playerShootControl(GameContext &context);
 	void playerAimTarget(GameContext &context);
 	void playerRespawn(GameContext &context);
