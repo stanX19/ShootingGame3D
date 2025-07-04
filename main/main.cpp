@@ -53,13 +53,23 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt)
 	camera.up = Vector3Lerp(camera.up, up, lerp);
 }
 
-
-
 static void resetGame(GameContext &context) {
     context.registry.clear();
     spawnPlayer(context);
 	spawnSunAndStars(context);
 	SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
+}
+
+static void inputControls(GameContext &context, [[maybe_unused]] float dt) {
+	if (IsKeyPressed(KEY_R)) {
+		resetGame(context);
+	}
+	if (IsKeyPressed(KEY_DELETE) && context.registry.valid(context.currentPlayer)) {
+		context.registry.emplace<DelayedDamage>(context.currentPlayer, DelayedDamage{0.0f, 100000000.0f});
+	}
+	if (IsKeyPressed(KEY_C)) {
+		SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
+	}
 }
 
 int main() {
@@ -97,7 +107,6 @@ int main() {
         ecs_systems::cleanOutOfBound(context);
 		ecs_systems::entityAnchorRelease(context, dt);
         ecs_systems::enemyRespawn(context);
-        ecs_systems::updatePlayerTargetable(context); // TODO: remove this and put into camera
         ecs_systems::asteroidRespawn(context);
 
         ecs_systems::ammoReload(context, dt);
@@ -113,9 +122,7 @@ int main() {
         camaraFollowPlayer(context, camera, dt);
         renderer.Render();
 
-		if (IsKeyPressed(KEY_R)) {
-			resetGame(context);
-		}		
+		inputControls(context, dt);
 
         DrawFPS(10, 10);
     }

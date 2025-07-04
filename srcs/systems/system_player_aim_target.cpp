@@ -6,7 +6,7 @@ static entt::entity calculateAimTarget(GameContext &context, Rotation &rotation,
 	Vector3 fowardDir = GetForwardVector(rotation);
 	Vector3 bestDir = fowardDir;
 	float bestDot = cosf(DEG2RAD * 20.0f); // 20° cone
-	float closestDist = 450.0f;			   // max assist distance
+	float minDist = 450.0f;			   // max assist distance
 	entt::entity bestTarget = entt::null;
 
 	auto enemyView = context.registry.view<tag::Enemy, Position, HP>();
@@ -21,11 +21,13 @@ static entt::entity calculateAimTarget(GameContext &context, Rotation &rotation,
 		float dist = Vector3Length(toEnemy);
 		Vector3 dirToEnemy = Vector3Normalize(toEnemy);
 
+		if (dist > minDist)
+			continue;
+
 		float dot = Vector3DotProduct(fowardDir, dirToEnemy);
-		if (dot > bestDot && dist < closestDist)
+		if (dot > bestDot)
 		{
 			bestDir = dirToEnemy;
-			closestDist = dist;
 			bestTarget = enemyEntity;
 		}
 	}

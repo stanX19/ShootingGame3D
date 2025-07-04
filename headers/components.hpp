@@ -152,12 +152,6 @@ struct WeaponParent
 };
 // end of weapon components
 
-struct PlayerTargetable
-{
-	int distance = 3000;
-	Vector3 toSelf = {0, 0, 0};
-};
-
 namespace tag {
 	struct Asteroid {};
 	struct Player {};

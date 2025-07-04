@@ -34,7 +34,6 @@ namespace ecs_systems
 	void weaponUpdateCooldown(GameContext &context, float dt);
 	void asteroidRespawn(GameContext &context);
 	void cleanOutOfBound(GameContext &context);
-	void updatePlayerTargetable(GameContext &context);
 	void syncModelRotation(GameContext &context); 
 }
 

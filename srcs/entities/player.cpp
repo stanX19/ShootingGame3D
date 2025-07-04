@@ -40,6 +40,7 @@ entt::entity spawnPlayer(GameContext &context) {
     context.registry.emplace<MaxSpeed>(player, 160.0f);
     context.registry.emplace<TurnSpeed>(player, 3.0f);
 	
+    context.registry.emplace<tag::Targetable>(player);
     context.registry.emplace<tag::Shaded>(player);
     context.registry.emplace<tag::Player>(player);
     context.registry.emplace<tag::RotationSyncModel>(player);

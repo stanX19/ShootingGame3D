@@ -209,9 +209,9 @@ void Renderer::DrawHealthBars()
 
 void Renderer::DrawTargetable()
 {
-	auto view = context.registry.view<Position, PlayerTargetable>();
-	AimTarget *aimTargetPtr = context.registry.try_get<AimTarget>(context.currentPlayer);
+	auto [aimTargetPtr, playerPosPtr] = context.registry.try_get<AimTarget, Position>(context.currentPlayer);
 	entt::entity targetedEntity = aimTargetPtr? aimTargetPtr->entity: entt::null;
+	Vector3 playerPos = playerPosPtr? playerPosPtr->value: camera.target;
 
 	Vector3 camForward = Vector3Normalize(camera.target - camera.position);
 	Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
@@ -223,18 +223,21 @@ void Renderer::DrawTargetable()
 	static float animationAngle = 0.0f;
 	animationAngle = WrapAngle(animationAngle + GetFrameTime() * 3.0f); // Adjust blink speed
 
-	for (auto entity : view)
+	for (auto [entity, pos] : context.registry.view<Position, tag::Targetable>().each())
 	{
-		const auto &pos = view.get<Position>(entity);
-		const auto &targetable = view.get<PlayerTargetable>(entity);
-
-		if (targetable.distance > 7500)
+		if (entity == context.currentPlayer)
 			continue;
-		Vector3 toTarget = targetable.toSelf;
-		Vector3 local;
-		local.x = Vector3DotProduct(toTarget, camRight);
-		local.y = Vector3DotProduct(toTarget, camUp);
-		local.z = Vector3DotProduct(toTarget, camForward);
+	
+		Vector3 toTarget = pos.value - playerPos;
+		int distance = Vector3Length(toTarget) * 10; 
+		if (distance > 7500)
+			continue;
+
+		Vector3 local = Vector3{
+			Vector3DotProduct(toTarget, camRight),
+			Vector3DotProduct(toTarget, camUp),
+			Vector3DotProduct(toTarget, camForward)
+		};
 
 		bool behind = local.z <= 0;
 
@@ -250,8 +253,8 @@ void Renderer::DrawTargetable()
 
 		if (behind || screenPos.x < 0 || screenPos.x > GetScreenWidth() || screenPos.y < 0 || screenPos.y > GetScreenHeight())
 		{
-			if (targetable.distance > 5500)
-				continue;
+			// if (distance > 6000)
+			// 	continue;
 			Vector2 relToCenter = screenPos - screenCenter;
 			Vector2 unitDir = Vector2Normalize(relToCenter);
 			Vector2 arrowLoc = screenCenter + unitDir * (uiFrameRadius + 20);
@@ -270,7 +273,7 @@ void Renderer::DrawTargetable()
 
 		if (entity == targetedEntity)
 		{
-			float innerRad = 17 + 5000.0f / targetable.distance;
+			float innerRad = 17 + 5000.0f / distance;
 			Color aimColor = MAROON;
 			DrawRingLines(screenPos, innerRad, innerRad + 2, 90 + animationAngle, 180 + animationAngle, 12, aimColor);
 			DrawRingLines(screenPos, innerRad, innerRad + 2, 270 + animationAngle, 360 + animationAngle, 12, aimColor);
@@ -281,7 +284,7 @@ void Renderer::DrawTargetable()
 		}
 
 		char txt[32];
-		snprintf(txt, sizeof(txt), "%im", targetable.distance);
+		snprintf(txt, sizeof(txt), "%im", distance);
 		DrawText(txt, screenPos.x + 20, screenPos.y + 10, 20, MAROON);
 	}
 }

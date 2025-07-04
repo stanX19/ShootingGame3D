@@ -21,8 +21,10 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	Quaternion newRotation = rotation.value;
 
 	Vector2 mouseDirection = getMouseDirectionNormalized(0.5);
-	if (std::abs(mouseDirection.x) >= 0.01)
+	if (std::abs(mouseDirection.x) >= 0.01) {
 		newRotation = RotateAroundAxis(newRotation, GetUpVector(rotation), -mouseDirection.x * turnSpeedDt);
+		newRotation = RotateAroundAxis(newRotation, GetForwardVector(rotation), mouseDirection.x * turnSpeedDt * 0.25);
+	}
 	if (std::abs(mouseDirection.y) >= 0.01)
 		newRotation = RotateAroundAxis(newRotation, GetRightVector(rotation), mouseDirection.y * turnSpeedDt);
 	if (IsKeyDown(KEY_RIGHT))
