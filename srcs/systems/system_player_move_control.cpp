@@ -2,12 +2,7 @@
 #include "utils.hpp"
 #include "constants.hpp"
 #include <iostream>
-
-#include "systems.hpp"
-#include "utils.hpp"
-#include "constants.hpp"
-#include <iostream>
-#include <iomanip> // for std::setprecision
+#include <cmath>
 
 Vector2 getMouseDirectionRelRot(const Quaternion &entRot, const Camera3D &camera) { 
 	Vector2 mouseDirection = getMouseDirectionNormalized(0.5f);
@@ -59,11 +54,11 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 	Vector3 rightVector = GetRightVector(rotation);
 
 	Vector2 mouseDirection = getMouseDirectionRelRot(rotation.value, camera);
-	if (std::abs(mouseDirection.x) >= 0.01) {
+	if (std::abs(mouseDirection.x) >= 0.01f) {
 		newRotation = RotateAroundAxis(newRotation, upVector, -mouseDirection.x * turnSpeedDt);
-		newRotation = RotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt);
+		newRotation = RotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: -0.2));
 	}
-	if (std::abs(mouseDirection.y) >= 0.01) {
+	if (std::abs(mouseDirection.y) >= 0.01f) {
 		newRotation = RotateAroundAxis(newRotation, rightVector, mouseDirection.y * turnSpeedDt);
 	}
 	if (IsKeyDown(KEY_RIGHT))

@@ -21,8 +21,8 @@ void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	weapon.bulletData.spreadSin = std::sin(1.00 * DEG2RAD);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0, 30});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{3.0});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{15.0, 30});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
     context.registry.emplace_or_replace<AimTarget>(entity);
@@ -36,7 +36,7 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	weapon.bulletData.hp = 1.0f;
 	weapon.bulletData.dmg = 500.0f;
 	weapon.bulletData.speed = 400.0f;
-	weapon.bulletData.rad = 0.025f;
+	weapon.bulletData.rad = 0.1f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
 	weapon.bulletData.spreadSin = std::sin(10 * DEG2RAD);
@@ -58,8 +58,8 @@ void emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	weapon.bulletData.hp = 1.0f;
 	weapon.bulletData.dmg = 15000.0f;
 	weapon.bulletData.speed = 300.0f;
-	weapon.bulletData.rad = 3.0f;
-	weapon.bulletData.color = getColor(context, entity);
+	weapon.bulletData.rad = 2.0f;
+	weapon.bulletData.color = getColor(context, entity);;
 	weapon.bulletData.lifetime = 15.0f;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
