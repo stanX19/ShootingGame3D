@@ -50,19 +50,20 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt)
 	// Smooth camera motion
 	camera.position = Vector3Lerp(camera.position, desiredPosition, lerp);
 	camera.target = Vector3Lerp(camera.target, desiredTarget, lerp);
-	camera.up = Vector3Lerp(camera.up, up, lerp * 0.05);
+	camera.up = Vector3Lerp(camera.up, up, lerp * 0.2);
 }
 
-static void resetGame(GameContext &context) {
+static void resetGame(GameContext &context, Camera &camera) {
     context.registry.clear();
+    setup_camera(camera);
     spawnPlayer(context);
 	spawnSunAndStars(context);
 	SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
 }
 
-static void inputControls(GameContext &context, [[maybe_unused]] float dt) {
+static void inputControls(GameContext &context, Camera &camera, [[maybe_unused]] float dt) {
 	if (IsKeyPressed(KEY_R)) {
-		resetGame(context);
+		resetGame(context, camera);
 	}
 	if (IsKeyPressed(KEY_DELETE) && context.registry.valid(context.currentPlayer)) {
 		context.registry.emplace<DelayedDamage>(context.currentPlayer, DelayedDamage{0.0f, 100000000.0f});
@@ -78,10 +79,9 @@ int main() {
     // HideCursor();
 
     Camera3D camera;
-    setup_camera(camera);
-
     GameContext context;
-	resetGame(context);
+	
+	resetGame(context, camera);
 	
     Renderer renderer(camera, context);
 
@@ -122,7 +122,7 @@ int main() {
         camaraFollowPlayer(context, camera, dt);
         renderer.Render();
 
-		inputControls(context, dt);
+		inputControls(context, camera, dt);
 
         DrawFPS(10, 10);
     }

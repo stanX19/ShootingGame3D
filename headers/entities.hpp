@@ -21,6 +21,8 @@ void spawnBullet(GameContext &context, Position pos, Velocity velocity, HP hp,
 void spawnDebris(GameContext &context, const Vector3 &position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f);
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir);
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad);
+void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir);
+void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir, float radius, const Vector3 &ringNormal, int numAsteroids = 20);
 
 void emplaceWeaponMachineGun(GameContext &context, entt::entity entity);
 void emplaceWeaponBasic(GameContext &context, entt::entity entity);

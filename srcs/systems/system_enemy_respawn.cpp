@@ -3,10 +3,10 @@
 #include "entities.hpp"
 #include "constants.hpp"
 
-#define ENEMY_COUNT 6
+#define ENEMY_COUNT 8
 
 static Vector3 generateSpawnPos(const Vector3 &playerPos) {
-	return playerPos + randomUnitVector3() * (ARENA_SIZE * 0.5f);
+	return playerPos + randomUnitVector3() * (COMBAT_DIST * 1.8f);
 }
 
 void ecs_systems::enemyRespawn(GameContext &context)

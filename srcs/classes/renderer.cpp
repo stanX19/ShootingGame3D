@@ -229,8 +229,8 @@ void Renderer::DrawTargetable()
 			continue;
 	
 		Vector3 toTarget = pos.value - playerPos;
-		int distance = Vector3Length(toTarget) * 10; 
-		if (distance > 7500)
+		int distance = Vector3Length(toTarget); 
+		if (distance > COMBAT_DIST * 1.5)
 			continue;
 
 		Vector3 local = Vector3{
@@ -253,8 +253,6 @@ void Renderer::DrawTargetable()
 
 		if (behind || screenPos.x < 0 || screenPos.x > GetScreenWidth() || screenPos.y < 0 || screenPos.y > GetScreenHeight())
 		{
-			// if (distance > 6000)
-			// 	continue;
 			Vector2 relToCenter = screenPos - screenCenter;
 			Vector2 unitDir = Vector2Normalize(relToCenter);
 			Vector2 arrowLoc = screenCenter + unitDir * (uiFrameRadius + 20);
@@ -273,7 +271,7 @@ void Renderer::DrawTargetable()
 
 		if (entity == targetedEntity)
 		{
-			float innerRad = 17 + 5000.0f / distance;
+			float innerRad = 17 + 500.0f / distance;
 			Color aimColor = MAROON;
 			DrawRingLines(screenPos, innerRad, innerRad + 2, 90 + animationAngle, 180 + animationAngle, 12, aimColor);
 			DrawRingLines(screenPos, innerRad, innerRad + 2, 270 + animationAngle, 360 + animationAngle, 12, aimColor);
@@ -284,7 +282,7 @@ void Renderer::DrawTargetable()
 		}
 
 		char txt[32];
-		snprintf(txt, sizeof(txt), "%im", distance);
+		snprintf(txt, sizeof(txt), "%im", distance * 10);
 		DrawText(txt, screenPos.x + 20, screenPos.y + 10, 20, MAROON);
 	}
 }
@@ -349,8 +347,8 @@ void Renderer::DrawSpeedBar()
 	
 	float currentSpeed = Vector3Length(velocity.value);
 	// float speedRatio = std::min(1.0f, 1.156f * (1 - std::exp(-2 * currentSpeed / maxSpeed.value)));
-	float speedRatio = currentSpeed / maxSpeed.value;
-	speedRatio = speedRatio > 0.5? 0.8 + 0.2 * ((speedRatio - 0.5) / 0.5): speedRatio / 0.5 * 0.8;
+	float speedRatio = currentSpeed / (maxSpeed.value * 2);
+	speedRatio = std::min(1.0, speedRatio > 0.5? 0.8 + 0.2 * ((speedRatio - 0.5) / 0.5): speedRatio / 0.5 * 0.8);
 	
 	Vector2 center = GetUIFrameCenter();
 	float frameRadius = GetUIFrameRadius();
@@ -544,8 +542,8 @@ void Renderer::DrawAmmoCircle()
 		}
 		
 		// Center text - show current ammo
-		char ammoText[20];
-		snprintf(ammoText, sizeof(ammoText), "%.0f", currentAmmo);
+		char ammoText[4];
+		snprintf(ammoText, sizeof(ammoText), "%i", (int)currentAmmo);
 		int textWidth = MeasureText(ammoText, 20);
 		DrawText(ammoText, circleCenter.x - textWidth/2, circleCenter.y - 7, 20, WHITE);
 		

@@ -1,12 +1,13 @@
 #include "systems.hpp"
 #include "utils.hpp"
+#include "constants.hpp"
 
 static entt::entity calculateAimTarget(GameContext &context, Rotation &rotation, Position &position)
 {
 	Vector3 fowardDir = GetForwardVector(rotation);
 	Vector3 bestDir = fowardDir;
 	float bestDot = cosf(DEG2RAD * 20.0f); // 20° cone
-	float minDist = 450.0f;			   // max assist distance
+	float minDist = COMBAT_DIST;			   // max assist distance
 	entt::entity bestTarget = entt::null;
 
 	auto enemyView = context.registry.view<tag::Enemy, Position, HP>();

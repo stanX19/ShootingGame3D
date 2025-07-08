@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
-#define ARENA_SIZE 1000.0f
+const float ARENA_SIZE = 2000.0f;
+const float COMBAT_DIST = 1000.0f;
 
 #endif

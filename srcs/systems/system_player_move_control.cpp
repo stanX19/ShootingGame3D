@@ -56,7 +56,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 	Vector2 mouseDirection = getMouseDirectionRelRot(rotation.value, camera);
 	if (std::abs(mouseDirection.x) >= 0.01f) {
 		newRotation = RotateAroundAxis(newRotation, upVector, -mouseDirection.x * turnSpeedDt);
-		newRotation = RotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: -0.2));
+		newRotation = RotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: 0.2));
 	}
 	if (std::abs(mouseDirection.y) >= 0.01f) {
 		newRotation = RotateAroundAxis(newRotation, rightVector, mouseDirection.y * turnSpeedDt);
@@ -75,18 +75,18 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 		newRotation = RotateAroundAxis(newRotation, fowardVector, turnSpeedDt);
 	
 	// TODO: change to engine thrust component
-	const float accel = 20.0f;
+	const float accel = 40.0f;
 
 	if (IsKeyDown(KEY_W) || IsMouseButtonDown(MOUSE_BUTTON_EXTRA) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 	{
 		speed += accel * dt;
 	}
-	else if (IsKeyDown(KEY_S) || IsMouseButtonDown(MOUSE_BUTTON_SIDE) || speed > maxSpeed.value / 2)
+	else if (IsKeyDown(KEY_S) || IsMouseButtonDown(MOUSE_BUTTON_SIDE) || speed > maxSpeed.value)
 	{
 		speed -= accel * dt;
 	}
 
-	speed = Clamp(speed, 0, maxSpeed.value);
+	// speed = Clamp(speed, 0, maxSpeed.value);
 
 	velocity.value = Vector3Scale(GetForwardVector(rotation), speed);
 	rotation.value = newRotation;

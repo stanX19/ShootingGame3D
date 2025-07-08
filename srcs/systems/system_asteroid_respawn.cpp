@@ -18,6 +18,9 @@ void ecs_systems::asteroidRespawn(GameContext &context)
 	{
 		Vector3 pos = randomPosOffField();
 		Vector3 dir = Vector3Normalize(pos) * -2.0f + randomUnitVector3();
-		spawnAsteroid(context, pos, dir);
+		if (GetRandomValue(1, 10) == 10)
+			spawnRingAsteroid(context, pos, dir);
+		else
+			spawnAsteroid(context, pos, dir);
 	}
 }

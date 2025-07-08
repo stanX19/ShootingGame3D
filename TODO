@@ -39,3 +39,9 @@
 15. Realistic physics, no more breaking in vacum
 16. Have another system to assign bitwise faction value
 17. number control for weapon firing
+18. make camera a component for playable entities
+	struct Camera {
+		Camera3d camera;
+		firstPerson = false;
+		alignHorizontal = false;
+	}
