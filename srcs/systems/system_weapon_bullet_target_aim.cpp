@@ -15,7 +15,7 @@ void ecs_systems::bulletTargetAim(GameContext &context)
 		if (!aimTargetExists(context, aimTarget))
 		{
 			if (context.registry.all_of<Rotation>(entity))
-				aimDirection.value = GetForwardVector(context.registry.get<Rotation>(entity));
+				aimDirection.value = getForwardVector(context.registry.get<Rotation>(entity));
 			continue;
 		}
 		if (!context.registry.all_of<Position, Velocity>(aimTarget.entity))

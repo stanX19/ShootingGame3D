@@ -30,8 +30,8 @@ void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
-    context.registry.emplace_or_replace<AimTarget>(entity);
-    context.registry.emplace_or_replace<AimDirection>(entity);
+	context.registry.emplace_or_replace<AimTarget>(entity);
+	context.registry.emplace_or_replace<AimDirection>(entity);
 }
 
 void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
@@ -52,8 +52,8 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{3.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
-    context.registry.emplace_or_replace<AimTarget>(entity);
-    context.registry.emplace_or_replace<AimDirection>(entity);
+	context.registry.emplace_or_replace<AimTarget>(entity);
+	context.registry.emplace_or_replace<AimDirection>(entity);
 }
 
 void emplaceWeaponBigBall(GameContext &context, entt::entity entity)
@@ -70,8 +70,8 @@ void emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{7.0});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
-    context.registry.emplace_or_replace<AimTarget>(entity);
-    context.registry.emplace_or_replace<AimDirection>(entity);
+	context.registry.emplace_or_replace<AimTarget>(entity);
+	context.registry.emplace_or_replace<AimDirection>(entity);
 }
 
 void emplaceWeaponSniper(GameContext &context, entt::entity entity)
@@ -89,8 +89,8 @@ void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.75});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
-    context.registry.emplace_or_replace<AimTarget>(entity);
-    context.registry.emplace_or_replace<AimDirection>(entity);
+	context.registry.emplace_or_replace<AimTarget>(entity);
+	context.registry.emplace_or_replace<AimDirection>(entity);
 }
 
 void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
@@ -110,8 +110,8 @@ void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0, 5});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.00});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
-    context.registry.emplace_or_replace<AimTarget>(entity);
-    context.registry.emplace_or_replace<AimDirection>(entity);
+	context.registry.emplace_or_replace<AimTarget>(entity);
+	context.registry.emplace_or_replace<AimDirection>(entity);
 }
 
 void emplaceWeaponBasic(GameContext &context, entt::entity entity)
@@ -129,6 +129,6 @@ void emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
-    context.registry.emplace_or_replace<AimTarget>(entity);
-    context.registry.emplace_or_replace<AimDirection>(entity);
+	context.registry.emplace_or_replace<AimTarget>(entity);
+	context.registry.emplace_or_replace<AimDirection>(entity);
 }

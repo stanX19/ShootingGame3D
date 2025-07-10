@@ -1,7 +1,7 @@
 #include "systems.hpp"
 
 void ecs_systems::entityAnchor(GameContext& context) {
-    auto parentView = context.registry.view<Position, Rotation>();
+	auto parentView = context.registry.view<Position, Rotation>();
 
 	for (auto [entity, anchor, pos] : context.registry.view<PositionAnchor, Position>().each()) {
 		if (parentView.contains(anchor.parent)) {

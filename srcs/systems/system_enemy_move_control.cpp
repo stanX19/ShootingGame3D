@@ -33,6 +33,6 @@ void ecs_systems::enemyMoveControl(GameContext &context, float dt)
 		float targetSpeed = maxSpeed.value * (0.5 + 0.5 * (180 - angleDifference(targetRotation, rotation.value)) / 180);
 
 		float newSpeed = Clamp(speed + Clamp(targetSpeed - speed, -20 * dt, 20 * dt), 0, maxSpeed.value);
-		velocity.value = GetForwardVector(rotation) * newSpeed;
+		velocity.value = getForwardVector(rotation) * newSpeed;
 	}
 }

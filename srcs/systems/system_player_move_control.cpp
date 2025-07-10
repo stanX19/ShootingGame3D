@@ -11,8 +11,8 @@ Vector2 getMouseDirectionRelRot(const Quaternion &entRot, const Camera3D &camera
 		return {0.0f, 0.0f};
 	}
 
-	Vector3 entityUp = GetUpVector(entRot);
-	Vector3 entityRight = GetRightVector(entRot);
+	Vector3 entityUp = getUpVector(entRot);
+	Vector3 entityRight = getRightVector(entRot);
 		
 	Vector3 cameraForward = Vector3Normalize(camera.target - camera.position);
 	Vector3 cameraRight = Vector3Normalize(Vector3CrossProduct(cameraForward, camera.up));
@@ -49,30 +49,30 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 
 	float turnSpeedDt = turnSpeed.value / (1.0f + speed / maxSpeed.value * 5.0f)  * dt;
 	Quaternion newRotation = rotation.value;
-	Vector3 fowardVector = GetForwardVector(rotation);
-	Vector3 upVector = GetUpVector(rotation);
-	Vector3 rightVector = GetRightVector(rotation);
+	Vector3 fowardVector = getForwardVector(rotation);
+	Vector3 upVector = getUpVector(rotation);
+	Vector3 rightVector = getRightVector(rotation);
 
 	Vector2 mouseDirection = getMouseDirectionRelRot(rotation.value, camera);
 	if (std::abs(mouseDirection.x) >= 0.01f) {
-		newRotation = RotateAroundAxis(newRotation, upVector, -mouseDirection.x * turnSpeedDt);
-		newRotation = RotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: 0.2));
+		newRotation = rotateAroundAxis(newRotation, upVector, -mouseDirection.x * turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: 0.2));
 	}
 	if (std::abs(mouseDirection.y) >= 0.01f) {
-		newRotation = RotateAroundAxis(newRotation, rightVector, mouseDirection.y * turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, rightVector, mouseDirection.y * turnSpeedDt);
 	}
 	if (IsKeyDown(KEY_RIGHT))
-		newRotation = RotateAroundAxis(newRotation, upVector, -turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, upVector, -turnSpeedDt);
 	if (IsKeyDown(KEY_LEFT))
-		newRotation = RotateAroundAxis(newRotation, upVector, turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, upVector, turnSpeedDt);
 	if (IsKeyDown(KEY_UP))
-		newRotation = RotateAroundAxis(newRotation, rightVector, -turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, rightVector, -turnSpeedDt);
 	if (IsKeyDown(KEY_DOWN))
-		newRotation = RotateAroundAxis(newRotation, rightVector, turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, rightVector, turnSpeedDt);
 	if (IsKeyDown(KEY_A))
-		newRotation = RotateAroundAxis(newRotation, fowardVector, -turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, fowardVector, -turnSpeedDt);
 	if (IsKeyDown(KEY_D))
-		newRotation = RotateAroundAxis(newRotation, fowardVector, turnSpeedDt);
+		newRotation = rotateAroundAxis(newRotation, fowardVector, turnSpeedDt);
 	
 	// TODO: change to engine thrust component
 	const float accel = 40.0f;
@@ -88,7 +88,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 
 	// speed = Clamp(speed, 0, maxSpeed.value);
 
-	velocity.value = Vector3Scale(GetForwardVector(rotation), speed);
+	velocity.value = Vector3Scale(getForwardVector(rotation), speed);
 	rotation.value = newRotation;
 
 	// Stay within arena

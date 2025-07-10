@@ -12,7 +12,8 @@ namespace event {
 		GameContext *context;
 		entt::entity a;
 		entt::entity b;
-		float dt;
+		float dt;			// frame dt
+		float collisionDt;	// dt from prev pos to collision
 	};
 
 	struct Listener {

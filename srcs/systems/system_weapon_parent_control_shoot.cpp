@@ -2,7 +2,7 @@
 #include <iostream>
 
 void ecs_systems::weaponParentControlShoot(GameContext& context) {
-    auto isFiringView = context.registry.view<tag::weapon::IsFiring>();
+	auto isFiringView = context.registry.view<tag::weapon::IsFiring>();
 	auto view = context.registry.view<WeaponParent, tag::weapon::FollowParentAim>();
 
 	for (auto entity : view) {

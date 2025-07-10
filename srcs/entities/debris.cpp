@@ -1,30 +1,30 @@
 #include "entities.hpp"
 #include "utils.hpp"
 
-void spawnDebris(GameContext &context, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan) {
-    t_model_id debrisModel = context.meshManager.createBox();
+void spawnDebris(GameContext &context, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan, Vector3 velocity) {
+	t_model_id debrisModel = context.meshManager.createBox();
 	
 	for (int i = 0; i < count; ++i) {
-        entt::entity debris = context.registry.create();
+		entt::entity debris = context.registry.create();
 
-        Vector3 dir = {
-            (float)rand() / RAND_MAX * 2.0f - 1.0f,
-            (float)rand() / RAND_MAX * 2.0f - 1.0f,
-            (float)rand() / RAND_MAX * 2.0f - 1.0f
-        };
-        dir = Vector3Normalize(dir);
+		Vector3 dir = {
+			(float)rand() / RAND_MAX * 2.0f - 1.0f,
+			(float)rand() / RAND_MAX * 2.0f - 1.0f,
+			(float)rand() / RAND_MAX * 2.0f - 1.0f
+		};
+		dir = Vector3Normalize(dir);
 
-        float speed = 5.0f + ((float)rand() / RAND_MAX) * 5.0f;
-        Vector3 velocity = dir * speed;
+		float speed = 5.0f + ((float)rand() / RAND_MAX) * 5.0f;
+		Vector3 debrisVel = dir * speed + velocity;
 
-        // fast = small
-        float radius = originalRadius * (0.05f + 0.5f / speed);
+		// fast = small
+		float radius = originalRadius * (0.05f + 0.5f / speed);
 
-        context.registry.emplace<Position>(debris, position);
-        context.registry.emplace<RenderBody>(debris, RenderBody{debrisModel, radius, originalColor, Vector3{0.0f, 0.0f, 0.0f}, randomRotation()});
-        context.registry.emplace<Velocity>(debris, velocity);
-        context.registry.emplace<Lifespan>(debris, lifespan + GetRandomValue(0, 200) / 100.0f);
-    	context.registry.emplace<tag::Shaded>(debris);
-    }
+		context.registry.emplace<Position>(debris, position);
+		context.registry.emplace<RenderBody>(debris, RenderBody{debrisModel, originalColor, radius, Vector3{0.0f, 0.0f, 0.0f}, randomRotation()});
+		context.registry.emplace<Velocity>(debris, debrisVel);
+		context.registry.emplace<Lifespan>(debris, lifespan + GetRandomValue(0, 200) / 100.0f);
+		context.registry.emplace<tag::Shaded>(debris);
+	}
 }
 

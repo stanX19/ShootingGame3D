@@ -1,12 +1,12 @@
 #include "systems.hpp"
 
 void ecs_systems::ammoReload(GameContext &context, float dt) {
-    auto view = context.registry.view<Ammo, AmmoReload>();
+	auto view = context.registry.view<Ammo, AmmoReload>();
 
-    for (auto entity : view) {
-        Ammo& ammo = view.get<Ammo>(entity);
+	for (auto entity : view) {
+		Ammo& ammo = view.get<Ammo>(entity);
 		AmmoReload& reload = view.get<AmmoReload>(entity);
 		
 		ammo.value = Clamp(ammo.value + reload.value * dt, 0, ammo.maxValue);
-    }
+	}
 }

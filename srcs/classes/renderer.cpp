@@ -120,10 +120,10 @@ void Renderer::HandleLightSource()
 // if (context.registry.all_of<Rotation>(entity))
 // {
 // 	auto &rot = context.registry.get<Rotation>(entity);
-// 	Vector3 forward = GetForwardVector(rot);
+// 	Vector3 forward = getForwardVector(rot);
 // 	Vector3 end = pos.value + forward * (body.radius * 100);
 // 	DrawLine3D(pos.value, end, WHITE);
-// 	end = pos.value + GetUpVector(rot) * (body.radius * 10);
+// 	end = pos.value + getUpVector(rot) * (body.radius * 10);
 // 	DrawLine3D(pos.value, end, GREEN);
 // }
 
@@ -131,13 +131,13 @@ void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body)
 {
 	Model &model = context.meshManager.getModel(body.modelID);
 
-	Vector3 scale = { body.scale, body.scale, body.scale };
 	Vector3 axis;
 	float angle;
 	QuaternionToAxisAngle(body.rotation, &axis, &angle);
 	// std::cout << "Entity rotation axis: (" << axis.x << ", " << axis.y << ", " << axis.z
 	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
-	DrawModelEx(model, pos.value + body.translation, axis, angle * RAD2DEG, scale, body.color);
+	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation);
+	DrawModelEx(model, position, axis, angle * RAD2DEG, body.scale, body.color);
 }
 
 void Renderer::DrawEntitiesWithoutShader()
@@ -398,7 +398,7 @@ void Renderer::DrawSpeedBar()
 	char speedText[16];
 	snprintf(speedText, sizeof(speedText), "%.0f", currentSpeed);
 	Vector2 valuePos = {center.x + cosf(labelAngleRad) * labelRadius - MeasureText(speedText, 14), 
-					    center.y + sinf(labelAngleRad) * labelRadius + 10};
+						center.y + sinf(labelAngleRad) * labelRadius + 10};
 	DrawText(speedText, valuePos.x, valuePos.y, 14, speedColor);
 	
 	// Speed limit indicator
@@ -585,81 +585,81 @@ void Renderer::DrawCrosshair()
 
 void Renderer::DrawCursorArrow()
 {
-    Vector2 mousePos = GetMousePosition();
-    Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-    
-    // Calculate direction and distance
-    Vector2 direction = Vector2Subtract(mousePos, screenCenter);
-    float distance = Vector2Length(direction);
-    
-    if (distance > 0) {
-        Vector2 normalizedDir = Vector2Normalize(direction);
-        
-        // Animation parameters
-        static float animationTime = 0.0f;
-        animationTime += GetFrameTime() * 1.0f; // Speed multiplier
-        
-        // Arrow properties
-        float arrowSpacing = 40.0f;          // Distance between arrows
-        float arrowSpeed = 200.0f;           // Pixels per second
-        int numArrows = (int)(distance / arrowSpacing) + 1;
-        
-        // Draw animated arrows
-        for (int i = 0; i < numArrows; i++) {
-            // Calculate arrow position with animation offset
-            float baseOffset = i * arrowSpacing;
-            float animOffset = fmod(animationTime * arrowSpeed, arrowSpacing);
-            float totalOffset = baseOffset + animOffset;
-            
-            // Skip arrows that have passed the mouse position
-            if (totalOffset >= distance) continue;
-            
-            Vector2 arrowPos = Vector2Add(screenCenter, 
-                Vector2Scale(normalizedDir, totalOffset));
-            
-            // Arrow size and fade based on progress
-            float progress = totalOffset / distance;
-            float alpha = 1.0f - (progress * 0.3f); // Fade slightly toward mouse
-            float arrowSize = 8.0f * (1.0f - progress * 0.2f); // Shrink slightly
-            
-            // Draw arrow (triangle pointing toward mouse)
-            Vector2 arrowTip = Vector2Add(arrowPos, Vector2Scale(normalizedDir, arrowSize));
-            Vector2 arrowLeft = Vector2Add(arrowPos, Vector2Scale(Vector2Rotate(normalizedDir, -2.5f), arrowSize * 0.6f));
-            Vector2 arrowRight = Vector2Add(arrowPos, Vector2Scale(Vector2Rotate(normalizedDir, 2.5f), arrowSize * 0.6f));
-            
-            Color arrowColor = ColorAlpha(SKYBLUE, alpha * 0.9f);
-            Color arrowBorder = ColorAlpha(DARKBLUE, alpha * 0.7f);
-            
-            // Draw arrow border (slightly offset)
-            DrawTriangle(Vector2Add(arrowTip, {1, 1}), 
-                        Vector2Add(arrowLeft, {1, 1}), 
-                        Vector2Add(arrowRight, {1, 1}), 
-                        arrowBorder);
-            
-            // Draw main arrow
-            DrawTriangle(arrowTip, arrowLeft, arrowRight, arrowColor);
-        }
-    }
-    
-    // Draw base line (optional, more subtle)
-    float lineThickness = 1.0f;
-    Color lineColor = ColorAlpha(SKYBLUE, 0.3f);
-    DrawLineEx(screenCenter, mousePos, lineThickness, lineColor);
-    
-    // Draw circle at mouse position
-    float circleRadius = 8.0f;
-    Color circleColor = WHITE;
-    Color circleBorder = ColorAlpha(BLACK, 0.8f);
-    
-    // Draw border first (slightly larger circle)
-    DrawCircleV(mousePos, circleRadius + 1, circleBorder);
-    // Draw main circle
-    DrawCircleV(mousePos, circleRadius, circleColor);
-    DrawCircleV(mousePos, 2.0f, SKYBLUE);
-    
-    // Draw center indicator
-    DrawCircleV(screenCenter, 4.0f, ColorAlpha(SKYBLUE, 0.8f));
-    DrawCircleV(screenCenter, 2.0f, WHITE);
+	Vector2 mousePos = GetMousePosition();
+	Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+	
+	// Calculate direction and distance
+	Vector2 direction = Vector2Subtract(mousePos, screenCenter);
+	float distance = Vector2Length(direction);
+	
+	if (distance > 0) {
+		Vector2 normalizedDir = Vector2Normalize(direction);
+		
+		// Animation parameters
+		static float animationTime = 0.0f;
+		animationTime += GetFrameTime() * 1.0f; // Speed multiplier
+		
+		// Arrow properties
+		float arrowSpacing = 40.0f;		  // Distance between arrows
+		float arrowSpeed = 200.0f;		   // Pixels per second
+		int numArrows = (int)(distance / arrowSpacing) + 1;
+		
+		// Draw animated arrows
+		for (int i = 0; i < numArrows; i++) {
+			// Calculate arrow position with animation offset
+			float baseOffset = i * arrowSpacing;
+			float animOffset = fmod(animationTime * arrowSpeed, arrowSpacing);
+			float totalOffset = baseOffset + animOffset;
+			
+			// Skip arrows that have passed the mouse position
+			if (totalOffset >= distance) continue;
+			
+			Vector2 arrowPos = Vector2Add(screenCenter, 
+				Vector2Scale(normalizedDir, totalOffset));
+			
+			// Arrow size and fade based on progress
+			float progress = totalOffset / distance;
+			float alpha = 1.0f - (progress * 0.3f); // Fade slightly toward mouse
+			float arrowSize = 8.0f * (1.0f - progress * 0.2f); // Shrink slightly
+			
+			// Draw arrow (triangle pointing toward mouse)
+			Vector2 arrowTip = Vector2Add(arrowPos, Vector2Scale(normalizedDir, arrowSize));
+			Vector2 arrowLeft = Vector2Add(arrowPos, Vector2Scale(Vector2Rotate(normalizedDir, -2.5f), arrowSize * 0.6f));
+			Vector2 arrowRight = Vector2Add(arrowPos, Vector2Scale(Vector2Rotate(normalizedDir, 2.5f), arrowSize * 0.6f));
+			
+			Color arrowColor = ColorAlpha(SKYBLUE, alpha * 0.9f);
+			Color arrowBorder = ColorAlpha(DARKBLUE, alpha * 0.7f);
+			
+			// Draw arrow border (slightly offset)
+			DrawTriangle(Vector2Add(arrowTip, {1, 1}), 
+						Vector2Add(arrowLeft, {1, 1}), 
+						Vector2Add(arrowRight, {1, 1}), 
+						arrowBorder);
+			
+			// Draw main arrow
+			DrawTriangle(arrowTip, arrowLeft, arrowRight, arrowColor);
+		}
+	}
+	
+	// Draw base line (optional, more subtle)
+	float lineThickness = 1.0f;
+	Color lineColor = ColorAlpha(SKYBLUE, 0.3f);
+	DrawLineEx(screenCenter, mousePos, lineThickness, lineColor);
+	
+	// Draw circle at mouse position
+	float circleRadius = 8.0f;
+	Color circleColor = WHITE;
+	Color circleBorder = ColorAlpha(BLACK, 0.8f);
+	
+	// Draw border first (slightly larger circle)
+	DrawCircleV(mousePos, circleRadius + 1, circleBorder);
+	// Draw main circle
+	DrawCircleV(mousePos, circleRadius, circleColor);
+	DrawCircleV(mousePos, 2.0f, SKYBLUE);
+	
+	// Draw center indicator
+	DrawCircleV(screenCenter, 4.0f, ColorAlpha(SKYBLUE, 0.8f));
+	DrawCircleV(screenCenter, 2.0f, WHITE);
 }
 
 void Renderer::DrawCollisionWarning() {
@@ -669,7 +669,7 @@ void Renderer::DrawCollisionWarning() {
 	auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
 	
 	if (!posA || !velA || !bodyA)
-    	return;
+		return;
 	// Find all potential collision positions
 	for (auto [other, posB, velB, bodyB, dmgB] : context.registry.view<Position, Velocity, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
 		if (context.currentPlayer == other)

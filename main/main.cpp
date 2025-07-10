@@ -9,8 +9,8 @@ static void spawnSunAndStars(GameContext &context) {
 	float rad = GetRandomValue(ARENA_SIZE * 0.3, ARENA_SIZE * 0.5);
 
 	context.registry.emplace<Position>(sun2, pos);
-	context.registry.emplace<RenderBody>(sun2, sunModel, rad, Color{105, 205, 255, 255});
-	context.registry.emplace<tag::LightSource>(sun2, rad, Color{105, 205, 255, 255});
+	context.registry.emplace<RenderBody>(sun2, sunModel, Color{105, 205, 255, 255}, rad);
+	context.registry.emplace<tag::LightSource>(sun2);
 	
 	// stars
 	t_model_id starsModel = context.meshManager.createSphere();
@@ -19,16 +19,16 @@ static void spawnSunAndStars(GameContext &context) {
 		entt::entity entity = context.registry.create();
 
 		context.registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 5);
-		context.registry.emplace<RenderBody>(entity, starsModel, (GetRandomValue(15, 25) * ARENA_SIZE / 4000.0f), WHITE);
+		context.registry.emplace<RenderBody>(entity, starsModel, WHITE, (GetRandomValue(15, 25) * ARENA_SIZE / 4000.0f));
 	}
 }
 
 static void setup_camera(Camera3D& camera) {
-    camera.position = Vector3{ 0.0f, 1.0f, 4.0f };
-    camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
-    camera.up = Vector3{ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 45.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+	camera.position = Vector3{ 0.0f, 1.0f, 4.0f };
+	camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
+	camera.up = Vector3{ 0.0f, 1.0f, 0.0f };
+	camera.fovy = 45.0f;
+	camera.projection = CAMERA_PERSPECTIVE;
 }
 
 static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt) {
@@ -36,8 +36,8 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt)
 		return ;
 	Position& pos = context.registry.get<Position>(context.currentPlayer);
 	Rotation& rot = context.registry.get<Rotation>(context.currentPlayer);
-	Vector3 forward = GetForwardVector(rot);
-	Vector3 up = GetUpVector(rot);
+	Vector3 forward = getForwardVector(rot);
+	Vector3 up = getUpVector(rot);
 
 	// Choose follow direction
 	bool shift = IsKeyDown(KEY_RIGHT_SHIFT);
@@ -54,10 +54,10 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt)
 }
 
 static void resetGame(GameContext &context, Camera &camera) {
-    context.registry.clear();
+	context.registry.clear();
 	event::utils::hookAllListeners(context);
-    setup_camera(camera);
-    spawnPlayer(context);
+	setup_camera(camera);
+	spawnPlayer(context);
 	spawnSunAndStars(context);
 	SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
 }
@@ -75,60 +75,60 @@ static void inputControls(GameContext &context, Camera &camera, [[maybe_unused]]
 }
 
 int main() {
-    InitWindow(1600, 900, "3D Space Shooter");
-    SetTargetFPS(60);
-    // HideCursor();
+	InitWindow(1600, 900, "3D Space Shooter");
+	SetTargetFPS(60);
+	// HideCursor();
 
-    Camera3D camera;
-    GameContext context;
+	Camera3D camera;
+	GameContext context;
 	
 	resetGame(context, camera);
 	
-    Renderer renderer(camera, context);
+	Renderer renderer(camera, context);
 
-    while (!WindowShouldClose()) {
-        float dt = GetFrameTime();
+	while (!WindowShouldClose()) {
+		float dt = GetFrameTime();
 
-        // --- Update systems ---
-        ecs_systems::playerMoveControl(context, dt, camera);
-        ecs_systems::playerShootControl(context);
-        ecs_systems::playerAimTarget(context);
-        // ecs_systems::playerRespawn(context);
-        ecs_systems::enemyMoveControl(context, dt);
-        ecs_systems::enemyAimTarget(context);
+		// --- Update systems ---
+		ecs_systems::playerMoveControl(context, dt, camera);
+		ecs_systems::playerShootControl(context);
+		ecs_systems::playerAimTarget(context);
+		// ecs_systems::playerRespawn(context);
+		ecs_systems::enemyMoveControl(context, dt);
+		ecs_systems::enemyAimTarget(context);
 
-        ecs_systems::entityMovement(context, dt);
+		ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context);
-        ecs_systems::detectEntityCollision(context, dt);
+		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
 		
-        ecs_systems::entityLifetime(context, dt);
-        ecs_systems::delayedDamage(context, dt);
-        ecs_systems::hpCleanup(context);
-        ecs_systems::hpRegen(context, dt);
-        ecs_systems::cleanOutOfBound(context);
+		ecs_systems::entityLifetime(context, dt);
+		ecs_systems::delayedDamage(context, dt);
+		ecs_systems::hpCleanup(context);
+		ecs_systems::hpRegen(context, dt);
+		ecs_systems::cleanOutOfBound(context);
 		ecs_systems::entityAnchorRelease(context, dt);
-        ecs_systems::enemyRespawn(context);
-        ecs_systems::asteroidRespawn(context);
+		ecs_systems::enemyRespawn(context);
+		ecs_systems::asteroidRespawn(context);
 
-        ecs_systems::ammoReload(context, dt);
+		ecs_systems::ammoReload(context, dt);
 		ecs_systems::bulletTargetAim(context);
 		ecs_systems::weaponParentControlAim(context);
 		ecs_systems::weaponParentControlShoot(context);
 		ecs_systems::weaponUpdateCooldown(context, dt);
 		ecs_systems::weaponUpdateCanFire(context);
-        ecs_systems::bulletWeaponShoot(context);
+		ecs_systems::bulletWeaponShoot(context);
 		ecs_systems::weaponUpdateFireStatus(context);
 
 		ecs_systems::syncModelRotation(context);
-        camaraFollowPlayer(context, camera, dt);
-        renderer.Render();
+		camaraFollowPlayer(context, camera, dt);
+		renderer.Render();
 
 		inputControls(context, camera, dt);
 
-        DrawFPS(10, 10);
-    }
+		DrawFPS(10, 10);
+	}
 	context.meshManager.unloadAll();
-    CloseWindow();
-    return 0;
+	CloseWindow();
+	return 0;
 }

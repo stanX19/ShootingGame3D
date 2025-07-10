@@ -2,11 +2,10 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
-#include <sstream>
-#include <string>
 #include <filesystem>
 #include <iostream>
 #include "model_manager.hpp"
+#include "utils.hpp"
 
 ModelManager::ModelManager() {}
 
@@ -15,15 +14,16 @@ ModelManager::~ModelManager()
 	unloadAll();
 }
 
-
-t_model_id ModelManager::loadModel(const std::string &filePath)
+t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &transform)
 {
-	auto it = loadedFromFile.find(filePath);
+	auto key = std::make_pair(filePath, transform);
+	auto it = loadedFromFile.find(key);
 	if (it != loadedFromFile.end())
 	{
 		return it->second;
 	}
-	std::filesystem::path originalPath = std::filesystem::current_path();  // use path not string
+
+	std::filesystem::path originalPath = std::filesystem::current_path();
 	std::filesystem::path modelPath = std::filesystem::absolute(filePath);
 	std::filesystem::path modelDir = modelPath.parent_path();
 	std::filesystem::path modelFile = modelPath.filename();
@@ -37,35 +37,64 @@ t_model_id ModelManager::loadModel(const std::string &filePath)
 	Model model = LoadModel(modelFile.string().c_str());
 	std::filesystem::current_path(originalPath);
 
+	// apply transformation
+	model.transform = transform;
+
 	models.push_back(model);
 	t_model_id id = models.size() - 1;
-	loadedFromFile[filePath] = id;
+	loadedFromFile[key] = id;
 	return id;
+}
+
+t_model_id ModelManager::loadModel(const std::string &filePath, const Vector3 &scale,
+								   const Vector3 &rotation, const Vector3 &displacement)
+{
+	Matrix transform = getTransformMatrix(scale, rotation, displacement);
+	return loadModel(filePath, transform);
+}
+
+t_model_id ModelManager::loadModel(const std::string &filePath, const Vector3 &scale)
+{
+	Vector3 rotation = {0.0f, 0.0f, 0.0f};
+	Vector3 displacement = {0.0f, 0.0f, 0.0f};
+	return loadModel(filePath, scale, rotation, displacement);
+}
+
+t_model_id ModelManager::loadModel(const std::string &filePath, float scale)
+{
+	Vector3 scaleVec = {scale, scale, scale};
+	return loadModel(filePath, scaleVec);
+}
+
+t_model_id ModelManager::loadModel(const std::string &filePath)
+{
+	Matrix identityMatrix = MatrixIdentity();
+	return loadModel(filePath, identityMatrix);
 }
 
 t_model_id ModelManager::createBox(float width, float height, float length)
 {
-	return createAndAddModel("box", [=]() {
+	return createAndAddModel("box", [=]()
+							 {
 		Mesh mesh = GenMeshCube(width, height, length);
-		return LoadModelFromMesh(mesh);
-	}, width, height, length);
+		return LoadModelFromMesh(mesh); }, width, height, length);
 }
 
 t_model_id ModelManager::createSphere(int rings, int slices, float radius)
 {
 	// assert(radius == 1.0);  // radius should be handled using scale
-	return createAndAddModel("sphere", [=]() {
+	return createAndAddModel("sphere", [=]()
+							 {
 		Mesh mesh = GenMeshSphere(radius, rings, slices);
-		return LoadModelFromMesh(mesh);
-	}, radius, rings, slices);
+		return LoadModelFromMesh(mesh); }, radius, rings, slices);
 }
 
 t_model_id ModelManager::createPlane(float width, float length, int resX, int resZ)
 {
-	return createAndAddModel("plane", [=]() {
+	return createAndAddModel("plane", [=]()
+							 {
 		Mesh mesh = GenMeshPlane(width, length, resX, resZ);
-		return LoadModelFromMesh(mesh);
-	}, width, length, resX, resZ);
+		return LoadModelFromMesh(mesh); }, width, length, resX, resZ);
 }
 
 Model &ModelManager::getModel(t_model_id id)

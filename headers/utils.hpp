@@ -4,19 +4,20 @@
 #include "components.hpp"
 
 // Utility functions
-Quaternion RotateAroundAxis(const Quaternion& current, const Vector3& axis, float angle);
-Vector3 GetForwardVector(const Rotation& rotation);
-Vector3 GetForwardVector(const Quaternion &rotation);
-Vector3 GetRightVector(const Rotation& rotation);
-Vector3 GetRightVector(const Quaternion &rotation);
-Vector3 GetUpVector(const Rotation& rotation);
-Vector3 GetUpVector(const Quaternion &rotation);
+Quaternion rotateAroundAxis(const Quaternion& current, const Vector3& axis, float angle);
+Vector3 getForwardVector(const Rotation& rotation);
+Vector3 getForwardVector(const Quaternion &rotation);
+Vector3 getRightVector(const Rotation& rotation);
+Vector3 getRightVector(const Quaternion &rotation);
+Vector3 getUpVector(const Rotation& rotation);
+Vector3 getUpVector(const Quaternion &rotation);
 Quaternion vector3ToRotation(const Vector3& forward);
 Quaternion vector3ToRotation(const Vector3& forward, const Vector3& up);
 Quaternion vector3ToRotation(const Vector3& newForward, const Quaternion &baseRotation);
 Vector3 randomUnitVector3();
 Vector3 randomPosInField();
 Quaternion randomRotation();
+Matrix getTransformMatrix(const Vector3 &scale, const Vector3 &rotation, const Vector3 &displacement);
 
 float angleDifference(const Quaternion& a, const Quaternion& b);
 float angleDifference(const Rotation& a, const Rotation& b);
@@ -29,7 +30,9 @@ Color colorRevert(Color a);
 
 // algorithms
 Vector3 calculateLeadDirection(const Vector3 &shooterPos, const Vector3 &targetPos, const Vector3 &targetVel, float projectileSpeed);
+bool willCollide(float collisionDt, float maxDt);
 bool willCollide(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance, float maxDt);
+float calculateCollisionTime(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance);
 std::string getParentPath(const std::string &path);
 std::string GetFileName(const std::string &path);
 

@@ -43,8 +43,9 @@ void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 				continue;
 
 			float combinedRadius = A.radius + B.radius;
-			if (willCollide(A.position, A.velocity, B.position, B.velocity, combinedRadius, 1.0f)) {
-				context.dispatcher.enqueue<event::CollisionEvent>({&context, A.id, B.id, dt});
+			float collisionDt = calculateCollisionTime(A.position, A.velocity, B.position, B.velocity, combinedRadius);
+			if (willCollide(collisionDt, 1.0f)) {
+				context.dispatcher.enqueue<event::CollisionEvent>({&context, A.id, B.id, dt, collisionDt});
 			}
 		}
 	}
