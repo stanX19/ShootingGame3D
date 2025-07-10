@@ -45,3 +45,6 @@
 		firstPerson = false;
 		alignHorizontal = false;
 	}
+19. enemy dodge asteroids
+20. angular velocity; acceleration; angular acceleration; radiusIncrease; radiusSyncModel {float }; mass
+21. tag::onDeath::sphereDebris; tag::onDeath::cubeDebris; tag::onDeath::explosion; 

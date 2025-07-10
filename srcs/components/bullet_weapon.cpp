@@ -20,10 +20,10 @@ void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	weapon.bulletData.rad = 0.05f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
-	weapon.bulletData.spreadSin = std::sin(0.75 * DEG2RAD);
+	weapon.bulletData.spreadSin = std::sin(0.5 * DEG2RAD);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0, 20});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0, 15});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);

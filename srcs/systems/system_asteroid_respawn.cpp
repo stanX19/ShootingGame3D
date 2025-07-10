@@ -6,7 +6,7 @@
 #define ASTEROID_COUNT 50
 
 static Vector3 randomPosOffField() {
-	return Vector3Scale(randomUnitVector3(), ARENA_SIZE * 1.5);
+	return Vector3Scale(randomUnitVector3(), ARENA_SIZE * 2.5);
 }
 
 void ecs_systems::asteroidRespawn(GameContext &context)

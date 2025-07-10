@@ -2,6 +2,10 @@
 #include "utils.hpp"
 #include "constants.hpp"
 
+namespace {
+	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 4, ARENA_SIZE * 4, ARENA_SIZE * 4};
+}
+
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {
 	spawnAsteroid(context, pos, dir, COMBAT_DIST * (0.08 + GetRandomValue(0, 20) * 0.01));
@@ -10,7 +14,6 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad)
 {
 	float speed = GetRandomValue(3, (int)(10 * ARENA_SIZE / 200.0f));
-	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 2, ARENA_SIZE * 2, ARENA_SIZE * 2};
 	t_model_id asteroidModel = context.meshManager.createSphere(64, 64);
 
 	for (int i = 0; i < 5; i++)
@@ -34,15 +37,14 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 
 void spawnRingAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {
-    float radius = GetRandomValue(75000, 100000) / 100.0f; // 750-1000 units
+    float radius = GetRandomValue(50000, 75000) / 100.0f; // 500-750 units
     Vector3 ringNormal = Vector3Normalize(randomUnitVector3());
-    spawnRingAsteroid(context, pos, dir, radius, ringNormal, 15);
+    spawnRingAsteroid(context, pos, dir, radius, ringNormal, 10);
 }
 
 void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir, float radius, const Vector3 &ringNormal, int numAsteroids)
 {
 	float speed = GetRandomValue(3, (int)(10 * ARENA_SIZE / 200.0f));
-    const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 2, ARENA_SIZE * 2, ARENA_SIZE * 2};
     t_model_id asteroidModel = context.meshManager.createSphere(64, 64);
     
     Vector3 u, v;
@@ -52,7 +54,7 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector
         u = Vector3Normalize(Vector3CrossProduct(ringNormal, Vector3{0, 1, 0}));
     v = Vector3CrossProduct(ringNormal, u);
     
-    float asteroidRadiusAvg = (2 * PI * radius) / numAsteroids / 2 * 1.5;  // circum / numAsteroid
+    float asteroidRadiusAvg = (2 * PI * radius) / numAsteroids / 2 * 1.2;  // circum / numAsteroid
     for (int i = 0; i < numAsteroids; i++)
     {
         float angle = (float)i / numAsteroids * 2 * PI + GetRandomValue(-10, 10) * DEG2RAD;

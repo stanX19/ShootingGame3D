@@ -229,7 +229,7 @@ void Renderer::DrawTargetable()
 			continue;
 	
 		Vector3 toTarget = pos.value - playerPos;
-		int distance = Vector3Length(toTarget); 
+		float distance = Vector3Length(toTarget); 
 		if (distance > COMBAT_DIST * 1.5)
 			continue;
 
@@ -282,7 +282,10 @@ void Renderer::DrawTargetable()
 		}
 
 		char txt[32];
-		snprintf(txt, sizeof(txt), "%im", distance * 10);
+		if (distance < 1000)
+			snprintf(txt, sizeof(txt), "%.1fm", distance);
+		else
+			snprintf(txt, sizeof(txt), "%.2fkm", distance / 1000.0f);
 		DrawText(txt, screenPos.x + 20, screenPos.y + 10, 20, MAROON);
 	}
 }
