@@ -1,13 +1,16 @@
 #include "entities.hpp"
 #include "utils.hpp"
 
-static const float BASE_SPEED = 400.0f;
+namespace {
+	const float BASE_SPEED = 400.0f;
+	const float BASE_SPREAD = 0.05f * DEG2RAD;
 
-static Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity)
-{
-	// if (context.registry.any_of<RenderBody>(entity))
-	// 	return colorLerp(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 0.4);
-	return WHITE;
+	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity)
+	{
+		// if (context.registry.any_of<RenderBody>(entity))
+		// 	return colorLerp(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 0.4);
+		return WHITE;
+	}
 }
 
 void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
@@ -20,7 +23,7 @@ void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	weapon.bulletData.rad = 0.05f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
-	weapon.bulletData.spreadSin = std::sin(0.5 * DEG2RAD);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0, 15});
@@ -40,8 +43,8 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	weapon.bulletData.speed = BASE_SPEED * 2.0f;
 	weapon.bulletData.rad = 0.1f;
 	weapon.bulletData.color = getColor(context, entity);
-	weapon.bulletData.lifetime = 10.0f;
-	weapon.bulletData.spreadSin = std::sin(5 * DEG2RAD);
+	weapon.bulletData.lifetime = 5.0f;
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 50.0f);
 	weapon.bulletData.bulletCount = 10;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
@@ -81,7 +84,7 @@ void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	weapon.bulletData.rad = 0.2f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
-	weapon.bulletData.spreadSin = std::sin(0.10 * DEG2RAD);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 1.0f);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.75});
@@ -100,7 +103,7 @@ void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	weapon.bulletData.rad = 0.2f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
-	weapon.bulletData.spreadSin = std::sin(0.20 * DEG2RAD);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 2);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
@@ -121,7 +124,7 @@ void emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	weapon.bulletData.rad = 0.075f;
 	weapon.bulletData.color = getColor(context, entity);
 	weapon.bulletData.lifetime = 10.0f;
-	weapon.bulletData.spreadSin = std::sin(0.50 * DEG2RAD);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});

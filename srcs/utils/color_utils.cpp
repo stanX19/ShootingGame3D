@@ -1,5 +1,4 @@
 #include "utils.hpp"
-#include "shoot_3d.hpp"
 #include <cmath>
 #include <iostream>
 

@@ -51,7 +51,7 @@ int main() {
 
         ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context);
-        ecs_systems::entityCollision(context, dt);
+        ecs_systems::detectEntityCollision(context, dt);
 		ecs_systems::hpCleanup(context);
 
         renderer.Render();

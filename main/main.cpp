@@ -55,6 +55,7 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, float dt)
 
 static void resetGame(GameContext &context, Camera &camera) {
     context.registry.clear();
+	event::utils::hookAllListeners(context);
     setup_camera(camera);
     spawnPlayer(context);
 	spawnSunAndStars(context);
@@ -98,7 +99,8 @@ int main() {
 
         ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context);
-        ecs_systems::entityCollision(context, dt);
+        ecs_systems::detectEntityCollision(context, dt);
+		context.dispatcher.update();
 		
         ecs_systems::entityLifetime(context, dt);
         ecs_systems::delayedDamage(context, dt);

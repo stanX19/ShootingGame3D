@@ -178,6 +178,4 @@ namespace tag {
 	struct GetVelOnAnchorDeath {};
 }
 
-
-
 #endif

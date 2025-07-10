@@ -23,6 +23,11 @@ static void linkWithParent(GameContext &context, entt::entity &turret, entt::ent
 	context.registry.emplace_or_replace<RotationAnchor>(turret, RotationAnchor{parent});
 	context.registry.emplace_or_replace<WeaponParent>(turret, WeaponParent{parent});
 	context.registry.emplace_or_replace<DeathAnchor>(turret, DeathAnchor{parent, 0.75});
+
+	// prevent collision straight on; to be removed after adding faction immunity
+	if (Position *posPtr = context.registry.try_get<Position>(parent)) {
+		context.registry.emplace_or_replace<Position>(turret, Position{posPtr->value + relpos * 2});
+	}
 }
 
 entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color) {

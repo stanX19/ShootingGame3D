@@ -3,7 +3,7 @@
 #include "entities.hpp"
 #include "constants.hpp"
 
-#define ENEMY_COUNT 8
+#define ENEMY_COUNT 6
 
 static Vector3 generateSpawnPos(const Vector3 &playerPos) {
 	return playerPos + randomUnitVector3() * (COMBAT_DIST * 1.8f);

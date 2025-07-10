@@ -1,5 +1,5 @@
 #include "utils.hpp"
-#include "shoot_3d.hpp"
+#include "constants.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -117,8 +117,6 @@ Vector3 randomUnitVector3()
 	return Vector3Normalize(v);
 }
 
-
-
 Vector3 randomPosInField()
 {
 	float x = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
@@ -126,7 +124,6 @@ Vector3 randomPosInField()
 	float y = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
 	return Vector3{x, y, z};
 }
-
 
 // unit quaternion, uniform
 Quaternion randomRotation()

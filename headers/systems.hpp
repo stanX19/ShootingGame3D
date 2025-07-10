@@ -17,7 +17,7 @@ namespace ecs_systems
 	void enemyAimTarget(GameContext &context);
 	void enemyRespawn(GameContext &context);
 	void entityMovement(GameContext &context, float dt);
-	void entityCollision(GameContext &context, float dt);
+	void detectEntityCollision(GameContext &context, float dt);
 	void entityAnchor(GameContext &context);
 	void entityAnchorRelease(GameContext &context, float dt);
 	void entityLifetime(GameContext &context, float dt);
@@ -34,7 +34,7 @@ namespace ecs_systems
 	void weaponUpdateCooldown(GameContext &context, float dt);
 	void asteroidRespawn(GameContext &context);
 	void cleanOutOfBound(GameContext &context);
-	void syncModelRotation(GameContext &context); 
+	void syncModelRotation(GameContext &context);
 }
 
 #endif // SYSTEMS_HPP
