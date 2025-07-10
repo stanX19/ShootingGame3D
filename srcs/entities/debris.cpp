@@ -7,15 +7,8 @@ void spawnDebris(GameContext &context, const Vector3& position, float originalRa
 	for (int i = 0; i < count; ++i) {
 		entt::entity debris = context.registry.create();
 
-		Vector3 dir = {
-			(float)rand() / RAND_MAX * 2.0f - 1.0f,
-			(float)rand() / RAND_MAX * 2.0f - 1.0f,
-			(float)rand() / RAND_MAX * 2.0f - 1.0f
-		};
-		dir = Vector3Normalize(dir);
-
 		float speed = 5.0f + ((float)rand() / RAND_MAX) * 5.0f;
-		Vector3 debrisVel = dir * speed + velocity;
+		Vector3 debrisVel = randomUnitVector3() * speed + velocity;
 
 		// fast = small
 		float radius = originalRadius * (0.05f + 0.5f / speed);
