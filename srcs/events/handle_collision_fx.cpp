@@ -6,18 +6,18 @@ void event::Listener::handleCollisionFX(const CollisionEvent& evt) {
 	auto& registry = evt.context->registry;
 
 	auto trySpawn = [&](entt::entity victim, entt::entity damager) {
-		auto [hpPtr, prevPosPtr, posPtr, velocityPtr, renderPtr] = registry.try_get<HP, PrevPosition, Position, Velocity, RenderBody>(victim);
-		auto [dmgPtr, damagerPrevPosPtr, damagerVelPtr] = registry.try_get<Damage, PrevPosition, Velocity>(damager);
+		auto [hpPtr, prevPosPtr, posPtr, bodyPtr] = registry.try_get<HP, PrevPosition, Position, RenderBody>(victim);
+		auto [dmgPtr, damagerPrevPosPtr, damagerPosPtr] = registry.try_get<Damage, PrevPosition, Position>(damager);
 
-		if (hpPtr && dmgPtr && dmgPtr->value >= 0 && prevPosPtr && velocityPtr && renderPtr && damagerPrevPosPtr && damagerVelPtr && posPtr) {
-			Vector3 victimPos = prevPosPtr->value + velocityPtr->value * evt.collisionDt;
-			Vector3 damagerPos = damagerPrevPosPtr->value + damagerVelPtr->value * evt.collisionDt;
-			Vector3 normal = Vector3Normalize(damagerPos - victimPos);
-			float scale = std::cbrt(renderPtr->scale.x * renderPtr->scale.y * renderPtr->scale.z);
+		if (hpPtr && dmgPtr && dmgPtr->value >= 0 && prevPosPtr && bodyPtr && damagerPrevPosPtr && posPtr) {
+			Vector3 victimPos = Vector3Lerp(prevPosPtr->value, posPtr->value, evt.collisionDt / evt.dt);
+			Vector3 damagerPos = Vector3Lerp(damagerPrevPosPtr->value, damagerPosPtr->value, evt.collisionDt / evt.dt);
+			Vector3 normal = Vector3Normalize(victimPos - damagerPos);
+			float scale = std::cbrt(bodyPtr->scale.x * bodyPtr->scale.y * bodyPtr->scale.z);
 			Vector3 collisionPos = posPtr->value + normal * scale;
-			Vector3 explosionDir = normal * 10 + velocityPtr->value;
+			Vector3 explosionDir = normal * 50 + (posPtr->value - prevPosPtr->value) / evt.dt;
 			int debrisCount = static_cast<int>(scale * 5.0f);
-			Color color = ColorLerp(renderPtr->color, WHITE, 0.5f);
+			Color color = ColorLerp(bodyPtr->color, WHITE, 0.5f);
 			spawnDebris(*evt.context, collisionPos, scale * 0.5f, color, debrisCount, 5.0f, explosionDir);
 		}
 	};

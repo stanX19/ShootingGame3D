@@ -15,11 +15,10 @@ void ecs_systems::hpCleanup(GameContext &context) {
 	for (auto entity : toDestroy) {
 		if (!context.registry.valid(entity)) continue;
 
-		if (context.registry.all_of<Position, RenderBody>(entity)) {
-			const Position& pos = context.registry.get<Position>(entity);
-			const RenderBody& renderBody = context.registry.get<RenderBody>(entity);
-			float scale = std::cbrt(renderBody.scale.x * renderBody.scale.y * renderBody.scale.z);
-			spawnDebris(context, pos.value, scale, renderBody.color, (int)(scale * 25), 5.0);
+		auto [posPtr, bodyPtr, velPtr] = context.registry.try_get<Position, RenderBody, Velocity>(entity);
+		if (posPtr && bodyPtr) {
+			float scale = std::cbrt(bodyPtr->scale.x * bodyPtr->scale.y * bodyPtr->scale.z);
+			spawnDebris(context, posPtr->value, scale, bodyPtr->color, (int)(scale * 25), 5.0, velPtr? velPtr->value: Vector3Zeros);
 		}
 
 		context.registry.destroy(entity);
