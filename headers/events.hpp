@@ -2,7 +2,6 @@
 #define EVENTS_HPP
 
 #include "includes.hpp"
-#include "model_manager.hpp"
 #include "game_context.hpp"
 #include <functional>
 #include <vector>
@@ -11,9 +10,13 @@ namespace event {
 	struct CollisionEvent {
 		GameContext *context;
 		entt::entity a;
+		Vector3 posA;			// position during collision
+		Vector3 velA;			// actual velocity
 		entt::entity b;
-		float dt;			// frame dt
-		float collisionDt;	// dt from prev pos to collision
+		Vector3 posB;			// same
+		Vector3 velB;
+		float dt;				// frame dt
+		float collisionDtRatio;	// collision_dt / frame_dt
 	};
 
 	struct Listener {

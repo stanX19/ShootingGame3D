@@ -180,7 +180,7 @@ bool isInFrontOfCamera(const Vector3 &entityPos, const Camera3D &camera)
 
 void Renderer::DrawHealthBars()
 {
-	auto view = context.registry.view<Position, CollisionBody, HP>();
+	auto view = context.registry.view<Position, CollisionBody, HP, tag::Targetable>();
 	for (auto entity : view)
 	{
 		auto &pos = view.get<Position>(entity);

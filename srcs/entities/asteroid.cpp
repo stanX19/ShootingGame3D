@@ -58,7 +58,7 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector
 	for (int i = 0; i < numAsteroids; i++)
 	{
 		float angle = (float)i / numAsteroids * 2 * PI + GetRandomValue(-10, 10) * DEG2RAD;
-		float asteroidRadius = GetRandomValue((int)(asteroidRadiusAvg * 90), (int)(asteroidRadiusAvg * 150)) / 100.0f;
+		float asteroidRadius = GetRandomValue((int)(asteroidRadiusAvg * 70), (int)(asteroidRadiusAvg * 99)) / 100.0f;
 		Vector3 ringOffset = u * (cos(angle) * radius) + v * (sin(angle) * radius);
 		Vector3 ringPos = center + ringOffset + ringNormal * (asteroidRadius / 5.0f);
 		unsigned char brightness = (unsigned char)GetRandomValue(40, 70);

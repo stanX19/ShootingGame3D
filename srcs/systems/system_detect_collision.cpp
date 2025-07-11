@@ -7,9 +7,9 @@
 void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 	struct EntityData {
 		entt::entity id;
-		Vector3 position;
-		Vector3 velocity;
-		float radius;
+		Vector3 pos;
+		Vector3 vel;
+		float rad;
 		int faction;
 	};
 
@@ -42,10 +42,14 @@ void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 			if ((A.faction & B.faction) != 0)
 				continue;
 
-			float combinedRadius = A.radius + B.radius;
-			float collisionDt = calculateCollisionTime(A.position, A.velocity, B.position, B.velocity, combinedRadius);
+			float combinedRadius = A.rad + B.rad;
+			float collisionDt = calculateCollisionTime(A.pos, A.vel, B.pos, B.vel, combinedRadius);
 			if (willCollide(collisionDt, 1.0f)) {
-				context.dispatcher.enqueue<event::CollisionEvent>({&context, A.id, B.id, dt, collisionDt});
+				context.dispatcher.enqueue<event::CollisionEvent>({&context,
+					A.id, A.pos + A.vel * collisionDt, A.vel / dt,
+					B.id, B.pos + B.vel * collisionDt, B.vel / dt,
+					dt, collisionDt}
+				);
 			}
 		}
 	}
