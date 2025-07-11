@@ -14,7 +14,7 @@ namespace {
 				Vector3 normal = Vector3Normalize(damagerPos - victimPos);
 
 				float scale = std::cbrt(bodyPtr->scale.x * bodyPtr->scale.y * bodyPtr->scale.z);
-				int debrisCount = static_cast<int>(scale * 5.0f);
+				int debrisCount = static_cast<int>(std::sqrt(scale) * 5);
 
 				Vector3 collisionPos = posPtr->value + normal * scale;
 				Vector3 explosionDir = Vector3Normalize(damagerVel) * -50 + victimVel;
