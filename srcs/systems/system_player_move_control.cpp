@@ -4,34 +4,78 @@
 #include <iostream>
 #include <cmath>
 
-Vector2 getMouseDirectionRelRot(const Quaternion &entRot, const Camera3D &camera) { 
-	Vector2 mouseDirection = getMouseDirectionNormalized(0.5f);
-		
-	if (std::abs(mouseDirection.x) < 0.01f && std::abs(mouseDirection.y) < 0.01f) {
-		return {0.0f, 0.0f};
+namespace {
+	Vector2 getMouseDirectionRelRot(const Quaternion &entRot, const Camera3D &camera) { 
+		Vector2 mouseDirection = getMouseDirectionNormalized(0.5f);
+			
+		if (std::abs(mouseDirection.x) < 0.01f && std::abs(mouseDirection.y) < 0.01f) {
+			return {0.0f, 0.0f};
+		}
+
+		Vector3 entityUp = getUpVector(entRot);
+		Vector3 entityRight = getRightVector(entRot);
+			
+		Vector3 cameraForward = Vector3Normalize(camera.target - camera.position);
+		Vector3 cameraRight = Vector3Normalize(Vector3CrossProduct(cameraForward, camera.up));
+			
+		Vector2 entityFlatUp = Vector2Normalize(Vector2{
+			Vector3DotProduct(entityUp, cameraRight),
+			-Vector3DotProduct(entityUp, camera.up)
+		});
+			
+		Vector2 entityFlatRight = Vector2Normalize(Vector2{
+			Vector3DotProduct(entityRight, cameraRight),
+			-Vector3DotProduct(entityRight, camera.up)
+		});
+			
+		return Vector2{
+			-Vector2DotProduct(entityFlatRight, mouseDirection),
+			-Vector2DotProduct(entityFlatUp, mouseDirection)
+		};
 	}
 
-	Vector3 entityUp = getUpVector(entRot);
-	Vector3 entityRight = getRightVector(entRot);
+	void applySoftBoundary(Position &position, Velocity &velocity, [[maybe_unused]] float dt) {
+		const float softBoundaryStart = ARENA_SIZE * 0.99f;
+		const float hardBoundary = ARENA_SIZE;
 		
-	Vector3 cameraForward = Vector3Normalize(camera.target - camera.position);
-	Vector3 cameraRight = Vector3Normalize(Vector3CrossProduct(cameraForward, camera.up));
+		Vector3 pos = position.value;
+		Vector3 vel = velocity.value;
+		Vector3 totalBoundaryForce = {0.0f, 0.0f, 0.0f};
 		
-	Vector2 entityFlatUp = Vector2Normalize(Vector2{
-		Vector3DotProduct(entityUp, cameraRight),
-		-Vector3DotProduct(entityUp, camera.up)
-	});
+		// Check each axis for boundary proximity
+		Vector3 axes[3] = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}};
+		float positions[3] = {pos.x, pos.y, pos.z};
 		
-	Vector2 entityFlatRight = Vector2Normalize(Vector2{
-		Vector3DotProduct(entityRight, cameraRight),
-		-Vector3DotProduct(entityRight, camera.up)
-	});
+		for (int i = 0; i < 3; i++) {
+			float currentPos = positions[i];
+			float absCurrentPos = std::abs(currentPos);
+			
+			if (absCurrentPos < softBoundaryStart)
+				continue ;
+				
+			Vector3 surfaceNormal = axes[i] * (currentPos > 0? -1.0f : 1.0f);
+			float velocityTowardSurface = Vector3DotProduct(vel, surfaceNormal * -1.0f);
+			
+			if (velocityTowardSurface <= 0)
+				continue ;
+				
+			float excess = absCurrentPos - softBoundaryStart;
+			float maxExcess = hardBoundary - softBoundaryStart;
+			float distanceRatio = excess / maxExcess;
+
+			float forceStrength = distanceRatio * velocityTowardSurface;
+
+			totalBoundaryForce += surfaceNormal * forceStrength;
+		}
 		
-	return Vector2{
-		-Vector2DotProduct(entityFlatRight, mouseDirection),
-		-Vector2DotProduct(entityFlatUp, mouseDirection)
-	};
+		velocity.value += totalBoundaryForce;
+		
+		position.value.x = Clamp(position.value.x, -hardBoundary, hardBoundary);
+		position.value.y = Clamp(position.value.y, -hardBoundary, hardBoundary);
+		position.value.z = Clamp(position.value.z, -hardBoundary, hardBoundary);
+	}
 }
+
 
 void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera3D &camera)
 {
@@ -92,6 +136,5 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 	rotation.value = newRotation;
 
 	// Stay within arena
-	position.value.x = Clamp(position.value.x, -ARENA_SIZE, ARENA_SIZE);
-	position.value.z = Clamp(position.value.z, -ARENA_SIZE, ARENA_SIZE);
+	applySoftBoundary(position, velocity, dt);
 }

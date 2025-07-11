@@ -63,6 +63,7 @@ void Renderer::Render()
 	HandleLightSource();
 	DrawEntitiesWithoutShader();
 	DrawEntitiesWithShader();
+	DrawBoundaryWarning();
 
 	EndMode3D();
 
@@ -91,6 +92,12 @@ void Renderer::DrawTexts() {
 		DrawText("Move: W S or Right click", 10, 50, 20, WHITE);
 		DrawText("Turn: Arrows or Mouse cursor", 10, 70, 20, WHITE);
 		DrawText("Fire: Space or Left click", 10, 90, 20, WHITE);
+
+		Position *posPtr = context.registry.try_get<Position>(context.currentPlayer);
+		Vector3 pos = posPtr? posPtr->value: camera.position;
+		char cords[40];
+		sprintf(cords, "CORDS: (%-5.0f, %-5.0f, %-5.0f)", pos.x, pos.y, pos.z);
+		DrawText(cords, 10, 110, 20, WHITE);
 	}
 	else
 	{
@@ -751,6 +758,91 @@ void Renderer::DrawCollisionWarning() {
 			int textWidth = MeasureText(distText, 16);
 			Vector2 textPos = screenCenter + directionToWarning * (uiFrameRadius + 50);
 			DrawText(distText, textPos.x - textWidth/2, textPos.y - 8, 16, ColorAlpha(RED, alpha));
+		}
+	}
+}
+
+void Renderer::DrawBoundaryWarning()
+{
+	if (!context.registry.valid(context.currentPlayer))
+		return;
+	
+	auto posPtr = context.registry.try_get<Position>(context.currentPlayer);
+	if (!posPtr)
+		return;
+	
+	Vector3 playerPos = posPtr->value;
+	
+	const float softBoundaryStart = ARENA_SIZE * 0.5f;
+	const float hardBoundary = ARENA_SIZE;
+	const float warningZone = hardBoundary - softBoundaryStart;
+	
+	Vector3 axes[3] = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}};
+	float positions[3] = {playerPos.x, playerPos.y, playerPos.z};
+	
+	for (int axis = 0; axis < 3; axis++) {
+		float currentPos = positions[axis];
+		float absCurrentPos = std::abs(currentPos);
+		
+		if (absCurrentPos < softBoundaryStart)
+			continue;
+
+		float excess = absCurrentPos - softBoundaryStart;
+		float intensity = std::min(1.0f, excess / warningZone);
+		
+		if (intensity <= 0.0f)
+			continue;
+		
+		Vector3 toBoundaryUnit = axes[axis] * (currentPos > 0 ? 1.0f : -1.0f);
+		
+		Vector3 planeCenter = playerPos * (Vector3Ones - toBoundaryUnit * toBoundaryUnit) + toBoundaryUnit * hardBoundary;
+		Vector3 right, up;
+		
+		// Generate perpendicular vectors for the grid plane
+		if (std::abs(toBoundaryUnit.y) < 0.9f) {
+			right = Vector3Normalize(Vector3CrossProduct(toBoundaryUnit, {0, 1, 0}));
+		} else {
+			right = Vector3Normalize(Vector3CrossProduct(toBoundaryUnit, {1, 0, 0}));
+		}
+		up = Vector3Normalize(Vector3CrossProduct(right, toBoundaryUnit));
+		
+		// Grid parameters
+		const float gridSize = 200.0f;  // Total grid size
+		const float gridTileSize = 20.0f;
+		const int linesPerSide = (int)(gridSize / gridTileSize) + 1;
+		const float halfGrid = gridSize * 0.5f;
+		const Vector3 boundVec = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
+
+		// Calculate grid offset and snap to grid tile size
+		Vector3 playerProjection = playerPos * (Vector3Ones - toBoundaryUnit * toBoundaryUnit);
+		float rightOffset = fmodf(Vector3DotProduct(playerProjection, right), gridTileSize);
+		float upOffset = fmodf(Vector3DotProduct(playerProjection, up), gridTileSize);
+		
+		float alpha = intensity * 0.3f;
+		Color warningColor = ColorAlpha(WHITE, alpha);
+		
+		// Draw horizontal grid lines
+		for (int i = 0; i < linesPerSide; i++) {
+			float linePos = (i * gridTileSize) - halfGrid - upOffset;
+			
+			Vector3 lineStart = planeCenter + right * (-halfGrid - rightOffset) + up * linePos;
+			Vector3 lineEnd = planeCenter + right * (halfGrid - rightOffset) + up * linePos;
+			
+			lineStart = Vector3Clamp(lineStart, boundVec * -1, boundVec);
+			lineEnd = Vector3Clamp(lineEnd, boundVec * -1, boundVec);
+			DrawLine3D(lineStart, lineEnd, warningColor);
+		}
+		
+		// Draw vertical grid lines
+		for (int i = 0; i < linesPerSide; i++) {
+			float linePos = (i * gridTileSize) - halfGrid - rightOffset;
+			
+			Vector3 lineStart = planeCenter + right * linePos + up * (-halfGrid - upOffset);
+			Vector3 lineEnd = planeCenter + right * linePos + up * (halfGrid - upOffset);
+			
+			lineStart = Vector3Clamp(lineStart, boundVec * -1, boundVec);
+			lineEnd = Vector3Clamp(lineEnd, boundVec * -1, boundVec);
+			DrawLine3D(lineStart, lineEnd, warningColor);
 		}
 	}
 }

@@ -31,11 +31,13 @@ private:
 	void DrawEntityModel(const Position &pos, const RenderBody &body);
 	void DrawEntitiesWithShader();
 	void DrawEntitiesWithoutShader();
+	void DrawBoundaryWarning();
 	void HandleLightSource();
+	
+	void DrawHUD();
 	void DrawHealthBars();
 	void DrawTargetable();
 	void DrawTexts();
-
 	void DrawSpeedBar();
 	void DrawThrustBar();
 	void DrawAmmoCircle();
@@ -43,7 +45,6 @@ private:
 	void DrawMainUIFrame();
 	void DrawCursorArrow();
 	void DrawCollisionWarning();
-	void DrawHUD();
 	
 	Vector2 GetUIFrameCenter() const;
 	float GetUIFrameRadius() const;
