@@ -160,7 +160,7 @@ struct Ammo
 
 struct AmmoReload
 {
-	float value;
+	float value;	// reload per second, the higher the faster
 };
 
 struct JustFired

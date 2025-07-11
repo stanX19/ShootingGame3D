@@ -49,7 +49,7 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0, 5});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{3.5});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
