@@ -49,3 +49,9 @@
 20. angular velocity; acceleration; angular acceleration; radiusIncrease; radiusSyncModel {float }; mass
 21. tag::onDeath::sphereDebris; tag::onDeath::cubeDebris; tag::onDeath::explosion; 
 22. missile, cylinder model; uses thrust component; same system as new player movement
+23. struct TrailParticle {
+	Color color;
+	float randomPosMagnitude = 0;
+	float randomVelMagnitude = 0;
+};
+system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * randomPosMagnitude, randomVector3 * randomVelMagnitude)

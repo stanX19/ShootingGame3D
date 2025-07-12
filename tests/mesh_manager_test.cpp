@@ -26,13 +26,15 @@ int main() {
 	t_model_id plane = meshManager.createPlane(4.0f, 4.0f, 4, 4);
 
 	std::cout << "Start of load" << "\n";
-	// 	t_model_id ship = meshManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
-	// t_model_id ship = meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
-	t_model_id ship = meshManager.loadModel("assets/Models/sun/sun.glb", 0.1);
+	// 	const char *path = "assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf";
+	// const char *path = "assets/Models/spaceship_custom_100/Spaceship1.obj";
+	// const char *path = "assets/Models/sun/sun.glb";
+	const char *path = "assets/Models/spaceship_custom_2/Spaceship2.glb";
+	t_model_id ship = meshManager.loadModel(path, 1.0);
 	// t_model_id ship = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
 	std::cout << "End of load" << "\n";
-	t_model_id ship_id_2 = meshManager.loadModel("assets/Models/sun/sun.glb", 0.1);
-	t_model_id ship_id_3 = meshManager.loadModel("assets/Models/sun/sun.glb", 1.0);
+	t_model_id ship_id_2 = meshManager.loadModel(path, 0.1);
+	t_model_id ship_id_3 = meshManager.loadModel(path, 1.0);
 
 	// Print results
 	std::cout << "Box1 ID: " << box1 << "\n";

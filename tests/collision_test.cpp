@@ -32,6 +32,7 @@ static void resetGame(GameContext &context) {
 	spawnBody(context, {3, 0, 0}, {-0.5, 0, 0});
 	spawnBody(context, {-3, 0, 0}, {0.5, 0, 0});
 	spawnBody(context, {-50, 0, 0}, {500000000, 0, 0});
+	event::utils::hookAllListeners(context);
 }
 
 int main() {
@@ -51,9 +52,8 @@ int main() {
 		float dt = GetFrameTime();
 
 		ecs_systems::entityMovement(context, dt);
-		ecs_systems::entityAnchor(context);
 		ecs_systems::detectEntityCollision(context, dt);
-		ecs_systems::hpCleanup(context);
+		context.dispatcher.update();
 
 		renderer.Render();
 
