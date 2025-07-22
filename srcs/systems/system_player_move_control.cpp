@@ -22,7 +22,7 @@ namespace {
 			Vector3DotProduct(entityUp, cameraRight),
 			-Vector3DotProduct(entityUp, camera.up)
 		});
-			
+
 		Vector2 entityFlatRight = Vector2Normalize(Vector2{
 			Vector3DotProduct(entityRight, cameraRight),
 			-Vector3DotProduct(entityRight, camera.up)

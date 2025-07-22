@@ -5,6 +5,7 @@ static entt::entity spawnBaseTurret(GameContext &context, Color color) {
 
 	// t_model_id turretModel = context.meshManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
 	// t_model_id turretModel = context.meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
+	// t_model_id turretModel = context.meshManager.loadModel("assets/Models/canon/canon1.glb");
 	t_model_id turretModel = context.meshManager.createBox();
 	context.registry.emplace<Position>(turret);
 	context.registry.emplace<Rotation>(turret);

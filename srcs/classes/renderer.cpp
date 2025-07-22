@@ -228,7 +228,19 @@ void Renderer::DrawTargetable()
 	float uiFrameRadius = GetUIFrameRadius();
 
 	static float animationAngle = 0.0f;
-	animationAngle = WrapAngle(animationAngle + GetFrameTime() * 3.0f); // Adjust blink speed
+	animationAngle = WrapAngle(animationAngle + GetFrameTime() * 3.0f); // Adjust constant animation speed
+
+	// Blinking specific static variables
+	static entt::entity s_prevTargetedEntity = entt::null;
+	static float s_blinkTimer = 0.0f; // Timer for controlling blink phase
+	const float blinkInterval = 0.1f;	  // Counter for completed blinks
+
+	// Trigger blink if target changes or a new target is acquired
+	s_blinkTimer -= GetFrameTime();
+	if (targetedEntity != s_prevTargetedEntity) {
+		s_blinkTimer = blinkInterval * 3;
+	}
+	s_prevTargetedEntity = targetedEntity;
 
 	for (auto [entity, pos] : context.registry.view<Position, tag::Targetable>().each())
 	{
@@ -280,6 +292,11 @@ void Renderer::DrawTargetable()
 		{
 			float innerRad = 17 + 500.0f / distance;
 			Color aimColor = MAROON;
+
+			if (s_blinkTimer >= 0 && fmod(s_blinkTimer / blinkInterval, 2.0f) >= 1.0f) {
+				aimColor = ColorAlpha(aimColor, 0.3f);
+			}
+
 			DrawRingLines(screenPos, innerRad, innerRad + 2, 90 + animationAngle, 180 + animationAngle, 12, aimColor);
 			DrawRingLines(screenPos, innerRad, innerRad + 2, 270 + animationAngle, 360 + animationAngle, 12, aimColor);
 			DrawLine(screenPos.x + innerRad + 2, screenPos.y, screenPos.x + innerRad + 7, screenPos.y, aimColor);
