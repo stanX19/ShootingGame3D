@@ -6,7 +6,7 @@ void event::Listener::handleCollisionDamage(const CollisionEvent& evt) {
 	auto [hpB, dmgB] = evt.context->registry.try_get<HP, Damage>(evt.b);
 
 	if (hpA && dmgB)
-		hpA->value -= dmgB->value * evt.dt;
+		hpA->value -= dmgB->value;
 	if (hpB && dmgA)
-		hpB->value -= dmgA->value * evt.dt;
+		hpB->value -= dmgA->value;
 }

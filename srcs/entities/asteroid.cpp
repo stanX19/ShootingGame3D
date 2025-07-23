@@ -28,7 +28,7 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 		context.registry.emplace<RenderBody>(asteroid,
 			RenderBody{asteroidModel, (i == 0)? Color{ 40, 40, 40, 255 } : Color{ 60, 60, 60, 255 }, subRad}
 		);
-		context.registry.emplace<Damage>(asteroid, 10000.0f);
+		context.registry.emplace<Damage>(asteroid, 500.0f);
 		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
 		context.registry.emplace<tag::Asteroid>(asteroid);
 		context.registry.emplace<tag::Shaded>(asteroid);

@@ -12,7 +12,7 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 		shipModel, GREEN, 1.0f
 	});
 	context.registry.emplace<HP>(enemy, 1000.0f);
-	context.registry.emplace<Damage>(enemy, 5000.0f);
+	context.registry.emplace<Damage>(enemy, 500.0f);
 	context.registry.emplace<MaxSpeed>(enemy, 40.0f);
 	context.registry.emplace<TurnSpeed>(enemy, 2.5f);
 	context.registry.emplace<tag::Targetable>(enemy);
