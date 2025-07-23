@@ -10,7 +10,7 @@ static void setup_camera(Camera3D& camera) {
 }
 
 
-entt::entity spawnBody(GameContext &context, const Vector3 &position, const Vector3 &velocity, float radius = 1.0f, float hp = 100.0f, float damagePerSecond = 10.0f)
+entt::entity spawnBody(GameContext &context, const Vector3 &position, const Vector3 &velocity, float radius = 1.0f, float hp = 100.0f, float damagePerSecond = 2.0f)
 {
 	auto entity = context.registry.create();
 
