@@ -87,14 +87,14 @@ entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<TurnSpeed>(enemy, 1.0f);
 
 	emplaceRandomWeapon(context, enemy);
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, +radius * 0.8f, -2}));
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, -radius * 0.8f, -2}));
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, +radius * 0.8f, -2}));
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, -radius * 0.8f, -2}));
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 2.0f, +radius * 1.2f, -1}));
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 2.0f, -radius * 1.2f, -1}));
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 2.0f, +radius * 1.2f, -1}));
-	emplaceWeaponMachineGun(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 2.0f, -radius * 1.2f, -1}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, +radius * 0.8f, -2}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, -radius * 0.8f, -2}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, +radius * 0.8f, -2}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, -radius * 0.8f, -2}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 2.0f, +radius * 1.2f, -1}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 2.0f, -radius * 1.2f, -1}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 2.0f, +radius * 1.2f, -1}));
+	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 2.0f, -radius * 1.2f, -1}));
 	context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
 	return enemy;
 }
