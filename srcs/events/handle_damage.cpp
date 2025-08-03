@@ -1,12 +1,27 @@
 #include "events.hpp"
 #include "components.hpp"
 
-void event::Listener::handleCollisionDamage(const CollisionEvent& evt) {
-	auto [hpA, dmgA] = evt.context->registry.try_get<HP, Damage>(evt.a);
-	auto [hpB, dmgB] = evt.context->registry.try_get<HP, Damage>(evt.b);
+void event::Listener::handleCollisionDamage(const CollisionEvent &evt)
+{
+	auto applyDamage = [&](entt::entity victim, entt::entity killer)
+	{
+		HP *hpPtr = evt.context->registry.try_get<HP>(victim);
+		Damage *dmgPtr = evt.context->registry.try_get<Damage>(killer);
 
-	if (hpA && dmgB)
-		hpA->value -= dmgB->value;
-	if (hpB && dmgA)
-		hpB->value -= dmgA->value;
+		if (hpPtr && dmgPtr)
+		{
+			if (hpPtr->value > 0 && dmgPtr->value > hpPtr->value)
+			{
+				evt.context->dispatcher.enqueue<KillEvent>(KillEvent{
+					evt.context,
+					killer,
+					victim
+				});
+			}
+			hpPtr->value -= dmgPtr->value;
+		}
+	};
+
+	applyDamage(evt.a, evt.b);
+	applyDamage(evt.b, evt.a);
 }

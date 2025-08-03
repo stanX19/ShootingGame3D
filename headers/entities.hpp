@@ -17,7 +17,7 @@ entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color);
 entt::entity spawnLinkedTurret(GameContext &context, Color color, entt::entity &parent, Vector3 relpos);
 entt::entity spawnLinkedAutoTurret(GameContext &context, Color color, entt::entity &parent, Vector3 relpos);
 void spawnBullet(GameContext &context, Position pos, Velocity velocity, HP hp,
-				 Damage damage, float rad, Color color, Lifespan lifetime);
+				 Damage damage, float rad, Color color, Lifespan lifetime, ScoreParent scoreParent);
 void spawnDebris(GameContext &context, const Vector3 &position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f, Vector3 velocity = {0, 0, 0});
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir);
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad);

@@ -33,7 +33,8 @@ void ecs_systems::bulletWeaponShoot(GameContext &context)
 				Damage{weapon.bulletData.dmg},
 				weapon.bulletData.rad,
 				weapon.bulletData.color,
-				Lifespan{weapon.bulletData.lifetime}
+				Lifespan{weapon.bulletData.lifetime},
+				ScoreParent{entity}
 			);
 		}
 		

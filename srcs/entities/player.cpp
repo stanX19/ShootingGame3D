@@ -40,6 +40,7 @@ entt::entity spawnPlayer(GameContext &context) {
 	context.registry.emplace<Damage>(player, 500.0f);
 	context.registry.emplace<MaxSpeed>(player, 80.0f);
 	context.registry.emplace<TurnSpeed>(player, 3.0f);
+	context.registry.emplace<Score>(player);
 	
 	context.registry.emplace<tag::Targetable>(player);
 	context.registry.emplace<tag::Shaded>(player);

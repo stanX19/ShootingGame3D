@@ -5,4 +5,6 @@ void event::utils::hookAllListeners(GameContext& context)
 	Listener listener;
 	context.dispatcher.sink<CollisionEvent>().connect<&Listener::handleCollisionDamage>(listener);
 	context.dispatcher.sink<CollisionEvent>().connect<&Listener::handleCollisionFX>(listener);
+	
+	context.dispatcher.sink<KillEvent>().connect<&Listener::handleKillingScore>(listener);
 }

@@ -19,10 +19,20 @@ namespace event {
 		float collisionDtRatio;	// collision_dt / frame_dt
 	};
 
+	struct KillEvent {
+		GameContext *context;
+		entt::entity killer;
+		entt::entity victim;
+	};
+
 	struct Listener {
+		// CollisionEvent
 		void handleCollisionPhysics(const CollisionEvent& evt);
 		void handleCollisionDamage(const CollisionEvent& evt);
 		void handleCollisionFX(const CollisionEvent& evt);
+		
+		// KillEvent
+		void handleKillingScore(const KillEvent& evt);
 	};
 }
 

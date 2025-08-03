@@ -77,8 +77,11 @@ void Renderer::Render()
 }
 
 void Renderer::DrawTexts() {
+	static int score = 0;
+
 	if (context.registry.valid(context.currentPlayer))
 	{
+		Color textColor = SKYBLUE;
 		int totalEntities = 0;
 		auto hittableView = context.registry.view<CollisionBody, Position, HP>();
 		for (auto entity : hittableView)
@@ -88,22 +91,31 @@ void Renderer::DrawTexts() {
 				totalEntities++;
 			}
 		}
-		DrawText(TextFormat("Entities: %d", totalEntities), 10, 30, 20, WHITE);
-		DrawText("Move: W S or Right click", 10, 50, 20, WHITE);
-		DrawText("Turn: Arrows or Mouse cursor", 10, 70, 20, WHITE);
-		DrawText("Fire: Space or Left click", 10, 90, 20, WHITE);
+		DrawText(TextFormat("Entities: %d", totalEntities), 10, 30, 20, textColor);
+		DrawText("Move: W S or Right click", 10, 50, 20, textColor);
+		DrawText("Turn: Arrows or Mouse cursor", 10, 70, 20, textColor);
+		DrawText("Fire: Space or Left click", 10, 90, 20, textColor);
 
-		Position *posPtr = context.registry.try_get<Position>(context.currentPlayer);
-		Vector3 pos = posPtr? posPtr->value: camera.position;
-		char cords[40];
-		sprintf(cords, "CORDS: (%-5.0f, %-5.0f, %-5.0f)", pos.x, pos.y, pos.z);
-		DrawText(cords, 10, 110, 20, WHITE);
+		char buf[40];
+		// Position *posPtr = context.registry.try_get<Position>(context.currentPlayer);
+		// Vector3 pos = posPtr? posPtr->value: camera.position;
+		// sprintf(buf, "CORDS: (%-5.0f, %-5.0f, %-5.0f)", pos.x, pos.y, pos.z);
+		// DrawText(buf, 10, 110, 20, textColor);
+		Score *scorePtr = context.registry.try_get<Score>(context.currentPlayer);
+		score = scorePtr? scorePtr->value: -1;
+		sprintf(buf, "score: %i", score);
+		DrawText(buf, 10, 130, 20, textColor);
 	}
 	else
 	{
 		const char *msg = "GAME OVER - PRESS R TO RESTART";
 		int w = MeasureText(msg, 40);
-		DrawText(msg, GetScreenWidth() / 2 - w / 2, GetScreenHeight() / 2, 40, RED);
+		DrawText(msg, GetScreenWidth() / 2 - w / 2, GetScreenHeight() / 2 + 50, 40, RED);
+		
+		char buf[40];
+		sprintf(buf, "Final Score: %i", score);
+		w = MeasureText(buf, 50);
+		DrawText(buf, GetScreenWidth() / 2 - w / 2, GetScreenHeight() / 2, 50, ORANGE);
 	}
 }
 

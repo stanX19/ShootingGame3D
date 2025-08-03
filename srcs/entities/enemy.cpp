@@ -1,5 +1,9 @@
 #include "entities.hpp"
 
+namespace {
+	int BASE_SCORE = 500;
+}
+
 entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	entt::entity enemy = context.registry.create();
 	
@@ -16,6 +20,8 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<MaxSpeed>(enemy, 40.0f);
 	context.registry.emplace<TurnSpeed>(enemy, 2.5f);
 	context.registry.emplace<tag::Targetable>(enemy);
+	context.registry.emplace<Score>(enemy);
+	context.registry.emplace<KilledScore>(enemy, BASE_SCORE);
 	
 	context.registry.emplace<tag::Enemy>(enemy);
 	context.registry.emplace<tag::Shaded>(enemy);
@@ -41,6 +47,7 @@ entt::entity spawnEliteEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HP>(enemy, 1200.0f);
 	context.registry.emplace_or_replace<HPRegen>(enemy, 10.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(enemy, 20.0f);
+	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 2);
 
 	emplaceRandomWeapon(context, enemy);
 	int subWeapons = GetRandomValue(0, 1000);
@@ -63,6 +70,7 @@ entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HPRegen>(enemy, 1.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(enemy, 80.0f);
 	context.registry.emplace_or_replace<TurnSpeed>(enemy, 3.5f);
+	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 2);
 
 	emplaceRandomWeapon(context, enemy);
 	int subWeapons = GetRandomValue(0, 1000);
@@ -85,6 +93,7 @@ entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HPRegen>(enemy, 50.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(enemy, 20.0f);
 	context.registry.emplace_or_replace<TurnSpeed>(enemy, 1.0f);
+	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 5);
 
 	emplaceRandomWeapon(context, enemy);
 	emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, +radius * 0.8f, -2}));

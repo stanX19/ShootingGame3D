@@ -174,6 +174,20 @@ struct WeaponParent
 };
 // end of weapon components
 
+struct ScoreParent
+{
+	entt::entity parent = entt::null;
+};
+
+struct KilledScore
+{
+	int value;
+};
+
+struct Score {
+	int value = 0;
+};
+
 namespace tag {
 	struct Asteroid {};
 	struct Player {};
