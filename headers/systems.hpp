@@ -17,6 +17,7 @@ namespace ecs_systems
 	void enemyAimTarget(GameContext &context);
 	void enemyRespawn(GameContext &context);
 	void entityMovement(GameContext &context, float dt);
+	void entityTransformation(GameContext &context, float dt);
 	void detectEntityCollision(GameContext &context, float dt);
 	void entityAnchor(GameContext &context);
 	void entityAnchorRelease(GameContext &context, float dt);

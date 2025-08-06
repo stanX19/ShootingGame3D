@@ -146,7 +146,7 @@ void Renderer::HandleLightSource()
 // 	DrawLine3D(pos.value, end, GREEN);
 // }
 
-void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body)
+void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body, float strech)
 {
 	Model &model = context.meshManager.getModel(body.modelID);
 
@@ -155,8 +155,18 @@ void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body)
 	QuaternionToAxisAngle(body.rotation, &axis, &angle);
 	// std::cout << "Entity rotation axis: (" << axis.x << ", " << axis.y << ", " << axis.z
 	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
+	Vector3 scale = body.scale * Vector3{1, 1, strech};
 	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation);
-	DrawModelEx(model, position, axis, angle * RAD2DEG, body.scale, body.color);
+	DrawModelEx(model, position, axis, angle * RAD2DEG, scale, body.color);
+}
+
+namespace {
+	float getStrech(GameContext &context, entt::entity entity) {
+		auto [velPtr, strechPtr] = context.registry.try_get<Velocity, ModelStrech>(entity);
+		if (velPtr && strechPtr)
+			return std::max(1.0f, Vector3Length(velPtr->value) * strechPtr->scale);
+		return 1.0f;
+	}
 }
 
 void Renderer::DrawEntitiesWithoutShader()
@@ -168,8 +178,7 @@ void Renderer::DrawEntitiesWithoutShader()
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
 		context.meshManager.getModel(body.modelID).materials[0].shader = defaultShader;
-		
-		DrawEntityModel(pos, body);
+		DrawEntityModel(pos, body, getStrech(context, entity));
 	}
 }
 
@@ -183,8 +192,7 @@ void Renderer::DrawEntitiesWithShader()
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
 		context.meshManager.getModel(body.modelID).materials[0].shader = shader;
-
-		DrawEntityModel(pos, body);
+		DrawEntityModel(pos, body, getStrech(context, entity));
 	}
 
 	EndShaderMode();

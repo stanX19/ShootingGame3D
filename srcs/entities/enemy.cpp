@@ -26,6 +26,8 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<tag::Enemy>(enemy);
 	context.registry.emplace<tag::Shaded>(enemy);
 	context.registry.emplace<tag::RotationSyncModel>(enemy);
+	context.registry.emplace<tag::effect::DropDebris>(enemy);
+	context.registry.emplace<tag::effect::ExplodeOnDeath>(enemy);
 	return enemy;
 }
 

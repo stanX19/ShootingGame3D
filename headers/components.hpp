@@ -188,13 +188,28 @@ struct Score {
 	int value = 0;
 };
 
+struct ModelStrech {
+	float scale;  // model scale front *= (scale * forward_speed)
+};
+
+struct RadiusExpand {
+	float speed;  // radius += speed * dt
+};
+
 namespace tag {
+	// todo: throw these into namespaces too
 	struct Asteroid {};
 	struct Player {};
 	struct Enemy {};
 	struct EliteEnemy {};
 	struct Bullet {};
 	struct Targetable {};
+	struct Spaceship {};
+	
+	namespace effect {
+		struct ExplodeOnDeath {};
+		struct DropDebris {};
+	}
 	namespace weapon {
 		struct IsWeapon {};
 		struct ParentControlledAim {};		// dont do anything, parent updates AimTarget; TODO
@@ -211,6 +226,7 @@ namespace tag {
 	struct Shaded {};
 	struct RotationSyncModel {};
 	struct AimDirectionSyncModel {};
+	struct VelocitySyncModelRot {};
 	struct GetVelOnAnchorDeath {};
 }
 

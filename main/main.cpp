@@ -99,6 +99,7 @@ int main() {
 
 		ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context);
+		ecs_systems::entityTransformation(context, dt);
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
 		

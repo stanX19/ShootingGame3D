@@ -16,6 +16,7 @@ static entt::entity spawnBaseTurret(GameContext &context, Color color) {
 	// context.registry.emplace<TurnSpeed>(turret, 2.5f);
 	context.registry.emplace<tag::Shaded>(turret);
 	context.registry.emplace<tag::AimDirectionSyncModel>(turret);
+	context.registry.emplace<tag::effect::DropDebris>(turret);
 	return turret;
 }
 

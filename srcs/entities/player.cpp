@@ -46,6 +46,8 @@ entt::entity spawnPlayer(GameContext &context) {
 	context.registry.emplace<tag::Shaded>(player);
 	context.registry.emplace<tag::Player>(player);
 	context.registry.emplace<tag::RotationSyncModel>(player);
+	context.registry.emplace<tag::effect::DropDebris>(player);
+	context.registry.emplace<tag::effect::ExplodeOnDeath>(player);
 	
 	addWeapons(context, player, SKYBLUE);
 	context.currentPlayer = player;

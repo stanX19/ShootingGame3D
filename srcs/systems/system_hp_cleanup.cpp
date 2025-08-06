@@ -19,8 +19,10 @@ void ecs_systems::hpCleanup(GameContext &context) {
 		if (posPtr && bodyPtr) {
 			float scale = std::cbrt(bodyPtr->scale.x * bodyPtr->scale.y * bodyPtr->scale.z);
 			int count = static_cast<int>(std::sqrt(scale)) * 25;
-			spawnDebris(context, posPtr->value, scale, bodyPtr->color,
-						count, 5.0, velPtr? velPtr->value: Vector3Zeros);
+			if (context.registry.any_of<tag::effect::DropDebris>(entity))
+				spawnDebris(context, posPtr->value, scale, bodyPtr->color, count, 5.0, velPtr? velPtr->value: Vector3Zeros);
+			if (context.registry.any_of<tag::effect::ExplodeOnDeath>(entity))
+				spawnExplosion(context, posPtr->value, scale, velPtr? velPtr->value: Vector3Zeros);
 		}
 
 		context.registry.destroy(entity);

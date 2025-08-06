@@ -28,7 +28,7 @@ private:
 	void LoadDefaultShader();
 	void LoadShaderWithFallback();
 	void SetupShaderUniforms();
-	void DrawEntityModel(const Position &pos, const RenderBody &body);
+	void DrawEntityModel(const Position &pos, const RenderBody &body, float strech = 1.0f);
 	void DrawEntitiesWithShader();
 	void DrawEntitiesWithoutShader();
 	void DrawBoundaryWarning();
