@@ -22,7 +22,7 @@ void ecs_systems::hpCleanup(GameContext &context) {
 			if (context.registry.any_of<tag::effect::DropDebris>(entity))
 				spawnDebris(context, posPtr->value, scale, bodyPtr->color, count, 5.0, velPtr? velPtr->value: Vector3Zeros);
 			if (context.registry.any_of<tag::effect::ExplodeOnDeath>(entity))
-				spawnExplosion(context, posPtr->value, scale, velPtr? velPtr->value: Vector3Zeros);
+				spawnExplosion(context, posPtr->value, scale * 10, velPtr? velPtr->value: Vector3Zeros);
 		}
 
 		context.registry.destroy(entity);

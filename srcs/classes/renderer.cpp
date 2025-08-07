@@ -155,16 +155,17 @@ void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body, floa
 	QuaternionToAxisAngle(body.rotation, &axis, &angle);
 	// std::cout << "Entity rotation axis: (" << axis.x << ", " << axis.y << ", " << axis.z
 	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
-	Vector3 scale = body.scale * Vector3{1, 1, strech};
+	float shrink = 1; //std::max(0.01f, 1.0f / std::sqrt(strech));
+	Vector3 scale = body.scale * Vector3{shrink , shrink, strech};
 	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation);
 	DrawModelEx(model, position, axis, angle * RAD2DEG, scale, body.color);
 }
 
 namespace {
 	float getStrech(GameContext &context, entt::entity entity) {
-		auto [velPtr, strechPtr] = context.registry.try_get<Velocity, ModelStrech>(entity);
-		if (velPtr && strechPtr)
-			return std::max(1.0f, Vector3Length(velPtr->value) * strechPtr->scale);
+		auto [posPtr, prevPosPtr, strechPtr] = context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
+		if (posPtr && prevPosPtr && strechPtr)
+			return std::max(1.0f, Vector3Distance(posPtr->value, prevPosPtr->value) * strechPtr->scale);
 		return 1.0f;
 	}
 }
