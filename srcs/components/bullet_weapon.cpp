@@ -1,16 +1,17 @@
 #include "entities.hpp"
 #include "utils.hpp"
 
-namespace {
+namespace
+{
 	const float BASE_SPEED = 400.0f;
 	const float BASE_DAMAGE = 15.0f;
 	const float BASE_SPREAD = 0.025f * DEG2RAD;
 
-	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity)
+	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = WHITE)
 	{
 		// if (context.registry.any_of<RenderBody>(entity))
-		// 	return colorLerp(colorRevert(context.registry.get<RenderBody>(entity).color), WHITE, 0.4);
-		return WHITE;
+		// 	return colorLerp(colorRevert(context.registry.get<RenderBody>(entity).color), baseColor, 0.4);
+		return baseColor;
 	}
 }
 
@@ -31,6 +32,7 @@ void emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+	context.registry.emplace_or_replace<tag::weapon::type::Bullet>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
 	context.registry.emplace_or_replace<AimDirection>(entity);
 }
@@ -53,6 +55,7 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+	context.registry.emplace_or_replace<tag::weapon::type::Bullet>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
 	context.registry.emplace_or_replace<AimDirection>(entity);
 }
@@ -62,15 +65,17 @@ void emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	BulletWeapon weapon;
 
 	weapon.bulletData.hp = 1.0f;
-	weapon.bulletData.dmg = BASE_DAMAGE * 15;
+	weapon.bulletData.dmg = BASE_DAMAGE * 10;
 	weapon.bulletData.speed = BASE_SPEED * 1.5f;
 	weapon.bulletData.rad = 1.0f;
-	weapon.bulletData.color = getColor(context, entity);;
+	weapon.bulletData.color = getColor(context, entity);
+	;
 	weapon.bulletData.lifetime = 15.0f;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{4.0});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.5});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+	context.registry.emplace_or_replace<tag::weapon::type::Bullet>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
 	context.registry.emplace_or_replace<AimDirection>(entity);
 }
@@ -90,6 +95,7 @@ void emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.75});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+	context.registry.emplace_or_replace<tag::weapon::type::Bullet>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
 	context.registry.emplace_or_replace<AimDirection>(entity);
 }
@@ -111,6 +117,7 @@ void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0, 5});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.75});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+	context.registry.emplace_or_replace<tag::weapon::type::Bullet>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
 	context.registry.emplace_or_replace<AimDirection>(entity);
 }
@@ -130,6 +137,7 @@ void emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+	context.registry.emplace_or_replace<tag::weapon::type::Bullet>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
 	context.registry.emplace_or_replace<AimDirection>(entity);
 }

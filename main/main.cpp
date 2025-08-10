@@ -97,12 +97,25 @@ int main() {
 		ecs_systems::enemyMoveControl(context, dt);
 		ecs_systems::enemyAimTarget(context);
 
+		ecs_systems::ammoReload(context, dt);
+		ecs_systems::bulletTargetAim(context);
+		ecs_systems::weaponParentControlAim(context);
+		ecs_systems::weaponParentControlShoot(context);
+		ecs_systems::weaponUpdateCooldown(context, dt);
+		ecs_systems::weaponUpdateCanFire(context);
+		ecs_systems::weaponShoot(context);
+		ecs_systems::weaponUpdateFireStatus(context);
+
 		ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context);
 		ecs_systems::entityTransformation(context, dt);
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
-		
+
+		ecs_systems::syncModelRotation(context);
+		camaraFollowPlayer(context, camera, dt);
+		renderer.Render();
+
 		ecs_systems::entityLifetime(context, dt);
 		ecs_systems::delayedDamage(context, dt);
 		ecs_systems::hpCleanup(context);
@@ -112,22 +125,7 @@ int main() {
 		ecs_systems::enemyRespawn(context);
 		ecs_systems::asteroidRespawn(context);
 
-		ecs_systems::ammoReload(context, dt);
-		ecs_systems::bulletTargetAim(context);
-		ecs_systems::weaponParentControlAim(context);
-		ecs_systems::weaponParentControlShoot(context);
-		ecs_systems::weaponUpdateCooldown(context, dt);
-		ecs_systems::weaponUpdateCanFire(context);
-		ecs_systems::bulletWeaponShoot(context);
-		ecs_systems::weaponUpdateFireStatus(context);
-
-		ecs_systems::syncModelRotation(context);
-		camaraFollowPlayer(context, camera, dt);
-		renderer.Render();
-
 		inputControls(context, camera, dt);
-
-		DrawFPS(10, 10);
 	}
 	context.meshManager.unloadAll();
 	CloseWindow();

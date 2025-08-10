@@ -221,6 +221,11 @@ namespace tag {
 		struct FollowParentFire {};			// follow parent firing
 		struct IsFiring {};
 		struct CanFire {};
+
+		namespace type {
+			struct Bullet {};
+			struct Lazer {};
+		}
 	};
 	struct LightSource {};
 	struct Shaded {};

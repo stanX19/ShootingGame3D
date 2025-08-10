@@ -79,6 +79,8 @@ void Renderer::Render()
 void Renderer::DrawTexts() {
 	static int score = 0;
 
+	DrawFPS(10, 10);
+
 	if (context.registry.valid(context.currentPlayer))
 	{
 		Color textColor = SKYBLUE;
@@ -156,7 +158,7 @@ void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body, floa
 	// std::cout << "Entity rotation axis: (" << axis.x << ", " << axis.y << ", " << axis.z
 	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
 	float shrink = 1; //std::max(0.01f, 1.0f / std::sqrt(strech));
-	Vector3 scale = body.scale * Vector3{shrink , shrink, strech};
+	Vector3 scale = body.scale * Vector3{shrink, shrink, strech};
 	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation);
 	DrawModelEx(model, position, axis, angle * RAD2DEG, scale, body.color);
 }
@@ -164,6 +166,8 @@ void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body, floa
 namespace {
 	float getStrech(GameContext &context, entt::entity entity) {
 		auto [posPtr, prevPosPtr, strechPtr] = context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
+		if (posPtr && prevPosPtr && strechPtr)
+			std::cout << Vector3Distance(posPtr->value, prevPosPtr->value) << std::endl;
 		if (posPtr && prevPosPtr && strechPtr)
 			return std::max(1.0f, Vector3Distance(posPtr->value, prevPosPtr->value) * strechPtr->scale);
 		return 1.0f;

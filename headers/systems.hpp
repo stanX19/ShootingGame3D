@@ -27,7 +27,7 @@ namespace ecs_systems
 	void hpRegen(GameContext &context, float dt);
 	void ammoReload(GameContext &context, float dt);
 	void bulletTargetAim(GameContext &context);
-	void bulletWeaponShoot(GameContext &context);
+	void weaponShoot(GameContext &context);
 	void weaponParentControlAim(GameContext &context);
 	void weaponParentControlShoot(GameContext &context);
 	void weaponUpdateCanFire(GameContext &context);
