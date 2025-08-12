@@ -1,133 +1,20 @@
-#include "shoot_3d.hpp"
-#include "renderer.hpp"
-
-static void spawnSunAndStars(GameContext &context) {
-	entt::entity sun2 = context.registry.create();
-	Position pos = {randomUnitVector3() * ARENA_SIZE * 3};
-	// t_model_id sunModel = context.meshManager.loadModel("assets/Models/sun/sun.glb");
-	t_model_id sunModel = context.meshManager.createSphere(128, 128);
-	float rad = GetRandomValue(ARENA_SIZE * 0.3, ARENA_SIZE * 0.5);
-
-	context.registry.emplace<Position>(sun2, pos);
-	context.registry.emplace<RenderBody>(sun2, sunModel, Color{105, 205, 255, 255}, rad);
-	context.registry.emplace<tag::LightSource>(sun2);
-	
-	// stars
-	t_model_id starsModel = context.meshManager.createSphere();
-
-	for (int i = 0; i < 100; i++) {
-		entt::entity entity = context.registry.create();
-
-		context.registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 5);
-		context.registry.emplace<RenderBody>(entity, starsModel, WHITE, (GetRandomValue(15, 25) * ARENA_SIZE / 4000.0f));
-	}
-}
-
-static void setup_camera(Camera3D& camera) {
-	camera.position = Vector3{ 0.0f, 1.0f, 4.0f };
-	camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
-	camera.up = Vector3{ 0.0f, 1.0f, 0.0f };
-	camera.fovy = 45.0f;
-	camera.projection = CAMERA_PERSPECTIVE;
-}
-
-static void camaraFollowPlayer(GameContext &context, Camera3D &camera, [[maybe_unused]] float  dt) {
-    if (!context.registry.valid(context.currentPlayer))
-        return;
-    
-    Position& pos = context.registry.get<Position>(context.currentPlayer);
-    Rotation& rot = context.registry.get<Rotation>(context.currentPlayer);
-    Vector3 forward = getForwardVector(rot);
-    Vector3 up = getUpVector(rot);
-	
-    bool shift = IsKeyDown(KEY_RIGHT_SHIFT);
-    float k = 10.0f;
-    Vector3 desiredPosition = pos.value + (shift ? forward * k : forward * -k) + up * 5.0f;
-    Vector3 desiredTarget = pos.value + (shift ? forward * -(20 - k) : forward * (20 - k) + up * 1.0f);
-    
-    // Velocity& vel = context.registry.get<Velocity>(context.currentPlayer);
-    float smoothing = 12.0f;
-	float lerp = 1.0f - std::exp(-smoothing * dt);
-    camera.position = Vector3Lerp(camera.position, desiredPosition, lerp);
-    camera.target = Vector3Lerp(camera.target, desiredTarget, lerp);
-    camera.up = Vector3Lerp(camera.up, up, lerp * 0.2f);
-}
-
-static void resetGame(GameContext &context, Camera &camera) {
-	context.registry.clear();
-	event::utils::hookAllListeners(context);
-	setup_camera(camera);
-	spawnPlayer(context);
-	spawnSunAndStars(context);
-	SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
-}
-
-static void inputControls(GameContext &context, Camera &camera, [[maybe_unused]] float dt) {
-	if (IsKeyPressed(KEY_R)) {
-		resetGame(context, camera);
-	}
-	if (IsKeyPressed(KEY_DELETE) && context.registry.valid(context.currentPlayer)) {
-		context.registry.emplace<DelayedDamage>(context.currentPlayer, DelayedDamage{0.0f, 100000000.0f});
-	}
-	if (IsKeyPressed(KEY_C)) {
-		SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
-	}
-}
+#include "game_state_manager.hpp"
 
 int main() {
-	InitWindow(1600, 900, "3D Space Shooter");
-	SetTargetFPS(60);
-	// HideCursor();
+    InitWindow(1600, 900, "3D Space Shooter");
+    SetTargetFPS(60);
+    // HideCursor(); // Uncomment if you want to hide cursor during gameplay
 
-	Camera3D camera;
-	GameContext context;
-	
-	resetGame(context, camera);
-	
-	Renderer renderer(camera, context);
+    GameStateManager gameManager;
 
-	while (!WindowShouldClose()) {
-		float dt = GetFrameTime();
+    while (!WindowShouldClose() && !gameManager.ShouldClose()) {
+        float deltaTime = GetFrameTime();
+        
+        gameManager.Update(deltaTime);
+        gameManager.Render();
+    }
 
-		// --- Update systems ---
-		ecs_systems::playerMoveControl(context, dt, camera);
-		ecs_systems::playerShootControl(context);
-		ecs_systems::playerAimTarget(context);
-		// ecs_systems::playerRespawn(context);
-		ecs_systems::enemyMoveControl(context, dt);
-		ecs_systems::enemyAimTarget(context);
-
-		ecs_systems::ammoReload(context, dt);
-		ecs_systems::bulletTargetAim(context);
-		ecs_systems::weaponParentControlAim(context);
-		ecs_systems::weaponParentControlShoot(context);
-		ecs_systems::weaponUpdateCooldown(context, dt);
-		ecs_systems::weaponUpdateCanFire(context);
-		ecs_systems::weaponShoot(context);
-		ecs_systems::weaponUpdateFireStatus(context);
-
-		ecs_systems::entityMovement(context, dt);
-		ecs_systems::entityAnchor(context);
-		ecs_systems::entityTransformation(context, dt);
-		ecs_systems::detectEntityCollision(context, dt);
-		context.dispatcher.update();
-
-		ecs_systems::syncModelRotation(context);
-		camaraFollowPlayer(context, camera, dt);
-		renderer.Render();
-
-		ecs_systems::entityLifetime(context, dt);
-		ecs_systems::delayedDamage(context, dt);
-		ecs_systems::hpCleanup(context);
-		ecs_systems::hpRegen(context, dt);
-		ecs_systems::cleanOutOfBound(context);
-		ecs_systems::entityAnchorRelease(context, dt);
-		ecs_systems::enemyRespawn(context);
-		ecs_systems::asteroidRespawn(context);
-
-		inputControls(context, camera, dt);
-	}
-	context.meshManager.unloadAll();
-	CloseWindow();
-	return 0;
+    // Cleanup is handled automatically by GameStateManager destructor
+    CloseWindow();
+    return 0;
 }

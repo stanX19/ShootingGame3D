@@ -5,7 +5,10 @@ namespace
 {
 	const float BASE_SPEED = 400.0f;
 	const float BASE_DAMAGE = 15.0f;
-	const float BASE_SPREAD = 0.025f * DEG2RAD;
+	const float EFFECTIVE_RANGE = 2000.0f;
+	// effective range and angle is linearly inverse, just multiply to get different distances
+	// atan(ENEMY_RAD, EFFECTIVE_RANGE)
+	const float BASE_SPREAD = std::atan2(1.0f, EFFECTIVE_RANGE);
 
 	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = WHITE)
 	{

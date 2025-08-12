@@ -38,7 +38,8 @@ namespace
 					weapon.bulletData.rad,
 					weapon.bulletData.color,
 					Lifespan{weapon.bulletData.lifetime},
-					ScoreParent{entity});
+					ScoreParent{entity}
+				);
 			}
 
 			context.registry.emplace_or_replace<JustFired>(entity, JustFired{1});
@@ -71,7 +72,8 @@ namespace
 					weapon.bulletData.rad,
 					weapon.bulletData.color,
 					Lifespan{weapon.bulletData.lifetime},
-					ScoreParent{entity});
+					ScoreParent{entity}
+				);
 			}
 
 			context.registry.emplace_or_replace<JustFired>(entity, JustFired{1});

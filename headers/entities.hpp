@@ -26,6 +26,7 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad);
 void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir);
 void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir, float radius, const Vector3 &ringNormal, int numAsteroids = 20);
+void spawnSunAndStars(GameContext &context, int numStars=100);
 
 void emplaceWeaponMachineGun(GameContext &context, entt::entity entity);
 void emplaceWeaponBasic(GameContext &context, entt::entity entity);
