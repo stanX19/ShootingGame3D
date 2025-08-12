@@ -22,7 +22,8 @@ entt::entity spawnBody(GameContext &context, const Vector3 &position, const Vect
 	context.registry.emplace<Damage>(entity, Damage{damagePerSecond});
 	context.registry.emplace<tag::Shaded>(entity);
 	context.registry.emplace<tag::Targetable>(entity);
-
+	context.registry.emplace<tag::effect::DropDebris>(entity);
+	
 	return entity;
 }
 

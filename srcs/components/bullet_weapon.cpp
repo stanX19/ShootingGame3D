@@ -45,7 +45,7 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	BulletWeapon weapon;
 
 	weapon.bulletData.hp = 1.0f;
-	weapon.bulletData.dmg = BASE_DAMAGE * 0.5f;
+	weapon.bulletData.dmg = BASE_DAMAGE * 0.75f;
 	weapon.bulletData.speed = BASE_SPEED * 2.0f;
 	weapon.bulletData.rad = 0.1f;
 	weapon.bulletData.color = getColor(context, entity);
@@ -54,8 +54,8 @@ void emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = 10;
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0, 5});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.0});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0, 3});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
 	context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 	context.registry.emplace_or_replace<tag::weapon::type::Bullet>(entity);

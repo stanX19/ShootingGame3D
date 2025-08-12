@@ -3,7 +3,7 @@
 #include "constants.hpp"
 #include "entities.hpp"
 
-#define ASTEROID_COUNT 50
+#define ASTEROID_COUNT 10
 
 static Vector3 randomPosOffField() {
 	return Vector3Scale(randomUnitVector3(), ARENA_SIZE * 2.5);

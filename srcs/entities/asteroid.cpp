@@ -4,19 +4,23 @@
 
 namespace {
 	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 4, ARENA_SIZE * 4, ARENA_SIZE * 4};
+
+	t_model_id getAsteroidModel(GameContext &context) {
+		return context.meshManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
+	}
 }
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {
-	spawnAsteroid(context, pos, dir, COMBAT_DIST * (0.08 + GetRandomValue(0, 20) * 0.01));
+	spawnAsteroid(context, pos, dir, COMBAT_DIST * (0.1 + GetRandomValue(0, 20) * 0.02));
 }
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad)
 {
 	float speed = GetRandomValue(3, (int)(10 * ARENA_SIZE / 200.0f));
-	t_model_id asteroidModel = context.meshManager.createSphere(64, 64);
+	t_model_id asteroidModel = getAsteroidModel(context);
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		entt::entity asteroid = context.registry.create();
 		Vector3 subPos = (i == 0) ? pos : pos + randomUnitVector3() * rad;
@@ -26,7 +30,7 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 		context.registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		context.registry.emplace<CollisionBody>(asteroid, subRad);
 		context.registry.emplace<RenderBody>(asteroid,
-			RenderBody{asteroidModel, (i == 0)? Color{ 40, 40, 40, 255 } : Color{ 60, 60, 60, 255 }, subRad}
+			RenderBody{asteroidModel, (i == 0)? Color{ 105, 105, 105, 255 } : Color{ 155, 155, 155, 255 }, subRad}
 		);
 		context.registry.emplace<Damage>(asteroid, 500.0f);
 		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
@@ -37,7 +41,7 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 
 void spawnRingAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {
-	float radius = GetRandomValue(50000, 75000) / 100.0f; // 500-750 units
+	float radius = GetRandomValue(74000, 100000) / 100.0f; // 750-1000 units
 	Vector3 ringNormal = Vector3Normalize(randomUnitVector3());
 	spawnRingAsteroid(context, pos, dir, radius, ringNormal, 10);
 }
@@ -45,29 +49,34 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &
 void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir, float radius, const Vector3 &ringNormal, int numAsteroids)
 {
 	float speed = GetRandomValue(3, (int)(10 * ARENA_SIZE / 200.0f));
-	t_model_id asteroidModel = context.meshManager.createSphere(64, 64);
-	
+	t_model_id asteroidModel = getAsteroidModel(context);
+
 	Vector3 u, v;
 	if (abs(ringNormal.x) < 0.9f)
 		u = Vector3Normalize(Vector3CrossProduct(ringNormal, Vector3{1, 0, 0}));
 	else
 		u = Vector3Normalize(Vector3CrossProduct(ringNormal, Vector3{0, 1, 0}));
 	v = Vector3CrossProduct(ringNormal, u);
-	
-	float asteroidRadiusAvg = (2 * PI * radius) / numAsteroids / 2;  // circum / numAsteroid
-	for (int i = 0; i < numAsteroids; i++)
+	float asteroidRadiusAvg = (2 * PI * radius) / numAsteroids / 2 * 0.75;
+	int totalAsteroids = numAsteroids + 10;
+
+	for (int i = 0; i < totalAsteroids; i++)
 	{
-		float angle = (float)i / numAsteroids * 2 * PI + GetRandomValue(-10, 10) * DEG2RAD;
-		float asteroidRadius = GetRandomValue((int)(asteroidRadiusAvg * 70), (int)(asteroidRadiusAvg * 99)) / 100.0f;
-		Vector3 ringOffset = u * (cos(angle) * radius) + v * (sin(angle) * radius);
-		Vector3 ringPos = center + ringOffset + ringNormal * (asteroidRadius / 5.0f);
-		unsigned char brightness = (unsigned char)GetRandomValue(40, 70);
+		float angle = ((float)i / totalAsteroids) * 2 * PI + GetRandomValue(-30, 30) * DEG2RAD;
+		float asteroidRadius = asteroidRadiusAvg * (GetRandomValue(10, 100) / 100.0f);
+		float radialOffset = GetRandomValue(-50, 50) / 100.0f * radius;
+		Vector3 ringOffset = u * (cos(angle) * (radius + radialOffset)) + v * (sin(angle) * (radius + radialOffset));
+
+		float verticalOffset = GetRandomValue(-50, 50) / 100.0f * radius;
+		Vector3 ringPos = center + ringOffset + ringNormal * verticalOffset;
+
+		unsigned char brightness = (unsigned char)GetRandomValue(105, 155);
 		entt::entity asteroid = context.registry.create();
 		context.registry.emplace<Position>(asteroid, ringPos);
 		context.registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		context.registry.emplace<CollisionBody>(asteroid, asteroidRadius);
 		context.registry.emplace<RenderBody>(asteroid,
-			RenderBody{asteroidModel, Color{brightness, brightness, brightness, 255}, asteroidRadius}
+			RenderBody{asteroidModel, Color{brightness, brightness, brightness, 255}, asteroidRadius, Vector3Zeros, randomRotation()}
 		);
 		context.registry.emplace<Damage>(asteroid, 10000.0f);
 		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
@@ -75,4 +84,3 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector
 		context.registry.emplace<tag::Shaded>(asteroid);
 	}
 }
-
