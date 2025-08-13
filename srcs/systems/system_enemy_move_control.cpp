@@ -11,14 +11,8 @@ void ecs_systems::enemyMoveControl(GameContext &context, float dt)
 
 	auto enemyView = context.registry.view<tag::Enemy, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
 
-	for (auto entity : enemyView)
+	for (auto [entity, position, rotation, velocity, maxSpeed, turnSpeed] : enemyView.each())
 	{
-		Position &position = enemyView.get<Position>(entity);
-		Rotation &rotation = enemyView.get<Rotation>(entity);
-		Velocity &velocity = enemyView.get<Velocity>(entity);
-		MaxSpeed &maxSpeed = enemyView.get<MaxSpeed>(entity);
-		TurnSpeed &turnSpeed = enemyView.get<TurnSpeed>(entity);
-
 		Vector3 toPlayer = playerPos.value - position.value;
 
 		// maybe try to avoid player in the future

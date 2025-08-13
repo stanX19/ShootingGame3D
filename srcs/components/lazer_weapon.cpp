@@ -4,7 +4,7 @@
 namespace {
 	const float LAZER_SPEED = 10000.0f;
 	const float LAZER_LIFETIME = 1.0f;
-	const float BASE_DAMAGE = 5.0f;
+	const float BASE_DAMAGE = 7.5f;
 	const float EFFECTIVE_RANGE = 500.0f;
 	// effective range and angle is linearly inverse, just multiply to get different distances
 	// atan(ENEMY_RAD, EFFECTIVE_RANGE)

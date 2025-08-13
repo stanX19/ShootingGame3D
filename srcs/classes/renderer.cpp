@@ -166,8 +166,8 @@ void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body, floa
 namespace {
 	float getStrech(GameContext &context, entt::entity entity) {
 		auto [posPtr, prevPosPtr, strechPtr] = context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
-		if (posPtr && prevPosPtr && strechPtr)
-			std::cout << Vector3Distance(posPtr->value, prevPosPtr->value) << std::endl;
+		// if (posPtr && prevPosPtr && strechPtr)
+		// 	std::cout << Vector3Distance(posPtr->value, prevPosPtr->value) << std::endl;
 		if (posPtr && prevPosPtr && strechPtr)
 			return std::max(1.0f, Vector3Distance(posPtr->value, prevPosPtr->value) * strechPtr->scale);
 		return 1.0f;

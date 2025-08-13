@@ -8,6 +8,18 @@ namespace {
 	t_model_id getAsteroidModel(GameContext &context) {
 		return context.meshManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
 	}
+
+	entt::entity spawnBaseAsteroid(GameContext &context) {
+		entt::entity asteroid = context.registry.create();
+		context.registry.emplace<Rotation>(asteroid, randomRotation());
+		context.registry.emplace<RotationVelocity>(asteroid, QuaternionLerp(QuaternionIdentity(), randomRotation(), 0.1));
+		context.registry.emplace<Damage>(asteroid, 10000.0f);
+		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
+		context.registry.emplace<tag::Asteroid>(asteroid);
+		context.registry.emplace<tag::Shaded>(asteroid);
+		context.registry.emplace<tag::RotationSyncModel>(asteroid);
+		return asteroid;
+	}
 }
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
@@ -22,20 +34,16 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 
 	for (int i = 0; i < 1; i++)
 	{
-		entt::entity asteroid = context.registry.create();
+		entt::entity asteroid = spawnBaseAsteroid(context);
 		Vector3 subPos = (i == 0) ? pos : pos + randomUnitVector3() * rad;
 		float subRad = (i == 0) ? rad : GetRandomValue(rad / 5, rad / 2);
 		// unsigned char brightness = GetRandomValue(40, 60);
 		context.registry.emplace<Position>(asteroid, subPos);
 		context.registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		context.registry.emplace<CollisionBody>(asteroid, subRad);
-		context.registry.emplace<RenderBody>(asteroid,
-			RenderBody{asteroidModel, (i == 0)? Color{ 105, 105, 105, 255 } : Color{ 155, 155, 155, 255 }, subRad}
-		);
-		context.registry.emplace<Damage>(asteroid, 500.0f);
-		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
-		context.registry.emplace<tag::Asteroid>(asteroid);
-		context.registry.emplace<tag::Shaded>(asteroid);
+		context.registry.emplace<RenderBody>(asteroid, RenderBody{
+			asteroidModel, (i == 0)? Color{ 105, 105, 105, 255 } : Color{ 155, 155, 155, 255 }, subRad
+		});
 	}
 }
 
@@ -71,16 +79,12 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector
 		Vector3 ringPos = center + ringOffset + ringNormal * verticalOffset;
 
 		unsigned char brightness = (unsigned char)GetRandomValue(105, 155);
-		entt::entity asteroid = context.registry.create();
+		entt::entity asteroid = spawnBaseAsteroid(context);
 		context.registry.emplace<Position>(asteroid, ringPos);
 		context.registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		context.registry.emplace<CollisionBody>(asteroid, asteroidRadius);
 		context.registry.emplace<RenderBody>(asteroid,
-			RenderBody{asteroidModel, Color{brightness, brightness, brightness, 255}, asteroidRadius, Vector3Zeros, randomRotation()}
+			RenderBody{asteroidModel, Color{brightness, brightness, brightness, 255}, asteroidRadius}
 		);
-		context.registry.emplace<Damage>(asteroid, 10000.0f);
-		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
-		context.registry.emplace<tag::Asteroid>(asteroid);
-		context.registry.emplace<tag::Shaded>(asteroid);
 	}
 }

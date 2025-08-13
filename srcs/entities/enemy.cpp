@@ -17,7 +17,7 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	});
 	context.registry.emplace<HP>(enemy, 1000.0f);
 	context.registry.emplace<Damage>(enemy, 500.0f);
-	context.registry.emplace<MaxSpeed>(enemy, 40.0f);
+	context.registry.emplace<MaxSpeed>(enemy, 80.0f);
 	context.registry.emplace<TurnSpeed>(enemy, 2.5f);
 	context.registry.emplace<tag::Targetable>(enemy);
 	context.registry.emplace<Score>(enemy);
@@ -48,7 +48,7 @@ entt::entity spawnEliteEnemy(GameContext &context, const Vector3& pos) {
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(enemy, 1200.0f);
 	context.registry.emplace_or_replace<HPRegen>(enemy, 10.0f);
-	context.registry.emplace_or_replace<MaxSpeed>(enemy, 20.0f);
+	context.registry.emplace_or_replace<MaxSpeed>(enemy, 40.0f);
 	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 2);
 
 	emplaceRandomWeapon(context, enemy);
@@ -70,7 +70,7 @@ entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(enemy, 720.0f);
 	context.registry.emplace_or_replace<HPRegen>(enemy, 1.0f);
-	context.registry.emplace_or_replace<MaxSpeed>(enemy, 80.0f);
+	context.registry.emplace_or_replace<MaxSpeed>(enemy, 160.0f);
 	context.registry.emplace_or_replace<TurnSpeed>(enemy, 3.5f);
 	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 2);
 
@@ -94,7 +94,7 @@ entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HP>(enemy, 1600.0f);
 	context.registry.emplace_or_replace<HPRegen>(enemy, 50.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(enemy, 20.0f);
-	context.registry.emplace_or_replace<TurnSpeed>(enemy, 1.0f);
+	context.registry.emplace_or_replace<TurnSpeed>(enemy, 0.5f);
 	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 5);
 
 	emplaceRandomWeapon(context, enemy);

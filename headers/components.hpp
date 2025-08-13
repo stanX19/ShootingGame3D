@@ -25,6 +25,11 @@ struct Rotation
 	Quaternion value = QuaternionUnitX;
 };
 
+struct RotationVelocity
+{
+	Quaternion value = QuaternionIdentity();
+};
+
 struct CollisionBody
 {
 	float radius;
