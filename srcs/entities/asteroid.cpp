@@ -12,7 +12,7 @@ namespace {
 	entt::entity spawnBaseAsteroid(GameContext &context) {
 		entt::entity asteroid = context.registry.create();
 		context.registry.emplace<Rotation>(asteroid, randomRotation());
-		context.registry.emplace<RotationVelocity>(asteroid, QuaternionLerp(QuaternionIdentity(), randomRotation(), 0.1));
+		context.registry.emplace<RotationVelocity>(asteroid, QuaternionLerp(QuaternionIdentity(), randomRotation(), 0.01));
 		context.registry.emplace<Damage>(asteroid, 10000.0f);
 		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
 		context.registry.emplace<tag::Asteroid>(asteroid);

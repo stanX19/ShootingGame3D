@@ -137,7 +137,7 @@ struct AimDirection
 	Vector3 value = {0, 1, 0};
 };
 
-struct BulletWeapon
+struct Weapon
 {
     struct
     {
@@ -148,7 +148,7 @@ struct BulletWeapon
 
     entt::entity bulletTemplate;
 
-	BulletWeapon(entt::entity templateEntity): bulletTemplate(templateEntity) {}
+	Weapon(entt::entity templateEntity): bulletTemplate(templateEntity) {}
 };
 
 

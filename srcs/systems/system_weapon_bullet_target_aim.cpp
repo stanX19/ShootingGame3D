@@ -3,14 +3,14 @@
 
 void ecs_systems::bulletTargetAim(GameContext &context)
 {
-	auto view = context.registry.view<Position, AimDirection, AimTarget, BulletWeapon>();
+	auto view = context.registry.view<Position, AimDirection, AimTarget, Weapon>();
 
 	for (auto entity : view)
 	{
 		Position &position = view.get<Position>(entity);
 		AimDirection &aimDirection = view.get<AimDirection>(entity);
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
-		BulletWeapon &bulletWeapon = view.get<BulletWeapon>(entity);
+		Weapon &bulletWeapon = view.get<Weapon>(entity);
 
 		if (!aimTargetExists(context, aimTarget))
 		{

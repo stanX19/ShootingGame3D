@@ -49,12 +49,12 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
 	// Dynamic firing config
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = LAZER_SPEED;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.20});
 	emplaceLazerWeaponCommon(context, entity);
 }
@@ -70,12 +70,12 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = LAZER_SPEED;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{30.0f, 60});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{5.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
@@ -93,12 +93,12 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = 0.0f;
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = LAZER_SPEED;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, 3});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.25});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});

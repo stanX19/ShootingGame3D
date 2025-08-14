@@ -11,12 +11,12 @@ namespace
 
 void ecs_systems::weaponShoot(GameContext &context)
 {
-    auto view = context.registry.view<BulletWeapon, Position, AimDirection,
+    auto view = context.registry.view<Weapon, Position, AimDirection,
                                       tag::weapon::IsFiring, tag::weapon::CanFire>();
 
     for (auto entity : view)
     {
-        auto &weapon = view.get<BulletWeapon>(entity);
+        auto &weapon = view.get<Weapon>(entity);
         Vector3 pos = view.get<Position>(entity).value;
         Vector3 baseDir = view.get<AimDirection>(entity).value;
 

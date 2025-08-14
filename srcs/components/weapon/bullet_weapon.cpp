@@ -44,12 +44,12 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = BASE_SPEED * 2.0f;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{20.0, 30});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
@@ -68,12 +68,12 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{5.0f});
 
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 50.0f);
 	weapon.bulletData.bulletCount = 10;
 	weapon.bulletData.speed = BASE_SPEED * 2.0f;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0, 3});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
@@ -92,12 +92,12 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{15.0f});
 
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = 0.0f;
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = BASE_SPEED * 1.5f;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.5});
 	emplaceBulletWeaponCommon(context, entity);
 }
@@ -114,12 +114,12 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 1.0f);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = BASE_SPEED * 3.0f;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.75});
 	emplaceBulletWeaponCommon(context, entity);
 }
@@ -139,13 +139,13 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	// Shooting Configurations
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 2);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = BASE_SPEED * 3.0f;
 
 	// Weapon Components
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0, 5});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.75});
@@ -164,12 +164,12 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
-	BulletWeapon weapon{bulletTemplate};
+	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = BASE_SPEED * 1.2f;
 
-	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
 	emplaceBulletWeaponCommon(context, entity);
 }
