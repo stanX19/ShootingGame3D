@@ -8,6 +8,7 @@
 #include "game_context.hpp"
 #include "utils.hpp"
 #include "entities.hpp"
+#include "weapons.hpp"
 #include "events.hpp"
 #include "systems.hpp"
 #include <vector>

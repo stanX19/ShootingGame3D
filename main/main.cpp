@@ -34,7 +34,7 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, [[maybe_u
 
 static void resetGame(GameContext &context, Camera &camera) {
 	context.registry.clear();
-	weapon::utils::assureBulletTypes(context.registry);
+	weapon::utils::setUpRegistry(context);
 	event::utils::hookAllListeners(context);
 	setup_camera(camera);
 	spawnPlayer(context);

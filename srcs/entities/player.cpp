@@ -1,4 +1,5 @@
 #include "entities.hpp"
+#include "weapons.hpp"
 #include "utils.hpp"
 
 namespace {

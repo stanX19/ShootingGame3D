@@ -1,4 +1,4 @@
-#include "entities.hpp"
+#include "weapons.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
 
@@ -11,7 +11,7 @@ namespace {
 	const float EFFECTIVE_RANGE = 500.0f;
 	const float BASE_SPREAD = std::atan2(1.0f, EFFECTIVE_RANGE);  // atan(ENEMY_RAD, EFFECTIVE_RANGE)
 
-	const Color BASE_COLOR = ColorAlpha(GREEN, 0.5);
+	const Color BASE_COLOR = GREEN;
 
 	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = BASE_COLOR)
 	{
@@ -20,7 +20,7 @@ namespace {
 		return baseColor;
 	}
 
-	void emplaceWeaponCommon(GameContext &context, entt::entity entity) {
+	void emplaceLazerWeaponCommon(GameContext &context, entt::entity entity) {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
@@ -46,8 +46,7 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 1.0f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, rad});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
 	// Dynamic firing config
 	BulletWeapon weapon{bulletTemplate};
@@ -57,7 +56,7 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.20});
-	emplaceWeaponCommon(context, entity);
+	emplaceLazerWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity)
@@ -69,8 +68,7 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.4f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, rad});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
 	BulletWeapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
@@ -81,7 +79,7 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{30.0f, 60});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{5.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
-	emplaceWeaponCommon(context, entity);
+	emplaceLazerWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity)
@@ -93,8 +91,7 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 10});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, rad});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
 	BulletWeapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = 0.0f;
@@ -105,5 +102,5 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, 3});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.25});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});
-	emplaceWeaponCommon(context, entity);
+	emplaceLazerWeaponCommon(context, entity);
 }

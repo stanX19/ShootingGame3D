@@ -1,4 +1,4 @@
-#include "entities.hpp"
+#include "weapons.hpp"
 #include "utils.hpp"
 
 namespace
@@ -17,7 +17,7 @@ namespace
 		return baseColor;
 	}
 
-	void emplaceWeaponCommon(GameContext &context, entt::entity entity) {
+	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity) {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
@@ -41,8 +41,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.5f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, radius});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	BulletWeapon weapon{bulletTemplate};
@@ -54,7 +53,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{20.0, 30});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
-	emplaceWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
@@ -66,8 +65,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.75f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, radius});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{5.0f});
 
 	BulletWeapon weapon{bulletTemplate};
@@ -79,7 +77,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0, 3});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.5});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
-	emplaceWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
@@ -91,8 +89,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 10});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, radius});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{15.0f});
 
 	BulletWeapon weapon{bulletTemplate};
@@ -102,7 +99,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.5});
-	emplaceWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
@@ -114,8 +111,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<HP>(bulletTemplate, HP{50.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 2.5f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, radius});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	BulletWeapon weapon{bulletTemplate};
@@ -125,7 +121,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.75});
-	emplaceWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity);
 }
 
 
@@ -139,8 +135,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<HP>(bulletTemplate, HP{50.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 2.5f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, radius});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	// Shooting Configurations
@@ -154,7 +149,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0, 5});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.75});
-	emplaceWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
@@ -166,8 +161,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, radius});
-	context.templateReg.emplace<Color>(bulletTemplate, getColor(context, entity));
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	BulletWeapon weapon{bulletTemplate};
@@ -177,7 +171,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 
 	context.registry.emplace_or_replace<BulletWeapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
-	emplaceWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity);
 }
 
 

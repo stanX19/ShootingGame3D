@@ -28,23 +28,4 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector
 void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir, float radius, const Vector3 &ringNormal, int numAsteroids = 20);
 void spawnSunAndStars(GameContext &context, int numStars=100);
 
-namespace weapon {
-	void emplaceWeaponMachineGun(GameContext &context, entt::entity entity);
-	void emplaceWeaponBasic(GameContext &context, entt::entity entity);
-	void emplaceWeaponSniper(GameContext &context, entt::entity entity);
-	void emplaceWeaponBurstSniper(GameContext &context, entt::entity entity);
-	void emplaceWeaponShotgun(GameContext &context, entt::entity entity);
-	void emplaceWeaponBigBall(GameContext &context, entt::entity entity);
-	void emplaceWeaponLazerBasic(GameContext &context, entt::entity entity);
-	void emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity);
-	void emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity);
-
-	void emplaceRandomWeapon(GameContext &context, entt::entity turret);
-	void emplaceRandomWeapon(GameContext &context, entt::entity turret, int value);
-}
-
-namespace weapon::utils {
-	void assureBulletTypes(entt::registry &registry);
-}
-
 #endif // ENTITIES_HPP

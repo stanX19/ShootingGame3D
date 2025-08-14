@@ -1,4 +1,5 @@
 #include "entities.hpp"
+#include "weapons.hpp"
 
 namespace {
 	int BASE_SCORE = 500;
