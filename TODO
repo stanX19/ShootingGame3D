@@ -16,26 +16,9 @@
 		enemies registry.view<decltype(tag_type)>(entt::exclude<decltype(tag_type)>)
 	}, ...) }, allFactionTags)
 
-4. replace AimTarget with AimTarget {
-	entity
-	locktime
-	lockedOn
-}; if in cone for locktime > radar.locktime then lock
-
-5. struct Radar {
-	detectDistance
-	lockAngle
-	lockDistance
-	lockTime
-}
-7. enemy shoot control if locked: weapon shoot
 8. aim assist only start when locked, use previous positions instead of straight prediction
 10. make constants be read from .conf files instead of hardcoded
-11. Collision
-	- seperate collision detection and actual processing
-	- seperate death logic of different entities using tags
 12. tag::SpaceShip + SpaceshipControl {float foward; quat turnDir} + tag::PlayerControl / tag::AIControl
-13. model_manager apply scaling to model when loading such that new scale reflects real scale (compared to unit sphere)
 15. Realistic physics, no more breaking in vacum
 16. Have another system to assign bitwise faction value
 17. number control for weapon firing
@@ -46,8 +29,7 @@
 		alignHorizontal = false;
 	}
 19. enemy dodge asteroids
-20. angular velocity; acceleration; angular acceleration; radiusIncrease; radiusSyncModel {float }; mass
-21. tag::onDeath::sphereDebris; tag::onDeath::cubeDebris; tag::onDeath::explosion; 
+20. acceleration; angular acceleration; mass
 22. missile, cylinder model; uses thrust component; same system as new player movement
 23. struct TrailParticle {
 	Color color;
@@ -55,3 +37,4 @@
 	float randomVelMagnitude = 0;
 };
 system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * randomPosMagnitude, randomVector3 * randomVelMagnitude)
+24. Energy shield component block energy weapons (lazer)

@@ -139,18 +139,18 @@ struct AimDirection
 
 struct BulletWeapon
 {
-	struct
-	{
-		float hp;
-		float dmg;
-		float speed;
-		float rad;
-		Color color;
-		float lifetime;
-		float spreadSin = 0.0;
-		int bulletCount = 1;
-	} bulletData;
+    struct
+    {
+        float spreadSin = 0.0f;
+        int bulletCount = 1;
+        float speed = 400.0f;
+    } bulletData;
+
+    entt::entity bulletTemplate;
+
+	BulletWeapon(entt::entity templateEntity): bulletTemplate(templateEntity) {}
 };
+
 
 struct WeaponCooldown {
 	float shootCooldown;

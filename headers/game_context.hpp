@@ -5,6 +5,7 @@
 
 struct GameContext {
 	ModelManager meshManager;
+	entt::registry templateReg;
 	entt::registry registry;
 	entt::dispatcher dispatcher;
 	entt::entity currentPlayer = entt::null;

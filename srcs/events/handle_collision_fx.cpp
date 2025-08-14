@@ -19,13 +19,13 @@ namespace {
 			Vector3 normal = Vector3Normalize(damagerPos - victimPos);
 
 			float scale = std::cbrt(bodyPtr->scale.x * bodyPtr->scale.y * bodyPtr->scale.z);
-			int debrisCount = 1 + static_cast<int>(30 * std::min(1.0f, dmgPtr->value / hpPtr->maxValue));
+			int debrisCount = 2 + static_cast<int>(30 * std::min(1.0f, dmgPtr->value / hpPtr->maxValue));
 
 			Vector3 collisionPos = posPtr->value + normal * scale;
 			Vector3 explosionDir = Vector3Normalize(damagerVel) * -50 + victimVel;
 			Color color = ColorLerp(bodyPtr->color, WHITE, 0.5f);
 
-			spawnDebris(*evt.context, collisionPos, scale * 0.5f, color, debrisCount, 5.0f, explosionDir);
+			spawnDebris(*evt.context, collisionPos, scale, color, debrisCount, 5.0f, explosionDir);
 		};
 
 		trySpawn(evt.a, evt.b, evt.posA, evt.velA, evt.posB, evt.velB);  // A damaged by B
