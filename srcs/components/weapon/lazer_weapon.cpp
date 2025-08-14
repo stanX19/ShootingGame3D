@@ -4,7 +4,7 @@
 
 namespace {
 	const float LAZER_SPEED = 10000.0f;
-	const float BASE_DAMAGE = 7.5f;
+	const float BASE_DAMAGE = 10.0f;
 	const Vector3 LAZER_BOUND = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
 	
 	// effective range and angle is linearly inverse, just multiply the angles to get different distances
@@ -31,6 +31,7 @@ namespace {
 		entt::entity bullet = context.templateReg.create();
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
+		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / rad);
 		return bullet;
 	}

@@ -9,6 +9,8 @@ namespace {
 		auto trySpawn = [&](entt::entity victim, entt::entity damager, Vector3 victimPos, Vector3 victimVel, Vector3 damagerPos, Vector3 damagerVel) {
 			if (!registry.any_of<tag::effect::DropDebris>(victim))
 				return ;
+			if (registry.any_of<tag::bullet_type::Energy>(damager))
+				return ;
 
 			auto [hpPtr, posPtr, bodyPtr] = registry.try_get<HP, Position, RenderBody>(victim);
 			auto dmgPtr = registry.try_get<Damage>(damager);

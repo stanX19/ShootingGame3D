@@ -29,8 +29,8 @@ int main() {
 	// 	const char *path = "assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf";
 	// const char *path = "assets/Models/spaceship_custom_100/Spaceship1.obj";
 	// const char *path = "assets/Models/sun/sun.glb";
-	const char *path = "assets/Models/asteroid/asteroid_ceres.glb";
-	t_model_id ship = meshManager.loadModel(path, Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
+	const char *path = "assets/Models/shield/spherical_hex_force_field.glb";
+	t_model_id ship = meshManager.loadModel(path, 0.01); //Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
 	// t_model_id ship = meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj");
 	std::cout << "End of load" << "\n";
 	t_model_id ship_id_2 = meshManager.loadModel(path, 1.0);
@@ -55,7 +55,7 @@ int main() {
 		BeginMode3D(camera);
 
 		DrawModel(meshManager.getModel(sphere1), { -10.0f, 0.0f, 0.0f }, 1.0f, Color{ 230, 41, 55, 105 });
-		DrawModel(meshManager.getModel(sphere1), { -0.0f, 0.0f, 0.0f }, 1.0f, Color{ 55, 41, 255, 105 });
+		// DrawModel(meshManager.getModel(sphere1), { -0.0f, 0.0f, 0.0f }, 1.0f, Color{ 55, 41, 255, 105 });
 		DrawModel(meshManager.getModel(ship), { 0.0f, 0.0f, 0.0f }, 1.0f, GREEN);
 		// DrawModel(meshManager.getModel(plane), { 0.0f, -1.0f, 0.0f }, 1.0f, LIGHTGRAY);
 

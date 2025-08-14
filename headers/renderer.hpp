@@ -25,26 +25,27 @@ private:
 	int lightColorLoc;
 	int ambientStrengthLoc;
 
-	void LoadDefaultShader();
-	void LoadShaderWithFallback();
-	void SetupShaderUniforms();
-	void DrawEntityModel(const Position &pos, const RenderBody &body, float strech = 1.0f);
-	void DrawEntitiesWithShader();
-	void DrawEntitiesWithoutShader();
-	void DrawBoundaryWarning();
-	void HandleLightSource();
+	void loadDefaultShader();
+	void loadShaderWithFallback();
+	void setupShaderUniforms();
+	void drawEntityModel(const Position &pos, const RenderBody &body, float strech = 1.0f);
+	void drawEntitiesWithShader();
+	void drawEntitiesWithoutShader();
+	void drawBoundaryWarning();
+	void drawEnergyShield();
+	void handleLightSource();
 	
-	void DrawHUD();
-	void DrawHealthBars();
-	void DrawTargetable();
-	void DrawTexts();
-	void DrawSpeedBar();
-	void DrawThrustBar();
-	void DrawAmmoCircle();
-	void DrawCrosshair();
-	void DrawMainUIFrame();
-	void DrawCursorArrow();
-	void DrawCollisionWarning();
+	void drawHUD();
+	void drawHealthBars();
+	void drawTargetable();
+	void drawTexts();
+	void drawSpeedBar();
+	void drawThrustBar();
+	void drawAmmoCircle();
+	void drawCrosshair();
+	void drawMainUIFrame();
+	void drawCursorArrow();
+	void drawCollisionWarning();
 	
 	Vector2 GetUIFrameCenter() const;
 	float GetUIFrameRadius() const;

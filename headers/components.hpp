@@ -27,7 +27,7 @@ struct Rotation
 
 struct RotationVelocity
 {
-	Quaternion value = QuaternionIdentity();
+	Quaternion value = QuaternionIdentity();  // rotation = rotation * (rotVel * dt)
 };
 
 struct CollisionBody
@@ -92,6 +92,21 @@ struct HP
 struct HPRegen
 {
 	float value; // health regen per second
+};
+
+struct EnergyShield
+{
+	float hp;
+	float maxHp;
+	float activeTimer = 0.0f;  // if > 0 will be rendered
+
+	EnergyShield(float val): hp(val), maxHp(val) {}
+};
+
+struct EnergyShieldRegen
+{
+	float value;  // regen per second
+	float regenCd = 2.0f;  // wait for deactivate 2 seconds
 };
 
 struct Damage
@@ -226,12 +241,11 @@ namespace tag {
 		struct FollowParentFire {};			// follow parent firing
 		struct IsFiring {};
 		struct CanFire {};
-
-		namespace type {
-			struct Bullet {};
-			struct Lazer {};
-		}
 	};
+	namespace bullet_type {
+		struct Kinetic {};
+		struct Energy {};
+	}
 	struct LightSource {};
 	struct Shaded {};
 	struct RotationSyncModel {};

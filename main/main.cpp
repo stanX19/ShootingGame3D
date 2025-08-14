@@ -100,6 +100,7 @@ int main() {
 		ecs_systems::delayedDamage(context, dt);
 		ecs_systems::hpCleanup(context);
 		ecs_systems::hpRegen(context, dt);
+		ecs_systems::energyShield(context, dt);
 		ecs_systems::cleanOutOfBound(context);
 		ecs_systems::entityAnchorRelease(context, dt);
 		ecs_systems::enemyRespawn(context);

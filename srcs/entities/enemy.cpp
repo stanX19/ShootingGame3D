@@ -17,6 +17,8 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 		shipModel, GREEN, 1.0f
 	});
 	context.registry.emplace<HP>(enemy, 1000.0f);
+	context.registry.emplace<EnergyShield>(enemy, 500.0f);
+	context.registry.emplace<EnergyShieldRegen>(enemy, 10.0f);
 	context.registry.emplace<Damage>(enemy, 500.0f);
 	context.registry.emplace<MaxSpeed>(enemy, 80.0f);
 	context.registry.emplace<TurnSpeed>(enemy, 2.5f);
@@ -49,6 +51,8 @@ entt::entity spawnEliteEnemy(GameContext &context, const Vector3& pos) {
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(enemy, 1200.0f);
 	context.registry.emplace_or_replace<HPRegen>(enemy, 10.0f);
+	context.registry.emplace_or_replace<EnergyShield>(enemy, 1000.0f);
+	context.registry.emplace_or_replace<EnergyShieldRegen>(enemy, 25.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(enemy, 40.0f);
 	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 2);
 
@@ -94,6 +98,8 @@ entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos) {
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(enemy, 1600.0f);
 	context.registry.emplace_or_replace<HPRegen>(enemy, 50.0f);
+	context.registry.emplace_or_replace<EnergyShield>(enemy, 1000.0f);
+	context.registry.emplace_or_replace<EnergyShieldRegen>(enemy, 100.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(enemy, 20.0f);
 	context.registry.emplace_or_replace<TurnSpeed>(enemy, 0.25f);
 	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 5);

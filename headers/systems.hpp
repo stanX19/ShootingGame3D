@@ -25,6 +25,7 @@ namespace ecs_systems
 	void delayedDamage(GameContext &context, float dt);
 	void hpCleanup(GameContext &context);
 	void hpRegen(GameContext &context, float dt);
+	void energyShield(GameContext &context, float dt);
 	void ammoReload(GameContext &context, float dt);
 	void bulletTargetAim(GameContext &context);
 	void weaponShoot(GameContext &context);

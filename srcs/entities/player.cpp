@@ -38,6 +38,8 @@ entt::entity spawnPlayer(GameContext &context) {
 	context.registry.emplace<RenderBody>(player, RenderBody{shipModel, BLUE, 1.0f});
 	context.registry.emplace<HP>(player, 1000.0f);
 	context.registry.emplace<HPRegen>(player, 20.0f);
+	context.registry.emplace<EnergyShield>(player, 1000.0f);
+	context.registry.emplace<EnergyShieldRegen>(player, 25.0f);
 	context.registry.emplace<Damage>(player, 500.0f);
 	context.registry.emplace<MaxSpeed>(player, 80.0f);
 	context.registry.emplace<TurnSpeed>(player, 3.0f);

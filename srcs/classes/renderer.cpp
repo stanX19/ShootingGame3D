@@ -5,9 +5,9 @@
 Renderer::Renderer(Camera3D &cam, GameContext &context)
 	: camera(cam), context(context)
 {
-	LoadDefaultShader();
-	LoadShaderWithFallback();
-	SetupShaderUniforms();
+	loadDefaultShader();
+	loadShaderWithFallback();
+	setupShaderUniforms();
 }
 
 Renderer::~Renderer()
@@ -19,12 +19,12 @@ Renderer::~Renderer()
 	}
 }
 
-void Renderer::LoadDefaultShader()
+void Renderer::loadDefaultShader()
 {
 	defaultShader = LoadShader(NULL, NULL);
 }
 
-void Renderer::LoadShaderWithFallback()
+void Renderer::loadShaderWithFallback()
 {
 	shader = LoadShader("shaders/sunlight.vs", "shaders/sunlight.fs");
 	if (shader.id == 0)
@@ -40,7 +40,7 @@ void Renderer::LoadShaderWithFallback()
 	
 }
 
-void Renderer::SetupShaderUniforms()
+void Renderer::setupShaderUniforms()
 {
 	lightPosLoc = GetShaderLocation(shader, "lightPosition");
 	lightColorLoc = GetShaderLocation(shader, "lightColor");
@@ -60,23 +60,24 @@ void Renderer::Render()
 	BeginMode3D(camera);
 	// DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
 
-	HandleLightSource();
-	DrawEntitiesWithoutShader();
-	DrawEntitiesWithShader();
-	DrawBoundaryWarning();
+	handleLightSource();
+	drawEntitiesWithoutShader();
+	drawEntitiesWithShader();
+	drawBoundaryWarning();
+	drawEnergyShield();
 
 	EndMode3D();
 
 	// HUD
-	DrawHUD();
+	drawHUD();
 	DrawFPS(10, 10);
 
-	DrawTexts();
+	drawTexts();
 
 	EndDrawing();
 }
 
-void Renderer::DrawTexts() {
+void Renderer::drawTexts() {
 	static int score = 0;
 
 	DrawFPS(10, 10);
@@ -121,7 +122,7 @@ void Renderer::DrawTexts() {
 	}
 }
 
-void Renderer::HandleLightSource()
+void Renderer::handleLightSource()
 {
 	auto view = context.registry.view<Position, RenderBody, tag::LightSource>();
 
@@ -148,7 +149,7 @@ void Renderer::HandleLightSource()
 // 	DrawLine3D(pos.value, end, GREEN);
 // }
 
-void Renderer::DrawEntityModel(const Position &pos, const RenderBody &body, float strech)
+void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, float strech)
 {
 	Model &model = context.meshManager.getModel(body.modelID);
 
@@ -174,7 +175,7 @@ namespace {
 	}
 }
 
-void Renderer::DrawEntitiesWithoutShader()
+void Renderer::drawEntitiesWithoutShader()
 {
 	auto view = context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded>);
 
@@ -183,11 +184,11 @@ void Renderer::DrawEntitiesWithoutShader()
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
 		context.meshManager.getModel(body.modelID).materials[0].shader = defaultShader;
-		DrawEntityModel(pos, body, getStrech(context, entity));
+		drawEntityModel(pos, body, getStrech(context, entity));
 	}
 }
 
-void Renderer::DrawEntitiesWithShader()
+void Renderer::drawEntitiesWithShader()
 {
 	BeginShaderMode(shader);
 
@@ -197,10 +198,27 @@ void Renderer::DrawEntitiesWithShader()
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
 		context.meshManager.getModel(body.modelID).materials[0].shader = shader;
-		DrawEntityModel(pos, body, getStrech(context, entity));
+		drawEntityModel(pos, body, getStrech(context, entity));
 	}
 
 	EndShaderMode();
+}
+
+void Renderer::drawEnergyShield()
+{
+	auto view = context.registry.view<Position, RenderBody, EnergyShield>();
+	t_model_id model = context.meshManager.loadModel("assets/Models/shield/spherical_hex_force_field.glb", 0.01f);
+
+	for (auto [entity, pos, body, shield] : view.each())
+	{
+		if (shield.activeTimer <= 0.0f || shield.hp < 10)
+			continue;
+		context.meshManager.getModel(body.modelID).materials[0].shader = defaultShader;
+
+		Color color = ColorAlpha(SKYBLUE, (0.1 + 0.5 * shield.hp / shield.maxHp) * (shield.activeTimer / 3.0f));
+		float scale = std::max(body.scale.x, std::max(body.scale.y, body.scale.z)) * 4;
+		DrawModel(context.meshManager.getModel(model), pos.value, scale, color);
+	}
 }
 
 bool isInFrontOfCamera(const Vector3 &entityPos, const Camera3D &camera)
@@ -210,15 +228,16 @@ bool isInFrontOfCamera(const Vector3 &entityPos, const Camera3D &camera)
 	return Vector3DotProduct(cameraToEntity, forward) > 0;
 }
 
-void Renderer::DrawHealthBars()
+void Renderer::drawHealthBars()
 {
 	auto view = context.registry.view<Position, CollisionBody, HP, tag::Targetable>();
 	for (auto entity : view)
 	{
 		auto &pos = view.get<Position>(entity);
 		auto &hp = view.get<HP>(entity);
+		EnergyShield *shieldPtr = context.registry.try_get<EnergyShield>(entity);
 
-		if (hp.value == hp.maxValue)
+		if (hp.value == hp.maxValue && (!shieldPtr || shieldPtr->hp == shieldPtr->maxHp))
 			continue;
 		if (!isInFrontOfCamera(pos.value, camera))
 			continue;
@@ -236,10 +255,19 @@ void Renderer::DrawHealthBars()
 		DrawRectangle(screen.x - w / 2 - 1, screen.y - 1, w + 2, h + 2, DARKGRAY);
 		DrawRectangle(screen.x - w / 2, screen.y, w, h, GRAY);
 		DrawRectangle(screen.x - w / 2, screen.y, w * pct, h, GREEN);
+
+		
+		if (!shieldPtr || shieldPtr->activeTimer <= 0.0f)
+			continue;
+		pct = (float)shieldPtr->hp / shieldPtr->maxHp;
+
+		DrawRectangle(screen.x - w / 2 - 1, screen.y - 1 + h + 1, w + 2, h + 2, DARKGRAY);
+		DrawRectangle(screen.x - w / 2, screen.y + h + 1, w, h, GRAY);
+		DrawRectangle(screen.x - w / 2, screen.y + h + 1, w * pct, h, SKYBLUE);
 	}
 }
 
-void Renderer::DrawTargetable()
+void Renderer::drawTargetable()
 {
 	auto [aimTargetPtr, playerPosPtr] = context.registry.try_get<AimTarget, Position>(context.currentPlayer);
 	entt::entity targetedEntity = aimTargetPtr? aimTargetPtr->entity: entt::null;
@@ -339,21 +367,21 @@ void Renderer::DrawTargetable()
 	}
 }
 
-void Renderer::DrawHUD()
+void Renderer::drawHUD()
 {
-	DrawHealthBars();
-	DrawTargetable();
+	drawHealthBars();
+	drawTargetable();
 
 	if (!context.registry.valid(context.currentPlayer))
 		return;
 		
-	DrawMainUIFrame();
-	DrawSpeedBar();
-	// DrawThrustBar();
-	DrawAmmoCircle();
-	DrawCrosshair();
-	DrawCursorArrow();
-	DrawCollisionWarning();
+	drawMainUIFrame();
+	drawSpeedBar();
+	// drawThrustBar();
+	drawAmmoCircle();
+	drawCrosshair();
+	drawCursorArrow();
+	drawCollisionWarning();
 }
 
 Vector2 Renderer::GetUIFrameCenter() const
@@ -366,7 +394,7 @@ float Renderer::GetUIFrameRadius() const
 	return fminf(GetScreenWidth(), GetScreenHeight()) * 0.25f;
 }
 
-void Renderer::DrawMainUIFrame()
+void Renderer::drawMainUIFrame()
 {
 	Vector2 center = GetUIFrameCenter();
 	float radius = GetUIFrameRadius();
@@ -388,7 +416,7 @@ void Renderer::DrawMainUIFrame()
 	}
 }
 
-void Renderer::DrawSpeedBar()
+void Renderer::drawSpeedBar()
 {
 	if (!context.registry.all_of<Velocity, MaxSpeed>(context.currentPlayer))
 		return ;
@@ -465,7 +493,7 @@ void Renderer::DrawSpeedBar()
 	}
 }
 
-void Renderer::DrawThrustBar()
+void Renderer::drawThrustBar()
 {
 	if (!context.registry.all_of<Velocity>(context.currentPlayer))
 		return ;
@@ -496,7 +524,7 @@ void Renderer::DrawThrustBar()
 	DrawText(thrustText, barPos.x - 15, barPos.y + barSize.y + 5, 14, WHITE);
 }
 
-void Renderer::DrawAmmoCircle()
+void Renderer::drawAmmoCircle()
 {
 	if (!context.registry.valid(context.currentPlayer))
 		return;
@@ -607,7 +635,7 @@ void Renderer::DrawAmmoCircle()
 	}
 }
 
-void Renderer::DrawCrosshair()
+void Renderer::drawCrosshair()
 {
 	Vector2 center = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
 	
@@ -632,7 +660,7 @@ void Renderer::DrawCrosshair()
 }
 
 
-void Renderer::DrawCursorArrow()
+void Renderer::drawCursorArrow()
 {
 	Vector2 mousePos = GetMousePosition();
 	Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
@@ -711,7 +739,7 @@ void Renderer::DrawCursorArrow()
 	DrawCircleV(screenCenter, 2.0f, WHITE);
 }
 
-void Renderer::DrawCollisionWarning() {
+void Renderer::drawCollisionWarning() {
 	const static float warningTime = 5.0f;
 	const static float warningDist = 10.0f;
 	std::vector<Vector3> warnings;
@@ -804,7 +832,7 @@ void Renderer::DrawCollisionWarning() {
 	}
 }
 
-void Renderer::DrawBoundaryWarning()
+void Renderer::drawBoundaryWarning()
 {
 	if (!context.registry.valid(context.currentPlayer))
 		return;

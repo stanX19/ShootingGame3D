@@ -27,6 +27,7 @@ namespace
 		entt::entity bullet = context.templateReg.create();
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
+		context.templateReg.emplace<tag::bullet_type::Kinetic>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f);
 		return bullet;
 	}
