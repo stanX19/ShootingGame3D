@@ -3,7 +3,7 @@
 #include "constants.hpp"
 
 namespace {
-	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 4, ARENA_SIZE * 4, ARENA_SIZE * 4};
+	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 1.5, ARENA_SIZE * 1.5, ARENA_SIZE * 1.5};
 
 	t_model_id getAsteroidModel(GameContext &context) {
 		// return context.meshManager.createSphere(64, 64);
@@ -12,7 +12,8 @@ namespace {
 	}
 
 	Color getRandomAsteroidColor() {
-		unsigned char brightness = (unsigned char)GetRandomValue(5, 55);
+		const int baseVal = 100;
+		unsigned char brightness = (unsigned char)GetRandomValue(baseVal + 5, baseVal + 55);
 		return Color{brightness, brightness, brightness, 255};
 	}
 

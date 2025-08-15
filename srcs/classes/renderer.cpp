@@ -183,7 +183,10 @@ void Renderer::drawEntitiesWithoutShader()
 	{
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
-		context.meshManager.getModel(body.modelID).materials[0].shader = defaultShader;
+		Model &model = context.meshManager.getModel(body.modelID);
+		for (int i = 0; i < model.materialCount; i++) {
+			model.materials[i].shader = defaultShader;
+		}
 		drawEntityModel(pos, body, getStrech(context, entity));
 	}
 }
@@ -197,7 +200,11 @@ void Renderer::drawEntitiesWithShader()
 	{
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
-		context.meshManager.getModel(body.modelID).materials[0].shader = shader;
+		Model &model = context.meshManager.getModel(body.modelID);
+		for (int i = 0; i < model.materialCount; i++) {
+			model.materials[i].shader = shader;
+		}
+		SetShaderValueTexture(shader, GetShaderLocation(shader, "texture0"), model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture);
 		drawEntityModel(pos, body, getStrech(context, entity));
 	}
 
