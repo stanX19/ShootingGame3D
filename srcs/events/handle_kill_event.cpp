@@ -17,8 +17,8 @@ void event::Listener::handleKillEvent(const KillEvent& evt) {
 	if (victimScorePtr)
 		addScore(*evt.context, evt.killer.id, victimScorePtr->value);
 	
-	// auto victimPosPtr = evt.context->registry.try_get<Position>(evt.victim.id);
-	// if (victimPosPtr) {
-	// 	victimPosPtr->value = evt.killLoc;
-	// }
+	auto victimPosPtr = evt.context->registry.try_get<Position>(evt.victim.id);
+	if (victimPosPtr) {
+		victimPosPtr->value = evt.victim.pos;
+	}
 }

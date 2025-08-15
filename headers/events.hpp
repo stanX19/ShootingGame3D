@@ -25,7 +25,7 @@ namespace event {
 		GameContext *context;
 		CollisionParty killer;
 		CollisionParty victim;
-		Vector3 killLoc;
+		float dt;				// frame dt
 	};
 
 	struct Listener {

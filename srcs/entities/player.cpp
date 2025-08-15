@@ -18,7 +18,8 @@ namespace {
 		context.registry.emplace<AimTarget>(player);
 		context.registry.emplace<tag::weapon::AIControlledAim>(player);
 		context.registry.emplace<tag::weapon::PlayerControlledFire>(player);
-		int subWeapons = GetRandomValue(0, 1000);
+		static int subWeapons = -1;
+		++subWeapons;
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);

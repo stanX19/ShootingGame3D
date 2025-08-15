@@ -8,7 +8,7 @@ namespace {
 	const Vector3 LAZER_BOUND = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
 	
 	// effective range and angle is linearly inverse, just multiply the angles to get different distances
-	const float EFFECTIVE_RANGE = 500.0f;
+	const float EFFECTIVE_RANGE = 1000.0f;
 	const float BASE_SPREAD = std::atan2(1.0f, EFFECTIVE_RANGE);  // atan(ENEMY_RAD, EFFECTIVE_RANGE)
 
 	const Color BASE_COLOR = GREEN;
@@ -32,7 +32,7 @@ namespace {
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
-		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / rad);
+		context.templateReg.emplace<ModelStrech>(bullet, 0.5f / rad);
 		return bullet;
 	}
 }

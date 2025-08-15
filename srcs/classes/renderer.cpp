@@ -160,7 +160,7 @@ void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, floa
 	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
 	float shrink = 1; //std::max(0.01f, 1.0f / std::sqrt(strech));
 	Vector3 scale = body.scale * Vector3{shrink, shrink, strech};
-	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation);
+	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation + Vector3{0, 0, -(strech - 1.0f) * body.scale.z}, body.rotation);
 	DrawModelEx(model, position, axis, angle * RAD2DEG, scale, body.color);
 }
 

@@ -58,7 +58,7 @@ namespace {
 				evt.context,
 				killer,
 				victim,
-				killer.pos
+				evt.dt
 			});
 		}
 
@@ -70,6 +70,7 @@ namespace {
 }
 
 void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
+	// std::cout << evt.a.pos.x << " " << evt.b.pos.x << std::endl;
 	applyDamageToEntity(evt, evt.b, evt.a);
 	applyDamageToEntity(evt, evt.a, evt.b);
 }
