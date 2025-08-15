@@ -11,6 +11,8 @@ namespace {
 	// 	entt::entity turret = spawnLinkedTurret(context, color, player, relpos);
 	// 	emplaceWeaponMachineGun(context, turret);
 	// }
+	const float SHIELD = 3000.0f;
+	const float SHIELD_REGEN = SHIELD / 15;
 
 	void addWeapons(GameContext &context, entt::entity &player, Color color) {
 		context.registry.emplace<AimTarget>(player);
@@ -36,10 +38,10 @@ entt::entity spawnPlayer(GameContext &context) {
 	context.registry.emplace<Rotation>(player);
 	context.registry.emplace<CollisionBody>(player, 1.0f);
 	context.registry.emplace<RenderBody>(player, RenderBody{shipModel, BLUE, 1.0f});
-	context.registry.emplace<HP>(player, 1000.0f);
-	context.registry.emplace<HPRegen>(player, 20.0f);
-	context.registry.emplace<EnergyShield>(player, 1000.0f);
-	context.registry.emplace<EnergyShieldRegen>(player, 25.0f);
+	context.registry.emplace<HP>(player, 1500.0f);
+	context.registry.emplace<HPRegen>(player, 25.0f);
+	context.registry.emplace<EnergyShield>(player, SHIELD);
+	context.registry.emplace<EnergyShieldRegen>(player, SHIELD_REGEN);
 	context.registry.emplace<Damage>(player, 500.0f);
 	context.registry.emplace<MaxSpeed>(player, 80.0f);
 	context.registry.emplace<TurnSpeed>(player, 3.0f);

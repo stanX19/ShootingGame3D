@@ -32,7 +32,6 @@ void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 			faction
 		});
 	}
-
 	for (size_t i = 0; i < entities.size(); ++i) {
 		const auto& A = entities[i];
 
@@ -45,10 +44,12 @@ void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 			float combinedRadius = A.rad + B.rad;
 			float collisionDt = calculateCollisionTime(A.pos, A.vel, B.pos, B.vel, combinedRadius);
 			if (willCollide(collisionDt, 1.0f)) {
-				context.dispatcher.enqueue<event::CollisionEvent>({&context,
-					A.id, A.pos + A.vel * collisionDt, A.vel / dt,
-					B.id, B.pos + B.vel * collisionDt, B.vel / dt,
-					dt, collisionDt}
+				context.dispatcher.enqueue<event::CollisionEvent>(event::CollisionEvent{
+					&context,
+					event::CollisionParty{A.id, A.pos + A.vel * collisionDt, A.vel / dt},
+					event::CollisionParty{B.id, B.pos + B.vel * collisionDt, B.vel / dt},
+					dt,
+					collisionDt}
 				);
 			}
 		}

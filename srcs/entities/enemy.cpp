@@ -2,7 +2,10 @@
 #include "weapons.hpp"
 
 namespace {
-	int BASE_SCORE = 500;
+	const int BASE_SCORE = 500;
+	const float BASE_HP = 1000.0f;
+	const float BASE_SHIELD = 500.0f;
+	const float BASE_SHIELD_REGEN = BASE_SHIELD / 15;
 }
 
 entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
@@ -16,9 +19,9 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<RenderBody>(enemy, RenderBody{
 		shipModel, GREEN, 1.0f
 	});
-	context.registry.emplace<HP>(enemy, 1000.0f);
-	context.registry.emplace<EnergyShield>(enemy, 500.0f);
-	context.registry.emplace<EnergyShieldRegen>(enemy, 10.0f);
+	context.registry.emplace<HP>(enemy, BASE_HP);
+	context.registry.emplace<EnergyShield>(enemy, BASE_SHIELD);
+	context.registry.emplace<EnergyShieldRegen>(enemy, BASE_SHIELD_REGEN);
 	context.registry.emplace<Damage>(enemy, 500.0f);
 	context.registry.emplace<MaxSpeed>(enemy, 80.0f);
 	context.registry.emplace<TurnSpeed>(enemy, 2.5f);

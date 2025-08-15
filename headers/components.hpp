@@ -98,9 +98,10 @@ struct EnergyShield
 {
 	float hp;
 	float maxHp;
+	float activeDuration;
 	float activeTimer = 0.0f;  // if > 0 will be rendered
 
-	EnergyShield(float val): hp(val), maxHp(val) {}
+	EnergyShield(float val, float _activeDuration=3.0f): hp(val), maxHp(val), activeDuration(_activeDuration) {}
 };
 
 struct EnergyShieldRegen

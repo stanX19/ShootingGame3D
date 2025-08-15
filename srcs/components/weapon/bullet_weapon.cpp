@@ -83,12 +83,12 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 
 void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 {
-	const float radius = 1.0f;
+	const float radius = 0.5f;
 	t_model_id model = context.meshManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 10});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 5});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{15.0f});

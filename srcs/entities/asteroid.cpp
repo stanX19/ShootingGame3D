@@ -6,7 +6,14 @@ namespace {
 	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 4, ARENA_SIZE * 4, ARENA_SIZE * 4};
 
 	t_model_id getAsteroidModel(GameContext &context) {
-		return context.meshManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
+		// return context.meshManager.createSphere(64, 64);
+		// return context.meshManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
+		return context.meshManager.loadModel("assets/Models/asteroid/round_stone.glb");
+	}
+
+	Color getRandomAsteroidColor() {
+		unsigned char brightness = (unsigned char)GetRandomValue(5, 55);
+		return Color{brightness, brightness, brightness, 255};
 	}
 
 	entt::entity spawnBaseAsteroid(GameContext &context) {
@@ -42,7 +49,7 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 		context.registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		context.registry.emplace<CollisionBody>(asteroid, subRad);
 		context.registry.emplace<RenderBody>(asteroid, RenderBody{
-			asteroidModel, (i == 0)? Color{ 105, 105, 105, 255 } : Color{ 155, 155, 155, 255 }, subRad
+			asteroidModel, getRandomAsteroidColor(), subRad
 		});
 	}
 }
@@ -78,13 +85,12 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector
 		float verticalOffset = GetRandomValue(-50, 50) / 100.0f * radius;
 		Vector3 ringPos = center + ringOffset + ringNormal * verticalOffset;
 
-		unsigned char brightness = (unsigned char)GetRandomValue(105, 155);
 		entt::entity asteroid = spawnBaseAsteroid(context);
 		context.registry.emplace<Position>(asteroid, ringPos);
 		context.registry.emplace<Velocity>(asteroid, Vector3Normalize(dir) * speed);
 		context.registry.emplace<CollisionBody>(asteroid, asteroidRadius);
 		context.registry.emplace<RenderBody>(asteroid,
-			RenderBody{asteroidModel, Color{brightness, brightness, brightness, 255}, asteroidRadius}
+			RenderBody{asteroidModel, getRandomAsteroidColor(), asteroidRadius}
 		);
 	}
 }

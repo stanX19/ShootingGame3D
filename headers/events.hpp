@@ -7,32 +7,33 @@
 #include <vector>
 
 namespace event {
+	struct CollisionParty {
+		entt::entity id;
+		Vector3 pos;			// position during collision
+		Vector3 vel;			// actual velocity
+	};
+
 	struct CollisionEvent {
 		GameContext *context;
-		entt::entity a;
-		Vector3 posA;			// position during collision
-		Vector3 velA;			// actual velocity
-		entt::entity b;
-		Vector3 posB;			// same
-		Vector3 velB;
+		CollisionParty a;
+		CollisionParty b;
 		float dt;				// frame dt
 		float collisionDtRatio;	// collision_dt / frame_dt
 	};
 
 	struct KillEvent {
 		GameContext *context;
-		entt::entity killer;
-		entt::entity victim;
+		CollisionParty killer;
+		CollisionParty victim;
+		Vector3 killLoc;
 	};
 
 	struct Listener {
 		// CollisionEvent
-		void handleCollisionPhysics(const CollisionEvent& evt);
-		void handleCollisionDamage(const CollisionEvent& evt);
-		void handleCollisionFX(const CollisionEvent& evt);
+		void handleCollisionEvent(const CollisionEvent& evt);
 		
 		// KillEvent
-		void handleKillingScore(const KillEvent& evt);
+		void handleKillEvent(const KillEvent& evt);
 	};
 }
 

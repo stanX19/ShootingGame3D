@@ -215,7 +215,7 @@ void Renderer::drawEnergyShield()
 			continue;
 		context.meshManager.getModel(body.modelID).materials[0].shader = defaultShader;
 
-		Color color = ColorAlpha(SKYBLUE, (0.1 + 0.5 * shield.hp / shield.maxHp) * (shield.activeTimer / 3.0f));
+		Color color = ColorAlpha(SKYBLUE, (0.1 + 0.5 * shield.hp / shield.maxHp) * (shield.activeTimer / shield.activeDuration));
 		float scale = std::max(body.scale.x, std::max(body.scale.y, body.scale.z)) * 4;
 		DrawModel(context.meshManager.getModel(model), pos.value, scale, color);
 	}
@@ -255,7 +255,6 @@ void Renderer::drawHealthBars()
 		DrawRectangle(screen.x - w / 2 - 1, screen.y - 1, w + 2, h + 2, DARKGRAY);
 		DrawRectangle(screen.x - w / 2, screen.y, w, h, GRAY);
 		DrawRectangle(screen.x - w / 2, screen.y, w * pct, h, GREEN);
-
 		
 		if (!shieldPtr || shieldPtr->activeTimer <= 0.0f)
 			continue;

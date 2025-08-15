@@ -92,19 +92,20 @@ int main() {
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
 
+		ecs_systems::energyShield(context, dt);
+		
 		ecs_systems::syncModelRotation(context);
 		camaraFollowPlayer(context, camera, dt);
 		renderer.Render();
 
+		ecs_systems::enemyRespawn(context);
+		ecs_systems::asteroidRespawn(context);
+		ecs_systems::entityAnchorRelease(context, dt);
 		ecs_systems::entityLifetime(context, dt);
+		ecs_systems::cleanOutOfBound(context);
 		ecs_systems::delayedDamage(context, dt);
 		ecs_systems::hpCleanup(context);
 		ecs_systems::hpRegen(context, dt);
-		ecs_systems::energyShield(context, dt);
-		ecs_systems::cleanOutOfBound(context);
-		ecs_systems::entityAnchorRelease(context, dt);
-		ecs_systems::enemyRespawn(context);
-		ecs_systems::asteroidRespawn(context);
 
 		inputControls(context, camera, dt);
 	}

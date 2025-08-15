@@ -22,6 +22,10 @@ void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3
 		);
 		context.registry.emplace<RadiusExpand>(explosion, expansion);
 		context.registry.emplace<Lifespan>(explosion, subLifespan);
+
+		context.registry.emplace<CollisionBody>(explosion, subRad * startRatio);
+		context.registry.emplace<Damage>(explosion, 5.0f);
+		context.registry.emplace<tag::bullet_type::Energy>(explosion);
 	}
 }
 
