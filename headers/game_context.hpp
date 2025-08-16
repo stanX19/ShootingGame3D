@@ -4,7 +4,7 @@
 #include "model_manager.hpp"
 
 struct GameContext {
-	ModelManager meshManager;
+	ModelManager modelManager;
 	entt::registry templateReg;
 	entt::registry registry;
 	entt::dispatcher dispatcher;

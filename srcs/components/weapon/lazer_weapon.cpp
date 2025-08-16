@@ -27,12 +27,15 @@ namespace {
 		context.registry.emplace<DisappearBound>(entity, LAZER_BOUND * -2, LAZER_BOUND * 2);
 	}
 
-	entt::entity createBulletTemplate(GameContext &context, float rad) {
+	entt::entity createBulletTemplate(GameContext &context, float rad, Color color) {
 		entt::entity bullet = context.templateReg.create();
+		t_model_id model = context.modelManager.createCube();
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
-		context.templateReg.emplace<ModelStrech>(bullet, 0.5f / rad);
+		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (rad * 2));  // 1 / diameter
+		context.templateReg.emplace<CollisionBody>(bullet, CollisionBody{rad});
+		context.templateReg.emplace<RenderBody>(bullet, RenderBody{model, color, rad});
 		return bullet;
 	}
 }
@@ -40,16 +43,11 @@ namespace {
 void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 {
 	const float rad = 0.1f;
-	t_model_id model = context.meshManager.createSphere();
 	
-	// Static bullet properties
-	entt::entity bulletTemplate = createBulletTemplate(context, rad);
+	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 1.0f});
-	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
-	// Dynamic firing config
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
 	weapon.bulletData.bulletCount = 1;
@@ -63,13 +61,10 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity)
 {
 	const float rad = 0.1f;
-	t_model_id model = context.meshManager.createSphere();
 	
-	entt::entity bulletTemplate = createBulletTemplate(context, rad);
+	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.4f});
-	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
@@ -86,14 +81,11 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity)
 {
 	const float rad = 1.0f;
-	t_model_id model = context.meshManager.createSphere();
 	
-	entt::entity bulletTemplate = createBulletTemplate(context, rad);
+	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 10});
-	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{rad});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), rad});
-
+	
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = 0.0f;
 	weapon.bulletData.bulletCount = 1;

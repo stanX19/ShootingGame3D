@@ -2,7 +2,7 @@
 #include "utils.hpp"
 
 void spawnDebris(GameContext &context, const Vector3& position, float originalRadius, Color originalColor, int count, float lifespan, Vector3 velocity) {
-	t_model_id debrisModel = context.meshManager.createBox();
+	t_model_id debrisModel = context.modelManager.createCube();
 	
 	for (int i = 0; i < count; ++i) {
 		entt::entity debris = context.registry.create();
@@ -11,7 +11,7 @@ void spawnDebris(GameContext &context, const Vector3& position, float originalRa
 		Vector3 debrisVel = randomUnitVector3() * speed + velocity;
 
 		// fast = small
-		float radius = originalRadius * (0.05f + 0.5f / speed);
+		float radius = originalRadius * (0.025f + 0.25f / speed);
 
 		context.registry.emplace<Position>(debris, position);
 		context.registry.emplace<RenderBody>(debris, RenderBody{debrisModel, originalColor, radius, Vector3{0.0f, 0.0f, 0.0f}, randomRotation()});

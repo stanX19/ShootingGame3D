@@ -28,16 +28,16 @@ int main()
 	// Create a light source (required for your shader)
 	auto light = context.registry.create();
 	context.registry.emplace<Position>(light, Vector3{100.0f, 100.0f, 100.0f});
-	context.registry.emplace<RenderBody>(light, context.meshManager.createSphere(), WHITE, 1.0f); // Light color
+	context.registry.emplace<RenderBody>(light, context.modelManager.createSphere(), WHITE, 1.0f); // Light color
 	context.registry.emplace<tag::LightSource>(light);
 
 	// Create an entity with a ModelData component
 	entt::entity testModelEntity = context.registry.create();
 	context.registry.emplace<Position>(testModelEntity, Vector3{0.0f, 0.0f, 0.0f});
-	context.registry.emplace<RenderBody>(testModelEntity, context.meshManager.createSphere(), RED, 1.0f); // RenderBody for general rendering, not directly used by ModelData
+	context.registry.emplace<RenderBody>(testModelEntity, context.modelManager.createSphere(), RED, 1.0f); // RenderBody for general rendering, not directly used by ModelData
 	context.registry.emplace<tag::Shaded>(testModelEntity);		   // Tag to ensure it's drawn with the shader
 
-	t_model_id boxModelID = context.meshManager.createBox(2.0f, 2.0f, 2.0f);
+	t_model_id boxModelID = context.modelManager.createCube(2.0f, 2.0f, 2.0f);
 
 	// Create a second entity to test another model
 	entt::entity secondTestModelEntity = context.registry.create();
@@ -79,7 +79,7 @@ int main()
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------
-	context.meshManager.unloadAll();
+	context.modelManager.unloadAll();
 	CloseWindow(); // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------
 

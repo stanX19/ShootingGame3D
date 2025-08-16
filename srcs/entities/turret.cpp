@@ -3,14 +3,14 @@
 static entt::entity spawnBaseTurret(GameContext &context, Color color) {
 	entt::entity turret = context.registry.create();
 
-	// t_model_id turretModel = context.meshManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
-	// t_model_id turretModel = context.meshManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
-	// t_model_id turretModel = context.meshManager.loadModel("assets/Models/canon/canon1.glb");
-	t_model_id turretModel = context.meshManager.createBox();
+	// t_model_id turretModel = context.modelManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
+	// t_model_id turretModel = context.modelManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
+	t_model_id turretModel = context.modelManager.loadModel("assets/Models/canon/canon3.glb");
+	// t_model_id turretModel = context.modelManager.createCube();
 	context.registry.emplace<Position>(turret);
 	context.registry.emplace<Rotation>(turret);
-	context.registry.emplace<CollisionBody>(turret, 0.5f);
-	context.registry.emplace<RenderBody>(turret, RenderBody{turretModel, color, 0.5f});
+	context.registry.emplace<CollisionBody>(turret, 0.25f);
+	context.registry.emplace<RenderBody>(turret, RenderBody{turretModel, color, 0.25f});
 	context.registry.emplace<HP>(turret, 750.0f);
 	context.registry.emplace<HPRegen>(turret, 10.0f);
 	// context.registry.emplace<TurnSpeed>(turret, 2.5f);

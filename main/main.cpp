@@ -109,7 +109,7 @@ int main() {
 
 		inputControls(context, camera, dt);
 	}
-	context.meshManager.unloadAll();
+	context.modelManager.unloadAll();
 	CloseWindow();
 	return 0;
 }

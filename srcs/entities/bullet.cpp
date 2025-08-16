@@ -6,7 +6,7 @@ static const Vector3 arenaVec = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
 void spawnBullet(GameContext &context, Position pos, Velocity velocity, HP hp,
 				 Damage damage, float rad, Color color, Lifespan lifetime, ScoreParent scoreParent)
 {
-	t_model_id sphereModel = context.meshManager.createSphere();
+	t_model_id sphereModel = context.modelManager.createSphere();
 	entt::entity bullet = context.registry.create();
 	context.registry.emplace<Position>(bullet, pos);
 	context.registry.emplace<Velocity>(bullet, velocity);

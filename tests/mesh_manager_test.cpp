@@ -18,8 +18,8 @@ int main() {
 	ModelManager meshManager;
 
 	// Create models (some duplicates to test caching)
-	t_model_id box1 = meshManager.createBox(1.0f, 1.0f, 1.0f);
-	t_model_id box2 = meshManager.createBox(1.0f, 1.0f, 1.0f);  // Should return same ID
+	t_model_id box1 = meshManager.createCube(1.0f, 1.0f, 1.0f);
+	t_model_id box2 = meshManager.createCube(1.0f, 1.0f, 1.0f);  // Should return same ID
 
 	t_model_id sphere1 = meshManager.createSphere(16, 16, 1.0f);
 	t_model_id sphere2 = meshManager.createSphere(17, 16, 1.0f);

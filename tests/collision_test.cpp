@@ -17,7 +17,7 @@ entt::entity spawnBody(GameContext &context, const Vector3 &position, const Vect
 	context.registry.emplace<Position>(entity, Position{position});
 	context.registry.emplace<Velocity>(entity, Velocity{velocity});
 	context.registry.emplace<CollisionBody>(entity, CollisionBody{radius});
-	context.registry.emplace<RenderBody>(entity, context.meshManager.createSphere());
+	context.registry.emplace<RenderBody>(entity, context.modelManager.createSphere());
 	context.registry.emplace<HP>(entity, HP{hp});
 	context.registry.emplace<Damage>(entity, Damage{damagePerSecond});
 	context.registry.emplace<tag::Shaded>(entity);
@@ -64,7 +64,7 @@ int main() {
 
 		DrawFPS(10, 10);
 	}
-	context.meshManager.unloadAll();
+	context.modelManager.unloadAll();
 	CloseWindow();
 	return 0;
 }

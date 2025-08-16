@@ -2,7 +2,7 @@
 #include "utils.hpp"
 
 void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3 velocity, float lifespan, Color color) {
-	t_model_id explosionModel = context.meshManager.createSphere(64, 64);
+	t_model_id explosionModel = context.modelManager.createSphere(64, 64);
 	const float startRatio = 0.05f;
 
 	for (int i = 0; i < 5 * rad; i++)
@@ -25,7 +25,7 @@ void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3
 
 		if (i == 0) {
 			context.registry.emplace<CollisionBody>(explosion, subRad * startRatio);
-			context.registry.emplace<Damage>(explosion, 20.0f);
+			context.registry.emplace<Damage>(explosion, 50.0f);
 			context.registry.emplace<tag::bullet_type::Energy>(explosion);
 		}
 	}

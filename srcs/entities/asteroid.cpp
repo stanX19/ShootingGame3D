@@ -6,9 +6,9 @@ namespace {
 	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 1.5, ARENA_SIZE * 1.5, ARENA_SIZE * 1.5};
 
 	t_model_id getAsteroidModel(GameContext &context) {
-		// return context.meshManager.createSphere(64, 64);
-		// return context.meshManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
-		return context.meshManager.loadModel("assets/Models/asteroid/round_stone.glb");
+		// return context.modelManager.createSphere(64, 64);
+		// return context.modelManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
+		return context.modelManager.loadModel("assets/Models/asteroid/round_stone.glb");
 	}
 
 	Color getRandomAsteroidColor() {

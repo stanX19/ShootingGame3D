@@ -11,7 +11,7 @@ namespace {
 entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	entt::entity enemy = context.registry.create();
 	
-	t_model_id shipModel = context.meshManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj", 0.4f);
+	t_model_id shipModel = context.modelManager.loadModel("assets/Models/spacechip1/model/Intergalactic_Spaceship-(Wavefront).obj", 0.4f);
 	context.registry.emplace<Position>(enemy, pos);
 	context.registry.emplace<Velocity>(enemy);
 	context.registry.emplace<Rotation>(enemy);
@@ -79,7 +79,7 @@ entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HP>(enemy, 720.0f);
 	context.registry.emplace_or_replace<HPRegen>(enemy, 1.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(enemy, 160.0f);
-	context.registry.emplace_or_replace<TurnSpeed>(enemy, 3.5f);
+	context.registry.emplace_or_replace<TurnSpeed>(enemy, 1.5f);
 	context.registry.emplace_or_replace<KilledScore>(enemy, BASE_SCORE * 2);
 
 	weapon::emplaceRandomWeapon(context, enemy);

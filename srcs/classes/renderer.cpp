@@ -151,7 +151,7 @@ void Renderer::handleLightSource()
 
 void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, float strech)
 {
-	Model &model = context.meshManager.getModel(body.modelID);
+	Model &model = context.modelManager.getModel(body.modelID);
 
 	Vector3 axis;
 	float angle;
@@ -183,7 +183,7 @@ void Renderer::drawEntitiesWithoutShader()
 	{
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
-		Model &model = context.meshManager.getModel(body.modelID);
+		Model &model = context.modelManager.getModel(body.modelID);
 		for (int i = 0; i < model.materialCount; i++) {
 			model.materials[i].shader = defaultShader;
 		}
@@ -200,7 +200,7 @@ void Renderer::drawEntitiesWithShader()
 	{
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
-		Model &model = context.meshManager.getModel(body.modelID);
+		Model &model = context.modelManager.getModel(body.modelID);
 		for (int i = 0; i < model.materialCount; i++) {
 			model.materials[i].shader = shader;
 		}
@@ -214,17 +214,17 @@ void Renderer::drawEntitiesWithShader()
 void Renderer::drawEnergyShield()
 {
 	auto view = context.registry.view<Position, RenderBody, EnergyShield>();
-	t_model_id model = context.meshManager.loadModel("assets/Models/shield/spherical_hex_force_field.glb", 0.01f);
+	t_model_id model = context.modelManager.loadModel("assets/Models/shield/spherical_hex_force_field.glb", 0.01f);
 
 	for (auto [entity, pos, body, shield] : view.each())
 	{
 		if (shield.activeTimer <= 0.0f || shield.hp < 10)
 			continue;
-		context.meshManager.getModel(body.modelID).materials[0].shader = defaultShader;
+		context.modelManager.getModel(body.modelID).materials[0].shader = defaultShader;
 
 		Color color = ColorAlpha(SKYBLUE, (0.1 + 0.5 * shield.hp / shield.maxHp) * (shield.activeTimer / shield.activeDuration));
 		float scale = std::max(body.scale.x, std::max(body.scale.y, body.scale.z)) * 4;
-		DrawModel(context.meshManager.getModel(model), pos.value, scale, color);
+		DrawModel(context.modelManager.getModel(model), pos.value, scale, color);
 	}
 }
 

@@ -72,7 +72,7 @@ t_model_id ModelManager::loadModel(const std::string &filePath)
 	return loadModel(filePath, identityMatrix);
 }
 
-t_model_id ModelManager::createBox(float width, float height, float length)
+t_model_id ModelManager::createCube(float width, float height, float length)
 {
 	return createAndAddModel("box", [=]()
 							 {
@@ -87,6 +87,15 @@ t_model_id ModelManager::createSphere(int rings, int slices, float radius)
 							 {
 		Mesh mesh = GenMeshSphere(radius, rings, slices);
 		return LoadModelFromMesh(mesh); }, radius, rings, slices);
+}
+
+t_model_id ModelManager::createCylinder(int slices, float radius, float height)
+{
+	// assert(radius == 1.0);  // radius should be handled using scale
+	return createAndAddModel("cylinder", [=]()
+							 {
+		Mesh mesh = GenMeshCylinder(radius, height, slices);
+		return LoadModelFromMesh(mesh); }, radius, height, slices);
 }
 
 t_model_id ModelManager::createPlane(float width, float length, int resX, int resZ)

@@ -36,7 +36,7 @@ namespace
 void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 {
 	const float radius = 0.05f;
-	t_model_id model = context.meshManager.createSphere();
+	t_model_id model = context.modelManager.createSphere();
 	
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
@@ -60,7 +60,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 {
 	const float radius = 0.1f;
-	t_model_id model = context.meshManager.createSphere();
+	t_model_id model = context.modelManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
@@ -84,7 +84,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 {
 	const float radius = 0.5f;
-	t_model_id model = context.meshManager.createSphere();
+	t_model_id model = context.modelManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
@@ -106,7 +106,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 {
 	const float radius = 0.2f;
-	t_model_id model = context.meshManager.createSphere();
+	t_model_id model = context.modelManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{50.0f});
@@ -130,7 +130,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 {
 	// Constants
 	const float radius = 0.2f;
-	t_model_id model = context.meshManager.createSphere();
+	t_model_id model = context.modelManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{50.0f});
@@ -156,7 +156,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 {
 	const float radius = 0.075f;
-	t_model_id model = context.meshManager.createSphere();
+	t_model_id model = context.modelManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});

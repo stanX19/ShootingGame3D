@@ -6,8 +6,8 @@
 void spawnSunAndStars(GameContext &context, int numStars) {
 	entt::entity sun2 = context.registry.create();
 	Position pos = {randomUnitVector3() * ARENA_SIZE * 3};
-	// t_model_id sunModel = context.meshManager.loadModel("assets/Models/sun/sun.glb");
-	t_model_id sunModel = context.meshManager.createSphere(128, 128);
+	// t_model_id sunModel = context.modelManager.loadModel("assets/Models/sun/sun.glb");
+	t_model_id sunModel = context.modelManager.createSphere(128, 128);
 	float rad = GetRandomValue(ARENA_SIZE * 0.3, ARENA_SIZE * 0.5);
 
 	context.registry.emplace<Position>(sun2, pos);
@@ -15,7 +15,7 @@ void spawnSunAndStars(GameContext &context, int numStars) {
 	context.registry.emplace<tag::LightSource>(sun2);
 	
 	// stars
-	t_model_id starsModel = context.meshManager.createSphere();
+	t_model_id starsModel = context.modelManager.createSphere();
 
 	for (int i = 0; i < numStars; i++) {
 		entt::entity entity = context.registry.create();
