@@ -1,11 +1,13 @@
 #include "weapons.hpp"
 #include "utils.hpp"
+#include "constants.hpp"
 
 namespace
 {
 	const float BASE_SPEED = 400.0f;
 	const float BASE_DAMAGE = 15.0f;
-	const float EFFECTIVE_RANGE = 2000.0f;
+	const float EFFECTIVE_RANGE = COMBAT_DIST * 2;
+	const Vector3 BULLET_BOUND = {ARENA_SIZE + COMBAT_DIST * 2, ARENA_SIZE + COMBAT_DIST * 2, ARENA_SIZE + COMBAT_DIST * 2};
 	// effective range and angle is linearly inverse, just multiply to get different distances
 	// atan(ENEMY_RAD, EFFECTIVE_RANGE)
 	const float BASE_SPREAD = std::atan2(1.0f, EFFECTIVE_RANGE);
@@ -29,6 +31,7 @@ namespace
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Kinetic>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f);
+		context.templateReg.emplace<DisappearBound>(bullet, BULLET_BOUND * -1, BULLET_BOUND);
 		return bullet;
 	}
 }
@@ -40,19 +43,19 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.5f});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 1.00f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 20);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = BASE_SPEED * 2.0f;
 
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{30.0, 45});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.0});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{3.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	emplaceBulletWeaponCommon(context, entity);
 }
@@ -70,7 +73,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{5.0f});
 
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 75.0f);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 100.0f);
 	weapon.bulletData.bulletCount = 10;
 	weapon.bulletData.speed = BASE_SPEED * 2.0f;
 
@@ -83,12 +86,12 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 
 void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 {
-	const float radius = 0.5f;
+	const float radius = 1.5f;
 	t_model_id model = context.modelManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
-	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 5.0});
+	context.templateReg.emplace<HP>(bulletTemplate, HP{1000.0f});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 10.0});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{15.0f});
@@ -99,7 +102,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	weapon.bulletData.speed = BASE_SPEED * 1.5f;
 
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{4});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{7});
 	emplaceBulletWeaponCommon(context, entity);
 }
 
@@ -134,14 +137,14 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{50.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 1.25f});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 2.0f});
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	// Shooting Configurations
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 2);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 20);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = BASE_SPEED * 3.0f;
 
@@ -149,7 +152,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0, 10});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.0});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.25});
 	emplaceBulletWeaponCommon(context, entity);
 }
 
@@ -171,7 +174,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	weapon.bulletData.speed = BASE_SPEED * 1.2f;
 
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.8});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
 	emplaceBulletWeaponCommon(context, entity);
 }
 

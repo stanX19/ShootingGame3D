@@ -75,7 +75,7 @@ int main() {
 		float cycleTime = reloadTime > burstTime? reloadTime: burstTime;
 		float averageDPS = (cycleTime > 0) ? burstDmg / cycleTime : 0.0f;
 
-		float combatWindow = 4.0f; // seconds
+		float combatWindow = 2.5f; // seconds
 		float time = 0.0f;
 		float windowDmg = 0.0f;
 		float bullets = ammo;

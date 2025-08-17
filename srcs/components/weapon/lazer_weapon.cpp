@@ -3,12 +3,12 @@
 #include "constants.hpp"
 
 namespace {
-	const float LAZER_SPEED = 10000.0f;
+	const float LAZER_SPEED = 100000.0f;
 	const float BASE_DAMAGE = 10.0f;
-	const Vector3 LAZER_BOUND = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
+	const Vector3 LAZER_BOUND = {ARENA_SIZE * 2, ARENA_SIZE * 2, ARENA_SIZE * 2};
 	
 	// effective range and angle is linearly inverse, just multiply the angles to get different distances
-	const float EFFECTIVE_RANGE = 1000.0f;
+	const float EFFECTIVE_RANGE = COMBAT_DIST;
 	const float BASE_SPREAD = std::atan2(1.0f, EFFECTIVE_RANGE);  // atan(ENEMY_RAD, EFFECTIVE_RANGE)
 
 	const Color BASE_COLOR = GREEN;
@@ -24,7 +24,7 @@ namespace {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
-		context.registry.emplace<DisappearBound>(entity, LAZER_BOUND * -2, LAZER_BOUND * 2);
+		context.registry.emplace<DisappearBound>(entity, LAZER_BOUND * -1, LAZER_BOUND);
 	}
 
 	entt::entity createBulletTemplate(GameContext &context, float rad, Color color) {
@@ -42,7 +42,7 @@ namespace {
 
 void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.1f;
+	const float rad = 0.05f;
 	
 	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
@@ -54,20 +54,20 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 	weapon.bulletData.speed = LAZER_SPEED;
 
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.40});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.20});
 	emplaceLazerWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.1f;
+	const float rad = 0.05f;
 	
 	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.4f});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.75f});
 
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = LAZER_SPEED;
 
@@ -93,7 +93,7 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, 3});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.25});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.125});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});
 	emplaceLazerWeaponCommon(context, entity);
 }
