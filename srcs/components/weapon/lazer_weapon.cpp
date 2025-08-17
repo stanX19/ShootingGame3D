@@ -54,7 +54,7 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 	weapon.bulletData.speed = LAZER_SPEED;
 
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.20});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.40});
 	emplaceLazerWeaponCommon(context, entity);
 }
 
@@ -73,7 +73,7 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{30.0f, 60});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{5.0});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{6.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
 	emplaceLazerWeaponCommon(context, entity);
 }

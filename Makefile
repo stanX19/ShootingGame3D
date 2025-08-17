@@ -39,7 +39,13 @@ $(NAME): $(OBJDIRS) $(OBJS) $(MAINCPP)
 
 all: $(NAME)
 
-test: $(TESTBINDIR) $(OBJS) $(TESTOBJS)
+LATEST_TEST_EXEC := $(TESTBINDIR)/$(basename $(notdir $(shell ls -t $(TESTDIR)/*.cpp | head -1)))
+
+test: $(LATEST_TEST_EXEC)
+	@echo "Running $(LATEST_TEST_EXEC)..."
+	@./$(LATEST_TEST_EXEC) || exit 1
+
+all_test: $(TESTBINDIR) $(OBJS) $(TESTOBJS)
 	@for test_exec in $(TESTOBJS); do \
 		echo "Running $$test_exec..."; \
 		./$$test_exec || exit 1; \
@@ -75,5 +81,5 @@ push:
 code:
 	find $(SRCDIR) $(HEADER_DIR) -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec cat {} + > ../code.txt
 
-.PHONY: all clean fclean re bonus push test run_test
+.PHONY: all clean fclean re bonus push test run_test test all_test
 -include $(OBJS:.o=.d)
