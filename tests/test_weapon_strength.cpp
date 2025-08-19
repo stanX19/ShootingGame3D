@@ -62,17 +62,18 @@ int main() {
 		if (cd == 0)
 			cd = 0.0001f;
 		auto ammo = context.registry.get_or_emplace<Ammo>(e, 0.0f, 1.0f).maxValue;
-		auto reload = context.registry.get_or_emplace<AmmoReload>(e, 1 / cd).value;
-		if (reload == 0)
-			reload = 0.000001f;
+		auto regen = context.registry.get_or_emplace<AmmoRegen>(e, 1 / cd).value;
+		auto reload = context.registry.get_or_emplace<AmmoReload>(e, 0.0f).cd;
+		if (regen == 0)
+			regen = 0.000001f;
 		
 		// --- Calculate Derived Stats ---
-		// Handle potential division by zero for weapons with no cooldown or reload
-		float reloadTime = ammo / reload;
+		// Handle potential division by zero for weapons with no cooldown or regen
+		float regenTime = ammo / regen;
 		float burstDmg = dmg * ammo;
 		float burstTime = ammo * cd;
 		// float burstDps = burstDmg / burstTime;
-		float cycleTime = reloadTime > burstTime? reloadTime: burstTime;
+		float cycleTime = (regenTime > burstTime? regenTime: burstTime) + reload;
 		float averageDPS = (cycleTime > 0) ? burstDmg / cycleTime : 0.0f;
 
 		float combatWindow = 2.5f; // seconds
@@ -81,11 +82,17 @@ int main() {
 		float bullets = ammo;
 
 		while (time < combatWindow) {
+			if (reload > 0 && bullets == 0)
+			{
+				bullets = ammo;
+				time += reload;
+				continue;
+			}
 			if (bullets > 0) {
 				windowDmg += dmg;
 				bullets--;
 			}
-			bullets += reload * cd;  // where cd is dt
+			bullets += regen * cd;  // where cd is dt
 			time += cd;
 		}
 		float effectiveDPS = windowDmg / combatWindow;
@@ -97,7 +104,7 @@ int main() {
 			dmg,
 			cd,
 			ammo,
-			reloadTime,
+			regenTime,
 			averageDPS,
 			windowDmg,
 			effectiveDPS

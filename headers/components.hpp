@@ -179,9 +179,17 @@ struct Ammo
 	float maxValue;
 };
 
-struct AmmoReload
+struct AmmoRegen
 {
 	float value;	// reload per second, the higher the faster
+};
+
+struct AmmoReload
+{
+	float cd;		// time needed to reload entire ammo
+	float timer;	// cd --> 0
+
+	AmmoReload(float _cd): cd(_cd), timer(cd) {}
 };
 
 struct JustFired

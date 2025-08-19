@@ -53,9 +53,9 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = LAZER_SPEED;
 
+	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.20});
-	emplaceLazerWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity)
@@ -71,11 +71,11 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = LAZER_SPEED;
 
+	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{30.0f, 60});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{6.0});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{6.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
-	emplaceLazerWeaponCommon(context, entity);
 }
 
 void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity)
@@ -91,9 +91,9 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	weapon.bulletData.bulletCount = 1;
 	weapon.bulletData.speed = LAZER_SPEED;
 
-	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, 3});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{0.125});
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});
 	emplaceLazerWeaponCommon(context, entity);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{2.0f, 10});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{0.125});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});
 }

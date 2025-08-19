@@ -23,7 +23,8 @@ float angleDifference(const Quaternion& a, const Quaternion& b);
 float angleDifference(const Rotation& a, const Rotation& b);
 float angleDifference(const Quaternion& a, const Rotation& b);
 float angleDifference(const Rotation& a, const Quaternion& b);
-float WrapAngle(float angle);
+float wrapAngle(float angle);
+float wrapAngleDegree(float angle);
 
 // color
 Color colorRevert(Color a);

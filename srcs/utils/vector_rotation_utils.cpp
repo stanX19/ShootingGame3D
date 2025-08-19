@@ -39,12 +39,21 @@ Quaternion rotateAroundAxis(const Quaternion &current, const Vector3 &axis, floa
 	return QuaternionNormalize(QuaternionMultiply(q, current));
 }
 
-float WrapAngle(float angle)
+float wrapAngle(float angle)
 {
 	while (angle < -PI)
 		angle += 2.0f * PI;
 	while (angle > PI)
 		angle -= 2.0f * PI;
+	return angle;
+}
+
+float wrapAngleDegree(float angle)
+{
+	while (angle < -180.0f)
+		angle += 2.0f * 180.0f;
+	while (angle > 180.0f)
+		angle -= 2.0f * 180.0f;
 	return angle;
 }
 

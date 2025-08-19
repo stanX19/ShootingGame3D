@@ -287,7 +287,7 @@ void Renderer::drawTargetable()
 	float uiFrameRadius = GetUIFrameRadius();
 
 	static float animationAngle = 0.0f;
-	animationAngle = WrapAngle(animationAngle + GetFrameTime() * 3.0f); // Adjust constant animation speed
+	animationAngle = wrapAngleDegree(animationAngle + 1.0f);
 
 	// Blinking specific static variables
 	static entt::entity s_prevTargetedEntity = entt::null;
@@ -504,8 +504,6 @@ void Renderer::drawThrustBar()
 	if (!context.registry.all_of<Velocity>(context.currentPlayer))
 		return ;
 	
-	// For thrust, we'll use a simple representation based on current acceleration
-	// You might want to add a Thrust component for more accurate representation
 	float thrustRatio = 0.7f; // Placeholder - replace with actual thrust calculation
 	
 	// Position on the right side of the screen
@@ -536,23 +534,32 @@ void Renderer::drawAmmoCircle()
 		return;
 	
 	// Collect all weapons with ammo for this player
-	std::vector<std::pair<float, float>> weaponAmmo; // pairs of (current, max)
+	std::vector<std::tuple<float, float, int>> weaponAmmo; // pairs of (current, max, is_cooldown)
 
 	if (auto ammoPtr = context.registry.try_get<Ammo>(context.currentPlayer)) {
-		weaponAmmo.push_back({ammoPtr->value, ammoPtr->maxValue});
+		auto reloadPtr = context.registry.try_get<AmmoReload>(context.currentPlayer);
+		if (reloadPtr && reloadPtr->timer < reloadPtr->cd)
+			weaponAmmo.push_back({reloadPtr->timer, reloadPtr->cd, true});
+		else
+			weaponAmmo.push_back({ammoPtr->value, ammoPtr->maxValue, false});
 	} else if (auto cooldownPtr = context.registry.try_get<WeaponCooldown>(context.currentPlayer)) {
-		weaponAmmo.push_back({std::min(1.0f, cooldownPtr->timeSinceLastShot / cooldownPtr->shootCooldown), 1.0});
+		weaponAmmo.push_back({std::min(1.0f, cooldownPtr->timeSinceLastShot / cooldownPtr->shootCooldown), 1.0, false});
 	}
 
 	for (auto [weaponEntity, weaponParent, ammo] : context.registry.view<WeaponParent, Ammo>().each()) {
-		if (weaponParent.parent == context.currentPlayer) {
-			weaponAmmo.push_back({ammo.value, ammo.maxValue});
+		if (weaponParent.parent != context.currentPlayer) {
+			continue ;
 		}
+		auto reloadPtr = context.registry.try_get<AmmoReload>(weaponEntity);
+		if (reloadPtr && reloadPtr->timer < reloadPtr->cd)
+			weaponAmmo.push_back({reloadPtr->timer, reloadPtr->cd, true});
+		else
+			weaponAmmo.push_back({ammo.value, ammo.maxValue, false});
 	}
 
 	for (auto [weaponEntity, weaponParent, cooldown] : context.registry.view<WeaponParent, WeaponCooldown>(entt::exclude<Ammo>).each()) {
 		if (weaponParent.parent == context.currentPlayer) {
-			weaponAmmo.push_back({std::min(1.0f, cooldown.timeSinceLastShot / cooldown.shootCooldown), 1.0});
+			weaponAmmo.push_back({std::min(1.0f, cooldown.timeSinceLastShot / cooldown.shootCooldown), 1.0, false});
 		}
 	}
 
@@ -607,11 +614,15 @@ void Renderer::drawAmmoCircle()
 		positions.push_back(pos);
 	}
 	
+	static float reloadAngleOffset = 0;
+	reloadAngleOffset += 5;
+	if (reloadAngleOffset >= 360.0f)
+		reloadAngleOffset = 0;
+
 	// Draw each weapon's ammo circle
 	for (size_t i = 0; i < weaponAmmo.size() && i < positions.size(); i++) {
 		Vector2 circleCenter = positions[i];
-		float currentAmmo = weaponAmmo[i].first;
-		float maxAmmo = weaponAmmo[i].second;
+		auto [currentAmmo, maxAmmo, isReload] = weaponAmmo[i];
 		float ammoRatio = maxAmmo > 0 ? currentAmmo / maxAmmo : 0.0f;
 		
 		// Background circle
@@ -621,15 +632,23 @@ void Renderer::drawAmmoCircle()
 		// Ammo arc (starts from top, goes clockwise)
 		float startAngle = 0 - 90.0f; // Start from top
 		float endAngle = startAngle + (360 * ammoRatio);
-		Color ammoColor = ammoRatio > 0.3f ? SKYBLUE : (ammoRatio > 0.1f ? YELLOW : RED);
+		Color ammoColor = isReload? SKYBLUE: (ammoRatio > 0.3f ? SKYBLUE : (ammoRatio > 0.1f ? YELLOW : RED));
 		
 		if (ammoRatio > 0) {
-			DrawRingLines(circleCenter, circleRadius - 2, circleRadius + 2, startAngle, endAngle, 32, ammoColor);
+			if (!isReload)
+				DrawRingLines(circleCenter, circleRadius - 2, circleRadius + 2, startAngle, endAngle, 32, ammoColor);
+			else {
+				const int segments = 4;
+				for (int i = 0; i < segments; i++) {
+					float angle = i * 360.0f / segments + reloadAngleOffset;
+					DrawRingLines(circleCenter, circleRadius, circleRadius, angle, angle + 360.0f / segments / 2, 2, BLUE);
+				}
+			}
 		}
 		
 		// Center text - show current ammo
 		char ammoText[4];
-		snprintf(ammoText, sizeof(ammoText), "%i", (int)currentAmmo);
+		snprintf(ammoText, sizeof(ammoText), "%i", (int)currentAmmo + isReload);
 		int textWidth = MeasureText(ammoText, 20);
 		DrawText(ammoText, circleCenter.x - textWidth/2, circleCenter.y - 7, 20, WHITE);
 		
