@@ -1,5 +1,4 @@
 #include "utils.hpp"
-#include "constants.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -37,24 +36,6 @@ Quaternion rotateAroundAxis(const Quaternion &current, const Vector3 &axis, floa
 {
 	Quaternion q = QuaternionFromAxisAngle(Vector3Normalize(axis), angle);
 	return QuaternionNormalize(QuaternionMultiply(q, current));
-}
-
-float wrapAngle(float angle)
-{
-	while (angle < -PI)
-		angle += 2.0f * PI;
-	while (angle > PI)
-		angle -= 2.0f * PI;
-	return angle;
-}
-
-float wrapAngleDegree(float angle)
-{
-	while (angle < -180.0f)
-		angle += 2.0f * 180.0f;
-	while (angle > 180.0f)
-		angle -= 2.0f * 180.0f;
-	return angle;
 }
 
 Quaternion vector3ToRotation(const Vector3 &vec)
@@ -113,23 +94,10 @@ float angleDifference(const Rotation &a, const Quaternion &b)
 	return angleDifference(a.value, b);
 }
 
-float randomFloat(float min = -1.0f, float max = 1.0f)
-{
-	return min + static_cast<float>(std::rand()) / (static_cast<float>(RAND_MAX) / (max - min));
-}
-
 Vector3 randomUnitVector3()
 {
 	Vector3 v{randomFloat(), randomFloat(), randomFloat()};
 	return Vector3Normalize(v);
-}
-
-Vector3 randomPosInField()
-{
-	float x = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
-	float z = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
-	float y = GetRandomValue(-ARENA_SIZE / 2 + 5, ARENA_SIZE / 2 - 5);
-	return Vector3{x, y, z};
 }
 
 // unit quaternion, uniform

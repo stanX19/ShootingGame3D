@@ -25,6 +25,12 @@ struct Rotation
 	Quaternion value = QuaternionUnitX;
 };
 
+struct PrevRotation
+{
+	Quaternion value = QuaternionUnitX;
+};
+
+
 struct RotationVelocity
 {
 	Quaternion value = QuaternionIdentity();  // rotation = rotation * (rotVel * dt)

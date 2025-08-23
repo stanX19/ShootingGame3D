@@ -13,13 +13,10 @@ entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3 &pos);
 entt::entity spawnEliteEnemy(GameContext &context, const Vector3 &pos);
 entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos);
 entt::entity spawnPlayer(GameContext &context);
+entt::entity spawnPlayer(GameContext &context, Vector3 pos);
 entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color);
 entt::entity spawnLinkedTurret(GameContext &context, Color color, entt::entity &parent, Vector3 relpos);
 entt::entity spawnLinkedAutoTurret(GameContext &context, Color color, entt::entity &parent, Vector3 relpos);
-void spawnBullet(GameContext &context, Position pos, Velocity velocity, HP hp,
-				 Damage damage, float rad, Color color, Lifespan lifetime, ScoreParent scoreParent);
-void spawnLazer(GameContext &context, Position pos, Velocity velocity, HP hp,
-				 Damage damage, float rad, Color color, Lifespan lifetime, ScoreParent scoreParent);
 void spawnDebris(GameContext &context, const Vector3 &position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f, Vector3 velocity = {0, 0, 0});
 void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3 velocity = {0, 0, 0}, float lifespan = 5.0f, Color color = ORANGE);
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir);

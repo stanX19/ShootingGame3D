@@ -300,17 +300,29 @@ void Renderer::drawTargetable()
 		s_blinkTimer = blinkInterval * 3;
 	}
 	s_prevTargetedEntity = targetedEntity;
-
+	std::vector<std::tuple<entt::entity, Vector3, float>> allPosArr;
+	std::vector<std::tuple<entt::entity, Vector3, float>> posArr;
 	for (auto [entity, pos] : context.registry.view<Position, tag::Targetable>().each())
 	{
 		if (entity == context.currentPlayer)
 			continue;
-	
-		Vector3 toTarget = pos.value - playerPos;
-		float distance = Vector3Length(toTarget); 
-		if (distance > COMBAT_DIST * 1.5)
-			continue;
+		float dist = Vector3Distance(pos.value, playerPos);
+		if (dist < COMBAT_DIST * 1.5f)
+			posArr.push_back({entity, pos.value, dist});
+		else
+			allPosArr.push_back({entity, pos.value, dist});
+	}
+	std::sort(allPosArr.begin(), allPosArr.end(), [&](const auto &p1, const auto &p2) {
+		return std::get<2>(p1) < std::get<2>(p2);
+	});  // closest to furthest
 
+	if (posArr.size() < 3) {
+		int toAdd = std::min(allPosArr.size(), 3 - posArr.size());
+		posArr.insert(posArr.end(), allPosArr.begin(), allPosArr.begin() + toAdd);
+	}
+
+	for (auto [entity, pos, distance]: posArr) {
+		Vector3 toTarget = pos - playerPos;
 		Vector3 local = Vector3{
 			Vector3DotProduct(toTarget, camRight),
 			Vector3DotProduct(toTarget, camUp),
@@ -319,14 +331,14 @@ void Renderer::drawTargetable()
 
 		bool behind = local.z <= 0;
 
-		Vector2 screenPos = GetWorldToScreen(pos.value, camera);
+		Vector2 screenPos = GetWorldToScreen(pos, camera);
 
 		if (behind)
 		{
 			screenPos.x = local.x;
 			screenPos.y = local.y;
-			screenPos.x *= GetScreenWidth();
-			screenPos.y *= GetScreenHeight();
+			screenPos.x *= 1e9;
+			screenPos.y *= 1e9;
 		}
 
 		if (behind || screenPos.x < 0 || screenPos.x > GetScreenWidth() || screenPos.y < 0 || screenPos.y > GetScreenHeight())
@@ -381,6 +393,7 @@ void Renderer::drawHUD()
 	if (!context.registry.valid(context.currentPlayer))
 		return;
 		
+	drawAimCircle();
 	drawMainUIFrame();
 	drawSpeedBar();
 	// drawThrustBar();
@@ -526,6 +539,43 @@ void Renderer::drawThrustBar()
 	char thrustText[16];
 	snprintf(thrustText, sizeof(thrustText), "%.0f%%", thrustRatio * 100);
 	DrawText(thrustText, barPos.x - 15, barPos.y + barSize.y + 5, 14, WHITE);
+}
+
+void Renderer::drawAimCircle() {
+	if (!context.registry.valid(context.currentPlayer))
+		return;
+	
+	std::vector<Vector2> aimLocs;
+
+	auto addWeaponAim = [&](entt::entity entity, Vector3 pos, Vector3 aim) {
+		float dist = COMBAT_DIST;
+		auto targetPtr = context.registry.try_get<AimTarget>(entity);
+		if (targetPtr) {
+			auto targetPosPtr = context.registry.try_get<Position>(targetPtr->entity);
+			if (targetPosPtr)
+				dist = Vector3Distance(pos, targetPosPtr->value);
+		}
+		Vector3 position = pos + aim * dist;
+		aimLocs.push_back(GetWorldToScreen(position, camera));
+	};
+
+	if (context.registry.all_of<Position, AimDirection>(context.currentPlayer)) {
+		auto [pos, aim] = context.registry.get<Position, AimDirection>(context.currentPlayer);
+		addWeaponAim(context.currentPlayer, pos.value, aim.value);
+	}
+
+	for (auto [weaponEntity, weaponParent, pos, aim] : context.registry.view<WeaponParent, Position, AimDirection>().each()) {
+		if (weaponParent.parent != context.currentPlayer) {
+			continue ;
+		}
+		addWeaponAim(weaponEntity, pos.value, aim.value);
+	}
+	// Vector2 posSum = {0, 0};
+	for (auto aimLoc : aimLocs) {
+		// posSum += aimLoc;
+		DrawCircleLines(aimLoc.x, aimLoc.y, 30, ColorAlpha(SKYBLUE, 0.5));
+	}
+	// DrawCircleLines(posSum.x / aimLocs.size(), posSum.y / aimLocs.size(), 30, SKYBLUE);
 }
 
 void Renderer::drawAmmoCircle()

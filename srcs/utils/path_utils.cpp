@@ -12,6 +12,6 @@ std::string getParentDir(const std::string &path) {
 	return std::filesystem::path(path).parent_path();
 }
 
-std::string GetFileName(const std::string &path) {
+std::string getFileName(const std::string &path) {
 	return std::filesystem::path(path).filename();
 }

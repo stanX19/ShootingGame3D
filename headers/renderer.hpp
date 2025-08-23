@@ -42,6 +42,7 @@ private:
 	void drawSpeedBar();
 	void drawThrustBar();
 	void drawAmmoCircle();
+	void drawAimCircle();
 	void drawCrosshair();
 	void drawMainUIFrame();
 	void drawCursorArrow();

@@ -1,4 +1,5 @@
 #include "entities.hpp"
+#include "constants.hpp"
 #include "weapons.hpp"
 #include "utils.hpp"
 
@@ -29,14 +30,18 @@ namespace {
 }
 
 entt::entity spawnPlayer(GameContext &context) {
+	return spawnPlayer(context, Vector3{0, 0, -ARENA_SIZE * 0.5f});
+}
+
+entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	entt::entity player = context.registry.create();
 
 	// t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
 	t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
 	// t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship_custom_2/Spaceship2.glb");
-	context.registry.emplace<Position>(player, Vector3{ 0, 0, 0 });
+	context.registry.emplace<Position>(player, pos);
 	context.registry.emplace<Velocity>(player);
-	context.registry.emplace<Rotation>(player);
+	context.registry.emplace<Rotation>(player, QuaternionFromAxisAngle(Vector3UnitY, 0.0f));
 	context.registry.emplace<CollisionBody>(player, 1.0f);
 	context.registry.emplace<RenderBody>(player, RenderBody{shipModel, BLUE, 1.0f});
 	context.registry.emplace<HP>(player, 1500.0f);

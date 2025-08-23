@@ -30,6 +30,7 @@ static entt::entity calculateAimTarget(GameContext &context, Rotation &rotation,
 		{
 			bestDir = dirToEnemy;
 			bestTarget = enemyEntity;
+			bestDot = dot;
 		}
 	}
 	return bestTarget;

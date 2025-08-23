@@ -29,10 +29,11 @@ static void linkWithParent(GameContext &context, entt::entity &turret, entt::ent
 	context.registry.emplace_or_replace<ScoreParent>(turret, ScoreParent{parent});
 
 	// prevent collision straight on; to be removed after adding faction immunity
-	if (Position *posPtr = context.registry.try_get<Position>(parent)) {
-		context.registry.emplace_or_replace<Position>(turret, Position{posPtr->value + relpos * 2});
+	Position *posPtr = context.registry.try_get<Position>(parent);
+	Rotation *rotPtr = context.registry.try_get<Rotation>(parent);
+	if (posPtr && rotPtr) {
+		context.registry.emplace_or_replace<Position>(turret, Position{posPtr->value + Vector3RotateByQuaternion(relpos * 2, rotPtr->value)});
 	}
-
 }
 
 entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color) {

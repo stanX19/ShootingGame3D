@@ -24,7 +24,6 @@ namespace {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
-		context.registry.emplace<DisappearBound>(entity, LAZER_BOUND * -1, LAZER_BOUND);
 	}
 
 	entt::entity createBulletTemplate(GameContext &context, float rad, Color color) {
@@ -36,6 +35,7 @@ namespace {
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (rad * 2));  // 1 / diameter
 		context.templateReg.emplace<CollisionBody>(bullet, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(bullet, RenderBody{model, color, rad});
+		context.templateReg.emplace<DisappearBound>(bullet, LAZER_BOUND * -1, LAZER_BOUND);
 		return bullet;
 	}
 }
@@ -64,7 +64,7 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 	
 	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.75f});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.5f});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
@@ -93,7 +93,7 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{2.0f, 10});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{0.125});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{2.0f, 5});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{0.25});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});
 }

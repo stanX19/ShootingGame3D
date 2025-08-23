@@ -23,8 +23,10 @@ float angleDifference(const Quaternion& a, const Quaternion& b);
 float angleDifference(const Rotation& a, const Rotation& b);
 float angleDifference(const Quaternion& a, const Rotation& b);
 float angleDifference(const Rotation& a, const Quaternion& b);
+
 float wrapAngle(float angle);
 float wrapAngleDegree(float angle);
+float randomFloat(float min = -1.0f, float max = 1.0f);
 
 // color
 Color colorRevert(Color a);
@@ -34,8 +36,8 @@ Vector3 calculateLeadDirection(const Vector3 &shooterPos, const Vector3 &targetP
 bool willCollide(float collisionDt, float maxDt);
 bool willCollide(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance, float maxDt);
 float calculateCollisionTime(const Vector3 &posA, const Vector3 &velA, const Vector3 &posB, const Vector3 &velB, float collisionDistance);
-std::string getParentPath(const std::string &path);
-std::string GetFileName(const std::string &path);
+std::string getParentDir(const std::string &path);
+std::string getFileName(const std::string &path);
 
 Vector2 getMouseRatioRelCenter();
 Vector2 getMouseDirectionNormalized(float clampRatio = 1.0);

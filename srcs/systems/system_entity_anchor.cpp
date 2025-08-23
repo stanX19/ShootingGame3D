@@ -1,4 +1,5 @@
 #include "systems.hpp"
+#include <iostream>
 
 void ecs_systems::entityAnchor(GameContext& context) {
 	auto parentView = context.registry.view<Position, Rotation>();
@@ -15,6 +16,7 @@ void ecs_systems::entityAnchor(GameContext& context) {
 	for (auto [entity, anchor, rot] : context.registry.view<RotationAnchor, Rotation>().each()) {
 		if (parentView.contains(anchor.parent)) {
 			const auto& parentRot = parentView.get<Rotation>(anchor.parent).value;
+			context.registry.emplace_or_replace<PrevRotation>(entity, rot.value);
 			rot.value = QuaternionMultiply(parentRot, anchor.relrot);
 		}
 	}
