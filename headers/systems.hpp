@@ -15,7 +15,8 @@ namespace ecs_systems
 	void aiMoveControl(GameContext &context, float dt);
 	void aiShootControl(GameContext &context);
 	void aiFindTarget(GameContext &context);
-	void enemyRespawn(GameContext &context);
+	void blueUnitRespawn(GameContext &context);
+	void redUnitRespawn(GameContext &context);
 	void entityMovement(GameContext &context, float dt);
 	void entityTransformation(GameContext &context, float dt);
 	void detectEntityCollision(GameContext &context, float dt);

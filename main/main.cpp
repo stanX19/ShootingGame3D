@@ -98,7 +98,8 @@ int main() {
 		camaraFollowPlayer(context, camera, dt);
 		renderer.Render();
 
-		ecs_systems::enemyRespawn(context);
+		ecs_systems::blueUnitRespawn(context);
+		ecs_systems::redUnitRespawn(context);
 		ecs_systems::asteroidRespawn(context);
 		ecs_systems::entityAnchorRelease(context, dt);
 		ecs_systems::entityLifetime(context, dt);

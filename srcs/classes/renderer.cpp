@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include "components/factions.hpp"
 #include <iostream>
 #include <algorithm>
 
@@ -54,6 +55,7 @@ void Renderer::setupShaderUniforms()
 
 void Renderer::Render()
 {
+	// std::cout << "start draw\n" << std::endl;
 	BeginDrawing();
 	ClearBackground(BLACK);
 
@@ -75,6 +77,7 @@ void Renderer::Render()
 	drawTexts();
 
 	EndDrawing();
+	// std::cout << "end draw\n" << std::endl;
 }
 
 void Renderer::drawTexts() {
@@ -275,7 +278,7 @@ void Renderer::drawHealthBars()
 
 void Renderer::drawTargetable()
 {
-	auto [aimTargetPtr, playerPosPtr] = context.registry.try_get<AimTarget, Position>(context.currentPlayer);
+	auto [aimTargetPtr, playerPosPtr, playerFac] = context.registry.try_get<AimTarget, Position, faction::Faction>(context.currentPlayer);
 	entt::entity targetedEntity = aimTargetPtr? aimTargetPtr->entity: entt::null;
 	Vector3 playerPos = playerPosPtr? playerPosPtr->value: camera.target;
 
@@ -300,17 +303,18 @@ void Renderer::drawTargetable()
 		s_blinkTimer = blinkInterval * 3;
 	}
 	s_prevTargetedEntity = targetedEntity;
-	std::vector<std::tuple<entt::entity, Vector3, float>> allPosArr;
-	std::vector<std::tuple<entt::entity, Vector3, float>> posArr;
-	for (auto [entity, pos] : context.registry.view<Position, tag::Targetable>().each())
+	std::vector<std::tuple<entt::entity, Vector3, float, faction::FacVal>> allPosArr;
+	std::vector<std::tuple<entt::entity, Vector3, float, faction::FacVal>> posArr;
+	for (auto [entity, pos, faction] : context.registry.view<Position, tag::Targetable, faction::Faction>().each())
 	{
 		if (entity == context.currentPlayer)
 			continue;
 		float dist = Vector3Distance(pos.value, playerPos);
+		faction::FacVal isAlly = faction.value & playerFac->value;
 		if (dist < COMBAT_DIST * 2.5f)
-			posArr.push_back({entity, pos.value, dist});
+			posArr.push_back({entity, pos.value, dist, isAlly});
 		else
-			allPosArr.push_back({entity, pos.value, dist});
+			allPosArr.push_back({entity, pos.value, dist, isAlly});
 	}
 	std::sort(allPosArr.begin(), allPosArr.end(), [&](const auto &p1, const auto &p2) {
 		return std::get<2>(p1) < std::get<2>(p2);
@@ -321,7 +325,7 @@ void Renderer::drawTargetable()
 		posArr.insert(posArr.end(), allPosArr.begin(), allPosArr.begin() + toAdd);
 	}
 
-	for (auto [entity, pos, distance]: posArr) {
+	for (auto [entity, pos, distance, isAlly]: posArr) {
 		Vector3 toTarget = pos - playerPos;
 		Vector3 local = Vector3{
 			Vector3DotProduct(toTarget, camRight),
@@ -330,6 +334,8 @@ void Renderer::drawTargetable()
 		};
 
 		bool behind = local.z <= 0;
+
+		Color color = isAlly? SKYBLUE: RED;
 
 		Vector2 screenPos = GetWorldToScreen(pos, camera);
 
@@ -343,6 +349,9 @@ void Renderer::drawTargetable()
 
 		if (behind || screenPos.x < 0 || screenPos.x > GetScreenWidth() || screenPos.y < 0 || screenPos.y > GetScreenHeight())
 		{
+			if (isAlly)
+				continue;
+				
 			Vector2 relToCenter = screenPos - screenCenter;
 			Vector2 unitDir = Vector2Normalize(relToCenter);
 			Vector2 arrowLoc = screenCenter + unitDir * (uiFrameRadius + 20);
@@ -352,12 +361,12 @@ void Renderer::drawTargetable()
 				arrowLoc + unitDir * 10,
 				arrowLoc - left * 5,
 				arrowLoc + left * 5,
-				RED);
+				color);
 			continue;
 		}
 
-		DrawCircleLines(screenPos.x, screenPos.y, 15, RED);
-		DrawCircleLines(screenPos.x, screenPos.y, 16, RED);
+		DrawCircleLines(screenPos.x, screenPos.y, 15, color);
+		DrawCircleLines(screenPos.x, screenPos.y, 16, color);
 
 		if (entity == targetedEntity)
 		{
@@ -376,12 +385,14 @@ void Renderer::drawTargetable()
 			DrawLine(screenPos.x, screenPos.y - innerRad - 2, screenPos.x, screenPos.y - innerRad - 7, aimColor);
 		}
 
-		char txt[32];
-		if (distance < 1000)
-			snprintf(txt, sizeof(txt), "%.1fm", distance);
-		else
-			snprintf(txt, sizeof(txt), "%.2fkm", distance / 1000.0f);
-		DrawText(txt, screenPos.x + 20, screenPos.y + 10, 20, MAROON);
+		if (!isAlly) {
+			char txt[32];
+			if (distance < 1000)
+				snprintf(txt, sizeof(txt), "%.1fm", distance);
+			else
+				snprintf(txt, sizeof(txt), "%.2fkm", distance / 1000.0f);
+			DrawText(txt, screenPos.x + 20, screenPos.y + 10, 20, MAROON);
+		}
 	}
 }
 
