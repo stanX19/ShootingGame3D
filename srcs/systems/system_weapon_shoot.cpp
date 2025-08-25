@@ -2,6 +2,7 @@
 #include "entities.hpp"
 #include "utils.hpp"
 #include "entt_utils.hpp"
+#include "components/factions.hpp"
 #include <random>
 
 namespace
@@ -19,6 +20,9 @@ void ecs_systems::weaponShoot(GameContext &context)
         auto &weapon = view.get<Weapon>(entity);
         Vector3 pos = view.get<Position>(entity).value;
         Vector3 baseDir = view.get<AimDirection>(entity).value;
+		faction::FacVal faction = faction::FAC_BULLET;
+		if (faction::Faction *factPtr = context.registry.try_get<faction::Faction>(entity))
+			faction = faction | factPtr->value;
 
         for (int i = 0; i < weapon.bulletData.bulletCount; i++)
         {
@@ -38,6 +42,7 @@ void ecs_systems::weaponShoot(GameContext &context)
             context.registry.emplace_or_replace<Position>(bullet, Position{pos + dir * rad});
             context.registry.emplace_or_replace<Velocity>(bullet, Velocity{dir * weapon.bulletData.speed});
             context.registry.emplace_or_replace<ScoreParent>(bullet, ScoreParent{entity});
+            context.registry.emplace_or_replace<faction::Faction>(bullet, faction);
         }
 
         context.registry.emplace_or_replace<JustFired>(entity, JustFired{1});

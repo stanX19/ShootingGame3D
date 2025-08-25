@@ -2,6 +2,7 @@
 #include "constants.hpp"
 #include "weapons.hpp"
 #include "utils.hpp"
+#include "components/factions.hpp"
 
 namespace {
 	Vector3 left = {1, 0, 0};
@@ -25,7 +26,7 @@ namespace {
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
-		weapon::emplaceRandomWeapon(context, player);
+		weapon::emplaceRandomWeapon(context, player, subWeapons);
 	}
 }
 
@@ -53,9 +54,9 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<TurnSpeed>(player, 3.0f);
 	context.registry.emplace<Score>(player);
 	
+	context.registry.emplace<faction::Faction>(player, faction::FAC_BLUE);
 	context.registry.emplace<tag::Targetable>(player);
 	context.registry.emplace<tag::Shaded>(player);
-	context.registry.emplace<tag::Player>(player);
 	context.registry.emplace<tag::RotationSyncModel>(player);
 	context.registry.emplace<tag::effect::DropDebris>(player);
 	context.registry.emplace<tag::effect::ExplodeOnDeath>(player);

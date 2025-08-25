@@ -18,6 +18,7 @@ namespace weapon {
 	void emplaceWeaponLazerBasic(GameContext &context, entt::entity entity);
 	void emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity);
 	void emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity);
+	void emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity);
 
 	void emplaceRandomWeapon(GameContext &context, entt::entity turret);
 	void emplaceRandomWeapon(GameContext &context, entt::entity turret, int value);

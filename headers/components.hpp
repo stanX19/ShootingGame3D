@@ -148,6 +148,12 @@ struct DisappearBound
 	Vector3 end;
 };
 
+// move components
+struct MoveTarget
+{
+	entt::entity entity = entt::null;
+};
+
 // weapon components
 struct AimTarget
 {
@@ -231,12 +237,13 @@ struct RadiusExpand {
 	float speed;  // radius += speed * dt
 };
 
+
 namespace tag {
 	// todo: throw these into namespaces too
 	struct Asteroid {};
-	struct Player {};
+	struct AIMoveControl {};
 	struct Enemy {};
-	struct EliteEnemy {};
+	struct EliteUnit {};
 	struct Bullet {};
 	struct Targetable {};
 	struct Spaceship {};
@@ -249,10 +256,10 @@ namespace tag {
 		struct IsWeapon {};
 		struct ParentControlledAim {};		// dont do anything, parent updates AimTarget; TODO
 		struct FollowParentAim {};			// follows parent's AimTarget
-		struct AIControlledAim {};			// updates AimTarget automatically using rotation; TODO; need to do factions first
+		struct AIControlledAim {};			// updates AimTarget automatically using rotation
 		struct PlayerControlledFire {};		// read keyboard or mouse inputs
 		struct ParentControlledFire {};		// dont do anything, parent updates AimTarget; TODO
-		struct AIControlledFire {};			// decide IsFiring using distance and angle; TODO
+		struct AIControlledFire {};			// decide IsFiring using distance and angle
 		struct FollowParentFire {};			// follow parent firing
 		struct IsFiring {};
 		struct CanFire {};

@@ -62,7 +62,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 
 void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 {
-	const float radius = 0.1f;
+	const float radius = 0.025f;
 	t_model_id model = context.modelManager.createSphere();
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
@@ -71,6 +71,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{5.0f});
+	context.templateReg.emplace_or_replace<ModelStrech>(bulletTemplate, ModelStrech{0.5f / (radius * 2)});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 100.0f);
@@ -95,11 +96,14 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{15.0f});
+	context.templateReg.emplace<Rotation>(bulletTemplate);
+	context.templateReg.emplace<RotationVelocity>(bulletTemplate, QuaternionFromAxisAngle(Vector3UnitY, PI * 0.1f));
+	context.templateReg.erase<ModelStrech>(bulletTemplate);
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = 0.0f;
 	weapon.bulletData.bulletCount = 1;
-	weapon.bulletData.speed = BASE_SPEED * 0.5f;
+	weapon.bulletData.speed = BASE_SPEED * 0.75f;
 
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
@@ -176,7 +180,9 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.5});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{15, 15});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.0f});
 }
 
 

@@ -1,22 +1,21 @@
 #include "systems.hpp"
 #include "utils.hpp"
 
-void ecs_systems::enemyMoveControl(GameContext &context, float dt)
+void ecs_systems::aiMoveControl(GameContext &context, float dt)
 {
-	auto playerView = context.registry.view<tag::Player, Position>();
-	if (playerView.begin() == playerView.end())
-		return;
+	auto enemyView = context.registry.view<Position, Rotation, Velocity, MaxSpeed, TurnSpeed, MoveTarget>();
 
-	Position playerPos = playerView.get<Position>(*playerView.begin());
-
-	auto enemyView = context.registry.view<tag::Enemy, Position, Rotation, Velocity, MaxSpeed, TurnSpeed>();
-
-	for (auto [entity, position, rotation, velocity, maxSpeed, turnSpeed] : enemyView.each())
+	for (auto [entity, position, rotation, velocity, maxSpeed, turnSpeed, target] : enemyView.each())
 	{
-		Vector3 toPlayer = playerPos.value - position.value;
+		Vector3 targetPos = {0, 0, 0};
+		
+		if (context.registry.valid(target.entity) && context.registry.all_of<Position>(target.entity))
+			targetPos = context.registry.get<Position>(target.entity).value;
+
+		Vector3 toTarget = targetPos - position.value;
 
 		// maybe try to avoid player in the future
-		Quaternion targetRotation = vector3ToRotation(toPlayer);
+		Quaternion targetRotation = vector3ToRotation(toTarget);
 
 		Vector3 vel = velocity.value;
 		float speed = Vector3Length(vel);

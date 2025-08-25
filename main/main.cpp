@@ -72,10 +72,10 @@ int main() {
 		// --- Update systems ---
 		ecs_systems::playerMoveControl(context, dt, camera);
 		ecs_systems::playerShootControl(context);
-		ecs_systems::playerAimTarget(context);
 		// ecs_systems::playerRespawn(context);
-		ecs_systems::enemyMoveControl(context, dt);
-		ecs_systems::enemyAimTarget(context);
+		ecs_systems::aiFindTarget(context);
+		ecs_systems::aiMoveControl(context, dt);
+		ecs_systems::aiShootControl(context);
 
 		ecs_systems::ammoReload(context, dt);
 		ecs_systems::bulletTargetAim(context);

@@ -11,10 +11,10 @@ namespace ecs_systems
 {
 	void playerMoveControl(GameContext &context, float dt, const Camera3D &camera);
 	void playerShootControl(GameContext &context);
-	void playerAimTarget(GameContext &context);
 	void playerRespawn(GameContext &context);
-	void enemyMoveControl(GameContext &context, float dt);
-	void enemyAimTarget(GameContext &context);
+	void aiMoveControl(GameContext &context, float dt);
+	void aiShootControl(GameContext &context);
+	void aiFindTarget(GameContext &context);
 	void enemyRespawn(GameContext &context);
 	void entityMovement(GameContext &context, float dt);
 	void entityTransformation(GameContext &context, float dt);

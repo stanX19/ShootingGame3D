@@ -307,7 +307,7 @@ void Renderer::drawTargetable()
 		if (entity == context.currentPlayer)
 			continue;
 		float dist = Vector3Distance(pos.value, playerPos);
-		if (dist < COMBAT_DIST * 1.5f)
+		if (dist < COMBAT_DIST * 2.5f)
 			posArr.push_back({entity, pos.value, dist});
 		else
 			allPosArr.push_back({entity, pos.value, dist});
@@ -570,12 +570,12 @@ void Renderer::drawAimCircle() {
 		}
 		addWeaponAim(weaponEntity, pos.value, aim.value);
 	}
-	// Vector2 posSum = {0, 0};
+	Vector2 posSum = {0, 0};
 	for (auto aimLoc : aimLocs) {
-		// posSum += aimLoc;
-		DrawCircleLines(aimLoc.x, aimLoc.y, 30, ColorAlpha(SKYBLUE, 0.5));
+		posSum += aimLoc;
+		DrawCircleLines(aimLoc.x, aimLoc.y, 10, ColorAlpha(SKYBLUE, 0.15));
 	}
-	// DrawCircleLines(posSum.x / aimLocs.size(), posSum.y / aimLocs.size(), 30, SKYBLUE);
+	DrawCircleLines(posSum.x / aimLocs.size(), posSum.y / aimLocs.size(), 30, SKYBLUE);
 }
 
 void Renderer::drawAmmoCircle()

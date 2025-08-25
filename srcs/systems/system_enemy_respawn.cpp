@@ -16,14 +16,14 @@ static Vector3 generateSpawnPos(const Vector3 &playerPos) {
 
 void ecs_systems::enemyRespawn(GameContext &context)
 {
-	auto playerView = context.registry.view<tag::Player, Position>();
 	Vector3 playerPos = {0, 0, 0};
-	if (playerView.begin() != playerView.end()) {
-		playerPos = playerView.get<Position>(*playerView.begin()).value;
+	if (context.registry.valid(context.currentPlayer)) {
+		playerPos = context.registry.get<Position>(context.currentPlayer).value;
 	}
 
-	auto eliteView = context.registry.view<tag::EliteEnemy>();
-	for (size_t i = 0; i < 3 - eliteView.size(); i++)
+	auto eliteView = context.registry.view<tag::EliteUnit, tag::Enemy>();
+	size_t eliteSize = eliteView.size_hint();
+	for (size_t i = 0; i < 3 - eliteSize; i++)
 	{
 		if (rand() % 3 == 1)
 			spawnEliteEnemy(context, generateSpawnPos(playerPos));

@@ -1,5 +1,6 @@
 #include "entities.hpp"
 #include "weapons.hpp"
+#include "components/factions.hpp"
 
 namespace {
 	const int BASE_SCORE = 500;
@@ -25,15 +26,20 @@ entt::entity spawnBaseEnemy(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<Damage>(enemy, 500.0f);
 	context.registry.emplace<MaxSpeed>(enemy, 80.0f);
 	context.registry.emplace<TurnSpeed>(enemy, 2.5f);
-	context.registry.emplace<tag::Targetable>(enemy);
 	context.registry.emplace<Score>(enemy);
 	context.registry.emplace<KilledScore>(enemy, BASE_SCORE);
+	context.registry.emplace<MoveTarget>(enemy);
 	
+	context.registry.emplace<faction::Faction>(enemy, faction::FAC_RED);
+	context.registry.emplace<tag::Targetable>(enemy);
 	context.registry.emplace<tag::Enemy>(enemy);
 	context.registry.emplace<tag::Shaded>(enemy);
 	context.registry.emplace<tag::RotationSyncModel>(enemy);
 	context.registry.emplace<tag::effect::DropDebris>(enemy);
 	context.registry.emplace<tag::effect::ExplodeOnDeath>(enemy);
+
+	context.registry.emplace<tag::weapon::AIControlledAim>(enemy);
+	context.registry.emplace<tag::weapon::AIControlledFire>(enemy);
 	return enemy;
 }
 
@@ -64,7 +70,7 @@ entt::entity spawnEliteEnemy(GameContext &context, const Vector3& pos) {
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, 0, 0}), subWeapons);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, 0, 0}), subWeapons);
 
-	context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
+	context.registry.emplace_or_replace<tag::EliteUnit>(enemy);
 	return enemy;
 }
 
@@ -87,7 +93,7 @@ entt::entity spawnFastEliteEnemy(GameContext &context, const Vector3& pos) {
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 1.5f, 0, 0}), subWeapons);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 1.5f, 0, 0}), subWeapons);
 
-	context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
+	context.registry.emplace_or_replace<tag::EliteUnit>(enemy);
 	return enemy;
 }
 
@@ -116,6 +122,6 @@ entt::entity spawnMothershipEnemy(GameContext &context, const Vector3& pos) {
 	// weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {+radius * 2.0f, -radius * 1.2f, -1}));
 	// weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 2.0f, +radius * 1.2f, -1}));
 	// weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, enemy, {-radius * 2.0f, -radius * 1.2f, -1}));
-	context.registry.emplace_or_replace<tag::EliteEnemy>(enemy);
+	context.registry.emplace_or_replace<tag::EliteUnit>(enemy);
 	return enemy;
 }

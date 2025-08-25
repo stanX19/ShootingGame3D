@@ -16,6 +16,7 @@ void weapon::emplaceRandomWeapon(GameContext &context, entt::entity turret, int 
 		weapon::emplaceWeaponLazerBasic,
 		weapon::emplaceWeaponLazerMachineGun,
 		weapon::emplaceWeaponLazerDeletor,
+		weapon::emplaceWeaponLazerShotgun,
 	};
 	list[value % list.size()](context, turret);
 }
