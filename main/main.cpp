@@ -20,9 +20,9 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, [[maybe_u
     Vector3 up = getUpVector(rot);
 	
     bool shift = IsKeyDown(KEY_RIGHT_SHIFT);
-    float k = 10.0f;
-    Vector3 desiredPosition = pos.value + (shift ? forward * k : forward * -k) + up * 5.0f;
-    Vector3 desiredTarget = pos.value + (shift ? forward * -(20 - k) : forward * (20 - k) + up * 1.0f);
+    float k = 5.0f;
+    Vector3 desiredPosition = pos.value + (shift ? forward * k : forward * -k) + up * 4.0f;
+    Vector3 desiredTarget = pos.value + (shift ? forward * -(20 - k) : forward * (20 - k) + up * 2.0f);
     
     // Velocity& vel = context.registry.get<Velocity>(context.currentPlayer);
     float smoothing = 12.0f;
@@ -48,6 +48,7 @@ static void inputControls(GameContext &context, Camera &camera, [[maybe_unused]]
 	}
 	if (IsKeyPressed(KEY_DELETE) && context.registry.valid(context.currentPlayer)) {
 		context.registry.emplace<DelayedDamage>(context.currentPlayer, DelayedDamage{0.0f, 100000000.0f});
+		spawnPlayer(context);
 	}
 	if (IsKeyPressed(KEY_C)) {
 		SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);

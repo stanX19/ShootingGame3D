@@ -10,5 +10,5 @@ out vec4 finalColor;
 
 void main() {
     vec4 texel = texture(texture0, fragTexCoord);
-    finalColor = texel * fragColor; // force opaque
+    finalColor = vec4((texel * fragColor).rgb * colDiffuse.a, 1);
 }

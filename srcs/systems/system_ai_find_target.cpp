@@ -21,7 +21,7 @@ namespace {
 
 	// angle: cone angle
 	// minDist: search distance limit
-	entt::entity findClosestTargetInCone(TargetsVector targets, Vector3 point, Vector3 forward, float angle=45.0f, float minDist = COMBAT_DIST) {
+	entt::entity findClosestTargetInCone(TargetsVector targets, Vector3 point, Vector3 forward, float angle=30.0f, float minDist = COMBAT_DIST) {
 		entt::entity target = entt::null;
 		float bestDot = cosf(DEG2RAD * angle * 0.5);
 

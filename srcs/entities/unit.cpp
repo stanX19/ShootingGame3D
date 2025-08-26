@@ -17,7 +17,7 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<Rotation>(entity);
 	context.registry.emplace<CollisionBody>(entity, 1.0f);
 	context.registry.emplace<RenderBody>(entity, RenderBody{
-		shipModel, GREEN, 1.0f
+		shipModel, WHITE, 1.0f
 	});
 	context.registry.emplace<HP>(entity, BASE_HP);
 	context.registry.emplace<EnergyShield>(entity, BASE_SHIELD);
@@ -53,7 +53,6 @@ entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos) {
 	float radius = 3.0f;
 	context.registry.emplace_or_replace<CollisionBody>(entity, radius);
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
-	renderBody.color = DARKGREEN;
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(entity, 1200.0f);
 	context.registry.emplace_or_replace<HPRegen>(entity, 10.0f);
@@ -77,7 +76,6 @@ entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos) {
 	float radius = 2.0f;
 	context.registry.emplace_or_replace<CollisionBody>(entity, radius);
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
-	renderBody.color = LIME;
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(entity, 720.0f);
 	context.registry.emplace_or_replace<HPRegen>(entity, 1.0f);
@@ -100,7 +98,6 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 	float radius = 6.0f;
 	context.registry.emplace_or_replace<CollisionBody>(entity, radius);
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
-	renderBody.color = Color{191, 245, 66, 255};
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(entity, 1600.0f);
 	context.registry.emplace_or_replace<HPRegen>(entity, 50.0f);
@@ -111,14 +108,16 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 5);
 
 	weapon::emplaceRandomWeapon(context, entity);
-	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, +radius * 0.8f, -2}));
-	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, -radius * 0.8f, -2}));
-	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, +radius * 0.8f, -2}));
-	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, -radius * 0.8f, -2}));
-	// weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 2.0f, +radius * 1.2f, -1}));
-	// weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 2.0f, -radius * 1.2f, -1}));
-	// weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 2.0f, +radius * 1.2f, -1}));
-	// weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 2.0f, -radius * 1.2f, -1}));
+	int randNum = GetRandomValue(0, 1000);
+	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, +radius * 0.8f, -2}), randNum);
+	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, -radius * 0.8f, -2}), randNum);
+	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, +radius * 0.8f, -2}), randNum);
+	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, -radius * 0.8f, -2}), randNum);
+
+	weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 2.0f, +radius * 1.2f, -1}));
+	weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 2.0f, -radius * 1.2f, -1}));
+	weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 2.0f, +radius * 1.2f, -1}));
+	weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 2.0f, -radius * 1.2f, -1}));
 	context.registry.emplace_or_replace<tag::EliteUnit>(entity);
 	return entity;
 }

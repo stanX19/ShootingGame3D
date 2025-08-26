@@ -4,8 +4,8 @@
 
 namespace
 {
-	const float BASE_SPEED = 400.0f;
-	const float BASE_DAMAGE = 15.0f;
+	const float BASE_SPEED = 800.0f;
+	const float BASE_DAMAGE = 25.0f;
 	const float EFFECTIVE_RANGE = COMBAT_DIST * 2;
 	const Vector3 BULLET_BOUND = {ARENA_SIZE + COMBAT_DIST * 2, ARENA_SIZE + COMBAT_DIST * 2, ARENA_SIZE + COMBAT_DIST * 2};
 	// effective range and angle is linearly inverse, just multiply to get different distances

@@ -14,7 +14,7 @@ namespace {
 		context.registry.emplace_or_replace<faction::Faction>(entity, faction::FAC_RED);
 		RenderBody *body = context.registry.try_get<RenderBody>(entity);
 		if (body)
-			body->color = ORANGE;
+			body->color = YELLOW;
 
 		// std::cout << "[applyTags] Applied RedTag + Faction::FAC_RED to entity " 
 		// 		  << (int)entity << std::endl;

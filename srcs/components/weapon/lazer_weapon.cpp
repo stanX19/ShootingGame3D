@@ -100,19 +100,20 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 
 void weapon::emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.05f;
+	const float rad = 0.025f;
 	
 	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
 	
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 100);
-	weapon.bulletData.bulletCount = 1;
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 50);
+	weapon.bulletData.bulletCount = 20;
 	weapon.bulletData.speed = LAZER_SPEED;
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{75.0f, 75});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{5});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{10.0f, 10});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{2});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
 }
