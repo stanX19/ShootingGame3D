@@ -23,4 +23,15 @@ void spawnSunAndStars(GameContext &context, int numStars) {
 		context.registry.emplace<Position>(entity, randomUnitVector3() * ARENA_SIZE * 5);
 		context.registry.emplace<RenderBody>(entity, starsModel, WHITE, (GetRandomValue(15, 25) * ARENA_SIZE / 4000.0f));
 	}
+
+	// space
+	t_model_id spaceModel = context.modelManager.loadModel("assets/Models/space/sky_pano_-_milkyway.glb");
+	Model model = context.modelManager.getModel(spaceModel);
+	model.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = model.materials[1].maps[MATERIAL_MAP_EMISSION].texture;
+	model.materials[1].maps[MATERIAL_MAP_ALBEDO].texture = model.materials[1].maps[MATERIAL_MAP_EMISSION].texture;
+
+	entt::entity space = context.registry.create();
+	context.registry.emplace<Position>(space);
+	context.registry.emplace<RenderBody>(space, RenderBody{spaceModel, 1.0f});
+	context.registry.emplace<tag::SkyBox>(space);
 }

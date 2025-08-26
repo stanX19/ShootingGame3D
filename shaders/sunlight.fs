@@ -1,9 +1,9 @@
 #version 330
 
-in vec3 fragNormal;
 in vec3 fragPosition;
-in vec3 fragLightDir;
 in vec2 fragTexCoord;
+in vec3 fragNormal;
+in vec3 fragLightDir;
 
 out vec4 finalColor;
 

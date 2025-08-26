@@ -270,6 +270,7 @@ namespace tag {
 	}
 	struct LightSource {};
 	struct Shaded {};
+	struct SkyBox {};
 	struct RotationSyncModel {};
 	struct AimDirectionSyncModel {};
 	struct VelocitySyncModelRot {};

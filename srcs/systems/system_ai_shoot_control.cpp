@@ -8,11 +8,10 @@ void ecs_systems::aiShootControl(GameContext &context) {
 										tag::weapon::IsWeapon, tag::weapon::AIControlledFire>();
 	for (auto [entity, position, rotation, aimTarget] : view.each())
 	{
-		if (!aimTargetExists(context, aimTarget))
+		if (!aimTargetExists(context, aimTarget) || !context.registry.all_of<Position>(aimTarget.entity)) {
+			context.registry.remove<tag::weapon::IsFiring>(entity);
 			continue;
-
-		if (!context.registry.all_of<Position>(aimTarget.entity))
-			continue;
+		}
 		
 		Vector3 targetPos = context.registry.get<Position>(aimTarget.entity).value;
 		Vector3 toTarget = targetPos - position.value;

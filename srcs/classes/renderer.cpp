@@ -1,5 +1,6 @@
 #include "renderer.hpp"
 #include "components/factions.hpp"
+#include "rlgl.h"
 #include <iostream>
 #include <algorithm>
 
@@ -13,10 +14,10 @@ Renderer::Renderer(Camera3D &cam, GameContext &context)
 
 Renderer::~Renderer()
 {
-	if (shader.id != 0)
+	if (lightedShader.id != 0)
 	{
 		// UnloadShader(shader);  // this seg faults idk why
-		shader = {0, NULL};
+		lightedShader = {0, NULL};
 	}
 }
 
@@ -27,30 +28,38 @@ void Renderer::loadDefaultShader()
 
 void Renderer::loadShaderWithFallback()
 {
-	shader = LoadShader("shaders/sunlight.vs", "shaders/sunlight.fs");
-	if (shader.id == 0)
+	lightedShader = LoadShader("shaders/sunlight.vs", "shaders/sunlight.fs");
+
+	if (lightedShader.id == 0)
 	{
 		TraceLog(LOG_WARNING, "Custom shader failed to load. Using default shader.");
-		shader = LoadShader(NULL, NULL);
+		lightedShader = LoadShader(NULL, NULL);
+		return ;
+	}
+
+	skyboxShader = LoadShader("shaders/skybox.vs", "shaders/skybox.fs");
+	if (skyboxShader.id == 0)
+	{
+		TraceLog(LOG_WARNING, "Custom shader failed to load. Using default shader.");
+		skyboxShader = LoadShader(NULL, NULL);
 		return ;
 	}
 
 	Mesh sphereMesh = GenMeshSphere(1.0f, 64, 64);
 	sphereModel = LoadModelFromMesh(sphereMesh);
-	sphereModel.materials[0].shader = shader;
-	
+	sphereModel.materials[0].shader = lightedShader;
 }
 
 void Renderer::setupShaderUniforms()
 {
-	lightPosLoc = GetShaderLocation(shader, "lightPosition");
-	lightColorLoc = GetShaderLocation(shader, "lightColor");
+	lightPosLoc = GetShaderLocation(lightedShader, "lightPosition");
+	lightColorLoc = GetShaderLocation(lightedShader, "lightColor");
 
 	Vector3 lightPos = { 100000, 100000, 100000 };
-	SetShaderValue(shader, lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
+	SetShaderValue(lightedShader, lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
 
 	Vector3 lightColor = { 1.0f, 1.0f, 1.0f };
-	SetShaderValue(shader, lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
+	SetShaderValue(lightedShader, lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
 }
 
 void Renderer::Render()
@@ -58,6 +67,8 @@ void Renderer::Render()
 	// std::cout << "start draw\n" << std::endl;
 	BeginDrawing();
 	ClearBackground(BLACK);
+
+	drawEntitiesWithSkyboxShader();
 
 	BeginMode3D(camera);
 	// DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
@@ -135,8 +146,8 @@ void Renderer::handleLightSource()
 		const RenderBody &body = view.get<RenderBody>(entity);
 
 		Vector3 color = {body.color.r / 255.0f, body.color.g / 255.0f, body.color.b / 255.0f};
-		SetShaderValue(shader, lightPosLoc, &pos.value, SHADER_UNIFORM_VEC3);
-		SetShaderValue(shader, lightColorLoc, &color, SHADER_UNIFORM_VEC3);
+		SetShaderValue(lightedShader, lightPosLoc, &pos.value, SHADER_UNIFORM_VEC3);
+		SetShaderValue(lightedShader, lightColorLoc, &color, SHADER_UNIFORM_VEC3);
 		break ;
 	}
 }
@@ -180,7 +191,7 @@ namespace {
 
 void Renderer::drawEntitiesWithoutShader()
 {
-	auto view = context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded>);
+	auto view = context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded, tag::SkyBox>);
 
 	for (auto entity : view)
 	{
@@ -196,7 +207,7 @@ void Renderer::drawEntitiesWithoutShader()
 
 void Renderer::drawEntitiesWithShader()
 {
-	BeginShaderMode(shader);
+	// BeginShaderMode(lightedShader);
 
 	auto view = context.registry.view<Position, RenderBody, tag::Shaded>();
 	for (auto entity : view)
@@ -205,13 +216,43 @@ void Renderer::drawEntitiesWithShader()
 		const RenderBody &body = view.get<RenderBody>(entity);
 		Model &model = context.modelManager.getModel(body.modelID);
 		for (int i = 0; i < model.materialCount; i++) {
-			model.materials[i].shader = shader;
+			model.materials[i].shader = lightedShader;
 		}
-		SetShaderValueTexture(shader, GetShaderLocation(shader, "texture0"), model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture);
+		// SetShaderValueTexture(shader, GetShaderLocation(shader, "texture0"), model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture);
 		drawEntityModel(pos, body, getStrech(context, entity));
 	}
 
-	EndShaderMode();
+	// EndShaderMode();
+}
+
+void Renderer::drawEntitiesWithSkyboxShader()
+{
+	// BeginShaderMode(skyboxShader);
+	Camera3D centerCam = camera;
+	centerCam.position = {0, 0, 0};
+	centerCam.target = Vector3Normalize(camera.target - camera.position) * 0.01f;
+
+	BeginMode3D(centerCam);
+	rlDisableDepthMask();
+	rlDisableBackfaceCulling();
+
+	auto view = context.registry.view<Position, RenderBody, tag::SkyBox>();
+	for (auto entity : view)
+	{
+		const Position &pos = view.get<Position>(entity);
+		const RenderBody &body = view.get<RenderBody>(entity);
+		Model &model = context.modelManager.getModel(body.modelID);
+		for (int i = 0; i < model.materialCount; i++) {
+			model.materials[i].shader = skyboxShader;
+		}
+		// std::cout << "drawing " << model.materials[0].maps[MATERIAL_MAP_ALBEDO].texture.height << std::endl;
+		drawEntityModel(pos, body, getStrech(context, entity));
+	}
+
+	rlEnableBackfaceCulling();
+	rlEnableDepthMask();
+	EndMode3D();
+	// EndShaderMode();
 }
 
 void Renderer::drawEnergyShield()
@@ -278,9 +319,10 @@ void Renderer::drawHealthBars()
 
 void Renderer::drawTargetable()
 {
-	auto [aimTargetPtr, playerPosPtr, playerFac] = context.registry.try_get<AimTarget, Position, faction::Faction>(context.currentPlayer);
+	auto [aimTargetPtr, playerPosPtr, playerFacPtr] = context.registry.try_get<AimTarget, Position, faction::Faction>(context.currentPlayer);
 	entt::entity targetedEntity = aimTargetPtr? aimTargetPtr->entity: entt::null;
 	Vector3 playerPos = playerPosPtr? playerPosPtr->value: camera.target;
+	faction::FacVal playerFac = playerFacPtr? playerFacPtr->value: 0;
 
 	Vector3 camForward = Vector3Normalize(camera.target - camera.position);
 	Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
@@ -310,7 +352,7 @@ void Renderer::drawTargetable()
 		if (entity == context.currentPlayer)
 			continue;
 		float dist = Vector3Distance(pos.value, playerPos);
-		faction::FacVal isAlly = faction.value & playerFac->value;
+		faction::FacVal isAlly = faction.value & playerFac;
 		if (dist < COMBAT_DIST * 2.5f)
 			posArr.push_back({entity, pos.value, dist, isAlly});
 		else

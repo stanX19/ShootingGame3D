@@ -17,7 +17,8 @@ public:
 private:
 	Camera3D& camera;
 	GameContext &context;
-	Shader shader;
+	Shader lightedShader;
+	Shader skyboxShader;
 	Shader defaultShader;
 	
 	Model sphereModel;
@@ -30,6 +31,7 @@ private:
 	void setupShaderUniforms();
 	void drawEntityModel(const Position &pos, const RenderBody &body, float strech = 1.0f);
 	void drawEntitiesWithShader();
+	void drawEntitiesWithSkyboxShader();
 	void drawEntitiesWithoutShader();
 	void drawBoundaryWarning();
 	void drawEnergyShield();
