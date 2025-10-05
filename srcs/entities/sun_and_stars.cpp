@@ -36,6 +36,6 @@ void spawnSunAndStars(GameContext &context, int numStars) {
 
 	entt::entity space = context.registry.create();
 	context.registry.emplace<Position>(space);
-	context.registry.emplace<RenderBody>(space, RenderBody{spaceModel, ColorAlpha(WHITE, 0.5), 100.0f});
+	context.registry.emplace<RenderBody>(space, RenderBody{spaceModel, ColorAlpha(WHITE, 0.5), 100.0f, Vector3Zeros, randomRotation()});
 	context.registry.emplace<tag::SkyBox>(space);
 }

@@ -13,33 +13,37 @@ void ecs_systems::bulletTargetAim(GameContext &context)
 		AimTarget &aimTarget = view.get<AimTarget>(entity);
 		Weapon &bulletWeapon = view.get<Weapon>(entity);
 		
-		Vector3 targetAimDir = aimDirection.value;
-		if (!aimTargetExists(context, aimTarget))
-		{
-			if (context.registry.all_of<Rotation>(entity))
-				targetAimDir = getForwardVector(context.registry.get<Rotation>(entity));
-		}
-		else if (context.registry.all_of<Position, Velocity>(aimTarget.entity))
-		{
-			auto [targetPosition, targetVelocity] = context.registry.get<Position, Velocity>(aimTarget.entity);
+		Vector3 targetedAimDir = aimDirection.value;
+		Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
+		Vector3 shooterVel = velocityPtr ? velocityPtr->value : Vector3Zeros;
 
-			targetAimDir = calculateLeadDirection(
+		if (aimTargetExists(context, aimTarget) && context.registry.all_of<Position>(aimTarget.entity))
+		{
+			Vector3 relVel = shooterVel * -1;
+
+			if (context.registry.all_of<Velocity>(aimTarget.entity)) {
+				relVel += context.registry.get<Velocity>(aimTarget.entity).value;
+			}
+
+			targetedAimDir = calculateLeadDirection(
 				position.value,
-				targetPosition.value,
-				targetVelocity.value,
+				context.registry.get<Position>(aimTarget.entity).value,
+				relVel,
 				bulletWeapon.bulletData.speed
 			);
+		} else if (context.registry.all_of<Rotation>(entity)) {
+			targetedAimDir = getForwardVector(context.registry.get<Rotation>(entity));
 		}
-		
+
 		auto [prevRotPtr, currRotPtr] = context.registry.try_get<PrevRotation, Rotation>(entity);
 		if (!prevRotPtr || !currRotPtr) {
-			aimDirection.value = targetAimDir;
+			aimDirection.value = targetedAimDir;
 			continue;
 		}
 		Vector3 prevRotVec = Vector3RotateByQuaternion(Vector3UnitZ, prevRotPtr->value);
 		Vector3 currRotVec = Vector3RotateByQuaternion(Vector3UnitZ, currRotPtr->value);
 		Quaternion originalRelRot = QuaternionFromVector3ToVector3(prevRotVec, aimDirection.value);
-		Quaternion targetRelRot = QuaternionFromVector3ToVector3(currRotVec, targetAimDir);
+		Quaternion targetRelRot = QuaternionFromVector3ToVector3(currRotVec, targetedAimDir);
 		Quaternion newRelRot = QuaternionLerp(originalRelRot, targetRelRot, 0.25);
 		aimDirection.value = Vector3RotateByQuaternion(currRotVec, newRelRot);
 	}

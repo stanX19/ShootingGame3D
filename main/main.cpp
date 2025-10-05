@@ -20,7 +20,7 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, [[maybe_u
     Vector3 up = getUpVector(rot);
 	
     bool shift = IsKeyDown(KEY_RIGHT_SHIFT);
-    float k = 5.0f;
+    float k = 10.0f;
     Vector3 desiredPosition = pos.value + (shift ? forward * k : forward * -k) + up * 4.0f;
     Vector3 desiredTarget = pos.value + (shift ? forward * -(20 - k) : forward * (20 - k) + up * 2.0f);
     
@@ -88,7 +88,7 @@ int main() {
 		ecs_systems::weaponUpdateFireStatus(context);
 
 		ecs_systems::entityMovement(context, dt);
-		ecs_systems::entityAnchor(context);
+		ecs_systems::entityAnchor(context, dt);
 		ecs_systems::entityTransformation(context, dt);
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();

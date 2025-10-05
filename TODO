@@ -37,4 +37,5 @@
 	float randomVelMagnitude = 0;
 };
 system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * randomPosMagnitude, randomVector3 * randomVelMagnitude)
-24. Energy shield component block energy weapons (lazer)
+25. sound component, sound system
+26. burning effect when hit, burning particle, burning system

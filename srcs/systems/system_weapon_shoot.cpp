@@ -23,13 +23,15 @@ void ecs_systems::weaponShoot(GameContext &context)
 		faction::FacVal faction = faction::FAC_BULLET;
 		if (faction::Faction *factPtr = context.registry.try_get<faction::Faction>(entity))
 			faction = faction | factPtr->value;
+		Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
+		Vector3 shooterVel = velocityPtr ? velocityPtr->value : Vector3Zeros;
 
         for (int i = 0; i < weapon.bulletData.bulletCount; i++)
         {
-            std::uniform_real_distribution<float> dist(0, weapon.bulletData.spreadSin);
+            std::uniform_real_distribution<float> weaponSpreadDistribution(0, weapon.bulletData.spreadSin);
             Vector3 offset = Vector3Normalize(
                 Vector3CrossProduct(randomUnitVector3(), Vector3Normalize(baseDir))
-            ) * dist(rng);
+            ) * weaponSpreadDistribution(rng);
 
             Vector3 dir = Vector3Normalize(baseDir + offset);
 
@@ -39,8 +41,8 @@ void ecs_systems::weaponShoot(GameContext &context)
                 rad = context.registry.get<CollisionBody>(entity).radius + context.templateReg.get<CollisionBody>(weapon.bulletTemplate).radius + 1.0f;
 
             entt::entity bullet = entt_utils::cloneEntity(context.templateReg, weapon.bulletTemplate, context.registry);
-            context.registry.emplace_or_replace<Position>(bullet, Position{pos + dir * rad});
-            context.registry.emplace_or_replace<Velocity>(bullet, Velocity{dir * weapon.bulletData.speed});
+            context.registry.emplace_or_replace<Position>(bullet, Position{pos + dir * (rad + 0.1f)});
+            context.registry.emplace_or_replace<Velocity>(bullet, Velocity{dir * weapon.bulletData.speed + shooterVel});
             context.registry.emplace_or_replace<ScoreParent>(bullet, ScoreParent{entity});
             context.registry.emplace_or_replace<faction::Faction>(bullet, faction);
         }

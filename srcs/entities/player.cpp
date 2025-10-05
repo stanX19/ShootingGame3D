@@ -24,8 +24,12 @@ namespace {
 		++subWeapons;
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
-		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
-		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
+		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
+		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
+		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * 0.5 + front * -2), subWeapons);
+		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * 0.5 + front * -2), subWeapons);
+		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * -0.5 + front * -2), subWeapons);
+		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * -0.5 + front * -2), subWeapons);
 		weapon::emplaceRandomWeapon(context, player, subWeapons);
 	}
 }

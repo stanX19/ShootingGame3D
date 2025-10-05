@@ -76,6 +76,82 @@ namespace {
 	}
 }
 
+// void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera3D &camera)
+// {
+// 	if (!context.registry.all_of<Position, Rotation, Velocity, MaxSpeed, TurnSpeed>(context.currentPlayer))
+// 		return ;
+
+// 	Position &position = context.registry.get<Position>(context.currentPlayer);
+// 	Rotation &rotation = context.registry.get<Rotation>(context.currentPlayer);
+// 	Velocity &velocity = context.registry.get<Velocity>(context.currentPlayer);
+// 	MaxSpeed &maxSpeed = context.registry.get<MaxSpeed>(context.currentPlayer);
+// 	TurnSpeed &turnSpeed = context.registry.get<TurnSpeed>(context.currentPlayer);
+
+// 	Vector3 vel = velocity.value;
+// 	// float speed = Vector3Length(vel);  // current speed
+
+// 	// float turnSpeedDt = turnSpeed.value / (1.0f + speed / maxSpeed.value * 5.0f)  * dt;
+// 	float turnSpeedDt = turnSpeed.value / 2 * dt;
+// 	Quaternion newRotation = rotation.value;
+// 	Vector3 fowardVector = getForwardVector(rotation);
+// 	Vector3 upVector = getUpVector(rotation);
+// 	Vector3 rightVector = getRightVector(rotation);
+
+// 	Vector2 mouseDirection = getMouseDirectionRelRot(rotation.value, camera);
+// 	if (std::abs(mouseDirection.x) >= 0.01f) {
+// 		newRotation = rotateAroundAxis(newRotation, upVector, -mouseDirection.x * turnSpeedDt);
+// 		newRotation = rotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: 0.2));
+// 	}
+// 	if (std::abs(mouseDirection.y) >= 0.01f) {
+// 		newRotation = rotateAroundAxis(newRotation, rightVector, mouseDirection.y * turnSpeedDt);
+// 	}
+// 	if (IsKeyDown(KEY_RIGHT))
+// 		newRotation = rotateAroundAxis(newRotation, upVector, -turnSpeedDt);
+// 	if (IsKeyDown(KEY_LEFT))
+// 		newRotation = rotateAroundAxis(newRotation, upVector, turnSpeedDt);
+// 	if (IsKeyDown(KEY_UP))
+// 		newRotation = rotateAroundAxis(newRotation, rightVector, -turnSpeedDt);
+// 	if (IsKeyDown(KEY_DOWN))
+// 		newRotation = rotateAroundAxis(newRotation, rightVector, turnSpeedDt);
+// 	if (IsKeyDown(KEY_A))
+// 		newRotation = rotateAroundAxis(newRotation, fowardVector, -turnSpeedDt);
+// 	if (IsKeyDown(KEY_D))
+// 		newRotation = rotateAroundAxis(newRotation, fowardVector, turnSpeedDt);
+	
+// 	// TODO: change to engine thrust component
+// 	const float accel = 40.0f;
+// 	Vector3 fowardVelocity = fowardVector * Vector3DotProduct(vel, fowardVector);
+// 	Vector3 perpendictlarVelocity = vel - fowardVelocity;
+
+// 	// perpendictlarVelocity -= Vector3Normalize(perpendictlarVelocity) * std::min(Vector3Length(perpendictlarVelocity), accel * 0.5f * dt);
+// 	if (IsKeyDown(KEY_W) || IsMouseButtonDown(MOUSE_BUTTON_EXTRA) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+// 	{
+// 		perpendictlarVelocity = Vector3Zeros;
+// 		if (Vector3DotProduct(vel, fowardVector) < 0)
+// 			fowardVelocity = Vector3Zeros;
+// 		fowardVelocity += fowardVector * accel * dt;
+// 	}
+// 	else if (IsKeyDown(KEY_S) || IsMouseButtonDown(MOUSE_BUTTON_SIDE) || Vector3Length(fowardVelocity) > maxSpeed.value)
+// 	{
+// 		fowardVelocity -= fowardVector * accel * dt;
+// 	}
+
+// 	// speed = Clamp(speed, 0, maxSpeed.value);
+
+// 	velocity.value = fowardVelocity + perpendictlarVelocity;
+// 	rotation.value = newRotation;
+
+// 	// Stay within arena
+// 	applySoftBoundary(position, velocity, dt);
+// 	entt::entity entity = context.registry.create();
+
+// 	// trail particles
+// 	context.registry.emplace<Position>(entity, position);
+// 	context.registry.emplace<RenderBody>(entity, context.modelManager.createSphere(), ColorAlpha(SKYBLUE, 0.5), 0.25f);
+// 	context.registry.emplace<RadiusExpand>(entity, -0.25f);
+// 	context.registry.emplace<Lifespan>(entity, 1.0f);
+// }
+
 
 void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera3D &camera)
 {
@@ -119,9 +195,25 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 		newRotation = rotateAroundAxis(newRotation, fowardVector, turnSpeedDt);
 	
 	// TODO: change to engine thrust component
-	const float accel = 40.0f;
+	static float boostCooldown = 0;
+	static float boostDuration = 0;
+	float accel = 40.0f;
+	if ((IsKeyDown(KEY_E) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	&& boostCooldown <= 0) {
+		boostDuration = 0.5f;
+		boostCooldown = 6.0f;
+	}
+	if (boostCooldown > 0)
+		boostCooldown -= dt;
+	if (boostDuration > 0) {
+		boostDuration -= dt;
+		accel *= 15.0f;
+	}
 
-	if (IsKeyDown(KEY_W) || IsMouseButtonDown(MOUSE_BUTTON_EXTRA) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	if ((
+		(IsKeyDown(KEY_W) || IsMouseButtonDown(MOUSE_BUTTON_EXTRA)
+			|| IsMouseButtonDown(MOUSE_BUTTON_RIGHT)))// && speed < maxSpeed.value)
+		|| boostDuration > 0)
 	{
 		speed += accel * dt;
 	}

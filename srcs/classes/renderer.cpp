@@ -490,14 +490,15 @@ void Renderer::drawMainUIFrame()
 
 void Renderer::drawSpeedBar()
 {
-	if (!context.registry.all_of<Velocity, MaxSpeed>(context.currentPlayer))
+	if (!context.registry.all_of<Velocity, MaxSpeed, Rotation>(context.currentPlayer))
 		return ;
 	
 	entt::entity entity = context.currentPlayer;
 	const auto& velocity = context.registry.get<Velocity>(entity);
 	const auto& maxSpeed = context.registry.get<MaxSpeed>(entity);
+	const auto& rotation = context.registry.get<Rotation>(entity);
 	
-	float currentSpeed = Vector3Length(velocity.value);
+	float currentSpeed = Vector3DotProduct(velocity.value, getForwardVector(rotation));
 	// float speedRatio = std::min(1.0f, 1.156f * (1 - std::exp(-2 * currentSpeed / maxSpeed.value)));
 	float speedRatio = currentSpeed / (maxSpeed.value * 2);
 	speedRatio = std::min(1.0, speedRatio > 0.5? 0.8 + 0.2 * ((speedRatio - 0.5) / 0.5): speedRatio / 0.5 * 0.8);
@@ -635,6 +636,8 @@ void Renderer::drawAmmoCircle()
 {
 	if (!context.registry.valid(context.currentPlayer))
 		return;
+
+	const int ammoTextSize = 20;
 	
 	// Collect all weapons with ammo for this player
 	std::vector<std::tuple<float, float, int>> weaponAmmo; // pairs of (current, max, is_cooldown)
@@ -675,7 +678,7 @@ void Renderer::drawAmmoCircle()
 	
 	Vector2 frameCenter = GetUIFrameCenter();
 	float frameRadius = GetUIFrameRadius();
-	float circleRadius = 15;
+	float circleRadius = ammoTextSize * 0.75f;
 
 	std::vector<Vector2> positions;
 	
@@ -752,8 +755,8 @@ void Renderer::drawAmmoCircle()
 		// Center text - show current ammo
 		char ammoText[4];
 		snprintf(ammoText, sizeof(ammoText), "%i", (int)currentAmmo + isReload);
-		int textWidth = MeasureText(ammoText, 20);
-		DrawText(ammoText, circleCenter.x - textWidth/2, circleCenter.y - 7, 20, WHITE);
+		int textWidth = MeasureText(ammoText, ammoTextSize);
+		DrawText(ammoText, circleCenter.x - textWidth/2, circleCenter.y - 7, ammoTextSize, WHITE);
 		
 		// Weapon number indicator (small number at top of circle)
 		char weaponNum[4];

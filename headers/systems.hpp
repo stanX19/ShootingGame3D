@@ -20,7 +20,7 @@ namespace ecs_systems
 	void entityMovement(GameContext &context, float dt);
 	void entityTransformation(GameContext &context, float dt);
 	void detectEntityCollision(GameContext &context, float dt);
-	void entityAnchor(GameContext &context);
+	void entityAnchor(GameContext &context, float dt);
 	void entityAnchorRelease(GameContext &context, float dt);
 	void entityLifetime(GameContext &context, float dt);
 	void delayedDamage(GameContext &context, float dt);
