@@ -1,5 +1,6 @@
 #include "shoot_3d.hpp"
 #include "renderer.hpp"
+#include "battlefield_hud_renderer.hpp"
 #include "entt_utils.hpp"
 
 static void setup_camera(Camera3D& camera) {
@@ -66,6 +67,7 @@ int main() {
 	resetGame(context, camera);
 	
 	Renderer renderer(camera, context);
+	BattlefieldHUDRenderer hudRenderer(camera, context);
 
 	while (!WindowShouldClose()) {
 		float dt = GetFrameTime();
@@ -97,7 +99,10 @@ int main() {
 		
 		ecs_systems::syncModelRotation(context);
 		camaraFollowPlayer(context, camera, dt);
+		BeginDrawing();
 		renderer.Render();
+		hudRenderer.Render();
+		EndDrawing();
 
 		ecs_systems::blueUnitRespawn(context);
 		ecs_systems::redUnitRespawn(context);

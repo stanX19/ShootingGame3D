@@ -36,22 +36,6 @@ private:
 	void drawBoundaryWarning();
 	void drawEnergyShield();
 	void handleLightSource();
-	
-	void drawHUD();
-	void drawHealthBars();
-	void drawTargetable();
-	void drawTexts();
-	void drawSpeedBar();
-	void drawThrustBar();
-	void drawAmmoCircle();
-	void drawAimCircle();
-	void drawCrosshair();
-	void drawMainUIFrame();
-	void drawCursorArrow();
-	void drawCollisionWarning();
-	
-	Vector2 GetUIFrameCenter() const;
-	float GetUIFrameRadius() const;
 };
 
 #endif
