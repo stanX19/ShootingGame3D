@@ -39,3 +39,4 @@
 system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * randomPosMagnitude, randomVector3 * randomVelMagnitude)
 25. sound component, sound system
 26. burning effect when hit, burning particle, burning system
+27. separate rendering and hud drawing
