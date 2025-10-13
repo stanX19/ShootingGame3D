@@ -55,7 +55,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<EnergyShieldRegen>(player, SHIELD_REGEN);
 	context.registry.emplace<Damage>(player, 500.0f);
 	context.registry.emplace<MaxSpeed>(player, 80.0f);
-	context.registry.emplace<TurnSpeed>(player, 3.0f);
+	context.registry.emplace<TurnSpeed>(player, 2.0f);
 	context.registry.emplace<Score>(player);
 	
 	context.registry.emplace<faction::Faction>(player, faction::FAC_BLUE);

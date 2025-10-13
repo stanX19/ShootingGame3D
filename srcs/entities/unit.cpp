@@ -99,12 +99,12 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<CollisionBody>(entity, radius);
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
 	renderBody.scale = Vector3Ones * radius;
-	context.registry.emplace_or_replace<HP>(entity, 3200.0f);
+	context.registry.emplace_or_replace<HP>(entity, 4800.0f);
 	context.registry.emplace_or_replace<HPRegen>(entity, 50.0f);
 	context.registry.emplace_or_replace<EnergyShield>(entity, 1000.0f);
 	context.registry.emplace_or_replace<EnergyShieldRegen>(entity, 100.0f);
 	context.registry.emplace_or_replace<MaxSpeed>(entity, 20.0f);
-	context.registry.emplace_or_replace<TurnSpeed>(entity, 0.25f);
+	context.registry.emplace_or_replace<TurnSpeed>(entity, 1.25f);
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 5);
 
 	weapon::emplaceRandomWeapon(context, entity);

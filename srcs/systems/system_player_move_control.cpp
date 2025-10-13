@@ -167,7 +167,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 	Vector3 vel = velocity.value;
 	float speed = Vector3Length(vel);  // current speed
 
-	float turnSpeedDt = turnSpeed.value / (1.0f + speed / maxSpeed.value * 5.0f)  * dt;
+	float turnSpeedDt = turnSpeed.value / (1.0f + speed / maxSpeed.value) * dt;
 	Quaternion newRotation = rotation.value;
 	Vector3 fowardVector = getForwardVector(rotation);
 	Vector3 upVector = getUpVector(rotation);

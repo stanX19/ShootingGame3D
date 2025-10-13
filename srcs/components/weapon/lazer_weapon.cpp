@@ -107,13 +107,13 @@ void weapon::emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
 	
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 50);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 25);
 	weapon.bulletData.bulletCount = 20;
 	weapon.bulletData.speed = LAZER_SPEED;
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{10.0f, 10});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{2});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{4.0f, 4});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{1.0f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
 }

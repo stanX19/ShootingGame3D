@@ -40,3 +40,9 @@ system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * ran
 25. sound component, sound system
 26. burning effect when hit, burning particle, burning system
 27. separate rendering and hud drawing
+28. ChargedWeapon {
+	float chargeTime; // time to fully charge
+	float cooldownTime; // time after firing to start charging again
+	float currentCharge; // current charge level
+	bool isCharging; // whether the weapon is currently charging
+}
