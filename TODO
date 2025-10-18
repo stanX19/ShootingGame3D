@@ -1,5 +1,3 @@
-2. Trail tag for rendering, will draw a line trail for objects previous positions
-	- add struct to record previous positions
 3. tags::faction::{
 		ally,
 		enemy,
@@ -29,17 +27,8 @@
 		alignHorizontal = false;
 	}
 19. enemy dodge asteroids
-20. acceleration; angular acceleration; mass
-22. missile, cylinder model; uses thrust component; same system as new player movement
-23. struct TrailParticle {
-	Color color;
-	float randomPosMagnitude = 0;
-	float randomVelMagnitude = 0;
-};
-system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * randomPosMagnitude, randomVector3 * randomVelMagnitude)
 25. sound component, sound system
 26. burning effect when hit, burning particle, burning system
-27. separate rendering and hud drawing
 28. ChargedWeapon {
 	float chargeTime; // time to fully charge
 	float cooldownTime; // time after firing to start charging again
@@ -47,3 +36,17 @@ system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * ran
 	bool isCharging; // whether the weapon is currently charging
 }
 29 fix missile by using aimtarget component and ai movement system
+	- add weapon componenet with negative bullet velocity so it kills itself
+	- missile should not affect aim circle
+	- missile should not change aim target & only have small vision cone
+30. mass system for physics calculation & death velocity inheritance
+31. cone Trail struct {
+	float radius;
+	float lifespan;
+	Vector3 color;
+	Vector3 prevPos1;
+	Vector3 prevPos2;
+	Vector3 prevPos3;
+}
+32. last enemy hit (record 2 entity uppermost parent and their damage) component for score calculation
+33. killing ally no score
