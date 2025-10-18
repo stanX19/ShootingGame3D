@@ -1,6 +1,7 @@
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
+#include "factions.hpp"
 
 namespace
 {
@@ -28,6 +29,7 @@ namespace
 	entt::entity createBulletTemplate(GameContext &context) {
 		entt::entity bullet = context.templateReg.create();
 		context.templateReg.emplace<tag::Bullet>(bullet);
+		context.templateReg.emplace<faction::Faction>(bullet, faction::FAC_BULLET);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Kinetic>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f);

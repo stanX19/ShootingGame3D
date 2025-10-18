@@ -1,6 +1,10 @@
 #include "systems.hpp"
 
 void ecs_systems::entityMovement(GameContext &context, float dt) {
+	for (auto [entity, velocity, scalarAcceleration] : context.registry.view<Velocity, ScalarAcceleration>(entt::exclude<PositionAnchor>).each()) {
+		velocity.value += Vector3Normalize(velocity.value) * scalarAcceleration.value * dt;
+	}
+
 	for (auto [entity, position, velocity] : context.registry.view<Position, Velocity>(entt::exclude<PositionAnchor>).each()) {
 		context.registry.emplace_or_replace<PrevPosition>(entity, position.value);
 		position.value = position.value + velocity.value * dt;

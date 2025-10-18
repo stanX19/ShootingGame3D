@@ -21,24 +21,47 @@ namespace {
 
 	// angle: cone angle
 	// minDist: search distance limit
-	entt::entity findClosestTargetInCone(TargetsVector targets, Vector3 point, Vector3 forward, float angle=30.0f, float minDist = COMBAT_DIST) {
-		entt::entity target = entt::null;
-		float bestDot = cosf(DEG2RAD * angle * 0.5);
+	entt::entity findClosestTargetInCone(
+		TargetsVector targets,
+		Vector3 point,
+		Vector3 forward,
+		float maxAngle = 90.0f, // 0 to 180 degrees
+		float maxDist = COMBAT_DIST,   // can be MAXFLOAT
+		float angleWeight = 0.7f,
+		float distWeight = 0.3f,
+		float falloffDist = 50.0f      // distance falloff for scoring
+	) {
+		entt::entity bestTarget = entt::null;
+		float bestScore = -1.0f / 0.0f;
 
-		for (auto [entity, pos]: targets) {
-			Vector3 toTarget = pos - (point - forward * 2.5f);
+		float cosLimit = cosf(DEG2RAD * maxAngle * 0.5f);
+
+		for (auto [entity, pos] : targets) {
+			Vector3 toTarget = pos - point;
 			float dist = Vector3Length(toTarget);
-			if (dist >= minDist)
+			if (dist > maxDist)
 				continue;
-			float dot = Vector3DotProduct(forward, Vector3Normalize(toTarget));
-			if (dot < bestDot)
-				continue;
-			bestDot = dot;
-			target = entity;
+
+			Vector3 dir = Vector3Normalize(toTarget);
+			float dot = Vector3DotProduct(forward, dir);
+			if (dot < cosLimit)
+				continue; // outside cone
+
+			// distance factor decays smoothly regardless of maxDist
+			float distFactor = 1.0f / (1.0f + dist / falloffDist);
+
+			// weighted combination
+			float score = angleWeight * dot + distWeight * distFactor;
+
+			if (score > bestScore) {
+				bestScore = score;
+				bestTarget = entity;
+			}
 		}
 
-		return target;
+		return bestTarget;
 	}
+
 }
 
 void ecs_systems::aiFindTarget(GameContext &context){
@@ -51,7 +74,11 @@ void ecs_systems::aiFindTarget(GameContext &context){
 		if (cache.find(faction.value) == cache.end())
 			cache[faction.value] = searchTargets(targetsView.each(), faction.value);
 
-		aimTarget.entity = findClosestTargetInCone(cache[faction.value], position.value, getForwardVector(rotation.value), 180.0f, MAXFLOAT);
+		aimTarget.entity = findClosestTargetInCone(
+			cache[faction.value], position.value,
+			getForwardVector(rotation.value),
+			180.0f, MAXFLOAT, 0.7f, 0.3f
+		);
 	}
 	
 	auto aimView = context.registry.view<faction::Faction, Position, Rotation, AimTarget,

@@ -46,3 +46,4 @@ system view<PrevPos, TrailParticle>, spawnParticle(prevPos + randomVector3 * ran
 	float currentCharge; // current charge level
 	bool isCharging; // whether the weapon is currently charging
 }
+29 fix missile by using aimtarget component and ai movement system

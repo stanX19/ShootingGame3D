@@ -38,6 +38,7 @@ namespace ecs_systems
 	void asteroidRespawn(GameContext &context);
 	void cleanOutOfBound(GameContext &context);
 	void syncModelRotation(GameContext &context);
+	void spawnTrailParticles(GameContext &context, float dt);
 }
 
 #endif // SYSTEMS_HPP

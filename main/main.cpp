@@ -113,6 +113,7 @@ int main() {
 		ecs_systems::delayedDamage(context, dt);
 		ecs_systems::hpCleanup(context);
 		ecs_systems::hpRegen(context, dt);
+		ecs_systems::spawnTrailParticles(context, dt);
 
 		inputControls(context, camera, dt);
 	}

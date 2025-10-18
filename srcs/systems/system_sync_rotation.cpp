@@ -33,8 +33,15 @@ static void velocitySyncModelRot(GameContext &context) {
 	}
 }
 
+static void velocitySyncRot(GameContext &context) {
+	for (auto [entity, vel, rot] : context.registry.view<Velocity, Rotation, tag::VelocitySyncRot>().each()) {
+		rot.value = vector3ToRotation(vel.value);
+	}
+}
+
 void ecs_systems::syncModelRotation(GameContext &context) {
 	rotationSyncModel(context);
 	aimDirectionSyncModel(context);
 	velocitySyncModelRot(context);
+	velocitySyncRot(context);
 }

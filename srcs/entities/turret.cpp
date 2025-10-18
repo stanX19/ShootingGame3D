@@ -1,4 +1,5 @@
 #include "entities.hpp"
+#include "factions.hpp"
 
 static entt::entity spawnBaseTurret(GameContext &context, Color color) {
 	entt::entity turret = context.registry.create();
@@ -33,6 +34,10 @@ static void linkWithParent(GameContext &context, entt::entity &turret, entt::ent
 	Rotation *rotPtr = context.registry.try_get<Rotation>(parent);
 	if (posPtr && rotPtr) {
 		context.registry.emplace_or_replace<Position>(turret, Position{posPtr->value + Vector3RotateByQuaternion(relpos * 2, rotPtr->value)});
+	}
+	faction::Faction *factPtr = context.registry.try_get<faction::Faction>(parent);
+	if (factPtr) {
+		context.registry.emplace_or_replace<faction::Faction>(turret, faction::Faction{factPtr->value});
 	}
 }
 

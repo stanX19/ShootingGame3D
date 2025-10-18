@@ -20,6 +20,16 @@ struct Velocity
 	Vector3 value = { 0, 0, 0 };
 };
 
+struct Acceleration
+{
+	Vector3 value = { 0, 0, 0 };
+};
+
+struct ScalarAcceleration
+{
+	float value = 0.0f;
+};
+
 struct Rotation
 {
 	Quaternion value = QuaternionUnitX;
@@ -237,6 +247,10 @@ struct RadiusExpand {
 	float speed;  // radius += speed * dt
 };
 
+struct SpawnsTrailParticle {
+	float radius = 0.5f;
+	float lifespan = 1.0f;
+};
 
 namespace tag {
 	// todo: throw these into namespaces too
@@ -274,6 +288,7 @@ namespace tag {
 	struct RotationSyncModel {};
 	struct AimDirectionSyncModel {};
 	struct VelocitySyncModelRot {};
+	struct VelocitySyncRot {};
 	struct GetVelOnAnchorDeath {};
 }
 

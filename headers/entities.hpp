@@ -18,7 +18,7 @@ entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color);
 entt::entity spawnLinkedTurret(GameContext &context, Color color, entt::entity &parent, Vector3 relpos);
 entt::entity spawnLinkedAutoTurret(GameContext &context, Color color, entt::entity &parent, Vector3 relpos);
 void spawnDebris(GameContext &context, const Vector3 &position, float originalRadius, Color originalColor, int count = 8, float lifespan = 2.0f, Vector3 velocity = {0, 0, 0});
-void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3 velocity = {0, 0, 0}, float lifespan = 5.0f, Color color = ORANGE);
+void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3 velocity = {0, 0, 0}, float lifespan = 5.0f, Color color = ORANGE, entt::entity parent = entt::null);
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir);
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad);
 void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir);

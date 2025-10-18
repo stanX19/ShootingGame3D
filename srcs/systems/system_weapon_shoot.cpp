@@ -20,7 +20,7 @@ void ecs_systems::weaponShoot(GameContext &context)
         auto &weapon = view.get<Weapon>(entity);
         Vector3 pos = view.get<Position>(entity).value;
         Vector3 baseDir = view.get<AimDirection>(entity).value;
-		faction::FacVal faction = faction::FAC_BULLET;
+		faction::FacVal faction = faction::FAC_NONE;
 		if (faction::Faction *factPtr = context.registry.try_get<faction::Faction>(entity))
 			faction = faction | factPtr->value;
 		Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
