@@ -15,6 +15,7 @@ static void aiTurnControl(GameContext &context, float dt)
 			targetVel = context.registry.get<Velocity>(target.entity).value;
 
 		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, Vector3Length(velocity.value));
+		// Vector3 targetDir = targetPos - position.value;
 		Quaternion targetRotation = vector3ToRotation(targetDir);
 
 		float speed = Vector3Length(velocity.value);

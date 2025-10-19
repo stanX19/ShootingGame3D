@@ -3,7 +3,9 @@
 #include "constants.hpp"
 
 namespace {
-	const float MISSILE_SPEED = 50.0f;
+	const float MISSILE_SPEED = 100.0f;
+	const float MISSILE_MAX_SPEED = 400.0f;
+	const float MISSILE_LIFESPAN = 20.0f;
 	const float BASE_DAMAGE = 250.0f;
 	const Vector3 MISSILE_BOUND = {ARENA_SIZE * 2, ARENA_SIZE * 2, ARENA_SIZE * 2};
 
@@ -28,18 +30,18 @@ namespace {
 
 	entt::entity createMissileTemplate(GameContext &context, float rad, Color color) {
 		entt::entity missile = context.templateReg.create();
-		t_model_id model = context.modelManager.createSphere();
+		t_model_id model = context.modelManager.loadModel("assets/Models/missile/missile.glb");
 		// context.templateReg.emplace<tag::Targetable>(missile);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(missile);
 		context.templateReg.emplace<CollisionBody>(missile, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(missile, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(missile, MISSILE_BOUND * -1, MISSILE_BOUND);
-		context.templateReg.emplace<DelayedDamage>(missile, 30.0f, 10000.0f);
+		context.templateReg.emplace<DelayedDamage>(missile, MISSILE_LIFESPAN, 1000000.0f);
 		context.templateReg.emplace<SpawnsTrailParticle>(missile, SpawnsTrailParticle{rad * 0.5f, 0.5f});
 		context.templateReg.emplace<Rotation>(missile);
 		context.templateReg.emplace<tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);
-		context.templateReg.emplace<TurnSpeed>(missile, TurnSpeed{10.0f});
+		context.templateReg.emplace<TurnSpeed>(missile, TurnSpeed{7.5f});
 		return missile;
 	}
 }
@@ -52,7 +54,7 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
 	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
-	// context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{100.0f});
+	context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{10.0f});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
