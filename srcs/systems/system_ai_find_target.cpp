@@ -25,7 +25,7 @@ namespace {
 		TargetsVector targets,
 		Vector3 point,
 		Vector3 forward,
-		float maxAngle = 90.0f, // 0 to 180 degrees
+		float maxAngle = 90.0f, // 0 to 360 degrees
 		float maxDist = COMBAT_DIST,   // can be MAXFLOAT
 		float angleWeight = 0.7f,
 		float distWeight = 0.3f,
@@ -77,7 +77,7 @@ void ecs_systems::aiFindTarget(GameContext &context){
 		aimTarget.entity = findClosestTargetInCone(
 			cache[faction.value], position.value,
 			getForwardVector(rotation.value),
-			180.0f, MAXFLOAT, 0.7f, 0.3f
+			360.0f, MAXFLOAT, 0.5f, 0.5f
 		);
 	}
 	

@@ -6,6 +6,7 @@ namespace {
 	const float BASE_HP = 1000.0f;
 	const float BASE_SHIELD = 500.0f;
 	const float BASE_SHIELD_REGEN = BASE_SHIELD / 15;
+	const float BASE_SPEED = 80.0f;
 }
 
 entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos) {
@@ -23,7 +24,7 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<EnergyShield>(entity, BASE_SHIELD);
 	context.registry.emplace<EnergyShieldRegen>(entity, BASE_SHIELD_REGEN);
 	context.registry.emplace<Damage>(entity, 500.0f);
-	context.registry.emplace<MaxSpeed>(entity, 80.0f);
+	context.registry.emplace<MaxSpeed>(entity, BASE_SPEED);
 	context.registry.emplace<TurnSpeed>(entity, 2.5f);
 	context.registry.emplace<Score>(entity);
 	context.registry.emplace<KilledScore>(entity, BASE_SCORE);
@@ -58,7 +59,7 @@ entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HPRegen>(entity, 10.0f);
 	context.registry.emplace_or_replace<EnergyShield>(entity, 1000.0f);
 	context.registry.emplace_or_replace<EnergyShieldRegen>(entity, 25.0f);
-	context.registry.emplace_or_replace<MaxSpeed>(entity, 40.0f);
+	context.registry.emplace_or_replace<MaxSpeed>(entity, BASE_SPEED * 0.5f);
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 2);
 
 	weapon::emplaceRandomWeapon(context, entity);
@@ -79,7 +80,7 @@ entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos) {
 	renderBody.scale = Vector3Ones * radius;
 	context.registry.emplace_or_replace<HP>(entity, 720.0f);
 	context.registry.emplace_or_replace<HPRegen>(entity, 1.0f);
-	context.registry.emplace_or_replace<MaxSpeed>(entity, 160.0f);
+	context.registry.emplace_or_replace<MaxSpeed>(entity, BASE_SPEED * 2.0f);
 	context.registry.emplace_or_replace<TurnSpeed>(entity, 1.5f);
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 2);
 
@@ -103,7 +104,7 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HPRegen>(entity, 50.0f);
 	context.registry.emplace_or_replace<EnergyShield>(entity, 1000.0f);
 	context.registry.emplace_or_replace<EnergyShieldRegen>(entity, 100.0f);
-	context.registry.emplace_or_replace<MaxSpeed>(entity, 20.0f);
+	context.registry.emplace_or_replace<MaxSpeed>(entity, BASE_SPEED * 0.25f);
 	context.registry.emplace_or_replace<TurnSpeed>(entity, 1.25f);
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 5);
 

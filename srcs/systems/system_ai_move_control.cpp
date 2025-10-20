@@ -14,14 +14,14 @@ static void aiTurnControl(GameContext &context, float dt)
 		if (context.registry.valid(target.entity) && context.registry.all_of<Velocity>(target.entity))
 			targetVel = context.registry.get<Velocity>(target.entity).value;
 
-		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, Vector3Length(velocity.value));
-		// Vector3 targetDir = targetPos - position.value;
-		Quaternion targetRotation = vector3ToRotation(targetDir);
-
+			
 		float speed = Vector3Length(velocity.value);
+		// Vector3 targetDir = targetPos - position.value;
+		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, speed);
+		Quaternion targetRotation = vector3ToRotation(targetDir);
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
-
-		rotation.value = QuaternionSlerp(rotation.value, targetRotation, std::min(turnSpeedDt, 1.0f));
+		float totalTargetTurn = angleDifference(targetRotation, rotation.value) * DEG2RAD;
+		rotation.value = QuaternionSlerp(rotation.value, targetRotation, std::min(turnSpeedDt / totalTargetTurn, 1.0f));
 
 		if (context.registry.all_of<Velocity, tag::VelocitySyncRot>(entity))
 			context.registry.get<Velocity>(entity).value = getForwardVector(rotation) * speed;

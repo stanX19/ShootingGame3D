@@ -71,6 +71,14 @@ Quaternion vector3ToRotation(const Vector3 &newForward, const Quaternion &baseRo
 }
 
 // in degrees [0, 180]
+float angleDifference(const Vector3 &a, const Vector3 &b)
+{
+	float dot = Vector3DotProduct(a, b);
+	dot = Clamp(fabsf(dot), 0.0f, 1.0f);
+    return RAD2DEG * acosf(dot);
+}
+
+// in degrees [0, 180]
 float angleDifference(const Quaternion &a, const Quaternion &b)
 {
 	float dot = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;

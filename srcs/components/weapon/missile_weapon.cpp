@@ -41,7 +41,7 @@ namespace {
 		context.templateReg.emplace<Rotation>(missile);
 		context.templateReg.emplace<tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);
-		context.templateReg.emplace<TurnSpeed>(missile, TurnSpeed{7.5f});
+		context.templateReg.emplace<TurnSpeed>(missile, TurnSpeed{0.5f});
 		return missile;
 	}
 }
@@ -54,7 +54,7 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
 	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
-	context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{10.0f});
+	// context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{50.0f});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
@@ -64,6 +64,6 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{2.0f, 2.0f});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{1.0f / 10.0f});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{1.0f / 7.5f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});
 }

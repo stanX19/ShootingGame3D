@@ -31,6 +31,8 @@ static void camaraFollowPlayer(GameContext &context, Camera3D &camera, [[maybe_u
     camera.position = Vector3Lerp(camera.position, desiredPosition, lerp);
     camera.target = Vector3Lerp(camera.target, desiredTarget, lerp);
     camera.up = Vector3Lerp(camera.up, up, lerp * 0.2f);
+	
+	camera.fovy = shift ? 90.0f : 45.0f;
 }
 
 static void resetGame(GameContext &context, Camera &camera) {
@@ -74,7 +76,6 @@ int main() {
 
 		// --- Update systems ---
 		ecs_systems::playerMoveControl(context, dt, camera);
-		ecs_systems::playerShootControl(context);
 		// ecs_systems::playerRespawn(context);
 		ecs_systems::aiFindTarget(context);
 		ecs_systems::aiMoveControl(context, dt);
@@ -84,6 +85,7 @@ int main() {
 		ecs_systems::bulletTargetAim(context);
 		ecs_systems::weaponParentControlAim(context);
 		ecs_systems::weaponParentControlShoot(context);
+		ecs_systems::playerShootControl(context);  // override parent control shoot
 		ecs_systems::weaponUpdateCooldown(context, dt);
 		ecs_systems::weaponUpdateCanFire(context);
 		ecs_systems::weaponShoot(context);

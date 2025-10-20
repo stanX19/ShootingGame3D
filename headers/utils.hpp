@@ -19,6 +19,7 @@ Vector3 randomPosInField();
 Quaternion randomRotation();
 Matrix getTransformMatrix(const Vector3 &scale, const Vector3 &rotation, const Vector3 &displacement);
 
+float angleDifference(const Vector3 &a, const Vector3 &b);
 float angleDifference(const Quaternion& a, const Quaternion& b);
 float angleDifference(const Rotation& a, const Rotation& b);
 float angleDifference(const Quaternion& a, const Rotation& b);
