@@ -250,6 +250,7 @@ struct RadiusExpand {
 struct SpawnsTrailParticle {
 	float radius = 0.5f;
 	float lifespan = 1.0f;
+	Color color = SKYBLUE;
 };
 
 namespace tag {

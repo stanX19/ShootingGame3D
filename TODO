@@ -50,3 +50,4 @@
 }
 32. last enemy hit (record 2 entity uppermost parent and their damage) component for score calculation
 33. killing ally no score
+34. ExplodeOnDeath {lifespan, damage, radius, color}

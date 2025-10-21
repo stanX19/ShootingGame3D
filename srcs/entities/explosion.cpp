@@ -1,6 +1,10 @@
 #include "entities.hpp"
 #include "utils.hpp"
 
+void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3 velocity, entt::entity parent) {
+	spawnExplosion(context, pos, rad, velocity, 5.0f, ORANGE, parent);
+}
+
 void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3 velocity, float lifespan, Color color, entt::entity parent) {
 	t_model_id explosionModel = context.modelManager.createSphere(64, 64);
 	const float startRatio = 0.05f;
@@ -23,12 +27,14 @@ void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3
 		context.registry.emplace<RadiusExpand>(explosion, expansion);
 		context.registry.emplace<Lifespan>(explosion, subLifespan);
 
-		if (i == 0) {
-			context.registry.emplace<CollisionBody>(explosion, subRad * startRatio);
-			context.registry.emplace<Damage>(explosion, 50.0f);
-			context.registry.emplace<tag::bullet_type::Energy>(explosion);
+		if (i != 0)
+			continue;
+
+		context.registry.emplace<CollisionBody>(explosion, subRad * startRatio);
+		context.registry.emplace<Damage>(explosion, 50.0f);
+		context.registry.emplace<tag::bullet_type::Energy>(explosion);
+		if (context.registry.valid(parent))
 			context.registry.emplace<ScoreParent>(explosion, parent);
-		}
 	}
 }
 

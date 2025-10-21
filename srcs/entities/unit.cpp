@@ -62,7 +62,7 @@ entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<MaxSpeed>(entity, BASE_SPEED * 0.5f);
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 2);
 
-	weapon::emplaceRandomWeapon(context, entity);
+	weapon::emplaceRandomMissileWeapon(context, entity);
 	int subWeapons = GetRandomValue(0, 1000);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
@@ -84,7 +84,7 @@ entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<TurnSpeed>(entity, 1.5f);
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 2);
 
-	weapon::emplaceRandomWeapon(context, entity);
+	weapon::emplaceRandomMissileWeapon(context, entity);
 	int subWeapons = GetRandomValue(0, 1000);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
@@ -108,7 +108,7 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<TurnSpeed>(entity, 1.25f);
 	context.registry.emplace_or_replace<KilledScore>(entity, BASE_SCORE * 5);
 
-	weapon::emplaceRandomWeapon(context, entity);
+	weapon::emplaceRandomMissileWeapon(context, entity);
 	int randNum = GetRandomValue(0, 1000);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, +radius * 0.8f, -2}), randNum);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, -radius * 0.8f, -2}), randNum);

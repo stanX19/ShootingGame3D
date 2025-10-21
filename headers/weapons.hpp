@@ -22,9 +22,16 @@ namespace weapon {
 	void emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity);
 	
 	void emplaceWeaponMissileBasic(GameContext &context, entt::entity entity);
+	void emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity);
+	void emplaceWeaponMissileTorpedo(GameContext &context, entt::entity entity);
+	void emplaceWeaponMissileNuke(GameContext &context, entt::entity entity);
+	void emplaceWeaponMissileSniper(GameContext &context, entt::entity entity);
+	void emplaceWeaponMissileFlares(GameContext &context, entt::entity entity);
 
 	void emplaceRandomWeapon(GameContext &context, entt::entity turret);
 	void emplaceRandomWeapon(GameContext &context, entt::entity turret, int value);
+	void emplaceRandomMissileWeapon(GameContext &context, entt::entity turret);
+	void emplaceRandomMissileWeapon(GameContext &context, entt::entity turret, int value);
 }
 
 namespace weapon::utils {
