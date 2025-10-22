@@ -131,6 +131,6 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{6.0f, 6.0f});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{15.0f});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{8.0f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.125f});
 }

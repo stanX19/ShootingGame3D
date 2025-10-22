@@ -12,7 +12,7 @@ void weapon::emplaceRandomWeapon(GameContext &context, entt::entity turret, int 
 		weapon::emplaceWeaponBurstSniper,
 		weapon::emplaceWeaponMachineGun,
 		weapon::emplaceWeaponShotgun,
-		weapon::emplaceWeaponBigBall,
+		// weapon::emplaceWeaponBigBall,
 		weapon::emplaceWeaponLazerBasic,
 		weapon::emplaceWeaponLazerMachineGun,
 		weapon::emplaceWeaponLazerDeletor,

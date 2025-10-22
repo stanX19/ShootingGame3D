@@ -51,3 +51,14 @@
 32. last enemy hit (record 2 entity uppermost parent and their damage) component for score calculation
 33. killing ally no score
 34. ExplodeOnDeath {lifespan, damage, radius, color}
+35. Multithreading
+36. lobby UI
+37. weapon heat system
+	struct WeaponHeat {
+		float currentHeat;
+		float heatPerShot;
+		float maxHeat;
+		float cooldownRate;
+		float overheatSpreadSin;
+	}
+38. unify shader using if else
