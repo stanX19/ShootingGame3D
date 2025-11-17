@@ -102,8 +102,8 @@ int main() {
 		ecs_systems::syncModelRotation(context);
 		camaraFollowPlayer(context, camera, dt);
 		BeginDrawing();
-		renderer.Render();
-		hudRenderer.Render();
+		renderer.Render(dt);
+		hudRenderer.Render(dt);
 		EndDrawing();
 
 		ecs_systems::blueUnitRespawn(context);

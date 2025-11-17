@@ -12,11 +12,12 @@ class BattlefieldHUDRenderer {
 public:
     BattlefieldHUDRenderer(Camera3D &camera, GameContext &context);
 
-    void Render();
+    void Render(float dt);
 
 private:
     Camera3D &camera;
     GameContext &context;
+    float currentDt;
 
     void drawHUD();
     void drawHealthBars();

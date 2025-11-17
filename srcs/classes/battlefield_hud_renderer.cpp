@@ -11,8 +11,9 @@ BattlefieldHUDRenderer::BattlefieldHUDRenderer(Camera3D &camera, GameContext &co
 {
 }
 
-void BattlefieldHUDRenderer::Render()
+void BattlefieldHUDRenderer::Render(float dt)
 {
+    currentDt = dt;
     drawHUD();
     drawTexts();
 }
@@ -136,7 +137,7 @@ void BattlefieldHUDRenderer::drawTargetable()
     static float s_blinkTimer = 0.0f;
     const float blinkInterval = 0.1f;
 
-    s_blinkTimer -= GetFrameTime();
+    s_blinkTimer -= currentDt;
     if (targetedEntity != s_prevTargetedEntity) {
         s_blinkTimer = blinkInterval * 3;
     }
@@ -449,7 +450,7 @@ void BattlefieldHUDRenderer::drawAmmoCircle()
     }
 
     static float reloadAngleOffset = 0;
-    reloadAngleOffset += 5;
+    reloadAngleOffset += 300.0f * currentDt;
     if (reloadAngleOffset >= 360.0f)
         reloadAngleOffset = 0;
 
@@ -538,7 +539,7 @@ void BattlefieldHUDRenderer::drawCursorArrow()
         Vector2 normalizedDir = Vector2Normalize(direction);
 
         static float animationTime = 0.0f;
-        animationTime += GetFrameTime() * 1.0f;
+        animationTime += currentDt * 1.0f;
 
         float arrowSpacing = 40.0f;
         float arrowSpeed = 200.0f;
@@ -624,7 +625,7 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
 
     static float blinkTimer = 0.0f;
-    blinkTimer += GetFrameTime() * 6.0f;
+    blinkTimer += currentDt * 6.0f;
     float alpha = 0.7f + 0.3f * sinf(blinkTimer);
 
     DrawRectangle(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha * 0.3f));

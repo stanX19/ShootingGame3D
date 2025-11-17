@@ -62,8 +62,9 @@ void Renderer::setupShaderUniforms()
 	SetShaderValue(lightedShader, lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
 }
 
-void Renderer::Render()
+void Renderer::Render(float dt)
 {
+	currentDt = dt;
 	// std::cout << "start draw\n" << std::endl;
 	ClearBackground(BLACK);
 

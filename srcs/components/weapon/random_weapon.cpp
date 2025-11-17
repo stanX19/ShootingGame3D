@@ -19,9 +19,9 @@ void weapon::emplaceRandomWeapon(GameContext &context, entt::entity turret, int 
 		weapon::emplaceWeaponLazerShotgun,
 		weapon::emplaceWeaponMissileBasic,
 		weapon::emplaceWeaponMissileSwarm,
-		// weapon::emplaceWeaponMissileTorpedo,
+		weapon::emplaceWeaponMissileTorpedo,
 		weapon::emplaceWeaponMissileNuke,
-		// weapon::emplaceWeaponMissileSniper
+		weapon::emplaceWeaponMissileSniper
 	};
 	list[value % list.size()](context, turret);
 }
@@ -34,9 +34,9 @@ void weapon::emplaceRandomMissileWeapon(GameContext &context, entt::entity turre
 	std::vector<std::function<void(GameContext &, entt::entity)>> list{
 		weapon::emplaceWeaponMissileBasic,
 		weapon::emplaceWeaponMissileSwarm,
-		// weapon::emplaceWeaponMissileTorpedo,
+		weapon::emplaceWeaponMissileTorpedo,
 		weapon::emplaceWeaponMissileNuke,
-		// weapon::emplaceWeaponMissileSniper
+		weapon::emplaceWeaponMissileSniper,
 		weapon::emplaceWeaponMissileFlares,
 	};
 	list[value % list.size()](context, turret);

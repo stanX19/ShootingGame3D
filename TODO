@@ -56,8 +56,7 @@
 37. weapon heat system
 	struct WeaponHeat {
 		float currentHeat;
-		float heatPerShot;
-		float maxHeat;
+		float heatPerShot; // max heat = 1.0f
 		float cooldownRate;
 		float overheatSpreadSin;
 	}

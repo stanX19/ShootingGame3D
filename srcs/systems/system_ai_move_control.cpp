@@ -16,8 +16,16 @@ static void aiTurnControl(GameContext &context, float dt)
 
 			
 		float speed = Vector3Length(velocity.value);
+		float calc_speed = speed;
+		
+		if (context.registry.all_of<ScalarAcceleration>(entity)) {
+			float acceleration = context.registry.get<ScalarAcceleration>(entity).value;
+			float distance = Vector3Distance(position.value, targetPos);
+			float traverlTime = speed + sqrtf(speed * speed + 2 * acceleration * distance) / acceleration;
+			calc_speed += acceleration * traverlTime / 2.0f;
+		}
 		// Vector3 targetDir = targetPos - position.value;
-		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, speed);
+		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, calc_speed);
 		Quaternion targetRotation = vector3ToRotation(targetDir);
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
 		float totalTargetTurn = angleDifference(targetRotation, rotation.value) * DEG2RAD;

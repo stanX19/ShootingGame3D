@@ -36,11 +36,11 @@ namespace {
 		context.templateReg.emplace<CollisionBody>(missile, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(missile, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(missile, MISSILE_BOUND * -1, MISSILE_BOUND);
-		context.templateReg.emplace<Lifespan>(missile, Lifespan{MISSILE_LIFESPAN});
 		context.templateReg.emplace<SpawnsTrailParticle>(missile, SpawnsTrailParticle{rad * 0.5f, 0.5f});
 		context.templateReg.emplace<Rotation>(missile);
 		context.templateReg.emplace<tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);
+		context.templateReg.emplace<Lifespan>(missile, Lifespan{MISSILE_LIFESPAN});
 		return missile;
 	}
 }
@@ -77,7 +77,7 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{0.75f});
 	// context.templateReg.emplace<DelayedDamage>(bulletTemplate, DelayedDamage{MISSILE_LIFESPAN * 0.2f, 1000000.0f});
-	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{MISSILE_LIFESPAN * 0.2f});
+	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{MISSILE_LIFESPAN * 0.25f});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(PI / 4);
@@ -91,6 +91,29 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
 }
 
+void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity entity)
+{
+	const float rad = 0.25f;
+
+	entt::entity bulletTemplate = createMissileTemplate(context, rad, getColor(context, entity));
+	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.25f});
+	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{500.0f});
+	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{0.1f});
+
+	Weapon weapon{bulletTemplate};
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
+	weapon.bulletData.bulletCount = 1;
+	weapon.bulletData.speed = MISSILE_SPEED;
+
+	emplaceMissileWeaponCommon(context, entity);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{4.0f, 4.0f});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{20.0f});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
+}
+
 void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity)
 {
 	const float rad = 2.0f;
@@ -100,7 +123,9 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 10.0f});
 	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{1.5f});
-
+	context.templateReg.remove<Lifespan>(bulletTemplate);
+	context.templateReg.emplace<DelayedDamage>(bulletTemplate, DelayedDamage{MISSILE_LIFESPAN * 2, 1000000.0f});
+	
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
 	weapon.bulletData.bulletCount = 1;
@@ -109,7 +134,25 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity)
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{1.0f, 1.0f});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{15.0f});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{30.0f});
+}
+
+void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entity)
+{
+	const float rad = 0.5f;
+
+	entt::entity bulletTemplate = createMissileTemplate(context, rad, getColor(context, entity));
+	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
+	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+
+	Weapon weapon{bulletTemplate};
+	weapon.bulletData.spreadSin = 0.0f;
+	weapon.bulletData.bulletCount = 1;
+	weapon.bulletData.speed = 1000.0f;
+
+	emplaceMissileWeaponCommon(context, entity);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.0f});
 }
 
 void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entity)
@@ -122,6 +165,7 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{0.05f});
 	// context.templateReg.emplace<DelayedDamage>(bulletTemplate, DelayedDamage{MISSILE_LIFESPAN * 0.2f, 1000000.0f});
 	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{MISSILE_LIFESPAN * 0.2f});
+	context.templateReg.emplace_or_replace<SpawnsTrailParticle>(bulletTemplate, SpawnsTrailParticle{rad, 0.5f, ORANGE});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(PI * 0.5f);

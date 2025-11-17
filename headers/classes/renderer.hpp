@@ -12,11 +12,12 @@ public:
 	Renderer(Camera3D& camera, GameContext &context);
 	~Renderer();
 
-	void Render();
+	void Render(float dt);
 
 private:
 	Camera3D& camera;
 	GameContext &context;
+	float currentDt;
 	Shader lightedShader;
 	Shader skyboxShader;
 	Shader defaultShader;
