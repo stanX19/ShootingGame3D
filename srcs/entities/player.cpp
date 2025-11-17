@@ -3,6 +3,7 @@
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "components/factions.hpp"
+#include "components/unit_camera.hpp"
 
 namespace {
 	Vector3 left = {1, 0, 0};
@@ -57,7 +58,8 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<MaxSpeed>(player, 80.0f);
 	context.registry.emplace<TurnSpeed>(player, 2.0f);
 	context.registry.emplace<Score>(player);
-	
+	context.registry.emplace<camera::UnitCamera>(player);
+
 	context.registry.emplace<faction::Faction>(player, faction::FAC_BLUE);
 	context.registry.emplace<tag::Targetable>(player);
 	context.registry.emplace<tag::Shaded>(player);

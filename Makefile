@@ -1,3 +1,6 @@
+NPROC		:= $(shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+MAKEFLAGS	+= -j$(NPROC)
+
 SRCDIR		= srcs
 SRCS		:= $(shell find $(SRCDIR) -name '*.cpp')
 
@@ -21,12 +24,23 @@ HEADERS_INC	= $(addprefix -I,$(sort $(dir $(HEADERS))) $(INCLUDE_DIR))
 IFLAGS		:= -I. $(HEADERS_INC)
 LFLAGS		= -Lincludes/raylib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-CC			= g++
-CFLAGS		= -std=c++20 -Wall -Wextra -Werror -MMD -MP -fmax-errors=3 -g3 # -fsanitize=address
+CC_BASE		= g++
+ifneq ($(shell command -v ccache 2>/dev/null),)
+CC			= ccache $(CC_BASE)
+else
+CC			= $(CC_BASE)
+endif
+
+CFLAGS		= -std=c++20 -Wall -Wextra -Werror -MMD -MP -fmax-errors=3 # -g3 -fsanitize=address
 AR			= ar -rcs
 RM			= rm -rf
 UP			= \033[1A
 FLUSH		= \033[2K
+
+PCH_HEADER	= headers/includes.hpp
+PCH			= $(OBJDIR)/includes.hpp.gch
+PCH_FLAG	= -include $(PCH_HEADER)
+PCH_DEPS	= $(PCH:.gch=.d)
 
 NAME		= shooting_game_3d
 ARGV		= 
@@ -34,8 +48,8 @@ ARGV		=
 run: all
 	./$(NAME) $(ARGV)
 
-$(NAME): $(OBJDIRS) $(OBJS) $(MAINCPP)
-	$(CC) $(CFLAGS) $(OBJS) $(MAINCPP) $(IFLAGS) $(LFLAGS) -o $(NAME)
+$(NAME): $(OBJDIRS) $(PCH) $(OBJS) $(MAINCPP)
+	$(CC) $(CFLAGS) $(PCH_FLAG) $(OBJS) $(MAINCPP) $(IFLAGS) $(LFLAGS) -o $(NAME)
 
 all: $(NAME)
 
@@ -57,14 +71,17 @@ $(OBJDIRS) $(TESTBINDIR):
 	mkdir -p $@
 	@echo "$(UP)$(FLUSH)$(UP)$(FLUSH)$(UP)"
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIRS)
-	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(PCH) | $(OBJDIRS)
+	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) -c $< -o $@
 
-$(TESTBINDIR)/%: $(TESTDIR)/%.cpp $(OBJS) | $(TESTBINDIR)
-	$(CC) $(CFLAGS) $(IFLAGS) $< $(OBJS) $(LFLAGS) -o $@
+$(TESTBINDIR)/%: $(TESTDIR)/%.cpp $(OBJS) $(PCH) | $(TESTBINDIR)
+	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) $< $(OBJS) $(LFLAGS) -o $@
+
+$(PCH): $(PCH_HEADER) | $(OBJDIRS)
+	$(CC) $(CFLAGS) $(IFLAGS) -x c++-header $< -o $@
 
 clean:
-	@$(RM) $(OBJS) $(OBJS:.o=.d)
+	@$(RM) $(OBJS) $(OBJS:.o=.d) $(PCH) $(PCH_DEPS)
 
 fclean:	clean
 	@$(RM) $(NAME)
@@ -82,4 +99,4 @@ code:
 	find $(SRCDIR) $(HEADER_DIR) -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec cat {} + > ../code.txt
 
 .PHONY: all clean fclean re bonus push test run_test test all_test
--include $(OBJS:.o=.d)
+-include $(OBJS:.o=.d) $(PCH_DEPS)

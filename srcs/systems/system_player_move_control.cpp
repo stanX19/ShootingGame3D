@@ -75,6 +75,15 @@ namespace {
 		position.value.y = Clamp(position.value.y, -hardBoundary, hardBoundary);
 		position.value.z = Clamp(position.value.z, -hardBoundary, hardBoundary);
 	}
+
+	float calculateTurnSpeed(GameContext &context, float speed, TurnSpeed &turnSpeed, float dt) {
+		float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
+		camera::UnitCamera *unitCamera = context.registry.try_get<camera::UnitCamera>(context.currentPlayer);
+		if (unitCamera && unitCamera->isAiming) {
+			turnSpeedDt *= 0.01f;
+		}
+		return turnSpeedDt;
+	}
 }
 
 // void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera3D &camera)
@@ -168,7 +177,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	Vector3 vel = velocity.value;
 	float speed = Vector3Length(vel);  // current speed
 
-	float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
+	float turnSpeedDt = calculateTurnSpeed(context, speed, turnSpeed, dt);
 	Quaternion newRotation = rotation.value;
 	Vector3 fowardVector = getForwardVector(rotation);
 	Vector3 upVector = getUpVector(rotation);

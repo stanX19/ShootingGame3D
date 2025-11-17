@@ -30,6 +30,7 @@ namespace camera {
 		// Smoothing / Physics
 		float lerpExp = 12.0f;       // Smoothing variable; Higher = higher lerp factor
 		float upLerpFactor = 0.2f;   // Up vector lerp multiplier
+		bool isAiming = false;        // Whether the camera is in aim mode
 	};
 
 	void emplaceUnitCameraBasic(entt::registry &registry, entt::entity entity);
