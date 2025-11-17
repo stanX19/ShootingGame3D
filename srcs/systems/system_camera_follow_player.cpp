@@ -16,7 +16,7 @@ namespace {
 		Vector3 playerForward = getForwardVector(playerRot);
 		
 		float closestDist = ARENA_SIZE * 2;
-		float closestAngle = std::cos(5.0f * DEG2RAD);  // minimum 5 degrees
+		float closestAngle = std::cos(1.0f * DEG2RAD);  // minimum 1.0 degrees
 		entt::entity closestEntity = entt::null;
 		for (auto otherEntity : context.registry.view<Position, tag::Targetable>()) {
 			if (otherEntity == entity)
@@ -26,7 +26,7 @@ namespace {
 
 			Vector3 toOtherDir = Vector3Normalize(toOther);
 			float dot = Vector3DotProduct(playerForward, toOtherDir);
-			if (dot < closestAngle) // 30 degrees cone
+			if (dot < closestAngle)
 				continue;
 			closestAngle = dot;
 

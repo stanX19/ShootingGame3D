@@ -38,7 +38,7 @@ UP			= \033[1A
 FLUSH		= \033[2K
 
 PCH_HEADER	= headers/includes.hpp
-PCH			= $(OBJDIR)/includes.hpp.gch
+PCH			= headers/includes.hpp.gch
 PCH_FLAG	= -include $(PCH_HEADER)
 PCH_DEPS	= $(PCH:.gch=.d)
 

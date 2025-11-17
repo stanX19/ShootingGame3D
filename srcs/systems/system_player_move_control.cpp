@@ -80,7 +80,7 @@ namespace {
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
 		camera::UnitCamera *unitCamera = context.registry.try_get<camera::UnitCamera>(context.currentPlayer);
 		if (unitCamera && unitCamera->isAiming) {
-			turnSpeedDt *= 0.01f;
+			turnSpeedDt *= 0.075f;
 		}
 		return turnSpeedDt;
 	}

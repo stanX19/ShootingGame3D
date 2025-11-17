@@ -1,5 +1,6 @@
 *.o
 *.d
+*.gch
 objs/
 shooting_game_3d
 includes/*/repo/
