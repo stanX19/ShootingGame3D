@@ -6,7 +6,7 @@
 
 #define ASTEROID_COUNT 10
 
-void ecs_systems::asteroidRespawn(GameContext &context)
+void ecs_systems::asteroidRespawn(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto asteroidView = context.registry.view<tag::Asteroid>();
 	int asteroidsToSpawn = ASTEROID_COUNT - (int)asteroidView.size();

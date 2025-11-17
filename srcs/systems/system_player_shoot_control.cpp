@@ -15,7 +15,7 @@ namespace {
     };
 }
 
-void ecs_systems::playerShootControl(GameContext &context) {
+void ecs_systems::playerShootControl(GameContext &context, [[maybe_unused]] float dt) {
 	auto playerView = context.registry.view<tag::weapon::PlayerControlledFire>();
 	auto weaponView = context.registry.view<WeaponParent, tag::weapon::IsWeapon>();
 

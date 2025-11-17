@@ -1,7 +1,7 @@
 #include "systems.hpp"
 #include "utils.hpp"
 
-static void rotationSyncModel(GameContext &context) {
+static void rotationSyncModel(GameContext &context, [[maybe_unused]] float dt) {
 	auto view = context.registry.view<Rotation, RenderBody, tag::RotationSyncModel>();
 	for (auto entity : view) {
 		Rotation& rotation = view.get<Rotation>(entity);
@@ -10,7 +10,7 @@ static void rotationSyncModel(GameContext &context) {
 	}
 }
 
-static void aimDirectionSyncModel(GameContext &context) {
+static void aimDirectionSyncModel(GameContext &context, [[maybe_unused]] float dt) {
 	auto viewAimOnly = context.registry.view<AimDirection, RenderBody, tag::AimDirectionSyncModel>(entt::exclude<Rotation>);
 	for (auto entity : viewAimOnly) {
 		AimDirection& aim = viewAimOnly.get<AimDirection>(entity);
@@ -27,21 +27,21 @@ static void aimDirectionSyncModel(GameContext &context) {
 	}
 }
 
-static void velocitySyncModelRot(GameContext &context) {
+static void velocitySyncModelRot(GameContext &context, [[maybe_unused]] float dt) {
 	for (auto [entity, vel, body] : context.registry.view<Velocity, RenderBody, tag::VelocitySyncModelRot>().each()) {
 		body.rotation = vector3ToRotation(vel.value);
 	}
 }
 
-static void velocitySyncRot(GameContext &context) {
+static void velocitySyncRot(GameContext &context, [[maybe_unused]] float dt) {
 	for (auto [entity, vel, rot] : context.registry.view<Velocity, Rotation, tag::VelocitySyncRot>().each()) {
 		rot.value = vector3ToRotation(vel.value);
 	}
 }
 
-void ecs_systems::syncModelRotation(GameContext &context) {
-	rotationSyncModel(context);
-	aimDirectionSyncModel(context);
-	velocitySyncModelRot(context);
-	velocitySyncRot(context);
+void ecs_systems::syncModelRotation(GameContext &context, [[maybe_unused]] float dt) {
+	rotationSyncModel(context, dt);
+	aimDirectionSyncModel(context, dt);
+	velocitySyncModelRot(context, dt);
+	velocitySyncRot(context, dt);
 }

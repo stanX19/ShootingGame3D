@@ -9,14 +9,15 @@ bool aimTargetExists(GameContext &context, AimTarget &target);
 // Game systems
 namespace ecs_systems
 {
-	void playerMoveControl(GameContext &context, float dt, const Camera3D &camera);
-	void playerShootControl(GameContext &context);
-	void playerRespawn(GameContext &context);
+	void cameraFollowPlayer(GameContext &context, float dt);
+	void playerMoveControl(GameContext &context, float dt);
+	void playerShootControl(GameContext &context, float dt);
+	void playerRespawn(GameContext &context, float dt);
 	void aiMoveControl(GameContext &context, float dt);
-	void aiShootControl(GameContext &context);
-	void aiFindTarget(GameContext &context);
-	void blueUnitRespawn(GameContext &context);
-	void redUnitRespawn(GameContext &context);
+	void aiShootControl(GameContext &context, float dt);
+	void aiFindTarget(GameContext &context, float dt);
+	void blueUnitRespawn(GameContext &context, float dt);
+	void redUnitRespawn(GameContext &context, float dt);
 	void entityMovement(GameContext &context, float dt);
 	void entityTransformation(GameContext &context, float dt);
 	void detectEntityCollision(GameContext &context, float dt);
@@ -24,20 +25,20 @@ namespace ecs_systems
 	void entityAnchorRelease(GameContext &context, float dt);
 	void entityLifetime(GameContext &context, float dt);
 	void delayedDamage(GameContext &context, float dt);
-	void hpCleanup(GameContext &context);
+	void hpCleanup(GameContext &context, float dt);
 	void hpRegen(GameContext &context, float dt);
 	void energyShield(GameContext &context, float dt);
 	void ammoReload(GameContext &context, float dt);
-	void bulletTargetAim(GameContext &context);
-	void weaponShoot(GameContext &context);
-	void weaponParentControlAim(GameContext &context);
-	void weaponParentControlShoot(GameContext &context);
-	void weaponUpdateCanFire(GameContext &context);
-	void weaponUpdateFireStatus(GameContext &context);
+	void bulletTargetAim(GameContext &context, float dt);
+	void weaponShoot(GameContext &context, float dt);
+	void weaponParentControlAim(GameContext &context, float dt);
+	void weaponParentControlShoot(GameContext &context, float dt);
+	void weaponUpdateCanFire(GameContext &context, float dt);
+	void weaponUpdateFireStatus(GameContext &context, float dt);
 	void weaponUpdateCooldown(GameContext &context, float dt);
-	void asteroidRespawn(GameContext &context);
-	void cleanOutOfBound(GameContext &context);
-	void syncModelRotation(GameContext &context);
+	void asteroidRespawn(GameContext &context, float dt);
+	void cleanOutOfBound(GameContext &context, float dt);
+	void syncModelRotation(GameContext &context, float dt);
 	void spawnTrailParticles(GameContext &context, float dt);
 }
 

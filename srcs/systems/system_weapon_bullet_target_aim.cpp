@@ -2,7 +2,7 @@
 #include "utils.hpp"
 #include <iostream>
 
-void ecs_systems::bulletTargetAim(GameContext &context)
+void ecs_systems::bulletTargetAim(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto view = context.registry.view<Position, AimDirection, AimTarget, Weapon>();
 

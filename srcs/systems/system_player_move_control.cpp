@@ -1,6 +1,7 @@
 #include "systems.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
+#include "components/unit_camera.hpp"
 #include <iostream>
 #include <cmath>
 
@@ -153,7 +154,7 @@ namespace {
 // }
 
 
-void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera3D &camera)
+void ecs_systems::playerMoveControl(GameContext &context, float dt)
 {
 	if (!context.registry.all_of<Position, Rotation, Velocity, MaxSpeed, TurnSpeed>(context.currentPlayer))
 		return ;
@@ -173,7 +174,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera
 	Vector3 upVector = getUpVector(rotation);
 	Vector3 rightVector = getRightVector(rotation);
 
-	Vector2 mouseDirection = getMouseDirectionRelRot(rotation.value, camera);
+	Vector2 mouseDirection = getMouseDirectionRelRot(rotation.value, context.mainCamera);
 	if (std::abs(mouseDirection.x) >= 0.01f) {
 		newRotation = rotateAroundAxis(newRotation, upVector, -mouseDirection.x * turnSpeedDt);
 		newRotation = rotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: 0.2));

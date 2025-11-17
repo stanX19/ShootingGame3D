@@ -25,7 +25,7 @@ static Vector3 generateSpawnPos(const Vector3 &playerPos) {
 	);
 }
 
-void ecs_systems::blueUnitRespawn(GameContext &context)
+void ecs_systems::blueUnitRespawn(GameContext &context, [[maybe_unused]] float dt)
 {
 	Vector3 playerPos = {0, 0, 0};
 	if (context.registry.valid(context.currentPlayer)) {

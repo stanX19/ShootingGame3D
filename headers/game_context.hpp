@@ -9,6 +9,7 @@ struct GameContext {
 	entt::registry registry;
 	entt::dispatcher dispatcher;
 	entt::entity currentPlayer = entt::null;
+	Camera3D mainCamera;
 };
 
 #endif  // GAME_CONTEXT_HPP

@@ -10,7 +10,7 @@ namespace
 	std::mt19937 rng(std::random_device{}());
 }
 
-void ecs_systems::weaponShoot(GameContext &context)
+void ecs_systems::weaponShoot(GameContext &context, [[maybe_unused]] float dt)
 {
     auto view = context.registry.view<Weapon, Position, AimDirection,
                                       tag::weapon::IsFiring, tag::weapon::CanFire>();

@@ -1,7 +1,7 @@
 #include "systems.hpp"
 #include <iostream>
 
-void ecs_systems::weaponParentControlShoot(GameContext& context) {
+void ecs_systems::weaponParentControlShoot(GameContext& context, [[maybe_unused]] float dt) {
 	auto isFiringView = context.registry.view<tag::weapon::IsFiring>();
 	auto view = context.registry.view<WeaponParent, tag::weapon::FollowParentAim>();
 

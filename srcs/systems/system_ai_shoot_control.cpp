@@ -3,7 +3,7 @@
 #include "constants.hpp"
 #include "components/factions.hpp"
 
-void ecs_systems::aiShootControl(GameContext &context) {
+void ecs_systems::aiShootControl(GameContext &context, [[maybe_unused]] float dt) {
 	auto view = context.registry.view<Position, AimDirection, AimTarget,
 										tag::weapon::IsWeapon, tag::weapon::AIControlledFire>();
 	for (auto [entity, position, aimDirection, aimTarget] : view.each())

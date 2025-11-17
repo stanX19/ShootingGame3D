@@ -1,7 +1,7 @@
 #include "systems.hpp"
 #include <iostream>
 
-void ecs_systems::weaponParentControlAim(GameContext& context) {
+void ecs_systems::weaponParentControlAim(GameContext& context, [[maybe_unused]] float dt) {
 	auto aimTargetView = context.registry.view<AimTarget>();
 	auto view = context.registry.view<WeaponParent, AimTarget, tag::weapon::FollowParentAim>();
 

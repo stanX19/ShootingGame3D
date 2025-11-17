@@ -1,6 +1,6 @@
 #include "systems.hpp"
 
-void ecs_systems::cleanOutOfBound(GameContext &context)
+void ecs_systems::cleanOutOfBound(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto view = context.registry.view<DisappearBound, Position>();
 	std::vector<entt::entity> toDestroy;

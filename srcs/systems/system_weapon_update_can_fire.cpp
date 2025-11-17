@@ -1,7 +1,7 @@
 #include "systems.hpp"
 
 
-void ecs_systems::weaponUpdateCanFire(GameContext &context)
+void ecs_systems::weaponUpdateCanFire(GameContext &context, [[maybe_unused]] float dt)
 {
 	// mark all weapons as CanFire
 	for (auto entity : context.registry.view<tag::weapon::IsWeapon>()) {

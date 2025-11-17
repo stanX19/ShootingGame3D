@@ -65,7 +65,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<tag::effect::DropDebris>(player);
 	context.registry.emplace<tag::effect::ExplodeOnDeath>(player);
 	context.registry.emplace<SpawnsTrailParticle>(player, SpawnsTrailParticle{0.3f, 0.1f});
-	
+
 	addWeapons(context, player, SKYBLUE);
 	context.currentPlayer = player;
 	return player;

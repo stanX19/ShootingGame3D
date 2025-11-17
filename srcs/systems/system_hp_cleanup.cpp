@@ -1,7 +1,7 @@
 #include "systems.hpp"
 #include "entities.hpp"
 
-void ecs_systems::hpCleanup(GameContext &context) {
+void ecs_systems::hpCleanup(GameContext &context, [[maybe_unused]] float dt) {
 	auto view = context.registry.view<HP>();
 	std::vector<entt::entity> toDestroy;
 

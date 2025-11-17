@@ -64,7 +64,7 @@ namespace {
 
 }
 
-void ecs_systems::aiFindTarget(GameContext &context){
+void ecs_systems::aiFindTarget(GameContext &context, [[maybe_unused]] float dt){
 	auto targetsView = context.registry.view<faction::Faction, Position, tag::Targetable>();
 	std::map<faction::FacVal, TargetsVector> cache;
 
