@@ -1,12 +1,9 @@
 #include "systems.hpp"
 
 namespace {
-	void setFiringStatus(entt::registry &registry, entt::entity entity, bool isFiring) {
-		if (isFiring) {
-			registry.emplace_or_replace<tag::weapon::IsFiring>(entity);
-		} else {
-			registry.remove<tag::weapon::IsFiring>(entity);
-		}
+	void setFireRequestStatus(entt::registry &registry, entt::entity entity, bool isFiring) {
+		if (isFiring)
+			registry.emplace_or_replace<tag::weapon::FireRequest>(entity);
 	}
 
 	static constexpr std::array<KeyboardKey, 8> numberKeys = {
@@ -33,7 +30,7 @@ void ecs_systems::playerShootControl(GameContext &context, [[maybe_unused]] floa
 				weaponEntities.push_back(weaponEntity);
 		}
 		for (size_t i = 0; i < weaponEntities.size() && i < numberKeys.size(); ++i) {
-			setFiringStatus(context.registry, weaponEntities[i], globalFire || IsKeyDown(numberKeys[i]));
+			setFireRequestStatus(context.registry, weaponEntities[i], globalFire || IsKeyDown(numberKeys[i]));
 		}
 	}
 }

@@ -57,7 +57,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{60.0, 60});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{80.0, 80});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{5.5f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
 }
@@ -83,8 +83,9 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0f, 5.0f});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{3.5f});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.5f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
+	context.registry.emplace_or_replace<FireDurationTakeAmmo>(entity, FireDurationTakeAmmo{1.0f});
 }
 
 void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
@@ -127,9 +128,9 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{10.0f});
 
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 1.0f);
+	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 0.01f);
 	weapon.bulletData.bulletCount = 1;
-	weapon.bulletData.speed = BASE_SPEED * 3.0f;
+	weapon.bulletData.speed = BASE_SPEED * 6.0f;
 
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
@@ -154,13 +155,13 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5.0f);
 	weapon.bulletData.bulletCount = 1;
-	weapon.bulletData.speed = BASE_SPEED * 3.0f;
+	weapon.bulletData.speed = BASE_SPEED * 6.0f;
 
 	// Weapon Components
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{10, 10});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{20, 20});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{8.0f});
 }
 
@@ -184,8 +185,8 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{15, 15});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.0f});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{30, 30});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{2.0f});
 }
 
 

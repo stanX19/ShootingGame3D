@@ -219,6 +219,19 @@ struct JustFired
 	float ammoCount;
 };
 
+struct FireDuration
+{
+	float duration = 0.0f;
+	float timeRemaining = 0.0f;
+
+	FireDuration(float t): duration(t), timeRemaining(0.0f) {}
+};
+
+struct FireDurationTakeAmmo : FireDuration
+{
+	using FireDuration::FireDuration;
+};
+
 struct WeaponParent
 {
 	entt::entity parent;
@@ -276,6 +289,8 @@ namespace tag {
 		struct ParentControlledFire {};		// dont do anything, parent updates AimTarget; TODO
 		struct AIControlledFire {};			// decide IsFiring using distance and angle
 		struct FollowParentFire {};			// follow parent firing
+
+		struct FireRequest {};
 		struct IsFiring {};
 		struct CanFire {};
 	};

@@ -9,7 +9,7 @@ void ecs_systems::aiShootControl(GameContext &context, [[maybe_unused]] float dt
 	for (auto [entity, position, aimDirection, aimTarget] : view.each())
 	{
 		if (!aimTargetExists(context, aimTarget) || !context.registry.all_of<Position>(aimTarget.entity)) {
-			context.registry.remove<tag::weapon::IsFiring>(entity);
+			context.registry.remove<tag::weapon::FireRequest>(entity);
 			continue;
 		}
 		
@@ -18,9 +18,9 @@ void ecs_systems::aiShootControl(GameContext &context, [[maybe_unused]] float dt
 		float dist = Vector3Length(toTarget);
 
 		if ((dist < COMBAT_DIST) && Vector3DotProduct(aimDirection.value, Vector3Normalize(toTarget)) > cosf(DEG2RAD * 35.0f)) {
-			context.registry.emplace_or_replace<tag::weapon::IsFiring>(entity);
+			context.registry.emplace_or_replace<tag::weapon::FireRequest>(entity);
 		} else {
-			context.registry.remove<tag::weapon::IsFiring>(entity);
+			context.registry.remove<tag::weapon::FireRequest>(entity);
 		}
 	}
 }
