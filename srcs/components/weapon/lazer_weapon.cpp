@@ -28,7 +28,7 @@ namespace {
 
 	entt::entity createBulletTemplate(GameContext &context, float rad, Color color) {
 		entt::entity bullet = context.templateReg.create();
-		t_model_id model = context.modelManager.createCube();
+		t_model_id model = context.modelManager.createCylinder();
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
@@ -76,6 +76,7 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{80.0f, 120});
 	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{6.0});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{0.5f});
 }
 
 void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity)

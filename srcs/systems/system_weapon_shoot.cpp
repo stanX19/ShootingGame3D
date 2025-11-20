@@ -21,7 +21,7 @@ namespace
 	}
 
 	void updateFireDuration(GameContext &context, [[maybe_unused]] float dt) {
-		for (auto [entity, fireDuration] : context.registry.view<FireDurationTakeAmmo>().each()) {
+		for (auto [entity, fireDuration] : context.registry.view<ExtendFireRequest>().each()) {
 			fireDuration.timeRemaining -= dt;
 		}
 		for (auto [entity, fireDuration] : context.registry.view<FireDuration>().each()) {
@@ -31,7 +31,7 @@ namespace
 		for (auto [entity, weapon, fireDuration] : context.registry.view<Weapon, FireDuration, tag::weapon::IsFiring>().each()) {
 			fireDuration.timeRemaining = fireDuration.duration;
 		}
-		for (auto [entity, weapon, fireDuration] : context.registry.view<Weapon, FireDurationTakeAmmo, tag::weapon::IsFiring>().each()) {
+		for (auto [entity, weapon, fireDuration] : context.registry.view<Weapon, ExtendFireRequest, tag::weapon::IsFiring>().each()) {
 			fireDuration.timeRemaining = fireDuration.duration;
 		}
 
@@ -41,7 +41,7 @@ namespace
 				continue;
 			context.registry.emplace_or_replace<tag::weapon::IsFiring>(entity);
 		}
-		for (auto [entity, weapon, fireDuration] : context.registry.view<Weapon, FireDurationTakeAmmo, tag::weapon::CanFire>().each()) {
+		for (auto [entity, weapon, fireDuration] : context.registry.view<Weapon, ExtendFireRequest, tag::weapon::CanFire>().each()) {
 			if (fireDuration.timeRemaining <= 0.0f)
 				continue;
 			context.registry.emplace_or_replace<tag::weapon::IsFiring>(entity);

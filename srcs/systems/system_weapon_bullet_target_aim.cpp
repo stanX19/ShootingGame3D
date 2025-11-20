@@ -44,7 +44,7 @@ void ecs_systems::bulletTargetAim(GameContext &context, [[maybe_unused]] float d
 		Vector3 currRotVec = Vector3RotateByQuaternion(Vector3UnitZ, currRotPtr->value);
 		Quaternion originalRelRot = QuaternionFromVector3ToVector3(prevRotVec, aimDirection.value);
 		Quaternion targetRelRot = QuaternionFromVector3ToVector3(currRotVec, targetedAimDir);
-		Quaternion newRelRot = QuaternionLerp(originalRelRot, targetRelRot, 0.25);
+		Quaternion newRelRot = QuaternionLerp(originalRelRot, targetRelRot, 0.5);
 		aimDirection.value = Vector3RotateByQuaternion(currRotVec, newRelRot);
 	}
 }

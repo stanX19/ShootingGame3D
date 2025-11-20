@@ -85,7 +85,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{5.0f, 5.0f});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{1.5f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.1});
-	context.registry.emplace_or_replace<FireDurationTakeAmmo>(entity, FireDurationTakeAmmo{1.0f});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{1.0f});
 }
 
 void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
@@ -160,7 +160,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	// Weapon Components
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.35});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{20, 20});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{8.0f});
 }

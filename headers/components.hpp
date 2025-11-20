@@ -227,7 +227,7 @@ struct FireDuration
 	FireDuration(float t): duration(t), timeRemaining(0.0f) {}
 };
 
-struct FireDurationTakeAmmo : FireDuration
+struct ExtendFireRequest : FireDuration
 {
 	using FireDuration::FireDuration;
 };

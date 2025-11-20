@@ -93,9 +93,17 @@ t_model_id ModelManager::createCylinder(int slices, float radius, float height)
 {
 	// assert(radius == 1.0);  // radius should be handled using scale
 	return createAndAddModel("cylinder", [=]()
-							 {
-		Mesh mesh = GenMeshCylinder(radius, height, slices);
-		return LoadModelFromMesh(mesh); }, radius, height, slices);
+		{
+			Mesh mesh = GenMeshCylinder(radius, height, slices);
+			Model model = LoadModelFromMesh(mesh);
+			Matrix transform = getTransformMatrix(
+				Vector3{1.0f, 1.0f, 1.0f},			// scale
+				Vector3{90.0f, 0.0f, 0.0f} * DEG2RAD,        // rotation
+				Vector3{0.0f, 0.0f, -height / 2.0f}          // displacement
+			);
+			model.transform = transform;
+			return model;
+		}, radius, height, slices);
 }
 
 t_model_id ModelManager::createPlane(float width, float length, int resX, int resZ)
