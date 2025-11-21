@@ -219,17 +219,25 @@ struct JustFired
 	float ammoCount;
 };
 
-struct FireDuration
+struct ExtendFireDuration
 {
 	float duration = 0.0f;
 	float timeRemaining = 0.0f;
 
-	FireDuration(float t): duration(t), timeRemaining(0.0f) {}
+	ExtendFireDuration(float t): duration(t), timeRemaining(0.0f) {}
 };
 
-struct ExtendFireRequest : FireDuration
+struct ExtendFireRequest : ExtendFireDuration
 {
-	using FireDuration::FireDuration;
+	using ExtendFireDuration::ExtendFireDuration;
+};
+
+struct ChargedWeapon
+{
+	float totalChargeNeeded;		// time needed to fully charge
+	float chargeAmmo = 1.0f;		// ammo consumption on full charge
+	float currentCharge = 0.0f;		// current charge time
+	entt::entity chargeEffectEntity = entt::null;
 };
 
 struct WeaponParent
@@ -270,6 +278,7 @@ namespace tag {
 	// todo: throw these into namespaces too
 	struct Asteroid {};
 	struct AIMoveControl {};
+	struct Suicidal {};
 	struct Enemy {};
 	struct EliteUnit {};
 	struct Bullet {};
@@ -297,6 +306,7 @@ namespace tag {
 	namespace bullet_type {
 		struct Kinetic {};
 		struct Energy {};
+		struct Lazer {};
 	}
 	struct LightSource {};
 	struct Shaded {};

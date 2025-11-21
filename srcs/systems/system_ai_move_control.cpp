@@ -3,7 +3,7 @@
 
 static void aiTurnControl(GameContext &context, float dt)
 {
-	auto view = context.registry.view<Position, Rotation, Velocity, TurnSpeed, MoveTarget>();
+	auto view = context.registry.view<Position, Rotation, Velocity, TurnSpeed, MoveTarget, tag::AIMoveControl>();
 
 	for (auto [entity, position, rotation, velocity, turnSpeed, target] : view.each())
 	{
@@ -14,7 +14,6 @@ static void aiTurnControl(GameContext &context, float dt)
 		if (context.registry.valid(target.entity) && context.registry.all_of<Velocity>(target.entity))
 			targetVel = context.registry.get<Velocity>(target.entity).value;
 
-			
 		float speed = Vector3Length(velocity.value);
 		float calc_speed = speed;
 		
@@ -24,8 +23,18 @@ static void aiTurnControl(GameContext &context, float dt)
 			float traverlTime = speed + sqrtf(speed * speed + 2 * acceleration * distance) / acceleration;
 			calc_speed += acceleration * traverlTime / 2.0f;
 		}
-		// Vector3 targetDir = targetPos - position.value;
+
+		// Vector3 toTargetEntt = targetPos - position.value;  // use normal aiming by default
+
 		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, calc_speed);
+		float distance = Vector3Distance(position.value, targetPos);
+		float relSpeed = Vector3Length(targetVel - velocity.value);
+
+		constexpr float avoidance_time = 1.5f;
+		if (!context.registry.all_of<tag::Suicidal>(entity) && distance / relSpeed < avoidance_time) {
+			targetDir = Vector3Normalize(Vector3Normalize(position.value - targetPos) + getUpVector(rotation) * 0.9f);
+		}
+
 		Quaternion targetRotation = vector3ToRotation(targetDir);
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
 		float totalTargetTurn = angleDifference(targetRotation, rotation.value) * DEG2RAD;
@@ -38,7 +47,7 @@ static void aiTurnControl(GameContext &context, float dt)
 
 static void aiSpeedControl(GameContext &context, float dt)
 {
-	auto view = context.registry.view<Rotation, Velocity, MaxSpeed, MoveTarget>();
+	auto view = context.registry.view<Rotation, Velocity, MaxSpeed, MoveTarget, tag::AIMoveControl>();
 
 	for (auto [entity, rotation, velocity, maxSpeed, target] : view.each())
 	{

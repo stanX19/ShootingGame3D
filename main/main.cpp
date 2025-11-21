@@ -47,7 +47,7 @@ int main() {
 
 		// --- Update systems ---
 		ecs_systems::playerMoveControl(context, dt);
-		// ecs_systems::playerRespawn(context, dt);
+		ecs_systems::playerRespawn(context, dt);
 		ecs_systems::aiFindTarget(context, dt);
 		ecs_systems::aiMoveControl(context, dt);
 		ecs_systems::aiShootControl(context, dt);
@@ -59,12 +59,14 @@ int main() {
 		ecs_systems::playerShootControl(context, dt);  // override parent control shoot
 		ecs_systems::weaponUpdateCooldown(context, dt);
 		ecs_systems::weaponUpdateCanFire(context, dt);
+		ecs_systems::weaponUpdateCharged(context, dt);
 		ecs_systems::weaponShoot(context, dt);
 		ecs_systems::weaponUpdateFireStatus(context, dt);
 
 		ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context, dt);
 		ecs_systems::entityTransformation(context, dt);
+		
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
 

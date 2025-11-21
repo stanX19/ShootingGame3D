@@ -16,8 +16,15 @@ void ecs_systems::weaponUpdateCanFire(GameContext &context, [[maybe_unused]] flo
 	}
 
 	// Remove CanFire if out of ammo
-	for (auto [entity, ammo] : context.registry.view<Ammo, tag::weapon::IsWeapon>().each()) {
+	for (auto [entity, ammo] : context.registry.view<Ammo, tag::weapon::IsWeapon>(entt::exclude<ChargedWeapon>).each()) {
 		if (ammo.value < 1.0f) {
+			context.registry.remove<tag::weapon::CanFire>(entity);
+		}
+	}
+
+	for (auto [entity, ammo, charge] : context.registry.view<Ammo, ChargedWeapon, tag::weapon::IsWeapon>().each()) {
+		float ammoNeeded = charge.chargeAmmo * (1 - charge.currentCharge / charge.totalChargeNeeded);
+		if (ammo.value < ammoNeeded) {
 			context.registry.remove<tag::weapon::CanFire>(entity);
 		}
 	}

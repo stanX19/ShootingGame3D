@@ -32,6 +32,7 @@ namespace {
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
+		context.templateReg.emplace<tag::bullet_type::Lazer>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (rad * 2));  // 1 / diameter
 		context.templateReg.emplace<CollisionBody>(bullet, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(bullet, RenderBody{model, color, rad});
@@ -85,7 +86,7 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	
 	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.5});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
 	
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = 0.0f;
@@ -94,15 +95,18 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{2.0f, 7});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{0.5});
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{1.0f});
-	context.registry.emplace_or_replace<FireDuration>(entity, FireDuration{0.5f});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{1.0f, 1});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{0.125});
+
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{2.0f});
+	context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{1.5f});
+	context.registry.emplace_or_replace<ExtendFireDuration>(entity, ExtendFireDuration{1.5f}); // this happens within cooldown
+	// context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.0f});
 }
 
 void weapon::emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.025f;
+	const float rad = 0.1f;
 	
 	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});

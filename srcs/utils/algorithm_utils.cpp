@@ -53,6 +53,8 @@ bool willCollide(float collisionDt, float maxDt)
 	return (collisionDt >= 0.0f && collisionDt <= maxDt);
 }
 
+// Predictive aiming: calculate direction to lead a moving target
+// Returns a normalized direction vector
 Vector3 calculateLeadDirection(
 	const Vector3 &shooterPos,
 	const Vector3 &targetPos,

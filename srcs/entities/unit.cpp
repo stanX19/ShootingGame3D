@@ -32,6 +32,7 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<MoveTarget>(entity);
 	
 	context.registry.emplace<tag::Targetable>(entity);
+	context.registry.emplace<tag::Spaceship>(entity);
 	context.registry.emplace<tag::Shaded>(entity);
 	context.registry.emplace<tag::RotationSyncModel>(entity);
 	context.registry.emplace<tag::effect::DropDebris>(entity);
@@ -39,6 +40,7 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos) {
 
 	context.registry.emplace<tag::weapon::AIControlledAim>(entity);
 	context.registry.emplace<tag::weapon::AIControlledFire>(entity);
+	context.registry.emplace<tag::AIMoveControl>(entity);
 	return entity;
 }
 

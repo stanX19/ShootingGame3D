@@ -20,6 +20,11 @@ namespace {
 
 	// need a better name for the function below
 	void handleVictimPhysics(const KillEvent& evt) {
+		if (evt.context->registry.any_of<tag::bullet_type::Energy>(evt.killer.id))
+			return;
+		if (evt.context->registry.any_of<tag::bullet_type::Lazer>(evt.victim.id))
+			return;
+
 		auto victimPosPtr = evt.context->registry.try_get<Position>(evt.victim.id);
 		if (victimPosPtr) {
 			victimPosPtr->value = evt.victim.pos;

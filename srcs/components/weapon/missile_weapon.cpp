@@ -40,6 +40,8 @@ namespace {
 		context.templateReg.emplace<Rotation>(missile);
 		context.templateReg.emplace<tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);
+		context.templateReg.emplace<tag::AIMoveControl>(missile);
+		context.templateReg.emplace<tag::Suicidal>(missile);
 		context.templateReg.emplace<Lifespan>(missile, Lifespan{MISSILE_LIFESPAN});
 		return missile;
 	}
@@ -112,6 +114,7 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{4.0f, 4.0f});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{20.0f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{2.0f});
 }
 
 void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity)

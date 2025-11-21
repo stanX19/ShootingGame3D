@@ -62,6 +62,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 
 	context.registry.emplace<faction::Faction>(player, faction::FAC_BLUE);
 	context.registry.emplace<tag::Targetable>(player);
+	context.registry.emplace<tag::Spaceship>(player);
 	context.registry.emplace<tag::Shaded>(player);
 	context.registry.emplace<tag::RotationSyncModel>(player);
 	context.registry.emplace<tag::effect::DropDebris>(player);

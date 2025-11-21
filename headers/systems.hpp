@@ -36,6 +36,7 @@ namespace ecs_systems
 	void weaponUpdateCanFire(GameContext &context, float dt);
 	void weaponUpdateFireStatus(GameContext &context, float dt);
 	void weaponUpdateCooldown(GameContext &context, float dt);
+	void weaponUpdateCharged(GameContext &context, float dt);
 	void asteroidRespawn(GameContext &context, float dt);
 	void cleanOutOfBound(GameContext &context, float dt);
 	void syncModelRotation(GameContext &context, float dt);

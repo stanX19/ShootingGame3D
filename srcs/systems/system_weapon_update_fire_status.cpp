@@ -3,28 +3,17 @@
 void ecs_systems::weaponUpdateFireStatus(GameContext &context, [[maybe_unused]] float dt)
 {
 	// deal with cooldown
-	auto cooldownView = context.registry.view<JustFired, WeaponCooldown>();
-
-	for (auto entity : cooldownView) {
-		auto& cooldown = cooldownView.get<WeaponCooldown>(entity);
-
+	for (auto [entity, justFired, cooldown] : context.registry.view<JustFired, WeaponCooldown>().each()) {
 		cooldown.timeSinceLastShot = 0;
 	}
 
 	// deal with ammo
-	auto ammoView = context.registry.view<JustFired, Ammo>();
-
-	for (auto entity : ammoView) {
-		auto& ammo = ammoView.get<Ammo>(entity);
-		auto& justFired = ammoView.get<JustFired>(entity);
-
+	for (auto [entity, justFired, ammo] : context.registry.view<JustFired, Ammo>(entt::exclude<ChargedWeapon>).each()) {
 		ammo.value -= justFired.ammoCount;
 	}
 
 	// remove the tag
-	auto justFiredView = context.registry.view<JustFired>();
-
-	for (auto entity : justFiredView) {
+	for (auto [entity, justFired] : context.registry.view<JustFired>().each()) {
 		context.registry.remove<JustFired>(entity);
 	}
 }
