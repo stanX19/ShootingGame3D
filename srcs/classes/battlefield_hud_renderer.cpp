@@ -1,6 +1,7 @@
 #include "battlefield_hud_renderer.hpp"
 #include "draw_utils.hpp"
 #include <algorithm>
+#include <numeric>
 #include <tuple>
 #include <vector>
 #include <cmath>
@@ -55,15 +56,35 @@ void BattlefieldHUDRenderer::drawTexts()
             }
         }
         DrawText(TextFormat("Entities: %d", totalEntities), 10, 30, 20, textColor);
-        DrawText("Move: W S or Right click", 10, 50, 20, textColor);
-        DrawText("Turn: Arrows or Mouse cursor", 10, 70, 20, textColor);
-        DrawText("Fire: Space or Left click", 10, 90, 20, textColor);
+		if (IsKeyDown(KEY_H)) {
+			DrawText("Move: W S or Right click", 10, 50, 20, textColor);
+			DrawText("Turn: Arrows or Mouse cursor", 10, 70, 20, textColor);
+			DrawText("Fire: Space or Left click", 10, 90, 20, textColor);
+		}
 
-        char buf[40];
-        Score *scorePtr = context.registry.try_get<Score>(context.currentPlayer);
-        score = scorePtr ? scorePtr->value : -1;
-        sprintf(buf, "score: %i", score);
-        DrawText(buf, 10, 130, 20, textColor);
+		auto playerFacPtr = context.registry.try_get<faction::Faction>(context.currentPlayer);
+
+		if (playerFacPtr) {
+			int allyKill = std::accumulate(context.factions.begin(), context.factions.end(), 0, [&](int acc, const std::pair<const faction::FacVal, FactionData> &pair) {
+				if (pair.first != playerFacPtr->value)
+					return acc + pair.second.deaths;
+				return acc;
+			});
+			int enemyKill = context.factions[playerFacPtr->value].deaths;
+			char buf[40];
+			float screenCenterX = GetScreenWidth() / 2.0f;
+			int spacing = 20;
+			int textSize = 24;
+			// int textSpacing = 50;
+			int textWidth = MeasureText("Kills", textSize);
+			DrawText("Kills", screenCenterX - textWidth / 2, 10, textSize, GRAY);
+			// DrawText("Allied", screenCenterX - MeasureText("Allied", textSize) - spacing - textSpacing, 10, textSize, SKYBLUE);
+			sprintf(buf, "%i", allyKill);
+			DrawText(buf, screenCenterX - MeasureText(buf, textSize) - spacing - textWidth / 2, 10, textSize, SKYBLUE);
+			// DrawText("Enemy", screenCenterX + spacing + textSpacing, 10, textSize, ORANGE);
+			sprintf(buf, "%i", enemyKill);
+			DrawText(buf, screenCenterX + spacing + textWidth / 2, 10, textSize, ORANGE);
+		}
     }
     else
     {

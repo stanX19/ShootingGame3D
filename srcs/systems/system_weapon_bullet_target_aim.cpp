@@ -16,6 +16,7 @@ void ecs_systems::bulletTargetAim(GameContext &context, [[maybe_unused]] float d
 		Vector3 targetedAimDir = aimDirection.value;
 		Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
 		Vector3 shooterVel = velocityPtr ? velocityPtr->value : Vector3Zeros;
+		float lerpFactor = 0.4f;
 
 		if (aimTargetExists(context, aimTarget) && context.registry.all_of<Position>(aimTarget.entity))
 		{
@@ -33,6 +34,7 @@ void ecs_systems::bulletTargetAim(GameContext &context, [[maybe_unused]] float d
 			);
 		} else if (context.registry.all_of<Rotation>(entity)) {
 			targetedAimDir = getForwardVector(context.registry.get<Rotation>(entity));
+			lerpFactor = 0.05f;
 		}
 
 		auto [prevRotPtr, currRotPtr] = context.registry.try_get<PrevRotation, Rotation>(entity);
@@ -44,7 +46,7 @@ void ecs_systems::bulletTargetAim(GameContext &context, [[maybe_unused]] float d
 		Vector3 currRotVec = Vector3RotateByQuaternion(Vector3UnitZ, currRotPtr->value);
 		Quaternion originalRelRot = QuaternionFromVector3ToVector3(prevRotVec, aimDirection.value);
 		Quaternion targetRelRot = QuaternionFromVector3ToVector3(currRotVec, targetedAimDir);
-		Quaternion newRelRot = QuaternionLerp(originalRelRot, targetRelRot, 0.5);
+		Quaternion newRelRot = QuaternionLerp(originalRelRot, targetRelRot, lerpFactor);
 		aimDirection.value = Vector3RotateByQuaternion(currRotVec, newRelRot);
 	}
 }

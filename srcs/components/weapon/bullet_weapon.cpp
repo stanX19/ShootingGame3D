@@ -162,7 +162,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.35});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{20, 20});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{8.0f});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{12.0f});
 }
 
 void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)

@@ -1,5 +1,6 @@
 #include "events.hpp"
 #include "components.hpp"
+#include <iostream>
 
 namespace {
 	using namespace event;
@@ -10,6 +11,28 @@ namespace {
 			scorePtr->value += score;
 		if (scoreParentPtr)
 			addScore(context, scoreParentPtr->parent, score);
+	}
+
+	void handleFactionDataUpdate(const KillEvent& evt) {
+		if (!evt.context->registry.all_of<tag::Spaceship>(evt.victim.id))
+			return;
+		auto &factions = evt.context->factions;
+		auto killerFacPtr = evt.context->registry.try_get<faction::Faction>(evt.killer.id);
+		auto victimFacPtr = evt.context->registry.try_get<faction::Faction>(evt.victim.id);
+		auto victimScorePtr = evt.context->registry.try_get<KilledScore>(evt.victim.id);
+
+		std::cout << "Entity killed\n";
+		if (killerFacPtr) {
+			auto &killerData = factions[killerFacPtr->value];
+			killerData.kills += 1;
+			killerData.score += victimScorePtr ? victimScorePtr->value : 0;
+		} else 
+			std::cout << "Killer has no faction\n";
+		if (victimFacPtr) {
+			auto &victimData = factions[victimFacPtr->value];
+			victimData.deaths += 1;
+		} else 
+			std::cout << "Victim has no faction\n";
 	}
 
 	void handleScoreTrasfer(const KillEvent& evt) {
@@ -41,6 +64,7 @@ namespace {
 }
 
 void event::Listener::handleKillEvent(const KillEvent& evt) {
+	handleFactionDataUpdate(evt);
 	handleScoreTrasfer(evt);
 	handleVictimPhysics(evt);
 }

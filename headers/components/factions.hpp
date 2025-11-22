@@ -13,7 +13,7 @@ namespace faction {
 	};
 	
 	struct Faction {
-		FacVal value;
+		FacVal value = FAC_NONE;
 	};
 }
 

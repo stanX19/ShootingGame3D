@@ -9,8 +9,7 @@ void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3
 	t_model_id explosionModel = context.modelManager.createSphere(64, 64);
 	const float startRatio = 0.05f;
 
-	for (int i = 0; i < 5 * rad; i++)
-	{
+	for (int i = 0; i < 5 * rad; i++) {
 		entt::entity explosion = context.registry.create();
 
 		Vector3 displaceDir = (i == 0) ? Vector3Zeros: randomUnitVector3();
@@ -33,8 +32,12 @@ void spawnExplosion(GameContext &context, const Vector3& pos, float rad, Vector3
 		context.registry.emplace<CollisionBody>(explosion, subRad * startRatio);
 		context.registry.emplace<Damage>(explosion, 50.0f);
 		context.registry.emplace<tag::bullet_type::Energy>(explosion);
-		if (context.registry.valid(parent))
+		if (context.registry.valid(parent)) {
 			context.registry.emplace<ScoreParent>(explosion, parent);
+			context.registry.emplace<faction::Faction>(
+				explosion, context.registry.get_or_emplace<faction::Faction>(parent).value
+			);
+		}
 	}
 }
 

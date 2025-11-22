@@ -52,8 +52,9 @@ namespace {
 			shieldPtr->hp = 0;
 		}
 
-		// Check if this damage will kill the entity
-		if (hpPtr->value > 0 && dmg > hpPtr->value) {
+		hpPtr->value -= dmg;
+
+		if (hpPtr->value < 0) {
 			evt.context->dispatcher.enqueue<event::KillEvent>(event::KillEvent{
 				evt.context,
 				killer,
@@ -61,8 +62,6 @@ namespace {
 				evt.dt
 			});
 		}
-
-		hpPtr->value -= dmg;
 		
 		// Try to spawn debris after applying damage
 		trySpawnDebris(evt.context, victim, killer);

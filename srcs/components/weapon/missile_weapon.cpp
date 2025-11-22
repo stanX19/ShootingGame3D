@@ -79,7 +79,7 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{0.75f});
 	// context.templateReg.emplace<DelayedDamage>(bulletTemplate, DelayedDamage{MISSILE_LIFESPAN * 0.2f, 1000000.0f});
-	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{MISSILE_LIFESPAN * 0.25f});
+	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{MISSILE_LIFESPAN * 0.5f});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(PI / 4);
@@ -89,8 +89,9 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{3.0f, 3.0f});
-	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{8.0f});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{15.0f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{2.0f});
 }
 
 void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity entity)
@@ -101,19 +102,18 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.25f});
 	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
-	context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{500.0f});
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{0.1f});
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
 	weapon.bulletData.bulletCount = 1;
-	weapon.bulletData.speed = MISSILE_SPEED;
+	weapon.bulletData.speed = MISSILE_MAX_SPEED;
 
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{4.0f, 4.0f});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{20.0f});
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.2f});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{2.0f});
 }
 
@@ -180,4 +180,5 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{6.0f, 6.0f});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{8.0f});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.125f});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{2.0f});
 }

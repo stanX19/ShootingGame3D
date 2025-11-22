@@ -11,6 +11,8 @@ static void resetGame(GameContext &context) {
 	spawnPlayer(context);
 	spawnSunAndStars(context);
 	SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
+	context.factions.clear();
+	
 	context.mainCamera.position = Vector3{ 0.0f, 1.0f, 4.0f };
 	context.mainCamera.target = Vector3{ 0.0f, 0.0f, 0.0f };
 	context.mainCamera.up = Vector3{ 0.0f, 1.0f, 0.0f };

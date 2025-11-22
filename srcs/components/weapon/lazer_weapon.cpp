@@ -82,7 +82,7 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 
 void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity)
 {
-	const float rad = 1.0f;
+	const float rad = 0.5f;
 	
 	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
