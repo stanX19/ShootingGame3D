@@ -1,9 +1,22 @@
 #include "events.hpp"
 #include "components.hpp"
+#include "components/sound.hpp"
 #include <iostream>
 
 namespace {
 	using namespace event;
+
+	void tryEmitDeathSound(const KillEvent& evt) {
+		auto soundPtr = evt.context->registry.try_get<sound::DeathSound>(evt.victim.id);
+		if (!soundPtr || soundPtr->id == sound::NONE) return;
+
+		evt.context->dispatcher.enqueue<event::SoundEvent>(event::SoundEvent{
+			evt.context,
+			soundPtr->id,
+			evt.victim.pos,
+			soundPtr->volume
+		});
+	}
 
 	void addScore(GameContext &context, entt::entity entity, int score) {
 		auto [scorePtr, scoreParentPtr] = context.registry.try_get<Score, ScoreParent>(entity);
@@ -64,6 +77,7 @@ namespace {
 }
 
 void event::Listener::handleKillEvent(const KillEvent& evt) {
+	tryEmitDeathSound(evt);
 	handleFactionDataUpdate(evt);
 	handleScoreTrasfer(evt);
 	handleVictimPhysics(evt);

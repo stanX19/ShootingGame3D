@@ -3,6 +3,8 @@
 #include "utils.hpp"
 #include "entt_utils.hpp"
 #include "components/factions.hpp"
+#include "components/sound.hpp"
+#include "events.hpp"
 #include <random>
 
 namespace
@@ -80,6 +82,18 @@ namespace
 				faction = faction | factPtr->value;
 			Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
 			Vector3 shooterVel = velocityPtr ? velocityPtr->value : Vector3Zeros;
+
+			// Emit shoot sound if weapon has ShootSound component
+			if (auto *shootSound = context.registry.try_get<sound::ShootSound>(entity)) {
+				if (shootSound->id != sound::NONE) {
+					context.dispatcher.enqueue<event::SoundEvent>(event::SoundEvent{
+						&context,
+						shootSound->id,
+						pos,
+						shootSound->volume
+					});
+				}
+			}
 
 			for (int i = 0; i < weapon.bulletData.bulletCount; i++)
 			{

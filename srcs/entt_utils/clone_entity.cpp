@@ -9,7 +9,7 @@ entt::entity entt_utils::cloneEntity(entt::registry &src, entt::entity srcEntity
 			continue;
 		auto* dst_storage = dst.storage(id);
 		if (!dst_storage) {
-			throw std::runtime_error("cloneEntity failed due to null dst storage");
+			throw std::runtime_error("cloneEntity failed due to null dst storage; you forgot to add the component type to the dst registry?");
 		}
 		dst_storage->push(dstEntity, storage.value(srcEntity));
     }

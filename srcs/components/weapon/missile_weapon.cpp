@@ -1,6 +1,7 @@
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
+#include "components/sound.hpp"
 
 namespace {
 	const float MISSILE_SPEED = 100.0f;
@@ -26,6 +27,7 @@ namespace {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
+		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_BULLET_SHOOT, 0.5f);
 	}
 
 	entt::entity createMissileTemplate(GameContext &context, float rad, Color color) {
@@ -43,6 +45,7 @@ namespace {
 		context.templateReg.emplace<tag::AIMoveControl>(missile);
 		context.templateReg.emplace<tag::Suicidal>(missile);
 		context.templateReg.emplace<Lifespan>(missile, Lifespan{MISSILE_LIFESPAN});
+		context.templateReg.emplace<sound::DeathSound>(missile, sound::RANDOM_EXPLOSION, std::min(1.0f, rad / 1.0f * 0.5f));
 		return missile;
 	}
 }

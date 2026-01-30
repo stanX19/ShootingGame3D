@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "components/factions.hpp"
 #include "components/unit_camera.hpp"
+#include "components/sound.hpp"
 
 namespace {
 	Vector3 left = {1, 0, 0};
@@ -68,6 +69,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<tag::effect::DropDebris>(player);
 	context.registry.emplace<tag::effect::ExplodeOnDeath>(player);
 	context.registry.emplace<SpawnsTrailParticle>(player, SpawnsTrailParticle{0.3f, 0.1f});
+	context.registry.emplace<sound::DeathSound>(player, sound::RANDOM_EXPLOSION, 0.5f);
 
 	addWeapons(context, player, SKYBLUE);
 	context.currentPlayer = player;

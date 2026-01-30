@@ -1,8 +1,23 @@
 #include "events.hpp"
 #include "components.hpp"
 #include "entities.hpp"
+#include "components/sound.hpp"
 
 namespace {
+	void tryEmitHitSound(GameContext *context, const event::CollisionParty& damager) {
+		entt::registry &registry = context->registry;
+		
+		auto soundPtr = registry.try_get<sound::HitSound>(damager.id);
+		if (!soundPtr || soundPtr->id == sound::NONE) return;
+
+		context->dispatcher.enqueue<event::SoundEvent>(event::SoundEvent{
+			context,
+			soundPtr->id,
+			damager.pos,
+			soundPtr->volume
+		});
+	}
+
 	void trySpawnDebris(GameContext *context, const event::CollisionParty& victim, 
 	                   const event::CollisionParty& damager) {
 		entt::registry &registry = context->registry;
@@ -72,4 +87,8 @@ void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
 	// std::cout << evt.a.pos.x << " " << evt.b.pos.x << std::endl;
 	applyDamageToEntity(evt, evt.b, evt.a);
 	applyDamageToEntity(evt, evt.a, evt.b);
+
+	// Emit hit sounds
+	tryEmitHitSound(evt.context, evt.a);
+	tryEmitHitSound(evt.context, evt.b);
 }

@@ -39,6 +39,8 @@ int main() {
 	// HideCursor();
 
 	GameContext context;
+	context.soundManager.init();
+	context.soundManager.playMusic();
 	resetGame(context);
 	
 	Renderer renderer(context.mainCamera, context);
@@ -46,6 +48,7 @@ int main() {
 
 	while (!WindowShouldClose()) {
 		float dt = GetFrameTime();
+		context.soundManager.updateMusic();
 
 		// --- Update systems ---
 		ecs_systems::playerMoveControl(context, dt);
@@ -71,6 +74,7 @@ int main() {
 		
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
+		context.soundManager.update(context.mainCamera);
 
 		ecs_systems::energyShield(context, dt);
 		
@@ -94,6 +98,7 @@ int main() {
 
 		inputControls(context, dt);
 	}
+	context.soundManager.shutdown();
 	context.modelManager.unloadAll();
 	CloseWindow();
 	return 0;

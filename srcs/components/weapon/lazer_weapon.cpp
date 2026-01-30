@@ -1,6 +1,7 @@
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "constants.hpp"
+#include "components/sound.hpp"
 
 namespace {
 	const float LAZER_SPEED = 100000.0f;
@@ -24,6 +25,7 @@ namespace {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
+		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_LAZER_SHOOT, 0.4f);
 	}
 
 	entt::entity createBulletTemplate(GameContext &context, float rad, Color color) {
@@ -37,6 +39,7 @@ namespace {
 		context.templateReg.emplace<CollisionBody>(bullet, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(bullet, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(bullet, LAZER_BOUND * -1, LAZER_BOUND);
+		context.templateReg.emplace<sound::HitSound>(bullet, sound::RANDOM_LAZER_HIT, 0.3f);
 		return bullet;
 	}
 }

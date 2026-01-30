@@ -2,6 +2,7 @@
 #define GAME_CONTEXT_HPP
 #include "includes.hpp"
 #include "model_manager.hpp"
+#include "sound_manager.hpp"
 #include "factions.hpp"
 #include <map>
 
@@ -13,6 +14,7 @@ struct FactionData {
 
 struct GameContext {
 	ModelManager modelManager;
+	SoundManager soundManager;
 	entt::registry templateReg;
 	entt::registry registry;
 	entt::dispatcher dispatcher;

@@ -3,6 +3,7 @@
 
 #include "includes.hpp"
 #include "game_context.hpp"
+#include "sound_manager.hpp"
 #include <functional>
 #include <vector>
 
@@ -28,12 +29,23 @@ namespace event {
 		float dt;				// frame dt
 	};
 
+	// Sound event - queued when sounds need to play
+	struct SoundEvent {
+		GameContext *context;
+		sound::Id soundId;
+		Vector3 position;
+		float volume;
+	};
+
 	struct Listener {
 		// CollisionEvent
 		void handleCollisionEvent(const CollisionEvent& evt);
 		
 		// KillEvent
 		void handleKillEvent(const KillEvent& evt);
+
+		// SoundEvent
+		void handleSoundEvent(const SoundEvent& evt);
 	};
 }
 

@@ -16,7 +16,7 @@ TESTBINDIR	= objs/test_bin
 TESTOBJS    = $(patsubst $(TESTDIR)/%.cpp,$(TESTBINDIR)/%,$(TESTS))
 
 CWD			:= $(shell pwd)
-INCLUDE_DIR	= includes/raylib includes/entt
+INCLUDE_DIR	= includes/raylib includes/entt includes
 HEADER_DIR	= headers
 HEADERS		:= $(shell find $(HEADER_DIR) -name '*.hpp')
 HEADERS_INC	= $(addprefix -I,$(sort $(dir $(HEADERS))) $(INCLUDE_DIR))

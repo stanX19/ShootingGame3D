@@ -1,5 +1,6 @@
 #include "entities.hpp"
 #include "weapons.hpp"
+#include "components/sound.hpp"
 
 namespace {
 	const int BASE_SCORE = 500;
@@ -37,6 +38,7 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace<tag::RotationSyncModel>(entity);
 	context.registry.emplace<tag::effect::DropDebris>(entity);
 	context.registry.emplace<tag::effect::ExplodeOnDeath>(entity);
+	context.registry.emplace_or_replace<sound::DeathSound>(entity, sound::RANDOM_EXPLOSION, 0.5f);
 
 	context.registry.emplace<tag::weapon::AIControlledAim>(entity);
 	context.registry.emplace<tag::weapon::AIControlledFire>(entity);

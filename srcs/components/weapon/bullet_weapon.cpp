@@ -2,6 +2,7 @@
 #include "utils.hpp"
 #include "constants.hpp"
 #include "factions.hpp"
+#include "components/sound.hpp"
 
 namespace
 {
@@ -24,6 +25,7 @@ namespace
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
+		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_BULLET_SHOOT, 0.5f);
 	}
 
 	entt::entity createBulletTemplate(GameContext &context) {
@@ -34,6 +36,7 @@ namespace
 		context.templateReg.emplace<tag::bullet_type::Kinetic>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f);
 		context.templateReg.emplace<DisappearBound>(bullet, BULLET_BOUND * -1, BULLET_BOUND);
+		context.templateReg.emplace<sound::HitSound>(bullet, sound::RANDOM_BULLET_HIT, 0.4f);
 		return bullet;
 	}
 }
