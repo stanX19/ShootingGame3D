@@ -11,7 +11,7 @@
 		"maxSoundsPerIdPerFrame": 10
 	},
 	"sounds": {
-		"backgroundMusic": "none",
+		"backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
 		"bulletShoot": [
 			"assets/sounds/gunshot_smg_shot_1-203471.mp3",
@@ -33,7 +33,8 @@
 			"assets/sounds/metal-hit-30-193295.mp3"
 		],
 		"lazerHit": [
-			"assets/sounds/sizzle-100449.mp3"
+			"assets/sounds/scifi-gun-shoot-1-266417.mp3",
+			"assets/sounds/lazer-sound-46104.mp3"
 		],
 		"explosion": [
 			"assets/sounds/medium-explosion-40472.mp3",

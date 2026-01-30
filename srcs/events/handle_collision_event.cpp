@@ -2,6 +2,7 @@
 #include "components.hpp"
 #include "entities.hpp"
 #include "components/sound.hpp"
+#include "entt_utils.hpp"
 
 namespace {
 	void tryEmitHitSound(GameContext *context, const event::CollisionParty& damager) {
@@ -88,7 +89,9 @@ void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
 	applyDamageToEntity(evt, evt.b, evt.a);
 	applyDamageToEntity(evt, evt.a, evt.b);
 
-	// Emit hit sounds
+	// Emit hit sounds only if collision involves player
+	if (!entt_utils::involvesPlayer(*evt.context, evt.a.id) && !entt_utils::involvesPlayer(*evt.context, evt.b.id))
+		return;
 	tryEmitHitSound(evt.context, evt.a);
 	tryEmitHitSound(evt.context, evt.b);
 }

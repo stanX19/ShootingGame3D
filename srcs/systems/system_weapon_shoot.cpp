@@ -83,15 +83,17 @@ namespace
 			Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
 			Vector3 shooterVel = velocityPtr ? velocityPtr->value : Vector3Zeros;
 
-			// Emit shoot sound if weapon has ShootSound component
-			if (auto *shootSound = context.registry.try_get<sound::ShootSound>(entity)) {
-				if (shootSound->id != sound::NONE) {
-					context.dispatcher.enqueue<event::SoundEvent>(event::SoundEvent{
-						&context,
-						shootSound->id,
-						pos,
-						shootSound->volume
-					});
+			// Emit shoot sound if weapon has ShootSound component and involves player
+			if (entt_utils::involvesPlayer(context, entity)) {
+				if (auto *shootSound = context.registry.try_get<sound::ShootSound>(entity)) {
+					if (shootSound->id != sound::NONE) {
+						context.dispatcher.enqueue<event::SoundEvent>(event::SoundEvent{
+							&context,
+							shootSound->id,
+							pos,
+							shootSound->volume
+						});
+					}
 				}
 			}
 
