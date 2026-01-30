@@ -11,7 +11,7 @@
 		"maxSoundsPerIdPerFrame": 10
 	},
 	"sounds": {
-		"backgroundMusic": "/mnt/d/Users/user/Music/All music/Thomas Bergersen - The Stars Are You And.mp3",
+		"backgroundMusic": "none",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
 		"bulletShoot": [
 			"assets/sounds/gunshot_smg_shot_1-203471.mp3",
