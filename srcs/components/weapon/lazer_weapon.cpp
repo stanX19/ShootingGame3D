@@ -2,22 +2,13 @@
 #include "utils.hpp"
 #include "constants.hpp"
 #include "components/sound.hpp"
+#include "game_config.hpp"
 
 namespace {
-	const float LAZER_SPEED = 100000.0f;
-	const float BASE_DAMAGE = 10.0f;
-	const Vector3 LAZER_BOUND = {ARENA_SIZE * 2, ARENA_SIZE * 2, ARENA_SIZE * 2};
-	
-	// effective range and angle is linearly inverse, just multiply the angles to get different distances
-	const float EFFECTIVE_RANGE = COMBAT_DIST;
-	const float BASE_SPREAD = std::atan2(1.0f, EFFECTIVE_RANGE);  // atan(ENEMY_RAD, EFFECTIVE_RANGE)
-
 	const Color BASE_COLOR = GREEN;
 
 	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = BASE_COLOR)
 	{
-		// if (context.registry.any_of<RenderBody>(entity))
-		// 	return colorLerp(colorRevert(context.registry.get<RenderBody>(entity).color), baseColor, 0.4);
 		return baseColor;
 	}
 
@@ -29,100 +20,165 @@ namespace {
 	}
 
 	entt::entity createBulletTemplate(GameContext &context, float rad, Color color) {
+		const auto& cfg = context.config;
+		float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
+		Vector3 lazerBound = {arenaSize * 2, arenaSize * 2, arenaSize * 2};
+
 		entt::entity bullet = context.templateReg.create();
 		t_model_id model = context.modelManager.createCylinder();
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Lazer>(bullet);
-		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (rad * 2));  // 1 / diameter
+		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (rad * 2));
 		context.templateReg.emplace<CollisionBody>(bullet, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(bullet, RenderBody{model, color, rad});
-		context.templateReg.emplace<DisappearBound>(bullet, LAZER_BOUND * -1, LAZER_BOUND);
+		context.templateReg.emplace<DisappearBound>(bullet, lazerBound * -1, lazerBound);
 		context.templateReg.emplace<sound::HitSound>(bullet, sound::RANDOM_LAZER_HIT, 0.3f);
 		return bullet;
+	}
+
+	float getBaseSpread(const GameConfig& cfg) {
+		float combatDist = cfg.getFloat("game.combatDist", 1000.0f);
+		float rangeMultiplier = cfg.getFloat("weapons.lazer.effectiveRangeMultiplier", 1.0f);
+		float effectiveRange = combatDist * rangeMultiplier;
+		return std::atan2(1.0f, effectiveRange);
 	}
 }
 
 void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.05f;
+	const auto& cfg = context.config;
+	const std::string path = "weapons.lazer.basic.";
+
+	float baseSpeed = cfg.getFloat("weapons.lazer.baseSpeed", 100000.0f);
+	float baseDamage = cfg.getFloat("weapons.lazer.baseDamage", 10.0f);
+	float baseSpread = getBaseSpread(cfg);
+
+	float radius = cfg.getFloat(path + "radius", 0.05f);
+	float hp = cfg.getFloat(path + "hp", 1.0f);
+	float damageMultiplier = cfg.getFloat(path + "damageMultiplier", 2.0f);
+	float spreadMultiplier = cfg.getFloat(path + "spreadMultiplier", 1.0f);
+	int bulletCount = cfg.getInt(path + "bulletCount", 1);
+	float cooldown = cfg.getFloat(path + "cooldown", 0.4f);
 	
-	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
-	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 2.0f});
+	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
+	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD);
-	weapon.bulletData.bulletCount = 1;
-	weapon.bulletData.speed = LAZER_SPEED;
+	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
+	weapon.bulletData.bulletCount = bulletCount;
+	weapon.bulletData.speed = baseSpeed;
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.40});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 }
 
 void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.05f;
+	const auto& cfg = context.config;
+	const std::string path = "weapons.lazer.machineGun.";
+
+	float baseSpeed = cfg.getFloat("weapons.lazer.baseSpeed", 100000.0f);
+	float baseDamage = cfg.getFloat("weapons.lazer.baseDamage", 10.0f);
+	float baseSpread = getBaseSpread(cfg);
+
+	float radius = cfg.getFloat(path + "radius", 0.05f);
+	float hp = cfg.getFloat(path + "hp", 1.0f);
+	float damageMultiplier = cfg.getFloat(path + "damageMultiplier", 0.5f);
+	float spreadMultiplier = cfg.getFloat(path + "spreadMultiplier", 5.0f);
+	int bulletCount = cfg.getInt(path + "bulletCount", 1);
+	int ammo = cfg.getInt(path + "ammo", 80);
+	float ammoRegen = cfg.getFloat(path + "ammoRegen", 6.0f);
+	float cooldown = cfg.getFloat(path + "cooldown", 0.05f);
+	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 0.5f);
 	
-	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
-	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE * 0.5f});
+	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
+	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 5);
-	weapon.bulletData.bulletCount = 1;
-	weapon.bulletData.speed = LAZER_SPEED;
+	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
+	weapon.bulletData.bulletCount = bulletCount;
+	weapon.bulletData.speed = baseSpeed;
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{80.0f, 120});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{6.0});
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.05});
-	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{0.5f});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo + 40)});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
 }
 
 void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.5f;
+	const auto& cfg = context.config;
+	const std::string path = "weapons.lazer.deletor.";
+
+	float baseSpeed = cfg.getFloat("weapons.lazer.baseSpeed", 100000.0f);
+	float baseDamage = cfg.getFloat("weapons.lazer.baseDamage", 10.0f);
+
+	float radius = cfg.getFloat(path + "radius", 0.5f);
+	float hp = cfg.getFloat(path + "hp", 1.0f);
+	float damageMultiplier = cfg.getFloat(path + "damageMultiplier", 1.0f);
+	float spreadMultiplier = cfg.getFloat(path + "spreadMultiplier", 0.0f);
+	int bulletCount = cfg.getInt(path + "bulletCount", 1);
+	int ammo = cfg.getInt(path + "ammo", 1);
+	float ammoRegen = cfg.getFloat(path + "ammoRegen", 0.125f);
+	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 2.0f);
+	float chargeTime = cfg.getFloat(path + "chargeTime", 1.5f);
+	float extendFireDuration = cfg.getFloat(path + "extendFireDuration", 1.5f);
 	
-	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
-	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
+	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
+	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = 0.0f;
-	weapon.bulletData.bulletCount = 1;
-	weapon.bulletData.speed = LAZER_SPEED;
+	weapon.bulletData.spreadSin = spreadMultiplier;
+	weapon.bulletData.bulletCount = bulletCount;
+	weapon.bulletData.speed = baseSpeed;
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{1.0f, 1});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{0.125});
-
-	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{2.0f});
-	context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{1.5f});
-	context.registry.emplace_or_replace<ExtendFireDuration>(entity, ExtendFireDuration{1.5f}); // this happens within cooldown
-	// context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{2.0f});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
+	context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{chargeTime});
+	context.registry.emplace_or_replace<ExtendFireDuration>(entity, ExtendFireDuration{extendFireDuration});
 }
 
 void weapon::emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity)
 {
-	const float rad = 0.1f;
+	const auto& cfg = context.config;
+	const std::string path = "weapons.lazer.shotgun.";
+
+	float baseSpeed = cfg.getFloat("weapons.lazer.baseSpeed", 100000.0f);
+	float baseDamage = cfg.getFloat("weapons.lazer.baseDamage", 10.0f);
+	float baseSpread = getBaseSpread(cfg);
+
+	float radius = cfg.getFloat(path + "radius", 0.1f);
+	float hp = cfg.getFloat(path + "hp", 1.0f);
+	float damageMultiplier = cfg.getFloat(path + "damageMultiplier", 1.0f);
+	float spreadMultiplier = cfg.getFloat(path + "spreadMultiplier", 25.0f);
+	int bulletCount = cfg.getInt(path + "bulletCount", 20);
+	int ammo = cfg.getInt(path + "ammo", 5);
+	float ammoRegen = cfg.getFloat(path + "ammoRegen", 1.0f);
+	float cooldown = cfg.getFloat(path + "cooldown", 0.5f);
 	
-	entt::entity bulletTemplate = createBulletTemplate(context, rad, getColor(context, entity));
-	context.templateReg.emplace<HP>(bulletTemplate, HP{1.0f});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{BASE_DAMAGE});
+	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
+	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	
 	Weapon weapon{bulletTemplate};
-	weapon.bulletData.spreadSin = std::sin(BASE_SPREAD * 25);
-	weapon.bulletData.bulletCount = 20;
-	weapon.bulletData.speed = LAZER_SPEED;
+	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
+	weapon.bulletData.bulletCount = bulletCount;
+	weapon.bulletData.speed = baseSpeed;
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<Ammo>(entity, Ammo{4.0f, 4});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{1.0f});
-	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{0.25f});
+	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
+	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 }

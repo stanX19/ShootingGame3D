@@ -1,4 +1,5 @@
 #include "sound_manager.hpp"
+#include "game_config.hpp"
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -11,28 +12,19 @@ SoundManager::~SoundManager() {
 	shutdown();
 }
 
-void SoundManager::loadFromConfig(const std::string& configPath) {
-	std::ifstream file(configPath);
-	if (!file.is_open()) {
-		TraceLog(LOG_WARNING, "SOUND: Failed to open config file: %s", configPath.c_str());
-		return;
-	}
-
-	json config;
-	try {
-		file >> config;
-	} catch (const json::parse_error& e) {
-		TraceLog(LOG_WARNING, "SOUND: Failed to parse config: %s", e.what());
+void SoundManager::loadFromConfig(const GameConfig& config) {
+	json soundsSection = config.getSection("sounds");
+	if (soundsSection.empty()) {
+		TraceLog(LOG_WARNING, "SOUND: No sounds section in config");
 		return;
 	}
 
 	// Load background music
-	if (config.contains("background_music")) {
-		std::string path = config["background_music"].get<std::string>();
+	if (soundsSection.contains("backgroundMusic")) {
+		std::string path = soundsSection["backgroundMusic"].get<std::string>();
 		backgroundMusic = LoadMusicStream(path.c_str());
 		musicLoaded = IsMusicValid(backgroundMusic);
 		if (musicLoaded) {
-			// SetMusicVolume(backgroundMusic, 0.3f);
 			backgroundMusic.looping = true;
 			backgroundMusicId = nextSoundId++;
 		}
@@ -40,8 +32,8 @@ void SoundManager::loadFromConfig(const std::string& configPath) {
 
 	// Helper lambda to load a category
 	auto loadCategory = [&](const std::string& key, std::vector<sound::Id>& pool) {
-		if (!config.contains(key)) return;
-		for (const auto& path : config[key]) {
+		if (!soundsSection.contains(key)) return;
+		for (const auto& path : soundsSection[key]) {
 			sound::Id id = loadSound(path.get<std::string>());
 			if (id != sound::NONE) {
 				pool.push_back(id);
@@ -49,20 +41,25 @@ void SoundManager::loadFromConfig(const std::string& configPath) {
 		}
 	};
 
-	loadCategory("bullet_shoot", bulletShootIds);
-	loadCategory("lazer_shoot", lazerShootIds);
-	loadCategory("bullet_hit", bulletHitIds);
-	loadCategory("lazer_hit", lazerHitIds);
+	loadCategory("bulletShoot", bulletShootIds);
+	loadCategory("lazerShoot", lazerShootIds);
+	loadCategory("bulletHit", bulletHitIds);
+	loadCategory("lazerHit", lazerHitIds);
 	loadCategory("explosion", explosionIds);
 
-	TraceLog(LOG_INFO, "SOUND: Loaded %zu bullet_shoot, %zu lazer_shoot, %zu bullet_hit, %zu lazer_hit, %zu explosion sounds",
+	TraceLog(LOG_INFO, "SOUND: Loaded %zu bulletShoot, %zu lazerShoot, %zu bulletHit, %zu lazerHit, %zu explosion sounds",
 		bulletShootIds.size(), lazerShootIds.size(), bulletHitIds.size(), lazerHitIds.size(), explosionIds.size());
 }
 
-void SoundManager::init(const std::string& configPath) {
+void SoundManager::init(const GameConfig& config) {
 	if (initialized) return;
 
-	SetAudioStreamBufferSizeDefault(65536);  // Larger buffer to prevent crackling/noise
+	int bufferSize = config.getInt("audio.bufferSize", 65536);
+	masterVolume = config.getFloat("audio.masterVolume", 0.5f);
+	maxSoundsPerIdPerFrame = config.getInt("audio.maxSoundsPerIdPerFrame", 3);
+	soundAliasesCount = config.getInt("audio.soundAliasCount", 4);
+
+	SetAudioStreamBufferSizeDefault(bufferSize);
 	InitAudioDevice();
 	if (!IsAudioDeviceReady()) {
 		TraceLog(LOG_WARNING, "SOUND: Failed to initialize audio device");
@@ -70,11 +67,11 @@ void SoundManager::init(const std::string& configPath) {
 		return;
 	}
 
-	initialized = true;  // Set before loadFromConfig so loadSound() works
-	loadFromConfig(configPath);
+	initialized = true;
+	loadFromConfig(config);
 
 	SetMasterVolume(masterVolume);
-	TraceLog(LOG_INFO, "SOUND: Audio system initialized");
+	TraceLog(LOG_INFO, "SOUND: Audio system initialized (bufferSize=%d)", bufferSize);
 }
 
 void SoundManager::shutdown() {
@@ -117,7 +114,7 @@ sound::Id SoundManager::loadSound(const std::string& path) {
 	data.loaded = true;
 
 	// Create aliases for simultaneous playback
-	for (int i = 0; i < SOUND_ALIASES_COUNT; i++) {
+	for (int i = 0; i < soundAliasesCount; i++) {
 		data.aliases.push_back(LoadSoundAlias(baseSound));
 	}
 
@@ -138,7 +135,7 @@ void SoundManager::unloadSound(sound::Id id) {
 Sound& SoundManager::getNextAlias(sound::Id id) {
 	auto& data = sounds[id];
 	int idx = data.currentAlias;
-	data.currentAlias = (data.currentAlias + 1) % SOUND_ALIASES_COUNT;
+	data.currentAlias = (data.currentAlias + 1) % static_cast<int>(data.aliases.size());
 	return data.aliases[idx];
 }
 
@@ -204,7 +201,7 @@ void SoundManager::update(const Camera3D& camera) {
 
 	for (const auto& req : pendingRequests) {
 		// Throttle: skip if we've played too many of this sound this frame
-		if (playsThisFrame[req.id] >= MAX_SOUNDS_PER_ID_PER_FRAME) {
+		if (playsThisFrame[req.id] >= maxSoundsPerIdPerFrame) {
 			continue;
 		}
 

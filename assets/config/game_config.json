@@ -1,0 +1,283 @@
+{
+	"game": {
+		"arenaSize": 2000.0,
+		"combatDist": 1000.0,
+		"unitCount": 4
+	},
+	"audio": {
+		"bufferSize": 16777216,
+		"masterVolume": 1.0,
+		"soundAliasCount": 4,
+		"maxSoundsPerIdPerFrame": 10
+	},
+	"sounds": {
+		"backgroundMusic": "/mnt/d/Users/user/Music/All music/Thomas Bergersen - The Stars Are You And.mp3",
+		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
+		"bulletShoot": [
+			"assets/sounds/gunshot_smg_shot_1-203471.mp3",
+			"assets/sounds/gunshot_smg_shot_2-203472.mp3",
+			"assets/sounds/gunshot_smg_shot_4-203474.mp3",
+			"assets/sounds/gunshot_smg_shot_5-203475.mp3"
+		],
+		"lazerShoot": [
+			"assets/sounds/scifi-gun-shoot-1-266417.mp3",
+			"assets/sounds/lazer-sound-46104.mp3"
+		],
+		"bulletHit": [
+			"assets/sounds/metal-hit-2-193269.mp3",
+			"assets/sounds/metal-hit-4-193271.mp3",
+			"assets/sounds/metal-hit-5-193273.mp3",
+			"assets/sounds/metal-hit-18-193284.mp3",
+			"assets/sounds/metal-hit-28-193294.mp3",
+			"assets/sounds/metal-hit-29-193293.mp3",
+			"assets/sounds/metal-hit-30-193295.mp3"
+		],
+		"lazerHit": [
+			"assets/sounds/sizzle-100449.mp3"
+		],
+		"explosion": [
+			"assets/sounds/medium-explosion-40472.mp3",
+			"assets/sounds/explosion-fx-343683.mp3"
+		]
+	},
+	"weapons": {
+		"bullet": {
+			"baseSpeed": 800.0,
+			"baseDamage": 25.0,
+			"effectiveRangeMultiplier": 2.0,
+			"machineGun": {
+				"radius": 0.05,
+				"hp": 1.0,
+				"damageMultiplier": 1.0,
+				"spreadMultiplier": 10,
+				"bulletCount": 1,
+				"speedMultiplier": 2.0,
+				"lifespan": 10.0,
+				"ammo": 80,
+				"reloadTime": 5.5,
+				"cooldown": 0.1
+			},
+			"shotgun": {
+				"radius": 0.025,
+				"hp": 1.0,
+				"damageMultiplier": 1.0,
+				"spreadMultiplier": 100.0,
+				"bulletCount": 10,
+				"speedMultiplier": 2.0,
+				"lifespan": 5.0,
+				"modelStretch": 0.5,
+				"ammo": 5,
+				"reloadTime": 1.5,
+				"cooldown": 0.1,
+				"extendFireRequest": 1.0
+			},
+			"bigBall": {
+				"radius": 1.5,
+				"hp": 1000.0,
+				"damageMultiplier": 15.0,
+				"spreadMultiplier": 0.0,
+				"bulletCount": 1,
+				"speedMultiplier": 0.25,
+				"lifespan": 15.0,
+				"ammo": 1,
+				"reloadTime": 7.0
+			},
+			"sniper": {
+				"radius": 0.2,
+				"hp": 50.0,
+				"damageMultiplier": 2.5,
+				"spreadMultiplier": 0.01,
+				"bulletCount": 1,
+				"speedMultiplier": 6.0,
+				"lifespan": 10.0,
+				"cooldown": 1.5
+			},
+			"burstSniper": {
+				"radius": 0.2,
+				"hp": 50.0,
+				"damageMultiplier": 2.5,
+				"spreadMultiplier": 5.0,
+				"bulletCount": 1,
+				"speedMultiplier": 6.0,
+				"lifespan": 10.0,
+				"cooldown": 0.35,
+				"ammo": 20,
+				"reloadTime": 12.0
+			},
+			"basic": {
+				"radius": 0.075,
+				"hp": 1.0,
+				"damageMultiplier": 1.0,
+				"spreadMultiplier": 5,
+				"bulletCount": 1,
+				"speedMultiplier": 1.2,
+				"lifespan": 10.0,
+				"cooldown": 0.25,
+				"ammo": 30,
+				"reloadTime": 2.0
+			}
+		},
+		"lazer": {
+			"baseSpeed": 100000.0,
+			"baseDamage": 10.0,
+			"effectiveRangeMultiplier": 1.0,
+			"basic": {
+				"radius": 0.05,
+				"hp": 1.0,
+				"damageMultiplier": 2.0,
+				"spreadMultiplier": 1.0,
+				"bulletCount": 1,
+				"cooldown": 0.4
+			},
+			"machineGun": {
+				"radius": 0.05,
+				"hp": 1.0,
+				"damageMultiplier": 0.5,
+				"spreadMultiplier": 5.0,
+				"bulletCount": 1,
+				"ammo": 80,
+				"ammoRegen": 6.0,
+				"cooldown": 0.05,
+				"extendFireRequest": 0.5
+			},
+			"deletor": {
+				"radius": 0.5,
+				"hp": 1.0,
+				"damageMultiplier": 1.0,
+				"spreadMultiplier": 0.0,
+				"bulletCount": 1,
+				"ammo": 1,
+				"ammoRegen": 0.125,
+				"extendFireRequest": 2.0,
+				"chargeTime": 1.5,
+				"extendFireDuration": 1.5
+			},
+			"shotgun": {
+				"radius": 0.1,
+				"hp": 1.0,
+				"damageMultiplier": 1.0,
+				"spreadMultiplier": 25.0,
+				"bulletCount": 20,
+				"ammo": 5,
+				"ammoRegen": 1.0,
+				"cooldown": 0.5
+			}
+		},
+		"missile": {
+			"baseSpeed": 100.0,
+			"maxSpeed": 400.0,
+			"baseDamage": 250.0,
+			"lifespan": 20.0,
+			"effectiveRangeMultiplier": 5.0,
+			"basic": {
+				"radius": 0.5,
+				"hp": 1.0,
+				"damageMultiplier": 1.0,
+				"acceleration": 100.0,
+				"turnSpeed": 0.5,
+				"ammo": 2,
+				"ammoRegen": 0.0667,
+				"cooldown": 1.0
+			},
+			"swarm": {
+				"radius": 0.15,
+				"hp": 1.0,
+				"turnSpeed": 0.75,
+				"lifespanMultiplier": 0.5,
+				"spreadAngle": 0.785,
+				"bulletCount": 4,
+				"speedMultiplier": 2.0,
+				"ammo": 3,
+				"reloadTime": 15.0,
+				"cooldown": 0.25,
+				"extendFireRequest": 2.0
+			},
+			"torpedo": {
+				"radius": 0.25,
+				"hp": 1.0,
+				"damageMultiplier": 0.25,
+				"turnSpeed": 0.1,
+				"ammo": 4,
+				"reloadTime": 20.0,
+				"cooldown": 0.2,
+				"extendFireRequest": 2.0
+			},
+			"nuke": {
+				"radius": 2.0,
+				"hp": 250.0,
+				"damageMultiplier": 10.0,
+				"turnSpeed": 1.5,
+				"speedMultiplier": 0.5,
+				"delayedDamageTime": 40.0,
+				"delayedDamage": 1000000.0,
+				"ammo": 1,
+				"reloadTime": 30.0
+			},
+			"sniper": {
+				"radius": 0.5,
+				"hp": 1.0,
+				"speed": 1000.0,
+				"cooldown": 2.0
+			},
+			"flares": {
+				"radius": 0.15,
+				"hp": 1.0,
+				"turnSpeed": 0.05,
+				"lifespanMultiplier": 0.2,
+				"spreadAngle": 1.571,
+				"bulletCount": 2,
+				"speedMultiplier": 0.5,
+				"ammo": 4,
+				"ammoRegen": 0.2,
+				"cooldown": 0.2,
+				"extendFireRequest": 1.0
+			}
+		}
+	},
+	"units": {
+		"base": {
+			"score": 500,
+			"hp": 1000.0,
+			"shield": 500.0,
+			"shieldRegenDivisor": 15.0,
+			"speed": 80.0,
+			"turnSpeed": 1.5,
+			"damage": 500.0
+		},
+		"elite": {
+			"radius": 3.0,
+			"hp": 1200.0,
+			"hpRegen": 10.0,
+			"shield": 1000.0,
+			"shieldRegen": 25.0,
+			"speedMultiplier": 0.5,
+			"scoreMultiplier": 2
+		},
+		"fastElite": {
+			"radius": 2.0,
+			"hp": 720.0,
+			"hpRegen": 1.0,
+			"speedMultiplier": 2.0,
+			"scoreMultiplier": 2
+		},
+		"mothership": {
+			"radius": 6.0,
+			"hp": 4800.0,
+			"hpRegen": 50.0,
+			"shield": 1000.0,
+			"shieldRegen": 100.0,
+			"speedMultiplier": 0.25,
+			"turnSpeedMultiplier": 0.5,
+			"scoreMultiplier": 5
+		},
+		"player": {
+			"hp": 1500.0,
+			"hpRegen": 25.0,
+			"shield": 3000.0,
+			"shieldRegenDivisor": 15.0,
+			"speed": 80.0,
+			"turnSpeed": 2.0,
+			"damage": 500.0
+		}
+	}
+}

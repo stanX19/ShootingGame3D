@@ -1,0 +1,79 @@
+#include "game_config.hpp"
+#include <fstream>
+#include <sstream>
+#include "raylib.h"
+
+void GameConfig::init(const std::string& configPath) {
+	if (loaded) return;
+
+	std::ifstream file(configPath);
+	if (!file.is_open()) {
+		TraceLog(LOG_WARNING, "CONFIG: Failed to open config file: %s", configPath.c_str());
+		return;
+	}
+
+	try {
+		file >> config;
+		loaded = true;
+		TraceLog(LOG_INFO, "CONFIG: Loaded config from %s", configPath.c_str());
+	} catch (const nlohmann::json::parse_error& e) {
+		TraceLog(LOG_WARNING, "CONFIG: Failed to parse config: %s", e.what());
+	}
+}
+
+const nlohmann::json* GameConfig::navigatePath(const std::string& path) const {
+	if (!loaded) return nullptr;
+
+	const nlohmann::json* current = &config;
+	std::istringstream ss(path);
+	std::string token;
+
+	while (std::getline(ss, token, '.')) {
+		if (!current->is_object() || !current->contains(token)) {
+			return nullptr;
+		}
+		current = &(*current)[token];
+	}
+	return current;
+}
+
+float GameConfig::getFloat(const std::string& path, float defaultVal) const {
+	const nlohmann::json* node = navigatePath(path);
+	if (!node || !node->is_number()) return defaultVal;
+	return node->get<float>();
+}
+
+int GameConfig::getInt(const std::string& path, int defaultVal) const {
+	const nlohmann::json* node = navigatePath(path);
+	if (!node || !node->is_number()) return defaultVal;
+	return node->get<int>();
+}
+
+bool GameConfig::getBool(const std::string& path, bool defaultVal) const {
+	const nlohmann::json* node = navigatePath(path);
+	if (!node || !node->is_boolean()) return defaultVal;
+	return node->get<bool>();
+}
+
+std::string GameConfig::getString(const std::string& path, const std::string& defaultVal) const {
+	const nlohmann::json* node = navigatePath(path);
+	if (!node || !node->is_string()) return defaultVal;
+	return node->get<std::string>();
+}
+
+Vector3 GameConfig::getVector3(const std::string& path, Vector3 defaultVal) const {
+	const nlohmann::json* node = navigatePath(path);
+	if (!node || !node->is_object()) return defaultVal;
+
+	return Vector3{
+		node->value("x", defaultVal.x),
+		node->value("y", defaultVal.y),
+		node->value("z", defaultVal.z)
+	};
+}
+
+nlohmann::json GameConfig::getSection(const std::string& path) const {
+	const nlohmann::json* node = navigatePath(path);
+	if (!node) return nlohmann::json{};
+	return *node;
+}

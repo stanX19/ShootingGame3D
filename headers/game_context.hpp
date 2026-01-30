@@ -1,6 +1,7 @@
 #ifndef GAME_CONTEXT_HPP
 #define GAME_CONTEXT_HPP
 #include "includes.hpp"
+#include "game_config.hpp"
 #include "model_manager.hpp"
 #include "sound_manager.hpp"
 #include "factions.hpp"
@@ -13,6 +14,7 @@ struct FactionData {
 };
 
 struct GameContext {
+	GameConfig config;
 	ModelManager modelManager;
 	SoundManager soundManager;
 	entt::registry templateReg;

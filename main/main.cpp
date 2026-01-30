@@ -39,7 +39,8 @@ int main() {
 	// HideCursor();
 
 	GameContext context;
-	context.soundManager.init();
+	context.config.init("assets/config/game_config.json");
+	context.soundManager.init(context.config);
 	context.soundManager.playMusic();
 	resetGame(context);
 	

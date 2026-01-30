@@ -26,12 +26,14 @@ struct PlaySoundRequest {
 	float volume;
 };
 
+class GameConfig;  // Forward declaration
+
 class SoundManager {
 public:
 	SoundManager();
 	~SoundManager();
 
-	void init(const std::string& configPath = "assets/sounds/sounds_config.json");
+	void init(const GameConfig& config);
 	void shutdown();
 
 	// Random getters - return specific ID (randomization happens at attach time)
@@ -63,8 +65,8 @@ public:
 	bool isEnabled() const;
 
 private:
-	static constexpr int MAX_SOUNDS_PER_ID_PER_FRAME = 3;
-	static constexpr int SOUND_ALIASES_COUNT = 4;  // simultaneous plays per sound
+	int maxSoundsPerIdPerFrame = 3;
+	int soundAliasesCount = 4;  // simultaneous plays per sound
 
 	struct SoundData {
 		Sound baseSound;
@@ -98,7 +100,7 @@ private:
 	sound::Id loadSound(const std::string& path);
 	void unloadSound(sound::Id id);
 	Sound& getNextAlias(sound::Id id);
-	void loadFromConfig(const std::string& configPath);
+	void loadFromConfig(const GameConfig& config);
 	sound::Id getRandomFromPool(const std::vector<sound::Id>& pool);
 	sound::Id resolveVirtualId(sound::Id id);  // Convert virtual IDs to actual random sounds
 };
