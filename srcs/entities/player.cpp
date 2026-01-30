@@ -11,13 +11,6 @@ namespace {
 	Vector3 up = {0, 1, 0};
 	Vector3 front = {0, 0, 1};
 
-	// void addTurretAt(GameContext &context, Color color, entt::entity &player, Vector3 relpos) {
-	// 	entt::entity turret = spawnLinkedTurret(context, color, player, relpos);
-	// 	emplaceWeaponMachineGun(context, turret);
-	// }
-	const float SHIELD = 3000.0f;
-	const float SHIELD_REGEN = SHIELD / 15;
-
 	void addWeapons(GameContext &context, entt::entity &player, Color color) {
 		context.registry.emplace<AimTarget>(player);
 		context.registry.emplace<tag::weapon::AIControlledAim>(player);
@@ -43,6 +36,15 @@ entt::entity spawnPlayer(GameContext &context) {
 entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	entt::entity player = context.registry.create();
 
+	const GameConfig& cfg = context.config;
+	const float hp = cfg.getFloat("units.player.hp", 1500.0f);
+	const float hpRegen = cfg.getFloat("units.player.hpRegen", 25.0f);
+	const float shield = cfg.getFloat("units.player.shield", 3000.0f);
+	const float shieldRegenDiv = cfg.getFloat("units.player.shieldRegenDivisor", 15.0f);
+	const float speed = cfg.getFloat("units.player.speed", 80.0f);
+	const float turnSpeed = cfg.getFloat("units.player.turnSpeed", 2.0f);
+	const float damage = cfg.getFloat("units.player.damage", 500.0f);
+
 	// t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
 	t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
 	// t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship_custom_2/Spaceship2.glb");
@@ -51,13 +53,13 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<Rotation>(player, QuaternionFromAxisAngle(Vector3UnitY, 0.0f));
 	context.registry.emplace<CollisionBody>(player, 1.0f);
 	context.registry.emplace<RenderBody>(player, RenderBody{shipModel, BLUE, 1.0f});
-	context.registry.emplace<HP>(player, 1500.0f);
-	context.registry.emplace<HPRegen>(player, 25.0f);
-	context.registry.emplace<EnergyShield>(player, SHIELD);
-	context.registry.emplace<EnergyShieldRegen>(player, SHIELD_REGEN);
-	context.registry.emplace<Damage>(player, 500.0f);
-	context.registry.emplace<MaxSpeed>(player, 80.0f);
-	context.registry.emplace<TurnSpeed>(player, 2.0f);
+	context.registry.emplace<HP>(player, hp);
+	context.registry.emplace<HPRegen>(player, hpRegen);
+	context.registry.emplace<EnergyShield>(player, shield);
+	context.registry.emplace<EnergyShieldRegen>(player, shield / shieldRegenDiv);
+	context.registry.emplace<Damage>(player, damage);
+	context.registry.emplace<MaxSpeed>(player, speed);
+	context.registry.emplace<TurnSpeed>(player, turnSpeed);
 	context.registry.emplace<Score>(player);
 	context.registry.emplace<camera::UnitCamera>(player);
 
