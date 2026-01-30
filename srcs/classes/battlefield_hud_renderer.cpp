@@ -641,6 +641,14 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     if (warnings.empty())
         return;
 
+    // Play alert sound with cooldown
+    static float alertSoundCooldown = 0.0f;
+    alertSoundCooldown -= currentDt;
+    if (alertSoundCooldown <= 0.0f) {
+        context.soundManager.playImmediate(context.soundManager.getAlertSound(), 0.5f);
+        alertSoundCooldown = 2.0f;
+    }
+
     const char* alertMsg = "PROXIMITY ALERT";
     int msgWidth = MeasureText(alertMsg, 24);
     Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
@@ -673,7 +681,7 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
             Vector3 toWarning = warningPos - camera.position;
             Vector3 camForward = Vector3Normalize(camera.target - camera.position);
             Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
-            Vector3 camUp = Vector3CrossProduct(camRight, camForward);
+            Vector3 camUp = Vector3CrossProduct(camRight, camForward) * -1;
 
             Vector3 local;
             local.x = Vector3DotProduct(toWarning, camRight);
@@ -687,9 +695,9 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
             float distance = Vector3Length(toWarning);
             char distText[32];
             snprintf(distText, sizeof(distText), "%.0fm", distance);
-            int textWidth = MeasureText(distText, 16);
+            int textWidth = MeasureText(distText, 20);
             Vector2 textPos = screenCenter + directionToWarning * (uiFrameRadius + 50);
-            DrawText(distText, textPos.x - textWidth/2, textPos.y - 8, 16, ColorAlpha(RED, alpha));
+            DrawText(distText, textPos.x - textWidth/2, textPos.y - 8, 20, ColorAlpha(RED, alpha));
         }
     }
 }

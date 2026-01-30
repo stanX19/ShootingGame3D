@@ -43,6 +43,7 @@ public:
 	sound::Id getRandomLazerHit();
 	sound::Id getRandomExplosion();
 	sound::Id getBackgroundMusic() const;
+	sound::Id getAlertSound() const;
 
 	// Queue a sound to be played (with throttling)
 	void queueSound(sound::Id id, Vector3 position = {0,0,0}, float volume = 1.0f);
@@ -86,6 +87,7 @@ private:
 	std::vector<sound::Id> lazerHitIds;
 	std::vector<sound::Id> explosionIds;
 	sound::Id backgroundMusicId = sound::NONE;
+	sound::Id alertSoundId = sound::NONE;
 
 	Music backgroundMusic;
 	bool musicLoaded = false;

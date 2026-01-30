@@ -47,6 +47,12 @@ void SoundManager::loadFromConfig(const GameConfig& config) {
 	loadCategory("lazerHit", lazerHitIds);
 	loadCategory("explosion", explosionIds);
 
+	// Load alert sound
+	if (soundsSection.contains("alert")) {
+		std::string alertPath = soundsSection["alert"].get<std::string>();
+		alertSoundId = loadSound(alertPath);
+	}
+
 	TraceLog(LOG_INFO, "SOUND: Loaded %zu bulletShoot, %zu lazerShoot, %zu bulletHit, %zu lazerHit, %zu explosion sounds",
 		bulletShootIds.size(), lazerShootIds.size(), bulletHitIds.size(), lazerHitIds.size(), explosionIds.size());
 }
@@ -178,6 +184,10 @@ sound::Id SoundManager::resolveVirtualId(sound::Id id) {
 
 sound::Id SoundManager::getBackgroundMusic() const {
 	return backgroundMusicId;
+}
+
+sound::Id SoundManager::getAlertSound() const {
+	return alertSoundId;
 }
 
 void SoundManager::queueSound(sound::Id id, Vector3 position, float volume) {

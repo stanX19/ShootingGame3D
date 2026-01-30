@@ -5,14 +5,15 @@
 		"unitCount": 4
 	},
 	"audio": {
-		"bufferSize": 16777216,
+		"bufferSize": 4096,
 		"masterVolume": 1.0,
 		"soundAliasCount": 4,
 		"maxSoundsPerIdPerFrame": 10
 	},
 	"sounds": {
-		"backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",
+		"backgroundMusic": "none",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
+		"alert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
 		"bulletShoot": [
 			"assets/sounds/gunshot_smg_shot_1-203471.mp3",
 			"assets/sounds/gunshot_smg_shot_2-203472.mp3",

@@ -16,7 +16,15 @@ namespace
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
-		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_BULLET_SHOOT, 0.5f);
+	}
+
+	void emplaceShootSoundFromStats(GameContext &context, entt::entity entity, float damage, float speed) {
+		const auto& cfg = context.config;
+		float baseDamage = cfg.getFloat("weapons.bullet.baseDamage", 25.0f);
+		float baseSpeed = cfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
+		float normalizer = baseDamage * baseSpeed;
+		float volume = 0.1f + std::clamp((damage * speed) / (normalizer * normalizer), 0.0f, 2.0f);
+		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_BULLET_SHOOT, volume);
 	}
 
 	entt::entity createBulletTemplate(GameContext &context) {
@@ -83,6 +91,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
+	emplaceShootSoundFromStats(context, entity, baseDamage * damageMultiplier, baseSpeed * speedMultiplier);
 }
 
 void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
@@ -128,6 +137,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
+	emplaceShootSoundFromStats(context, entity, baseDamage * damageMultiplier, baseSpeed * speedMultiplier);
 }
 
 void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
@@ -169,6 +179,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
+	emplaceShootSoundFromStats(context, entity, baseDamage * damageMultiplier, baseSpeed * speedMultiplier);
 }
 
 void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
@@ -206,6 +217,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	emplaceBulletWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
+	emplaceShootSoundFromStats(context, entity, baseDamage * damageMultiplier, baseSpeed * speedMultiplier);
 }
 
 void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
@@ -247,6 +259,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
+	emplaceShootSoundFromStats(context, entity, baseDamage * damageMultiplier, baseSpeed * speedMultiplier);
 }
 
 void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
@@ -288,6 +301,5 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
+	emplaceShootSoundFromStats(context, entity, baseDamage * damageMultiplier, baseSpeed * speedMultiplier);
 }
-
-
