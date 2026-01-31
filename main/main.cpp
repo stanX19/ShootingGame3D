@@ -18,6 +18,12 @@ static void resetGame(GameContext &context) {
 	context.mainCamera.up = Vector3{ 0.0f, 1.0f, 0.0f };
 	context.mainCamera.fovy = 45.0f;
 	context.mainCamera.projection = CAMERA_PERSPECTIVE;
+
+	context.soundManager.playImmediate(
+		context.soundManager.loadSound(
+			context.config.getString("sounds.gameStart", "")
+		), 0.25f
+	);
 }
 
 static void inputControls(GameContext &context, [[maybe_unused]] float dt) {
@@ -76,6 +82,7 @@ int main() {
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
 		context.soundManager.update(context.mainCamera);
+		ecs_systems::soundSfx(context, dt);
 
 		ecs_systems::energyShield(context, dt);
 		

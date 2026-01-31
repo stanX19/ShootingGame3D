@@ -20,11 +20,6 @@ struct Velocity
 	Vector3 value = { 0, 0, 0 };
 };
 
-struct Acceleration
-{
-	Vector3 value = { 0, 0, 0 };
-};
-
 struct ScalarAcceleration
 {
 	float value = 0.0f;

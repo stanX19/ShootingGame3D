@@ -71,10 +71,20 @@ void SoundManager::loadFromConfig(const GameConfig& config) {
 	// Load thrust sound
 	if (soundsSection.contains("thrust")) {
 		std::string path = soundsSection["thrust"].get<std::string>();
-		thrustSound = LoadSound(path.c_str());
-		thrustLoaded = IsSoundValid(thrustSound);
-		if (thrustLoaded) {
-			thrustSoundId = nextSoundId++;
+		float threshold = 2.0f;
+		if (soundsSection.contains("thrustRestartThreshold")) {
+			threshold = soundsSection["thrustRestartThreshold"].get<float>();
+		}
+		thrustSound = std::make_unique<LoopingFadeSound>(path, threshold);
+		thrustSound->init(masterVolume);
+		if (soundsSection.contains("thrustFadeIn")) {
+			thrustSound->setFadeInDuration(soundsSection["thrustFadeIn"].get<float>());
+		}
+		if (soundsSection.contains("thrustFadeOut")) {
+			thrustSound->setFadeOutDuration(soundsSection["thrustFadeOut"].get<float>());
+		}
+		if (soundsSection.contains("thrustVolume")) {
+			thrustSound->setMaxVolume(soundsSection["thrustVolume"].get<float>());
 		}
 	}
 
@@ -104,6 +114,12 @@ void SoundManager::init(const GameConfig& config) {
 	TraceLog(LOG_INFO, "SOUND: Audio system initialized");
 }
 
+sound::Id SoundManager::getConfigSound(const GameConfig& config, const std::string& configPath, sound::Id defaultId) {
+	std::string path = config.getString(configPath, "");
+	if (path.empty()) return defaultId;
+	return loadSound(path);
+}
+
 void SoundManager::shutdown() {
 	if (!initialized) return;
 
@@ -113,12 +129,9 @@ void SoundManager::shutdown() {
 		musicLoaded = false;
 	}
 
-	if (thrustLoaded) {
-		StopSound(thrustSound);
-		UnloadSound(thrustSound);
-		thrustLoaded = false;
-		thrustActive = false;
-		thrustVolume = 0.0f;
+	if (thrustSound) {
+		thrustSound->shutdown();
+		thrustSound.reset();
 	}
 
 	for (auto& [id, data] : sounds) {
@@ -141,6 +154,12 @@ void SoundManager::shutdown() {
 sound::Id SoundManager::loadSound(const std::string& path) {
 	if (!initialized || !enabled) return sound::NONE;
 
+	// Check cache first
+	auto cacheIt = pathCache.find(path);
+	if (cacheIt != pathCache.end()) {
+		return cacheIt->second;
+	}
+
 	Sound baseSound = LoadSound(path.c_str());
 	if (!IsSoundValid(baseSound)) {
 		TraceLog(LOG_WARNING, "SOUND: Failed to load sound: %s", path.c_str());
@@ -158,6 +177,7 @@ sound::Id SoundManager::loadSound(const std::string& path) {
 	}
 
 	sounds[id] = std::move(data);
+	pathCache[path] = id;
 	return id;
 }
 
@@ -246,28 +266,6 @@ void SoundManager::update(const Camera3D& camera) {
 	if (!initialized || !enabled) {
 		pendingRequests.clear();
 		return;
-	}
-
-	// Update thrust sound volume (fade in/out)
-	if (thrustLoaded) {
-		float dt = GetFrameTime();
-		if (thrustActive) {
-			thrustVolume += dt * 2.0f; // Fade in over 0.5s
-			if (thrustVolume > 1.0f)
-				thrustVolume = 1.0f;
-		} else {
-			thrustVolume -= dt * 1.5f; // Fade out slightly slower
-			if (thrustVolume < 0.0f)
-				thrustVolume = 0.0f;
-		}
-
-		if (thrustVolume > 0.0f) {
-			if (!IsSoundPlaying(thrustSound))
-				PlaySound(thrustSound);
-			SetSoundVolume(thrustSound, thrustVolume * masterVolume * 0.5f);
-		} else if (IsSoundPlaying(thrustSound)) {
-			StopSound(thrustSound);
-		}
 	}
 
 	// Reset per-frame counters
@@ -363,12 +361,10 @@ void SoundManager::stopMusic() {
 	StopSound(backgroundMusicSound);
 }
 
-void SoundManager::setThrustActive(bool active) {
-	thrustActive = active;
-}
-
-bool SoundManager::isThrustActive() const {
-	return thrustActive;
+void SoundManager::updateThrustSound(bool isAccelerating, float dt) {
+	if (!initialized || !enabled || !thrustSound)
+		return;
+	thrustSound->update(isAccelerating, dt, masterVolume);
 }
 
 void SoundManager::setMasterVolume(float volume) {

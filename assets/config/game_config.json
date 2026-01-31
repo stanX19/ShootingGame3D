@@ -11,10 +11,20 @@
 		"explosionMaxDistance": 500.0
 	},
 	"sounds": {
-		"backgroundMusic": "none",
+		"backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
 		"alert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
-		"thrust": "assets/sounds/window-glass-vibration-67541.mp3",
+		"warning": "assets/sounds/buzzer-2-181415.mp3",
+		"warningVolume": 0.25,
+		"lowHpWarningThreshold": 0.4,
+		"lowHpWarningDuration": 3.0,
+		"lowHpWarningInterval": 1.0,
+		"gameStart": "assets/sounds/percussive-drum-hit-1-189787.mp3",
+		"thrust": "assets/sounds/engine3_up-75891.mp3",
+		"thrustVolume": 0.25,
+		"thrustFadeIn": 1.0,
+		"thrustFadeOut": 5.0,
+		"thrustRestartThreshold": 2.0,
 		"bulletShoot": [
 			"assets/sounds/gunshot/gunshot_smg_shot_1-203471.mp3",
 			"assets/sounds/gunshot/gunshot_smg_shot_2-203472.mp3",
@@ -36,7 +46,7 @@
 			"assets/sounds/metal/metal-hit-95-200424.mp3"
 		],
 		"lazerHit": [
-			"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3"
+			"assets/sounds/lazer/lightning-magic-4-378647.mp3"
 		],
 		"explosion": [
 			"assets/sounds/explosion/medium-explosion-40472.mp3",
@@ -48,7 +58,7 @@
 	},
 	"weapons": {
 		"bullet": {
-			"baseSpeed": 800.0,
+			"baseSpeed": 1200.0,
 			"baseDamage": 25.0,
 			"effectiveRangeMultiplier": 2.0,
 			"machineGun": {
@@ -233,9 +243,9 @@
 				"spreadAngle": 1.571,
 				"bulletCount": 2,
 				"speedMultiplier": 0.5,
-				"ammo": 4,
-				"ammoRegen": 0.2,
 				"cooldown": 0.2,
+				"ammo": 4,
+				"ammoReload": 8.0,
 				"extendFireRequest": 1.0
 			}
 		}

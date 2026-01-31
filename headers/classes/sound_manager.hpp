@@ -2,10 +2,12 @@
 #define SOUND_MANAGER_HPP
 
 #include "includes.hpp"
+#include "looping_fade_sound.hpp"
 #include <map>
 #include <vector>
 #include <string>
 #include <random>
+#include <memory>
 
 namespace sound {
 	// Sound ID type - simple int for cache efficiency in ECS
@@ -57,14 +59,19 @@ public:
 	// Direct play (bypasses throttling - use sparingly)
 	void playImmediate(sound::Id id, float volume = 1.0f);
 
+	// Load a sound file and return its ID
+	sound::Id loadSound(const std::string& path);
+
+	// Load a sound from config path (e.g., "sounds.warning")
+	sound::Id getConfigSound(const GameConfig& config, const std::string& configPath, sound::Id defaultId = sound::NONE);
+
 	// Background music
 	void playMusic();
 	void updateMusic();
 	void stopMusic();
 
-	// Thrust sound (looping while accelerating)
-	void setThrustActive(bool active);
-	bool isThrustActive() const;
+	// Thrust sound (looping with fade)
+	void updateThrustSound(bool isAccelerating, float dt);
 
 	void setMasterVolume(float volume);
 	float getMasterVolume() const;
@@ -85,6 +92,7 @@ private:
 	};
 
 	std::map<sound::Id, SoundData> sounds;
+	std::map<std::string, sound::Id> pathCache;  // path -> id cache
 	std::vector<PlaySoundRequest> pendingRequests;
 	std::map<sound::Id, int> playsThisFrame;
 
@@ -105,10 +113,7 @@ private:
 	Sound backgroundMusicSound;
 	bool musicLoaded = false;
 
-	Sound thrustSound;
-	bool thrustLoaded = false;
-	bool thrustActive = false;
-	float thrustVolume = 0.0f; // 0.0 to 1.0 for fading
+	std::unique_ptr<LoopingFadeSound> thrustSound;
 
 	float masterVolume = 0.5f;
 	bool enabled = true;
@@ -117,7 +122,6 @@ private:
 	int nextSoundId = 1;  // Start at 1, 0 is NONE, negatives are virtual
 	std::mt19937 rng{std::random_device{}()};
 
-	sound::Id loadSound(const std::string& path);
 	void unloadSound(sound::Id id);
 	Sound& getNextAlias(sound::Id id);
 	void loadFromConfig(const GameConfig& config);

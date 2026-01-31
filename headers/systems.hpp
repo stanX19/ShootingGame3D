@@ -41,6 +41,7 @@ namespace ecs_systems
 	void cleanOutOfBound(GameContext &context, float dt);
 	void syncModelRotation(GameContext &context, float dt);
 	void spawnTrailParticles(GameContext &context, float dt);
+	void soundSfx(GameContext &context, float dt);
 }
 
 #endif // SYSTEMS_HPP

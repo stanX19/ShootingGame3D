@@ -241,7 +241,7 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	int bulletCount = cfg.getInt(path + "bulletCount", 2);
 	float speedMultiplier = cfg.getFloat(path + "speedMultiplier", 0.5f);
 	int ammo = cfg.getInt(path + "ammo", 4);
-	float ammoRegen = cfg.getFloat(path + "ammoRegen", 0.2f);
+	float ammoReload = cfg.getFloat(path + "ammoReload", 8.0f);
 	float cooldown = cfg.getFloat(path + "cooldown", 0.2f);
 	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 1.0f);
 
@@ -260,7 +260,7 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
-	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
+	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{ammoReload});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
 }
