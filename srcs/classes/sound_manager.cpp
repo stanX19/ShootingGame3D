@@ -117,7 +117,8 @@ void SoundManager::shutdown() {
 		StopSound(thrustSound);
 		UnloadSound(thrustSound);
 		thrustLoaded = false;
-		thrustPlaying = false;
+		thrustActive = false;
+		thrustVolume = 0.0f;
 	}
 
 	for (auto& [id, data] : sounds) {
@@ -247,6 +248,28 @@ void SoundManager::update(const Camera3D& camera) {
 		return;
 	}
 
+	// Update thrust sound volume (fade in/out)
+	if (thrustLoaded) {
+		float dt = GetFrameTime();
+		if (thrustActive) {
+			thrustVolume += dt * 2.0f; // Fade in over 0.5s
+			if (thrustVolume > 1.0f)
+				thrustVolume = 1.0f;
+		} else {
+			thrustVolume -= dt * 1.5f; // Fade out slightly slower
+			if (thrustVolume < 0.0f)
+				thrustVolume = 0.0f;
+		}
+
+		if (thrustVolume > 0.0f) {
+			if (!IsSoundPlaying(thrustSound))
+				PlaySound(thrustSound);
+			SetSoundVolume(thrustSound, thrustVolume * masterVolume * 0.5f);
+		} else if (IsSoundPlaying(thrustSound)) {
+			StopSound(thrustSound);
+		}
+	}
+
 	// Reset per-frame counters
 	playsThisFrame.clear();
 
@@ -340,22 +363,12 @@ void SoundManager::stopMusic() {
 	StopSound(backgroundMusicSound);
 }
 
-void SoundManager::playThrust() {
-	if (!initialized || !enabled || !thrustLoaded) return;
-	if (thrustPlaying) return;
-	SetSoundVolume(thrustSound, masterVolume * 0.5f);
-	PlaySound(thrustSound);
-	thrustPlaying = true;
+void SoundManager::setThrustActive(bool active) {
+	thrustActive = active;
 }
 
-void SoundManager::stopThrust() {
-	if (!thrustLoaded || !thrustPlaying) return;
-	StopSound(thrustSound);
-	thrustPlaying = false;
-}
-
-bool SoundManager::isThrustPlaying() const {
-	return thrustPlaying;
+bool SoundManager::isThrustActive() const {
+	return thrustActive;
 }
 
 void SoundManager::setMasterVolume(float volume) {

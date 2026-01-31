@@ -166,7 +166,10 @@ namespace {
 void ecs_systems::playerMoveControl(GameContext &context, float dt)
 {
 	if (!context.registry.all_of<Position, Rotation, Velocity, MaxSpeed, TurnSpeed>(context.currentPlayer))
+	{
+		context.soundManager.setThrustActive(false);
 		return ;
+	}
 
 	Position &position = context.registry.get<Position>(context.currentPlayer);
 	Rotation &rotation = context.registry.get<Rotation>(context.currentPlayer);
@@ -231,6 +234,8 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	{
 		speed -= accel * dt;
 	}
+
+	context.soundManager.setThrustActive(speed > 0);
 
 	// speed = Clamp(speed, 0, maxSpeed.value);
 

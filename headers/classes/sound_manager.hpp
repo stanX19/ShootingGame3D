@@ -63,9 +63,8 @@ public:
 	void stopMusic();
 
 	// Thrust sound (looping while accelerating)
-	void playThrust();
-	void stopThrust();
-	bool isThrustPlaying() const;
+	void setThrustActive(bool active);
+	bool isThrustActive() const;
 
 	void setMasterVolume(float volume);
 	float getMasterVolume() const;
@@ -108,7 +107,8 @@ private:
 
 	Sound thrustSound;
 	bool thrustLoaded = false;
-	bool thrustPlaying = false;
+	bool thrustActive = false;
+	float thrustVolume = 0.0f; // 0.0 to 1.0 for fading
 
 	float masterVolume = 0.5f;
 	bool enabled = true;

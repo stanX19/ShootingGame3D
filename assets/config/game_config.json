@@ -14,7 +14,7 @@
 		"backgroundMusic": "none",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
 		"alert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
-		"thrust": "assets/sounds/space-flight-10-422488.mp3",
+		"thrust": "assets/sounds/window-glass-vibration-67541.mp3",
 		"bulletShoot": [
 			"assets/sounds/gunshot/gunshot_smg_shot_1-203471.mp3",
 			"assets/sounds/gunshot/gunshot_smg_shot_2-203472.mp3",
