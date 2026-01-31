@@ -46,6 +46,7 @@ public:
 	sound::Id getRandomMissileShoot();
 	sound::Id getBackgroundMusic() const;
 	sound::Id getAlertSound() const;
+	sound::Id getThrustSound() const;
 
 	// Queue a sound to be played (with throttling)
 	void queueSound(sound::Id id, Vector3 position = {0,0,0}, float volume = 1.0f);
@@ -60,6 +61,11 @@ public:
 	void playMusic();
 	void updateMusic();
 	void stopMusic();
+
+	// Thrust sound (looping while accelerating)
+	void playThrust();
+	void stopThrust();
+	bool isThrustPlaying() const;
 
 	void setMasterVolume(float volume);
 	float getMasterVolume() const;
@@ -92,9 +98,17 @@ private:
 	std::vector<sound::Id> missileShootIds;
 	sound::Id backgroundMusicId = sound::NONE;
 	sound::Id alertSoundId = sound::NONE;
+	sound::Id thrustSoundId = sound::NONE;
 
-	Music backgroundMusic;
+	// Per-category pitch modifiers (virtual ID -> pitch)
+	std::map<sound::Id, float> categoryPitches;
+
+	Sound backgroundMusicSound;
 	bool musicLoaded = false;
+
+	Sound thrustSound;
+	bool thrustLoaded = false;
+	bool thrustPlaying = false;
 
 	float masterVolume = 0.5f;
 	bool enabled = true;

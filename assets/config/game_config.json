@@ -5,22 +5,23 @@
 		"unitCount": 4
 	},
 	"audio": {
-		"bufferSize": 4096,
 		"masterVolume": 1.0,
 		"soundAliasCount": 4,
-		"maxSoundsPerIdPerFrame": 20,
+		"maxSoundsPerIdPerFrame": 10,
 		"explosionMaxDistance": 500.0
 	},
 	"sounds": {
 		"backgroundMusic": "none",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
 		"alert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
+		"thrust": "assets/sounds/space-flight-10-422488.mp3",
 		"bulletShoot": [
 			"assets/sounds/gunshot/gunshot_smg_shot_1-203471.mp3",
 			"assets/sounds/gunshot/gunshot_smg_shot_2-203472.mp3",
 			"assets/sounds/gunshot/gunshot_smg_shot_4-203474.mp3",
 			"assets/sounds/gunshot/gunshot_smg_shot_5-203475.mp3"
 		],
+		"bulletShootPitch": 1.0,
 		"lazerShoot": [
 			"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3",
 			"assets/sounds/lazer/lazer-sound-46104.mp3"

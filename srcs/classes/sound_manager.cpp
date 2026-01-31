@@ -22,11 +22,12 @@ void SoundManager::loadFromConfig(const GameConfig& config) {
 	// Load background music
 	if (soundsSection.contains("backgroundMusic")) {
 		std::string path = soundsSection["backgroundMusic"].get<std::string>();
-		backgroundMusic = LoadMusicStream(path.c_str());
-		musicLoaded = IsMusicValid(backgroundMusic);
-		if (musicLoaded) {
-			backgroundMusic.looping = true;
-			backgroundMusicId = nextSoundId++;
+		if (path != "none") {
+			backgroundMusicSound = LoadSound(path.c_str());
+			musicLoaded = IsSoundValid(backgroundMusicSound);
+			if (musicLoaded) {
+				backgroundMusicId = nextSoundId++;
+			}
 		}
 	}
 
@@ -48,10 +49,33 @@ void SoundManager::loadFromConfig(const GameConfig& config) {
 	loadCategory("explosion", explosionIds);
 	loadCategory("missileShoot", missileShootIds);
 
+	// Load per-category pitch modifiers (for "space cockpit" sound effect)
+	auto loadPitch = [&](const std::string& key, sound::Id virtualId) {
+		if (soundsSection.contains(key)) {
+			categoryPitches[virtualId] = soundsSection[key].get<float>();
+		}
+	};
+	loadPitch("bulletShootPitch", sound::RANDOM_BULLET_SHOOT);
+	loadPitch("lazerShootPitch", sound::RANDOM_LAZER_SHOOT);
+	loadPitch("bulletHitPitch", sound::RANDOM_BULLET_HIT);
+	loadPitch("lazerHitPitch", sound::RANDOM_LAZER_HIT);
+	loadPitch("explosionPitch", sound::RANDOM_EXPLOSION);
+	loadPitch("missileShootPitch", sound::RANDOM_MISSILE_SHOOT);
+
 	// Load alert sound
 	if (soundsSection.contains("alert")) {
 		std::string alertPath = soundsSection["alert"].get<std::string>();
 		alertSoundId = loadSound(alertPath);
+	}
+
+	// Load thrust sound
+	if (soundsSection.contains("thrust")) {
+		std::string path = soundsSection["thrust"].get<std::string>();
+		thrustSound = LoadSound(path.c_str());
+		thrustLoaded = IsSoundValid(thrustSound);
+		if (thrustLoaded) {
+			thrustSoundId = nextSoundId++;
+		}
 	}
 
 	TraceLog(LOG_INFO, "SOUND: Loaded %zu bulletShoot, %zu lazerShoot, %zu bulletHit, %zu lazerHit, %zu explosion sounds",
@@ -61,13 +85,11 @@ void SoundManager::loadFromConfig(const GameConfig& config) {
 void SoundManager::init(const GameConfig& config) {
 	if (initialized) return;
 
-	int bufferSize = config.getInt("audio.bufferSize", 65536);
 	masterVolume = config.getFloat("audio.masterVolume", 0.5f);
 	maxSoundsPerIdPerFrame = config.getInt("audio.maxSoundsPerIdPerFrame", 3);
 	soundAliasesCount = config.getInt("audio.soundAliasCount", 4);
 	explosionMaxDistance = config.getFloat("audio.explosionMaxDistance", -1.0f);
 
-	SetAudioStreamBufferSizeDefault(bufferSize);
 	InitAudioDevice();
 	if (!IsAudioDeviceReady()) {
 		TraceLog(LOG_WARNING, "SOUND: Failed to initialize audio device");
@@ -79,16 +101,23 @@ void SoundManager::init(const GameConfig& config) {
 	loadFromConfig(config);
 
 	SetMasterVolume(masterVolume);
-	TraceLog(LOG_INFO, "SOUND: Audio system initialized (bufferSize=%d)", bufferSize);
+	TraceLog(LOG_INFO, "SOUND: Audio system initialized");
 }
 
 void SoundManager::shutdown() {
 	if (!initialized) return;
 
 	if (musicLoaded) {
-		StopMusicStream(backgroundMusic);
-		UnloadMusicStream(backgroundMusic);
+		StopSound(backgroundMusicSound);
+		UnloadSound(backgroundMusicSound);
 		musicLoaded = false;
+	}
+
+	if (thrustLoaded) {
+		StopSound(thrustSound);
+		UnloadSound(thrustSound);
+		thrustLoaded = false;
+		thrustPlaying = false;
 	}
 
 	for (auto& [id, data] : sounds) {
@@ -198,6 +227,10 @@ sound::Id SoundManager::getAlertSound() const {
 	return alertSoundId;
 }
 
+sound::Id SoundManager::getThrustSound() const {
+	return thrustSoundId;
+}
+
 void SoundManager::queueSound(sound::Id id, Vector3 position, float volume) {
 	if (!enabled || id == sound::NONE) return;
 
@@ -248,8 +281,20 @@ void SoundManager::update(const Camera3D& camera) {
 		pan = std::max(-1.0f, std::min(1.0f, pan * 0.01f));  // normalize
 		pan = 0.5f + pan * 0.4f;  // convert to 0.1-0.9 range (centered at 0.5)
 
+		// Determine pitch from category (default 1.0f)
+		float pitch = 1.0f;
+		for (const auto& [virtualId, p] : categoryPitches) {
+			if (virtualId == sound::RANDOM_BULLET_SHOOT && std::find(bulletShootIds.begin(), bulletShootIds.end(), req.id) != bulletShootIds.end()) { pitch = p; break; }
+			if (virtualId == sound::RANDOM_LAZER_SHOOT && std::find(lazerShootIds.begin(), lazerShootIds.end(), req.id) != lazerShootIds.end()) { pitch = p; break; }
+			if (virtualId == sound::RANDOM_BULLET_HIT && std::find(bulletHitIds.begin(), bulletHitIds.end(), req.id) != bulletHitIds.end()) { pitch = p; break; }
+			if (virtualId == sound::RANDOM_LAZER_HIT && std::find(lazerHitIds.begin(), lazerHitIds.end(), req.id) != lazerHitIds.end()) { pitch = p; break; }
+			if (virtualId == sound::RANDOM_EXPLOSION && std::find(explosionIds.begin(), explosionIds.end(), req.id) != explosionIds.end()) { pitch = p; break; }
+			if (virtualId == sound::RANDOM_MISSILE_SHOOT && std::find(missileShootIds.begin(), missileShootIds.end(), req.id) != missileShootIds.end()) { pitch = p; break; }
+		}
+
 		Sound& alias = getNextAlias(req.id);
 		SetSoundVolume(alias, finalVolume);
+		SetSoundPitch(alias, pitch);
 		SetSoundPan(alias, pan);
 		PlaySound(alias);
 
@@ -277,18 +322,40 @@ void SoundManager::playImmediate(sound::Id id, float volume) {
 
 void SoundManager::playMusic() {
 	if (!initialized || !enabled || !musicLoaded) return;
-	PlayMusicStream(backgroundMusic);
+	SetSoundVolume(backgroundMusicSound, masterVolume);
+	PlaySound(backgroundMusicSound);
 }
 
 void SoundManager::updateMusic() {
 	if (!initialized || !enabled || !musicLoaded)
 		return;
-	UpdateMusicStream(backgroundMusic);
+	// Loop the music by replaying when it finishes
+	if (!IsSoundPlaying(backgroundMusicSound)) {
+		PlaySound(backgroundMusicSound);
+	}
 }
 
 void SoundManager::stopMusic() {
 	if (!musicLoaded) return;
-	StopMusicStream(backgroundMusic);
+	StopSound(backgroundMusicSound);
+}
+
+void SoundManager::playThrust() {
+	if (!initialized || !enabled || !thrustLoaded) return;
+	if (thrustPlaying) return;
+	SetSoundVolume(thrustSound, masterVolume * 0.5f);
+	PlaySound(thrustSound);
+	thrustPlaying = true;
+}
+
+void SoundManager::stopThrust() {
+	if (!thrustLoaded || !thrustPlaying) return;
+	StopSound(thrustSound);
+	thrustPlaying = false;
+}
+
+bool SoundManager::isThrustPlaying() const {
+	return thrustPlaying;
 }
 
 void SoundManager::setMasterVolume(float volume) {
