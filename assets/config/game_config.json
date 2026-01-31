@@ -8,38 +8,41 @@
 		"bufferSize": 4096,
 		"masterVolume": 1.0,
 		"soundAliasCount": 4,
-		"maxSoundsPerIdPerFrame": 10
+		"maxSoundsPerIdPerFrame": 20,
+		"explosionMaxDistance": 500.0
 	},
 	"sounds": {
 		"backgroundMusic": "none",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
 		"alert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
 		"bulletShoot": [
-			"assets/sounds/gunshot_smg_shot_1-203471.mp3",
-			"assets/sounds/gunshot_smg_shot_2-203472.mp3",
-			"assets/sounds/gunshot_smg_shot_4-203474.mp3",
-			"assets/sounds/gunshot_smg_shot_5-203475.mp3"
+			"assets/sounds/gunshot/gunshot_smg_shot_1-203471.mp3",
+			"assets/sounds/gunshot/gunshot_smg_shot_2-203472.mp3",
+			"assets/sounds/gunshot/gunshot_smg_shot_4-203474.mp3",
+			"assets/sounds/gunshot/gunshot_smg_shot_5-203475.mp3"
 		],
 		"lazerShoot": [
-			"assets/sounds/scifi-gun-shoot-1-266417.mp3",
-			"assets/sounds/lazer-sound-46104.mp3"
+			"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3",
+			"assets/sounds/lazer/lazer-sound-46104.mp3"
 		],
 		"bulletHit": [
-			"assets/sounds/metal-hit-2-193269.mp3",
-			"assets/sounds/metal-hit-4-193271.mp3",
-			"assets/sounds/metal-hit-5-193273.mp3",
-			"assets/sounds/metal-hit-18-193284.mp3",
-			"assets/sounds/metal-hit-28-193294.mp3",
-			"assets/sounds/metal-hit-29-193293.mp3",
-			"assets/sounds/metal-hit-30-193295.mp3"
+			"assets/sounds/metal/metal-hit-18-193284.mp3",
+			"assets/sounds/metal/metal-hit-28-193294.mp3",
+			"assets/sounds/metal/metal-hit-29-193293.mp3",
+			"assets/sounds/metal/metal-hit-30-193295.mp3",
+			"assets/sounds/metal/metal-hit-58-193319.mp3",
+			"assets/sounds/metal/metal-hit-68-193329.mp3",
+			"assets/sounds/metal/metal-hit-95-200424.mp3"
 		],
 		"lazerHit": [
-			"assets/sounds/scifi-gun-shoot-1-266417.mp3",
-			"assets/sounds/lazer-sound-46104.mp3"
+			"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3"
 		],
 		"explosion": [
-			"assets/sounds/medium-explosion-40472.mp3",
-			"assets/sounds/explosion-fx-343683.mp3"
+			"assets/sounds/explosion/medium-explosion-40472.mp3",
+			"assets/sounds/explosion/explosion-fx-343683.mp3"
+		],
+		"missileShoot": [
+			"assets/sounds/missile/cas-missile-launching-with-some-reverb-66630.mp3"
 		]
 	},
 	"weapons": {

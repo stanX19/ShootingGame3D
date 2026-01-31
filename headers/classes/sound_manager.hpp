@@ -18,6 +18,7 @@ namespace sound {
 	constexpr Id RANDOM_BULLET_HIT   = -3;
 	constexpr Id RANDOM_LAZER_HIT    = -4;
 	constexpr Id RANDOM_EXPLOSION    = -5;
+	constexpr Id RANDOM_MISSILE_SHOOT = -6;
 } // namespace sound
 
 struct PlaySoundRequest {
@@ -42,6 +43,7 @@ public:
 	sound::Id getRandomBulletHit();
 	sound::Id getRandomLazerHit();
 	sound::Id getRandomExplosion();
+	sound::Id getRandomMissileShoot();
 	sound::Id getBackgroundMusic() const;
 	sound::Id getAlertSound() const;
 
@@ -68,6 +70,7 @@ public:
 private:
 	int maxSoundsPerIdPerFrame = 3;
 	int soundAliasesCount = 4;  // simultaneous plays per sound
+	float explosionMaxDistance = -1.0f;  // -1 means no limit
 
 	struct SoundData {
 		Sound baseSound;
@@ -86,6 +89,7 @@ private:
 	std::vector<sound::Id> bulletHitIds;
 	std::vector<sound::Id> lazerHitIds;
 	std::vector<sound::Id> explosionIds;
+	std::vector<sound::Id> missileShootIds;
 	sound::Id backgroundMusicId = sound::NONE;
 	sound::Id alertSoundId = sound::NONE;
 
@@ -105,6 +109,7 @@ private:
 	void loadFromConfig(const GameConfig& config);
 	sound::Id getRandomFromPool(const std::vector<sound::Id>& pool);
 	sound::Id resolveVirtualId(sound::Id id);  // Convert virtual IDs to actual random sounds
+	bool isExplosionSound(sound::Id id) const;
 };
 
 #endif  // SOUND_MANAGER_HPP

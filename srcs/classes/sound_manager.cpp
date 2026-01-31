@@ -46,6 +46,7 @@ void SoundManager::loadFromConfig(const GameConfig& config) {
 	loadCategory("bulletHit", bulletHitIds);
 	loadCategory("lazerHit", lazerHitIds);
 	loadCategory("explosion", explosionIds);
+	loadCategory("missileShoot", missileShootIds);
 
 	// Load alert sound
 	if (soundsSection.contains("alert")) {
@@ -64,6 +65,7 @@ void SoundManager::init(const GameConfig& config) {
 	masterVolume = config.getFloat("audio.masterVolume", 0.5f);
 	maxSoundsPerIdPerFrame = config.getInt("audio.maxSoundsPerIdPerFrame", 3);
 	soundAliasesCount = config.getInt("audio.soundAliasCount", 4);
+	explosionMaxDistance = config.getFloat("audio.explosionMaxDistance", -1.0f);
 
 	SetAudioStreamBufferSizeDefault(bufferSize);
 	InitAudioDevice();
@@ -100,6 +102,7 @@ void SoundManager::shutdown() {
 	bulletHitIds.clear();
 	lazerHitIds.clear();
 	explosionIds.clear();
+	missileShootIds.clear();
 
 	CloseAudioDevice();
 	initialized = false;
@@ -171,6 +174,10 @@ sound::Id SoundManager::getRandomExplosion() {
 	return getRandomFromPool(explosionIds);
 }
 
+sound::Id SoundManager::getRandomMissileShoot() {
+	return getRandomFromPool(missileShootIds);
+}
+
 sound::Id SoundManager::resolveVirtualId(sound::Id id) {
 	switch (id) {
 		case sound::RANDOM_BULLET_SHOOT: return getRandomFromPool(bulletShootIds);
@@ -178,6 +185,7 @@ sound::Id SoundManager::resolveVirtualId(sound::Id id) {
 		case sound::RANDOM_BULLET_HIT:   return getRandomFromPool(bulletHitIds);
 		case sound::RANDOM_LAZER_HIT:    return getRandomFromPool(lazerHitIds);
 		case sound::RANDOM_EXPLOSION:    return getRandomFromPool(explosionIds);
+		case sound::RANDOM_MISSILE_SHOOT: return getRandomFromPool(missileShootIds);
 		default: return id;  // Not virtual, return as-is
 	}
 }
@@ -221,6 +229,11 @@ void SoundManager::update(const Camera3D& camera) {
 
 		// Calculate volume based on distance (simple falloff)
 		float distance = Vector3Distance(camera.position, req.position);
+
+		// Skip explosion sounds beyond max distance
+		if (explosionMaxDistance > 0 && isExplosionSound(req.id) && distance > explosionMaxDistance) {
+			continue;
+		}
 		float distanceAttenuation = 1.0f / (1.0f + distance * 0.01f);  // gentle falloff
 		distanceAttenuation = std::max(0.1f, std::min(1.0f, distanceAttenuation));
 
@@ -295,4 +308,8 @@ void SoundManager::setEnabled(bool value) {
 
 bool SoundManager::isEnabled() const {
 	return enabled;
+}
+
+bool SoundManager::isExplosionSound(sound::Id id) const {
+	return std::find(explosionIds.begin(), explosionIds.end(), id) != explosionIds.end();
 }

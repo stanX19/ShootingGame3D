@@ -16,7 +16,7 @@ namespace {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
-		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_BULLET_SHOOT, 0.5f);
+		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_MISSILE_SHOOT, 0.5f);
 	}
 
 	entt::entity createMissileTemplate(GameContext &context, float rad, Color color) {
