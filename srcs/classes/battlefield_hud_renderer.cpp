@@ -645,10 +645,10 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
         if (context.currentPlayer == other)
             continue;
 		float relSpeed = Vector3Length(velA->value - velB.value);
-		float collisionTime = (Vector3Distance(posA->value, posB.value) - warningDist)  / relSpeed;
-		bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime);
+		float collisionTime = Vector3Distance(posA->value, posB.value)  / relSpeed;
+		bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius, warningTime);
 		
-		if (willCollideFlag || (target.entity == context.currentPlayer && collisionTime < warningTime)) {
+		if (willCollideFlag || (target.entity == context.currentPlayer && collisionTime <= warningTime)) {
             warnings.push_back(posB.value);
 			if (canPlayAlertSound)
         		context.soundManager.queueSound(context.config, "sounds.missileAlert", posB.value, 0.5f);
