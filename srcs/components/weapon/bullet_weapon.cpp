@@ -12,11 +12,11 @@ namespace
 		return baseColor;
 	}
 
-	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity) {
+	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_BULLET_SHOOT) {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
-		context.registry.emplace_or_replace<sound::ShootSound>(entity, sound::RANDOM_BULLET_SHOOT, 0.5f);
+		context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.5f);
 	}
 
 	entt::entity createBulletTemplate(GameContext &context) {
@@ -78,7 +78,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(cfg, path + "sound", sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -122,7 +122,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(cfg, path + "sound", sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -165,7 +165,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(cfg, path + "sound", sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -203,7 +203,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(cfg, path + "sound", sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 }
@@ -242,7 +242,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(cfg, path + "sound", sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
@@ -283,7 +283,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity);
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(cfg, path + "sound", sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});

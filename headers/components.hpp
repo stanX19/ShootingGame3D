@@ -126,6 +126,16 @@ struct Damage
 	float value;
 };
 
+struct Mass
+{
+	float value = 1.0f;
+};
+
+struct ImpulseRequest  // vel = vel + impulse  (directly, no dt)
+{
+	Vector3 value = {0, 0, 0};
+};
+
 struct MaxSpeed
 {
 	float value;
@@ -272,6 +282,7 @@ struct SpawnsTrailParticle {
 namespace tag {
 	// todo: throw these into namespaces too
 	struct Asteroid {};
+	struct Missile {};
 	struct AIMoveControl {};
 	struct Suicidal {};
 	struct Enemy {};

@@ -37,6 +37,7 @@ namespace {
 		context.templateReg.emplace<MoveTarget>(missile);
 		context.templateReg.emplace<tag::AIMoveControl>(missile);
 		context.templateReg.emplace<tag::Suicidal>(missile);
+		context.templateReg.emplace<tag::Missile>(missile);
 		context.templateReg.emplace<Lifespan>(missile, Lifespan{lifespan});
 		context.templateReg.emplace<sound::DeathSound>(missile, sound::RANDOM_EXPLOSION, std::min(1.0f, rad / 1.0f * 0.5f));
 		return missile;

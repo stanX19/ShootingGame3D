@@ -19,11 +19,7 @@ static void resetGame(GameContext &context) {
 	context.mainCamera.fovy = 45.0f;
 	context.mainCamera.projection = CAMERA_PERSPECTIVE;
 
-	context.soundManager.playImmediate(
-		context.soundManager.loadSound(
-			context.config.getString("sounds.gameStart", "")
-		), 0.25f
-	);
+	context.soundManager.playImmediate(context.config, "sounds.gameStart", 0.25f);
 }
 
 static void inputControls(GameContext &context, [[maybe_unused]] float dt) {

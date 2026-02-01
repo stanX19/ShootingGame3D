@@ -617,37 +617,46 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     const static float warningTime = 5.0f;
     const static float warningDist = 10.0f;
     std::vector<Vector3> warnings;
+
+    // Play alert sound with cooldown
+    static float alertSoundCooldown = 0.0f;
+	static bool canPlayAlertSound;
+    alertSoundCooldown -= currentDt;
+	canPlayAlertSound = alertSoundCooldown <= 0.0f;
+    if (alertSoundCooldown <= 0.0f) {
+        alertSoundCooldown = 1.0f;
+    }
+
     auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
 
     if (!posA || !velA || !bodyA)
         return;
-    for (auto [other, posB, velB, bodyB, dmgB] : context.registry.view<Position, Velocity, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
+    for (auto [other, posB, bodyB, dmgB] : context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
         if (context.currentPlayer == other)
             continue;
-
+		Velocity velB = context.registry.all_of<Velocity>(other)? context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
         if (willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime)) {
             warnings.push_back(posB.value);
+			if (canPlayAlertSound)
+        		context.soundManager.queueSound(context.config, "sounds.collisionAlert", posB.value, 0.5f);
         }
     }
-    for (auto [other, posB, bodyB, dmgB] : context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet, Velocity>).each()) {
+    for (auto [other, posB, bodyB, dmgB, velB, target] : context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
         if (context.currentPlayer == other)
             continue;
-
-        if (willCollide(posA->value, velA->value, posB.value, Vector3Zero(), bodyA->radius + bodyB.radius + warningDist, warningTime)) {
+		float relSpeed = Vector3Length(velA->value - velB.value);
+		float collisionTime = (Vector3Distance(posA->value, posB.value) - warningDist)  / relSpeed;
+		bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime);
+		
+		if (willCollideFlag || (target.entity == context.currentPlayer && collisionTime < warningTime)) {
             warnings.push_back(posB.value);
+			if (canPlayAlertSound)
+        		context.soundManager.queueSound(context.config, "sounds.missileAlert", posB.value, 0.5f);
         }
     }
 
     if (warnings.empty())
         return;
-
-    // Play alert sound with cooldown
-    static float alertSoundCooldown = 0.0f;
-    alertSoundCooldown -= currentDt;
-    if (alertSoundCooldown <= 0.0f) {
-        context.soundManager.playImmediate(context.soundManager.getAlertSound(), 0.5f);
-        alertSoundCooldown = 2.0f;
-    }
 
     const char* alertMsg = "PROXIMITY ALERT";
     int msgWidth = MeasureText(alertMsg, 24);

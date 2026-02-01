@@ -19,6 +19,7 @@ namespace ecs_systems
 	void blueUnitRespawn(GameContext &context, float dt);
 	void redUnitRespawn(GameContext &context, float dt);
 	void entityMovement(GameContext &context, float dt);
+	void applyImpulse(GameContext &context, float dt);
 	void entityTransformation(GameContext &context, float dt);
 	void detectEntityCollision(GameContext &context, float dt);
 	void entityAnchor(GameContext &context, float dt);

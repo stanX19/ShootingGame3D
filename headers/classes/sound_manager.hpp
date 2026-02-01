@@ -50,20 +50,24 @@ public:
 	sound::Id getAlertSound() const;
 	sound::Id getThrustSound() const;
 
-	// Queue a sound to be played (with throttling)
-	void queueSound(sound::Id id, Vector3 position = {0,0,0}, float volume = 1.0f);
 
 	// Process queued sounds (call once per frame after dispatcher.update())
 	void update(const Camera3D& camera);
 
+	// Queue a sound to be played (with throttling)
+	void queueSound(sound::Id id, Vector3 position = {0,0,0}, float volume = 1.0f);
+	void queueSound(const GameConfig& config, const std::string& configPath,
+					Vector3 position = {0,0,0}, float volume = 1.0f);
+
 	// Direct play (bypasses throttling - use sparingly)
 	void playImmediate(sound::Id id, float volume = 1.0f);
+	void playImmediate(const GameConfig& config, const std::string& configPath, float volume = 1.0f);
 
 	// Load a sound file and return its ID
 	sound::Id loadSound(const std::string& path);
 
 	// Load a sound from config path (e.g., "sounds.warning")
-	sound::Id getConfigSound(const GameConfig& config, const std::string& configPath, sound::Id defaultId = sound::NONE);
+	sound::Id loadSound(const GameConfig& config, const std::string& configPath, sound::Id defaultId = sound::NONE);
 
 	// Background music
 	void playMusic();

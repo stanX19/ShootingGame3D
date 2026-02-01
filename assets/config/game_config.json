@@ -6,20 +6,24 @@
 	},
 	"audio": {
 		"masterVolume": 1.0,
-		"soundAliasCount": 4,
+		"soundAliasCount": 8,
 		"maxSoundsPerIdPerFrame": 10,
 		"explosionMaxDistance": 500.0
 	},
 	"sounds": {
 		"backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",
 		"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
-		"alert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
-		"warning": "assets/sounds/buzzer-2-181415.mp3",
+		"collisionAlert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
+		"missileAlert": "assets/sounds/buzzer-2-181415.mp3",
+		"lockOn": "assets/sounds/electronic-beep-1-453381.mp3",
+		"lockOnVolume": 0.25,
+		"warning": "none",
 		"warningVolume": 0.25,
 		"lowHpWarningThreshold": 0.4,
 		"lowHpWarningDuration": 3.0,
 		"lowHpWarningInterval": 1.0,
-		"gameStart": "assets/sounds/percussive-drum-hit-1-189787.mp3",
+		"gameStart": "assets/sounds/electronic-beep-3-453383.mp3",
+		"hyperBoost": "assets/sounds/static-noise-mechanical-whoosh-23-a-191050.mp3",
 		"thrust": "assets/sounds/engine3_up-75891.mp3",
 		"thrustVolume": 0.25,
 		"thrustFadeIn": 1.0,
@@ -46,7 +50,8 @@
 			"assets/sounds/metal/metal-hit-95-200424.mp3"
 		],
 		"lazerHit": [
-			"assets/sounds/lazer/lightning-magic-4-378647.mp3"
+			"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3",
+			"assets/sounds/lazer/lazer-sound-46104.mp3"
 		],
 		"explosion": [
 			"assets/sounds/explosion/medium-explosion-40472.mp3",
@@ -106,7 +111,8 @@
 				"bulletCount": 1,
 				"speedMultiplier": 6.0,
 				"lifespan": 10.0,
-				"cooldown": 1.5
+				"cooldown": 1.5,
+				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3"
 			},
 			"burstSniper": {
 				"radius": 0.2,
@@ -114,11 +120,12 @@
 				"damageMultiplier": 2.5,
 				"spreadMultiplier": 5.0,
 				"bulletCount": 1,
-				"speedMultiplier": 6.0,
+				"speedMultiplier": 4.0,
 				"lifespan": 10.0,
 				"cooldown": 0.35,
-				"ammo": 20,
-				"reloadTime": 12.0
+				"ammo": 10,
+				"reloadTime": 6.0,
+				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3"
 			},
 			"basic": {
 				"radius": 0.075,
@@ -189,7 +196,7 @@
 				"radius": 0.5,
 				"hp": 1.0,
 				"damageMultiplier": 1.0,
-				"acceleration": 100.0,
+				"acceleration": 0.0,
 				"turnSpeed": 0.5,
 				"ammo": 2,
 				"ammoRegen": 0.0667,

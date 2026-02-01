@@ -6,6 +6,7 @@ namespace
 	float prevHp = 0.0f;
 	float lowHpWarningDuration = 0.0f; // remaining duration to keep warning
 	float lowHpWarningCooldown = 0.0f; // cooldown between beeps
+	entt::entity lastLockOnTarget = entt::null;
 
 	void lowHpWarningSfx(GameContext &context, float dt)
 	{
@@ -29,10 +30,21 @@ namespace
 		lowHpWarningCooldown -= dt;
 		if (lowHpWarningCooldown > 0.0f)
 			return;
-
 		lowHpWarningCooldown = context.config.getFloat("sounds.lowHpWarningInterval", 1.0f);
-		sound::Id warningId = context.soundManager.getConfigSound(context.config, "sounds.warning");
-		context.soundManager.playImmediate(warningId, context.config.getFloat("sounds.warningVolume", 1.0f));
+		
+		float volume = context.config.getFloat("sounds.warningVolume", 1.0f);
+		context.soundManager.playImmediate(context.config, "sounds.warning", volume);
+	}
+
+	void lockOnSfx(GameContext &context)
+	{
+		AimTarget *aimTargetPtr = context.registry.try_get<AimTarget>(context.currentPlayer);
+		entt::entity targetedEntity = aimTargetPtr ? aimTargetPtr->entity : entt::null;
+		if (targetedEntity != entt::null && targetedEntity != lastLockOnTarget) {
+			float volume = context.config.getFloat("sounds.lockOnVolume", 1.0f);
+			context.soundManager.playImmediate(context.config, "sounds.lockOn", volume);
+		}
+		lastLockOnTarget = targetedEntity;
 	}
 }
 
@@ -46,4 +58,7 @@ void ecs_systems::soundSfx(GameContext &context, float dt)
 
 	// --- Low HP warning sound ---
 	lowHpWarningSfx(context, dt);
+
+	// --- Lock-on sound ---
+	lockOnSfx(context);
 }

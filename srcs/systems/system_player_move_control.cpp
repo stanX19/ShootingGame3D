@@ -212,6 +212,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	&& boostCooldown <= 0) {
 		boostDuration = 0.5f;
 		boostCooldown = 6.0f;
+		context.soundManager.playImmediate(context.config, "sounds.hyperBoost");
 	}
 	if (boostCooldown > 0)
 		boostCooldown -= dt;
