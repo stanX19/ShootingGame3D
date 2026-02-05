@@ -30,7 +30,7 @@ static void aiTurnControl(GameContext &context, float dt)
 		float distance = Vector3Distance(position.value, targetPos);
 		float relSpeed = Vector3Length(targetVel - velocity.value);
 
-		constexpr float avoidance_time = 1.5f;
+		const float avoidance_time = 1.0f;
 		if (!context.registry.all_of<tag::Suicidal>(entity) && distance / relSpeed < avoidance_time) {
 			targetDir = Vector3Normalize(Vector3Normalize(position.value - targetPos) + getUpVector(rotation) * 0.9f);
 		}

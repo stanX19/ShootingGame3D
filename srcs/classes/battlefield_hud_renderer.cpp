@@ -616,7 +616,7 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
 {
     const static float warningTime = 5.0f;
     const static float warningDist = 10.0f;
-    std::vector<Vector3> warnings;
+    std::vector<std::pair<Vector3, float>> warnings;
 
     // Play alert sound with cooldown
     static float alertSoundCooldown = 0.0f;
@@ -636,20 +636,21 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
             continue;
 		Velocity velB = context.registry.all_of<Velocity>(other)? context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
         if (willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime)) {
-            warnings.push_back(posB.value);
+            warnings.push_back({posB.value, Vector3Distance(posA->value, posB.value) - bodyA->radius - bodyB.radius});
 			if (canPlayAlertSound)
         		context.soundManager.queueSound(context.config, "sounds.collisionAlert", posB.value, 0.5f);
         }
     }
     for (auto [other, posB, bodyB, dmgB, velB, target] : context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
-        if (context.currentPlayer == other)
+        if (context.currentPlayer == other || target.entity != context.currentPlayer)
             continue;
-		float relSpeed = Vector3Length(velA->value - velB.value);
-		float collisionTime = Vector3Distance(posA->value, posB.value)  / relSpeed;
-		bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius, warningTime);
+		// float relSpeed = Vector3Length(velA->value - velB.value);
+		float distance = Vector3Distance(posA->value, posB.value);
+		// float collisionTime = distance / relSpeed;
+		bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime * 2);
 		
-		if (willCollideFlag || (target.entity == context.currentPlayer && collisionTime <= warningTime)) {
-            warnings.push_back(posB.value);
+		if (willCollideFlag) {
+            warnings.push_back({posB.value, distance - bodyA->radius - bodyB.radius});
 			if (canPlayAlertSound)
         		context.soundManager.queueSound(context.config, "sounds.missileAlert", posB.value, 0.5f);
         }
@@ -674,7 +675,7 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
     float uiFrameRadius = GetUIFrameRadius();
 
-    for (const Vector3& warningPos : warnings) {
+    for (const auto& [warningPos, distance]: warnings) {
         Vector2 screenPos = GetWorldToScreen(warningPos, camera);
         bool isOnScreen = (screenPos.x >= 0 && screenPos.x <= GetScreenWidth() &&
                            screenPos.y >= 0 && screenPos.y <= GetScreenHeight() &&
@@ -701,7 +702,6 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
 
             directionToWarning = Vector2Normalize(directionToWarning);
 
-            float distance = Vector3Length(toWarning);
             char distText[32];
             snprintf(distText, sizeof(distText), "%.0fm", distance);
             int textWidth = MeasureText(distText, 20);

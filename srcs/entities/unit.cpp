@@ -47,9 +47,15 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos, float radiu
 }
 
 entt::entity spawnUnit(GameContext &context, const Vector3& pos) {
-	entt::entity entity = spawnBaseUnit(context, pos, 1.0f);
+	const GameConfig& cfg = context.config;
+	const float radius = cfg.getFloat("units.basic.radius", 1.0f);
+	entt::entity entity = spawnBaseUnit(context, pos, radius);
 
-	weapon::emplaceWeaponBasic(context, entity);
+	weapon::emplaceWeaponMissileBasic(context, entity);
+	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
+	int subWeapons = GetRandomValue(0, 1000);
+	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
+	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
 	return entity;
 }
 
@@ -122,7 +128,7 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<TurnSpeed>(entity, baseTurn * cfg.getFloat("units.mothership.turnSpeedMultiplier", 0.5f));
 	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("units.mothership.scoreMultiplier", 5));
 
-	weapon::emplaceRandomMissileWeapon(context, entity);
+	weapon::emplaceWeaponMissileFlares(context, entity);
 	int randNum = GetRandomValue(0, 1000);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, +radius * 0.8f, -2}), randNum);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, -radius * 0.8f, -2}), randNum);

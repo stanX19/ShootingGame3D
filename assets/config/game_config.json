@@ -2,7 +2,7 @@
 	"game": {
 		"arenaSize": 2000.0,
 		"combatDist": 1000.0,
-		"unitCount": 4
+		"unitCount": 10
 	},
 	"audio": {
 		"masterVolume": 1.0,
@@ -50,7 +50,8 @@
 			"assets/sounds/metal/metal-hit-95-200424.mp3"
 		],
 		"lazerHit": [
-			"assets/sounds/lazer/electric-1-463650.mp3"
+			"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3",
+			"assets/sounds/lazer/lazer-sound-46104.mp3"
 		],
 		"explosion": [
 			"assets/sounds/explosion/medium-explosion-40472.mp3",
@@ -195,7 +196,8 @@
 				"radius": 0.5,
 				"hp": 1.0,
 				"damageMultiplier": 1.0,
-				"acceleration": 0.0,
+				"speedMultiplier": 1.0,
+				"acceleration": -0.0000001,
 				"turnSpeed": 0.5,
 				"ammo": 2,
 				"ammoRegen": 0.0667,
@@ -218,6 +220,7 @@
 				"radius": 0.25,
 				"hp": 1.0,
 				"damageMultiplier": 0.25,
+				"speedMultiplier": 4.0,
 				"turnSpeed": 0.1,
 				"ammo": 4,
 				"reloadTime": 20.0,
@@ -238,7 +241,7 @@
 			"sniper": {
 				"radius": 0.5,
 				"hp": 1.0,
-				"speed": 1000.0,
+				"speedMultiplier": 10.0,
 				"cooldown": 2.0
 			},
 			"flares": {
