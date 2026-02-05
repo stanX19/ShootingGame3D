@@ -1,5 +1,4 @@
 #include "entities.hpp"
-#include "constants.hpp"
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "components/factions.hpp"
@@ -30,7 +29,7 @@ namespace {
 }
 
 entt::entity spawnPlayer(GameContext &context) {
-	return spawnPlayer(context, Vector3{0, 0, -ARENA_SIZE * 0.5f});
+	return spawnPlayer(context, Vector3{0, 0, -context.config.ARENA_SIZE * 0.5f});
 }
 
 entt::entity spawnPlayer(GameContext &context, Vector3 pos) {

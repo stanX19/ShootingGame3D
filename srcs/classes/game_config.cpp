@@ -18,7 +18,17 @@ void GameConfig::init(const std::string& configPath) {
 		TraceLog(LOG_INFO, "CONFIG: Loaded config from %s", configPath.c_str());
 	} catch (const nlohmann::json::parse_error& e) {
 		TraceLog(LOG_WARNING, "CONFIG: Failed to parse config: %s", e.what());
+		return;
 	}
+
+	initConstants();
+}
+
+// load default values at construction
+void GameConfig::initConstants() {
+	ARENA_SIZE = getFloat("game.arenaSize", 2000.0f);
+	COMBAT_DIST = getFloat("game.combatDist", 1000.0f);
+	UNIT_COUNT = getInt("game.unitCount", 4);
 }
 
 const nlohmann::json* GameConfig::navigatePath(const std::string& path) const {

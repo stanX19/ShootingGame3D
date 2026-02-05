@@ -2,7 +2,6 @@
 #include "utils.hpp"
 #include "game_utils.hpp"
 #include "entities.hpp"
-#include "constants.hpp"
 #include "components/factions.hpp"
 #include <iostream>
 
@@ -21,11 +20,14 @@ namespace {
 	}
 }
 
-static Vector3 generateSpawnPos(const Vector3 &playerPos) {
+static Vector3 generateSpawnPos(GameContext const &context, Vector3 const &playerPos) {
+	float arenaSize = context.config.ARENA_SIZE;
+
 	return game_utils::randomPosInBoxOffCombat(
-		Vector3{-ARENA_SIZE * 0.5f, -ARENA_SIZE * 0.5f, ARENA_SIZE * 0.5f},
-		Vector3{+ARENA_SIZE * 0.5f, +ARENA_SIZE * 0.5f, ARENA_SIZE},
-		playerPos
+		Vector3{-arenaSize * 0.5f, -arenaSize * 0.5f, -arenaSize},
+		Vector3{+arenaSize * 0.5f, +arenaSize * 0.5f, -arenaSize * 0.5f},
+		playerPos,
+		context.config.COMBAT_DIST
 	);
 }
 
@@ -44,22 +46,23 @@ void ecs_systems::redUnitRespawn(GameContext &context, [[maybe_unused]] float dt
 	// Count elites
 	auto eliteView = context.registry.view<tag::EliteUnit, RedTag>();
 	int eliteSize = (int)eliteView.size_hint();
+	int elitesToSpawn = context.config.UNIT_COUNT / 2 - eliteSize;
 	// std::cout << "Current Elite Count: " << eliteSize << std::endl;
 
 	// Spawn elites until we have 3
-	for (int i = 0; i < 3 - eliteSize; i++)
+	for (int i = 0; i < elitesToSpawn; i++)
 	{
 		entt::entity unit;
 		if (rand() % 3 == 1) {
-			unit = spawnEliteUnit(context, generateSpawnPos(playerPos));
+			unit = spawnEliteUnit(context, generateSpawnPos(context, playerPos));
 			// std::cout << "Spawned EliteUnit entity " << (int)unit << std::endl;
 		}
 		else if (rand() % 2 == 1) {
-			unit = spawnFastEliteUnit(context, generateSpawnPos(playerPos));
+			unit = spawnFastEliteUnit(context, generateSpawnPos(context, playerPos));
 			// std::cout << "Spawned FastEliteUnit entity " << (int)unit << std::endl;
 		}
 		else {
-			unit = spawnMothershipUnit(context, generateSpawnPos(playerPos));
+			unit = spawnMothershipUnit(context, generateSpawnPos(context, playerPos));
 			// std::cout << "Spawned MothershipUnit entity " << (int)unit << std::endl;
 		}
 		applyTags(context, unit);
@@ -68,7 +71,7 @@ void ecs_systems::redUnitRespawn(GameContext &context, [[maybe_unused]] float dt
 	// Count total red units (all kinds)
 	auto unitView = context.registry.view<RedTag>();
 	int redCount = (int)unitView.size();
-	int enemiesToSpawn = UNIT_COUNT - redCount;
+	int enemiesToSpawn = context.config.UNIT_COUNT - redCount;
 
 	// std::cout << "Total Red Units (with tag): " << redCount << std::endl;
 	// std::cout << "EnemiesToSpawn: " << enemiesToSpawn << " (Target = " << UNIT_COUNT << ")" << std::endl;
@@ -76,7 +79,7 @@ void ecs_systems::redUnitRespawn(GameContext &context, [[maybe_unused]] float dt
 	// Spawn regular units
 	for (int i = 0; i < enemiesToSpawn; i++)
 	{
-		entt::entity unit = spawnUnit(context, generateSpawnPos(playerPos));
+		entt::entity unit = spawnUnit(context, generateSpawnPos(context, playerPos));
 		// std::cout << "Spawned RegularUnit entity " << (int)unit << std::endl;
 		applyTags(context, unit);
 	}

@@ -1,6 +1,5 @@
 #include "systems.hpp"
 #include "utils.hpp"
-#include "constants.hpp"
 #include "components/unit_camera.hpp"
 #include <iostream>
 #include <cmath>
@@ -35,9 +34,9 @@ namespace {
 		};
 	}
 
-	void applySoftBoundary(Position &position, Velocity &velocity, [[maybe_unused]] float dt) {
-		const float softBoundaryStart = ARENA_SIZE * 0.99f;
-		const float hardBoundary = ARENA_SIZE;
+	void applySoftBoundary(Position &position, Velocity &velocity, [[maybe_unused]] float dt, GameContext &context) {
+		const float softBoundaryStart = context.config.ARENA_SIZE * 0.99f;
+		const float hardBoundary = context.config.ARENA_SIZE * 1.00f;
 		
 		Vector3 pos = position.value;
 		Vector3 vel = velocity.value;
@@ -239,5 +238,5 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	rotation.value = newRotation;
 
 	// Stay within arena
-	applySoftBoundary(position, velocity, dt);
+	applySoftBoundary(position, velocity, dt, context);
 }

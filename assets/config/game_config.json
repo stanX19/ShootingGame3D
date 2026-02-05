@@ -1,8 +1,8 @@
 {
 	"game": {
-		"arenaSize": 2000.0,
-		"combatDist": 1000.0,
-		"unitCount": 10
+		"arenaSize": 3500.0,
+		"combatDist": 1500.0,
+		"unitCount": 4
 	},
 	"audio": {
 		"masterVolume": 1.0,

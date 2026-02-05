@@ -2,7 +2,6 @@
 #include "utils.hpp"
 #include "iostream"
 #include "components/unit_camera.hpp"
-#include "constants.hpp"
 
 namespace {
 	camera::UnitCamera defaultCamera;
@@ -15,7 +14,7 @@ namespace {
 		Quaternion playerRot = context.registry.get<Rotation>(entity).value;
 		Vector3 playerForward = getForwardVector(playerRot);
 		
-		float closestDist = ARENA_SIZE * 2;
+		float closestDist = context.config.ARENA_SIZE * 2;
 		float closestAngle = std::cos(1.0f * DEG2RAD);  // minimum 1.0 degrees
 		entt::entity closestEntity = entt::null;
 		for (auto otherEntity : context.registry.view<Position, tag::Targetable>()) {

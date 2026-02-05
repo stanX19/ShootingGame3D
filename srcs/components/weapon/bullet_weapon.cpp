@@ -1,6 +1,5 @@
 #include "weapons.hpp"
 #include "utils.hpp"
-#include "constants.hpp"
 #include "factions.hpp"
 #include "components/sound.hpp"
 #include "game_config.hpp"
@@ -21,9 +20,7 @@ namespace
 
 	entt::entity createBulletTemplate(GameContext &context) {
 		const auto& cfg = context.config;
-		float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
-		float combatDist = cfg.getFloat("game.combatDist", 1000.0f);
-		Vector3 bulletBound = {arenaSize + combatDist * 2, arenaSize + combatDist * 2, arenaSize + combatDist * 2};
+		Vector3 bulletBound = {cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2};
 
 		entt::entity bullet = context.templateReg.create();
 		context.templateReg.emplace<tag::Bullet>(bullet);
@@ -37,9 +34,8 @@ namespace
 	}
 
 	float getBaseSpread(const GameConfig& cfg) {
-		float combatDist = cfg.getFloat("game.combatDist", 1000.0f);
 		float rangeMultiplier = cfg.getFloat("weapons.bullet.effectiveRangeMultiplier", 2.0f);
-		float effectiveRange = combatDist * rangeMultiplier;
+		float effectiveRange = cfg.COMBAT_DIST * rangeMultiplier;
 		return std::atan2(1.0f, effectiveRange);
 	}
 }

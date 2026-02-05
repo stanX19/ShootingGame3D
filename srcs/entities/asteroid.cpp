@@ -1,9 +1,14 @@
 #include "entities.hpp"
 #include "utils.hpp"
-#include "constants.hpp"
 
 namespace {
-	const Vector3 arenaSizeVec = Vector3{ARENA_SIZE * 1.5, ARENA_SIZE * 1.5, ARENA_SIZE * 1.5};
+	Vector3 getArenaSizeVec(GameContext &context) {
+		return Vector3{
+			context.config.ARENA_SIZE * 1.5f,
+			context.config.ARENA_SIZE * 1.5f,
+			context.config.ARENA_SIZE * 1.5f
+		};
+	}
 
 	t_model_id getAsteroidModel(GameContext &context) {
 		// return context.modelManager.createSphere(64, 64);
@@ -22,7 +27,7 @@ namespace {
 		context.registry.emplace<Rotation>(asteroid, randomRotation());
 		context.registry.emplace<RotationVelocity>(asteroid, QuaternionLerp(QuaternionIdentity(), randomRotation(), 0.01));
 		context.registry.emplace<Damage>(asteroid, 10000.0f);
-		context.registry.emplace<DisappearBound>(asteroid, arenaSizeVec * -1, arenaSizeVec);
+		context.registry.emplace<DisappearBound>(asteroid, getArenaSizeVec(context) * -1, getArenaSizeVec(context));
 		context.registry.emplace<tag::Asteroid>(asteroid);
 		context.registry.emplace<tag::Shaded>(asteroid);
 		context.registry.emplace<tag::RotationSyncModel>(asteroid);
@@ -32,12 +37,12 @@ namespace {
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {
-	spawnAsteroid(context, pos, dir, COMBAT_DIST * (0.1 + GetRandomValue(0, 20) * 0.02));
+	spawnAsteroid(context, pos, dir, context.config.COMBAT_DIST * (0.1 + GetRandomValue(0, 20) * 0.02));
 }
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad)
 {
-	float speed = GetRandomValue(3, (int)(10 * ARENA_SIZE / 200.0f));
+	float speed = GetRandomValue(3, (int)(10 * context.config.ARENA_SIZE / 200.0f));
 	t_model_id asteroidModel = getAsteroidModel(context);
 
 	for (int i = 0; i < 1; i++)
@@ -64,7 +69,7 @@ void spawnRingAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &
 
 void spawnRingAsteroid(GameContext &context, const Vector3 &center, const Vector3 &dir, float radius, const Vector3 &ringNormal, int numAsteroids)
 {
-	float speed = GetRandomValue(3, (int)(10 * ARENA_SIZE / 200.0f));
+	float speed = GetRandomValue(3, (int)(10 * context.config.ARENA_SIZE / 200.0f));
 	t_model_id asteroidModel = getAsteroidModel(context);
 
 	Vector3 u, v;

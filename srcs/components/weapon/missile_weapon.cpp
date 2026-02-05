@@ -1,6 +1,5 @@
 #include "weapons.hpp"
 #include "utils.hpp"
-#include "constants.hpp"
 #include "components/sound.hpp"
 #include "game_config.hpp"
 

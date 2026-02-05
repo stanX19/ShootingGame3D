@@ -12,6 +12,7 @@ public:
 	~GameConfig() = default;
 
 	void init(const std::string& configPath);
+	void initConstants();
 	bool isLoaded() const { return loaded; }
 
 	// Generic getters with defaults
@@ -24,6 +25,11 @@ public:
 	// Access raw JSON for arrays/complex structures
 	const nlohmann::json& getJson() const { return config; }
 	nlohmann::json getSection(const std::string& path) const;
+
+	// Game constants
+	float ARENA_SIZE = 2000.0f;
+	int COMBAT_DIST = 1000;
+	int UNIT_COUNT = 4;
 
 private:
 	nlohmann::json config;

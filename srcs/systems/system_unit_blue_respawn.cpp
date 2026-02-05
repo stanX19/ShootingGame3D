@@ -2,7 +2,6 @@
 #include "utils.hpp"
 #include "game_utils.hpp"
 #include "entities.hpp"
-#include "constants.hpp"
 #include "components/factions.hpp"
 
 namespace {
@@ -17,11 +16,14 @@ namespace {
 	}
 }
 
-static Vector3 generateSpawnPos(const Vector3 &playerPos) {
+static Vector3 generateSpawnPos(GameContext const &context, Vector3 const &playerPos) {
+	float arenaSize = context.config.ARENA_SIZE;
+
 	return game_utils::randomPosInBoxOffCombat(
-		Vector3{-ARENA_SIZE * 0.5f, -ARENA_SIZE * 0.5f, -ARENA_SIZE},
-		Vector3{+ARENA_SIZE * 0.5f, +ARENA_SIZE * 0.5f, -ARENA_SIZE * 0.5f},
-		playerPos
+		Vector3{-arenaSize * 0.5f, -arenaSize * 0.5f, -arenaSize},
+		Vector3{+arenaSize * 0.5f, +arenaSize * 0.5f, -arenaSize * 0.5f},
+		playerPos,
+		context.config.COMBAT_DIST
 	);
 }
 
@@ -34,24 +36,25 @@ void ecs_systems::blueUnitRespawn(GameContext &context, [[maybe_unused]] float d
 
 	auto eliteView = context.registry.view<tag::EliteUnit, BlueTag>();
 	int eliteSize = (int)eliteView.size_hint();
-	for (int i = 0; i < 3 - eliteSize; i++)
+	int elitesToSpawn = context.config.UNIT_COUNT / 2 - eliteSize;
+	for (int i = 0; i < elitesToSpawn; i++)
 	{
 		entt::entity unit;
 		if (rand() % 3 == 1)
-			unit = spawnEliteUnit(context, generateSpawnPos(playerPos));
+			unit = spawnEliteUnit(context, generateSpawnPos(context, playerPos));
 		else if (rand() % 2 == 1)
-			unit = spawnFastEliteUnit(context, generateSpawnPos(playerPos));
+			unit = spawnFastEliteUnit(context, generateSpawnPos(context, playerPos));
 		else
-			unit = spawnMothershipUnit(context, generateSpawnPos(playerPos));
+			unit = spawnMothershipUnit(context, generateSpawnPos(context, playerPos));
 		applyTags(context, unit);
 	}
 
 	auto unitView = context.registry.view<BlueTag>();
-	int enemiesToSpawn = UNIT_COUNT - (int)unitView.size();
+	int enemiesToSpawn = context.config.UNIT_COUNT - (int)unitView.size();
 
 	for (int i = 0; i < enemiesToSpawn; i++)
 	{
-		entt::entity unit = spawnUnit(context, generateSpawnPos(playerPos));
+		entt::entity unit = spawnUnit(context, generateSpawnPos(context, playerPos));
 		applyTags(context, unit);
 	}
 }

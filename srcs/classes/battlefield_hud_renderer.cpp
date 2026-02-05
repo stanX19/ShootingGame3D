@@ -171,7 +171,7 @@ void BattlefieldHUDRenderer::drawTargetable()
             continue;
         float dist = Vector3Distance(pos.value, playerPos);
         faction::FacVal isAlly = faction.value & playerFac;
-        if (dist < COMBAT_DIST * 2.5f)
+        if (dist < context.config.COMBAT_DIST * 2.5f)
             posArr.push_back({entity, pos.value, dist, isAlly});
         else
             allPosArr.push_back({entity, pos.value, dist, isAlly});
@@ -353,7 +353,7 @@ void BattlefieldHUDRenderer::drawAimCircle()
     std::vector<Vector2> aimLocs;
 
     auto addWeaponAim = [&](entt::entity entity, Vector3 pos, Vector3 aim) {
-        float dist = COMBAT_DIST;
+        float dist = context.config.COMBAT_DIST;
         auto targetPtr = context.registry.try_get<AimTarget>(entity);
         if (targetPtr) {
             auto targetPosPtr = context.registry.try_get<Position>(targetPtr->entity);

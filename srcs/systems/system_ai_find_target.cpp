@@ -1,6 +1,5 @@
 #include "systems.hpp"
 #include "utils.hpp"
-#include "constants.hpp"
 #include "components/factions.hpp"
 
 namespace {
@@ -25,8 +24,8 @@ namespace {
 		TargetsVector targets,
 		Vector3 point,
 		Vector3 forward,
-		float maxAngle = 90.0f, // 0 to 360 degrees
-		float maxDist = COMBAT_DIST,   // can be MAXFLOAT
+		float maxAngle,  // 0 to 360 degrees
+		float maxDist,  // can be MAXFLOAT
 		float angleWeight = 0.7f,
 		float distWeight = 0.3f,
 		float falloffDist = 50.0f      // distance falloff for scoring
@@ -88,6 +87,10 @@ void ecs_systems::aiFindTarget(GameContext &context, [[maybe_unused]] float dt){
 		if (cache.find(faction.value) == cache.end())
 			cache[faction.value] = searchTargets(targetsView.each(), faction.value);
 
-		aimTarget.entity = findClosestTargetInCone(cache[faction.value], position.value, getForwardVector(rotation.value));
+		aimTarget.entity = findClosestTargetInCone(
+			cache[faction.value], position.value,
+			getForwardVector(rotation.value),
+			90.0f, context.config.COMBAT_DIST
+		);
 	}
 }

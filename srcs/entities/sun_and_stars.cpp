@@ -1,11 +1,10 @@
 #include "entities.hpp"
 #include "utils.hpp"
-#include "constants.hpp"
 
 
 void spawnSunAndStars(GameContext &context, int numStars) {
 	entt::entity sun2 = context.registry.create();
-	Position pos = {randomUnitVector3() * ARENA_SIZE * 3};
+	Position pos = {randomUnitVector3() * (context.config.ARENA_SIZE + 1000)};
 	t_model_id sunModel = context.modelManager.loadModel("assets/Models/sun/sun.glb");
 	// t_model_id sunModel = context.modelManager.createSphere(128, 128);
 	float rad = GetRandomValue(350, 450);

@@ -1,7 +1,6 @@
 #include "systems.hpp"
 #include "utils.hpp"
 #include "game_utils.hpp"
-#include "constants.hpp"
 #include "entities.hpp"
 
 #define ASTEROID_COUNT 10
@@ -17,7 +16,7 @@ void ecs_systems::asteroidRespawn(GameContext &context, [[maybe_unused]] float d
 
 	for (int i = 0; i < asteroidsToSpawn; i += 10)
 	{
-		Vector3 pos = game_utils::randomPosOffCombat(playerPos);
+		Vector3 pos = game_utils::randomPosOffCombat(playerPos, context.config.COMBAT_DIST);
 		Vector3 dir = Vector3Normalize(pos) * -2.0f + randomUnitVector3();
 		if (GetRandomValue(1, 10) == 10)
 			spawnRingAsteroid(context, pos, dir);

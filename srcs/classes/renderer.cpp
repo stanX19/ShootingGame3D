@@ -230,8 +230,8 @@ void Renderer::drawBoundaryWarning()
 	
 	Vector3 playerPos = posPtr->value;
 	
-	const float softBoundaryStart = ARENA_SIZE * 0.5f;
-	const float hardBoundary = ARENA_SIZE;
+	const float softBoundaryStart = context.config.ARENA_SIZE * 0.5f;
+	const float hardBoundary = context.config.ARENA_SIZE;
 	const float warningZone = hardBoundary - softBoundaryStart;
 	
 	Vector3 axes[3] = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}};
@@ -268,7 +268,7 @@ void Renderer::drawBoundaryWarning()
 		const float gridTileSize = 20.0f;
 		const int linesPerSide = (int)(gridSize / gridTileSize) + 1;
 		const float halfGrid = gridSize * 0.5f;
-		const Vector3 boundVec = {ARENA_SIZE, ARENA_SIZE, ARENA_SIZE};
+		const Vector3 boundVec = {context.config.ARENA_SIZE, context.config.ARENA_SIZE, context.config.ARENA_SIZE};
 
 		// Calculate grid offset and snap to grid tile size
 		Vector3 playerProjection = playerPos * (Vector3Ones - toBoundaryUnit * toBoundaryUnit);

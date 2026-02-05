@@ -2,8 +2,6 @@
 #define SHOOT_3D_HPP
 #include "includes.hpp"
 #include "components.hpp"
-#include "constants.hpp"
-#include "constants.hpp"
 #include "model_manager.hpp"
 #include "game_context.hpp"
 #include "utils.hpp"
