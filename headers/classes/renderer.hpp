@@ -22,6 +22,7 @@ private:
 	Shader defaultShader;
 	
 	Model sphereModel;
+	Model trailModel;
 	int lightPosLoc;
 	int lightColorLoc;
 	int ambientStrengthLoc;
@@ -30,6 +31,8 @@ private:
 	void loadShaderWithFallback();
 	void setupShaderUniforms();
 	void drawEntityModel(const Position &pos, const RenderBody &body, float strech = 1.0f);
+	void drawTrails();
+	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
 	void drawEntitiesWithShader();
 	void drawEntitiesWithSkyboxShader();
 	void drawEntitiesWithoutShader();

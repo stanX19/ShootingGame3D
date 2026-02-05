@@ -5,7 +5,7 @@
 		"unitCount": 4
 	},
 	"audio": {
-		"masterVolume": 1.0,
+		"masterVolume": 0.5,
 		"soundAliasCount": 8,
 		"maxSoundsPerIdPerFrame": 10,
 		"explosionMaxDistance": 500.0
@@ -63,9 +63,21 @@
 	},
 	"weapons": {
 		"bullet": {
-			"baseSpeed": 1200.0,
+			"baseSpeed": 1000.0,
 			"baseDamage": 25.0,
 			"effectiveRangeMultiplier": 2.0,
+			"basic": {
+				"radius": 0.05,
+				"hp": 1.0,
+				"damageMultiplier": 1.0,
+				"spreadMultiplier": 5,
+				"bulletCount": 1,
+				"speedMultiplier": 1.2,
+				"lifespan": 10.0,
+				"cooldown": 0.25,
+				"ammo": 30,
+				"reloadTime": 2.0
+			},
 			"machineGun": {
 				"radius": 0.05,
 				"hp": 1.0,
@@ -109,7 +121,7 @@
 				"damageMultiplier": 2.5,
 				"spreadMultiplier": 0.01,
 				"bulletCount": 1,
-				"speedMultiplier": 6.0,
+				"speedMultiplier": 8.0,
 				"lifespan": 10.0,
 				"cooldown": 1.5,
 				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3"
@@ -120,30 +132,19 @@
 				"damageMultiplier": 2.5,
 				"spreadMultiplier": 5.0,
 				"bulletCount": 1,
-				"speedMultiplier": 4.0,
+				"speedMultiplier": 5.0,
 				"lifespan": 10.0,
 				"cooldown": 0.35,
 				"ammo": 10,
 				"reloadTime": 6.0,
 				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3"
-			},
-			"basic": {
-				"radius": 0.075,
-				"hp": 1.0,
-				"damageMultiplier": 1.0,
-				"spreadMultiplier": 5,
-				"bulletCount": 1,
-				"speedMultiplier": 1.2,
-				"lifespan": 10.0,
-				"cooldown": 0.25,
-				"ammo": 30,
-				"reloadTime": 2.0
 			}
 		},
 		"lazer": {
 			"baseSpeed": 100000.0,
 			"baseDamage": 10.0,
 			"effectiveRangeMultiplier": 1.0,
+			"modelPath": "assets/Models/bullet/lazer.glb",
 			"basic": {
 				"radius": 0.05,
 				"hp": 1.0,
@@ -200,7 +201,7 @@
 				"acceleration": -0.0000001,
 				"turnSpeed": 0.5,
 				"ammo": 2,
-				"ammoRegen": 0.0667,
+				"ammoRegen": 0.05,
 				"cooldown": 1.0
 			},
 			"swarm": {
@@ -212,7 +213,7 @@
 				"bulletCount": 4,
 				"speedMultiplier": 2.0,
 				"ammo": 3,
-				"reloadTime": 15.0,
+				"reloadTime": 25.0,
 				"cooldown": 0.25,
 				"extendFireRequest": 2.0
 			},
@@ -236,7 +237,7 @@
 				"delayedDamageTime": 40.0,
 				"delayedDamage": 1000000.0,
 				"ammo": 1,
-				"reloadTime": 30.0
+				"reloadTime": 60.0
 			},
 			"sniper": {
 				"radius": 0.5,
@@ -254,7 +255,7 @@
 				"speedMultiplier": 0.5,
 				"cooldown": 0.2,
 				"ammo": 4,
-				"ammoReload": 8.0,
+				"ammoReload": 10.0,
 				"extendFireRequest": 1.0
 			}
 		}

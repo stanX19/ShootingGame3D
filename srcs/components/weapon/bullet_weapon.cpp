@@ -3,6 +3,7 @@
 #include "factions.hpp"
 #include "components/sound.hpp"
 #include "game_config.hpp"
+#include <string>
 
 namespace
 {
@@ -38,6 +39,13 @@ namespace
 		float effectiveRange = cfg.COMBAT_DIST * rangeMultiplier;
 		return std::atan2(1.0f, effectiveRange);
 	}
+
+	t_model_id getBulletModel(GameContext &context) {
+		std::string path = context.config.getString("weapons.bullet.modelPath", "");
+		if (!path.empty())
+			return context.modelManager.loadModel(path);
+		return context.modelManager.createSphere();
+	}
 }
 
 void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
@@ -60,7 +68,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	float reloadTime = cfg.getFloat(path + "reloadTime", 5.5f);
 	float cooldown = cfg.getFloat(path + "cooldown", 0.1f);
 
-	t_model_id model = context.modelManager.createSphere();
+	t_model_id model = getBulletModel(context);
 	
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -103,7 +111,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	float cooldown = cfg.getFloat(path + "cooldown", 0.1f);
 	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 1.0f);
 
-	t_model_id model = context.modelManager.createSphere();
+	t_model_id model = getBulletModel(context);
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -185,7 +193,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	float lifespan = cfg.getFloat(path + "lifespan", 10.0f);
 	float cooldown = cfg.getFloat(path + "cooldown", 1.5f);
 
-	t_model_id model = context.modelManager.createSphere();
+	t_model_id model = getBulletModel(context);
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -224,7 +232,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	int ammo = cfg.getInt(path + "ammo", 20);
 	float reloadTime = cfg.getFloat(path + "reloadTime", 12.0f);
 
-	t_model_id model = context.modelManager.createSphere();
+	t_model_id model = getBulletModel(context);
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -265,7 +273,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	int ammo = cfg.getInt(path + "ammo", 30);
 	float reloadTime = cfg.getFloat(path + "reloadTime", 2.0f);
 
-	t_model_id model = context.modelManager.createSphere();
+	t_model_id model = getBulletModel(context);
 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});

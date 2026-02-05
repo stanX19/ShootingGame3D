@@ -48,6 +48,10 @@ void Renderer::loadShaderWithFallback()
 	Mesh sphereMesh = GenMeshSphere(1.0f, 64, 64);
 	sphereModel = LoadModelFromMesh(sphereMesh);
 	sphereModel.materials[0].shader = lightedShader;
+
+	// create a unit cone mesh (height = 1, base radius = 1) for trails
+	t_model_id trailModelID = context.modelManager.loadModel("assets/Models/Trail/trail.glb");
+	trailModel = context.modelManager.getModel(trailModelID);
 }
 
 void Renderer::setupShaderUniforms()
@@ -76,11 +80,36 @@ void Renderer::Render(float dt)
 	handleLightSource();
 	drawEntitiesWithoutShader();
 	drawEntitiesWithShader();
+	// drawTrails();
 	drawBoundaryWarning();
 	drawEnergyShield();
 
 	EndMode3D();
 	// std::cout << "end draw\n" << std::endl;
+}
+
+void Renderer::drawTrails()
+{
+	auto trailView = context.registry.view<Position, PrevPosition, Trail>();
+	for (auto entity : trailView)
+	{
+		const Position &p = trailView.get<Position>(entity);
+		const PrevPosition &pp = trailView.get<PrevPosition>(entity);
+		const Trail &t = trailView.get<Trail>(entity);
+		drawTrailBetween(p.value, pp.value, t.rad, t.color);
+	}
+}
+
+void Renderer::drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color)
+{
+	Vector3 dir = head - tail;
+	float len = Vector3Length(dir);
+	Vector3 mid = tail + dir * len;
+
+	Vector3 axisOut;
+	float angleOut;
+	QuaternionToAxisAngle(vector3ToRotation(dir), &axisOut, &angleOut);
+	DrawModelEx(trailModel, mid, axisOut, angleOut * RAD2DEG, (Vector3){rad, rad, len}, color);
 }
 
 void Renderer::handleLightSource()

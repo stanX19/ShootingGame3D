@@ -279,6 +279,12 @@ struct SpawnsTrailParticle {
 	Color color = SKYBLUE;
 };
 
+struct Trail {
+    Color color = WHITE;
+    float rad = 0.1f;
+    Trail(Color c = WHITE, float r = 0.1f): color(c), rad(r) {}
+};
+
 namespace tag {
 	// todo: throw these into namespaces too
 	struct Asteroid {};

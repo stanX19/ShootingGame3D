@@ -11,6 +11,13 @@ namespace {
 		return baseColor;
 	}
 
+	t_model_id getBulletModel(GameContext &context) {
+		std::string path = context.config.getString("weapons.lazer.modelPath", "");
+		if (!path.empty())
+			return context.modelManager.loadModel(path);
+		return context.modelManager.createCylinder();
+	}
+
 	void emplaceLazerWeaponCommon(GameContext &context, entt::entity entity) {
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
@@ -24,7 +31,7 @@ namespace {
 		Vector3 lazerBound = {arenaSize * 2, arenaSize * 2, arenaSize * 2};
 
 		entt::entity bullet = context.templateReg.create();
-		t_model_id model = context.modelManager.createCylinder();
+		t_model_id model = getBulletModel(context);
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
