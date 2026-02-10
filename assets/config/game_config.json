@@ -1,7 +1,7 @@
 {
 	"game": {
 		"arenaSize": 3500.0,
-		"combatDist": 1500.0,
+		"combatDist": 1750.0,
 		"unitCount": 4
 	},
 	"audio": {
@@ -82,7 +82,7 @@
 				"radius": 0.05,
 				"hp": 1.0,
 				"damageMultiplier": 1.0,
-				"spreadMultiplier": 10,
+				"spreadMultiplier": 20,
 				"bulletCount": 1,
 				"speedMultiplier": 2.0,
 				"lifespan": 10.0,
@@ -132,11 +132,11 @@
 				"damageMultiplier": 2.5,
 				"spreadMultiplier": 5.0,
 				"bulletCount": 1,
-				"speedMultiplier": 5.0,
+				"speedMultiplier": 6.0,
 				"lifespan": 10.0,
 				"cooldown": 0.35,
 				"ammo": 10,
-				"reloadTime": 6.0,
+				"reloadTime": 10.0,
 				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3"
 			}
 		},
@@ -180,7 +180,7 @@
 				"radius": 0.1,
 				"hp": 1.0,
 				"damageMultiplier": 1.0,
-				"spreadMultiplier": 25.0,
+				"spreadMultiplier": 20.0,
 				"bulletCount": 20,
 				"ammo": 5,
 				"ammoRegen": 1.0,

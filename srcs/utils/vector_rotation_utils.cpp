@@ -2,6 +2,11 @@
 #include <cmath>
 #include <iostream>
 
+Vector3 vector3Abs(const Vector3 &vec)
+{
+	return Vector3{std::abs(vec.x), std::abs(vec.y), std::abs(vec.z)};
+}
+
 Vector3 getForwardVector(const Rotation &rotation)
 {
 	return Vector3Transform({0, 0, 1}, QuaternionToMatrix(rotation.value));

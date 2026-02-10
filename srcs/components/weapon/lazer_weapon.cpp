@@ -36,7 +36,7 @@ namespace {
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Lazer>(bullet);
-		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (rad * 2));
+		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (2 * rad));
 		context.templateReg.emplace<CollisionBody>(bullet, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(bullet, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(bullet, lazerBound * -1, lazerBound);

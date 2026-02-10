@@ -35,7 +35,7 @@ float calculateCollisionTime(const Vector3 &posA, const Vector3 &velA, const Vec
 	// return (t1 + t2) / 2.0f; // closest point
 	if (t2 < 0.0f)
 		return t2; // collision was in the past
-	if (t1 < 0.0f)
+	if (t1 < 0.0f)  // and t2 >= 0
 		return 0.0f; // already overlapping
 	return t1; // collision in future
 }

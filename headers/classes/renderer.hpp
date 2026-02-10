@@ -6,6 +6,7 @@
 #include "utils.hpp"
 #include "game_context.hpp"
 
+
 class Renderer {
 public:
 	Renderer(Camera3D& camera, GameContext &context);
@@ -27,10 +28,16 @@ private:
 	int lightColorLoc;
 	int ambientStrengthLoc;
 
+	struct StrechDat {
+		float strech;
+		Vector3 dir;
+	};
+
 	void loadDefaultShader();
 	void loadShaderWithFallback();
 	void setupShaderUniforms();
-	void drawEntityModel(const Position &pos, const RenderBody &body, float strech = 1.0f);
+	StrechDat getStrech(entt::entity entity);
+	void drawEntityModel(const Position &pos, const RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
 	void drawTrails();
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
 	void drawEntitiesWithShader();

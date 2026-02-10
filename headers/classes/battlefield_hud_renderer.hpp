@@ -11,13 +11,9 @@ class BattlefieldHUDRenderer {
 public:
     BattlefieldHUDRenderer(Camera3D &camera, GameContext &context);
 
-    void Render(float dt);
+    void RenderAll(float dt);
 
-private:
-    Camera3D &camera;
-    GameContext &context;
-    float currentDt;
-
+	void setDt(float dt);
     void drawHUD();
     void drawHealthBars();
     void drawTargetable();
@@ -30,6 +26,11 @@ private:
     void drawMainUIFrame();
     void drawCursorArrow();
     void drawCollisionWarning();
+
+private:
+    Camera3D &camera;
+    GameContext &context;
+    float currentDt;
 
     Vector2 GetUIFrameCenter() const;
     float GetUIFrameRadius() const;

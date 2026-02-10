@@ -86,7 +86,7 @@ int main() {
 		ecs_systems::cameraFollowPlayer(context, dt);
 		BeginDrawing();
 		renderer.Render(dt);
-		hudRenderer.Render(dt);
+		hudRenderer.RenderAll(dt);
 		EndDrawing();
 
 		ecs_systems::blueUnitRespawn(context, dt);

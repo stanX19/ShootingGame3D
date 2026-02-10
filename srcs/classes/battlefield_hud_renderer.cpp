@@ -8,15 +8,20 @@
 #include <cstdio>
 
 BattlefieldHUDRenderer::BattlefieldHUDRenderer(Camera3D &camera, GameContext &context)
-    : camera(camera), context(context)
+    : camera(camera), context(context), currentDt(0.0f)
 {
 }
 
-void BattlefieldHUDRenderer::Render(float dt)
+void BattlefieldHUDRenderer::RenderAll(float dt)
 {
-    currentDt = dt;
+    setDt(dt);
     drawHUD();
     drawTexts();
+}
+
+void BattlefieldHUDRenderer::setDt(float dt)
+{
+    currentDt = dt;
 }
 
 void BattlefieldHUDRenderer::drawHUD()

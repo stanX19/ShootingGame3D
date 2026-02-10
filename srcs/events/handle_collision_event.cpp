@@ -48,11 +48,10 @@ namespace {
 	                        const event::CollisionParty& killer) {
 		entt::registry &registry = evt.context->registry;
 		
-		HP *hpPtr = registry.try_get<HP>(victim.id);
-		Damage *dmgPtr = registry.try_get<Damage>(killer.id);
-		EnergyShield *shieldPtr = registry.try_get<EnergyShield>(victim.id);
+		auto [dmgPtr, killerHpPtr] = registry.try_get<Damage, HP>(killer.id);
+		auto [shieldPtr, hpPtr] = registry.try_get<EnergyShield, HP>(victim.id);
 
-		if (!hpPtr || !dmgPtr || hpPtr->value <= 0)
+		if (!hpPtr || !dmgPtr || hpPtr->value <= 0 || (killerHpPtr && killerHpPtr->value <= 0))
 			return;
 			
 		float dmg = dmgPtr->value;

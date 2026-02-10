@@ -139,31 +139,33 @@ void Renderer::handleLightSource()
 // 	DrawLine3D(pos.value, end, GREEN);
 // }
 
-void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, float strech)
+Renderer::StrechDat Renderer::getStrech(entt::entity entity) {
+	StrechDat result = {1.0f, {0, 0, 0}};
+	auto [pos, prevPos, strechComp] = context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
+	if (!pos || !prevPos || !strechComp)
+		return result;
+	result.dir = Vector3Normalize(pos->value - prevPos->value);
+	result.strech = std::max(1.0f, Vector3Distance(pos->value, prevPos->value) * strechComp->scale);
+	return result;
+}
+
+void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, StrechDat strech)
 {
 	Model &model = context.modelManager.getModel(body.modelID);
 
 	Vector3 axis;
 	float angle;
 	QuaternionToAxisAngle(body.rotation, &axis, &angle);
+
 	// std::cout << "Entity rotation axis: (" << axis.x << ", " << axis.y << ", " << axis.z
 	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
 	float shrink = 1; //std::max(0.01f, 1.0f / std::sqrt(strech));
-	Vector3 scale = body.scale * Vector3{shrink, shrink, strech};
-	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation + Vector3{0, 0, -(strech - 1.0f) * body.scale.z}, body.rotation);
-	DrawModelEx(model, position, axis, angle * RAD2DEG, scale, body.color);
+	Vector3 renderScale = body.scale * Vector3{shrink, shrink, strech.strech};
+	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation) + strech.dir * (-renderScale.z);
+	DrawModelEx(model, position, axis, angle * RAD2DEG, renderScale, body.color);
 }
 
-namespace {
-	float getStrech(GameContext &context, entt::entity entity) {
-		auto [posPtr, prevPosPtr, strechPtr] = context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
-		// if (posPtr && prevPosPtr && strechPtr)
-		// 	std::cout << Vector3Distance(posPtr->value, prevPosPtr->value) << std::endl;
-		if (posPtr && prevPosPtr && strechPtr)
-			return std::max(1.0f, Vector3Distance(posPtr->value, prevPosPtr->value) * strechPtr->scale);
-		return 1.0f;
-	}
-}
+
 
 void Renderer::drawEntitiesWithoutShader()
 {
@@ -177,7 +179,7 @@ void Renderer::drawEntitiesWithoutShader()
 		for (int i = 0; i < model.materialCount; i++) {
 			model.materials[i].shader = defaultShader;
 		}
-		drawEntityModel(pos, body, getStrech(context, entity));
+		drawEntityModel(pos, body, getStrech(entity));
 	}
 }
 
@@ -195,7 +197,7 @@ void Renderer::drawEntitiesWithShader()
 			model.materials[i].shader = lightedShader;
 		}
 		// SetShaderValueTexture(shader, GetShaderLocation(shader, "texture0"), model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture);
-		drawEntityModel(pos, body, getStrech(context, entity));
+		drawEntityModel(pos, body, getStrech(entity));
 	}
 
 	// EndShaderMode();
@@ -222,7 +224,7 @@ void Renderer::drawEntitiesWithSkyboxShader()
 			model.materials[i].shader = skyboxShader;
 		}
 		// std::cout << "drawing " << model.materials[0].maps[MATERIAL_MAP_ALBEDO].texture.height << std::endl;
-		drawEntityModel(pos, body, getStrech(context, entity));
+		drawEntityModel(pos, body);
 	}
 
 	rlEnableBackfaceCulling();

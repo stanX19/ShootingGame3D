@@ -1,5 +1,6 @@
 #include "shoot_3d.hpp"
 #include "renderer.hpp"
+#include "battlefield_hud_renderer.hpp"
 
 static void setup_camera(Camera3D& camera) {
 	camera.position = Vector3{ 0.0f, 1.0f, 4.0f } * 5;
@@ -29,10 +30,9 @@ entt::entity spawnBody(GameContext &context, const Vector3 &position, const Vect
 
 static void resetGame(GameContext &context) {
 	context.registry.clear();
-	context.registry.emplace<tag::Player>(context.registry.create());
 	spawnBody(context, {3, 0, 0}, {-0.5, 0, 0});
 	spawnBody(context, {-3, 0, 0}, {0.5, 0, 0});
-	spawnBody(context, {-50, 0, 0}, {500000000, 0, 0});
+	spawnBody(context, {-50, 0, 0}, {500000000, 0, 0}, 0.001f, 0.01f);
 	event::utils::hookAllListeners(context);
 }
 
@@ -48,6 +48,7 @@ int main() {
 	resetGame(context);
 	
 	Renderer renderer(camera, context);
+	BattlefieldHUDRenderer hudRenderer(camera, context);
 
 	while (!WindowShouldClose()) {
 		float dt = GetFrameTime();
@@ -56,7 +57,11 @@ int main() {
 		ecs_systems::detectEntityCollision(context, dt);
 		context.dispatcher.update();
 
-		renderer.Render();
+		BeginDrawing();
+		renderer.Render(dt);
+		hudRenderer.setDt(dt);
+		hudRenderer.drawHealthBars();
+		EndDrawing();
 
 		if (IsKeyPressed(KEY_R)) {
 			resetGame(context);

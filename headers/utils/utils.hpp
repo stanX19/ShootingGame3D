@@ -5,6 +5,7 @@
 
 // Utility functions
 Quaternion rotateAroundAxis(const Quaternion& current, const Vector3& axis, float angle);
+Vector3 vector3Abs(const Vector3 &vec);
 Vector3 getForwardVector(const Rotation& rotation);
 Vector3 getForwardVector(const Quaternion &rotation);
 Vector3 getRightVector(const Rotation& rotation);

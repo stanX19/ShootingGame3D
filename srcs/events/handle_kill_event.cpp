@@ -54,17 +54,20 @@ namespace {
 			addScore(*evt.context, evt.killer.id, victimScorePtr->value);
 	}
 
-	// need a better name for the function below
-	void handleVictimPhysics(const KillEvent& evt) {
+
+	void fixVictimPosition(const KillEvent& evt) {
+		auto victimPosPtr = evt.context->registry.try_get<Position>(evt.victim.id);
+		if (victimPosPtr) {
+			victimPosPtr->value = evt.victim.pos;
+		}
+	}
+
+	void updateVictimVelocity(const KillEvent& evt) {
 		if (evt.context->registry.any_of<tag::bullet_type::Energy>(evt.killer.id))
 			return;
 		if (evt.context->registry.any_of<tag::bullet_type::Lazer>(evt.victim.id))
 			return;
 
-		auto victimPosPtr = evt.context->registry.try_get<Position>(evt.victim.id);
-		if (victimPosPtr) {
-			victimPosPtr->value = evt.victim.pos;
-		}
 		auto [victimVelPtr, victimBodyPtr] = evt.context->registry.try_get<Velocity, CollisionBody>(evt.victim.id);
 		CollisionBody* killerBodyPtr = evt.context->registry.try_get<CollisionBody>(evt.killer.id);
 
@@ -73,6 +76,11 @@ namespace {
 				victimVelPtr->value = evt.killer.vel;
 			}
 		}
+	}
+	// need a better name for the function below
+	void handleVictimPhysics(const KillEvent& evt) {
+		fixVictimPosition(evt);
+		updateVictimVelocity(evt);
 	}
 }
 
