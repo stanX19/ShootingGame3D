@@ -52,30 +52,27 @@ namespace {
 		auto [aMass, aVel, aRot] = registry.try_get<Mass, Velocity, Rotation>(a.id);
 		auto [bMass, bVel, bRot] = registry.try_get<Mass, Velocity, Rotation>(b.id);
 		
-		// Guard clause: Early return if any necessary component is missing
-		if (!aMass || !aVel || !bMass || !bVel) return;
+		// handle velocity changes
+		if (!aMass || !aVel || !bMass || !bVel)
+			return;
 			
-		// Guard clause: Avoid divide by zero if masses are invalid
-		if (aMass->value <= 0.0f || bMass->value <= 0.0f) return;
-			
+		if (aMass->value <= 0.0f || bMass->value <= 0.0f)
+			return;
+				
 		Vector3 normal = Vector3Normalize(b.pos - a.pos);
 		Vector3 relativeVelocity = b.vel - a.vel;
 		float velAlongNormal = Vector3DotProduct(relativeVelocity, normal);
 
-		// Guard clause: Objects moving apart or parallel means no collision push
-		if (velAlongNormal >= 0.0f) return;
+		if (velAlongNormal >= 0.0f)
+			return;
 
 		float collisionElasticity = evt.context->config.physics.collisionElasticity;
 		float invMassA = 1.0f / aMass->value;
 		float invMassB = 1.0f / bMass->value;
-
-		// Calculate impulse scalar
 		float impulseScalar = -(1.0f + collisionElasticity) * velAlongNormal;
 		impulseScalar /= (invMassA + invMassB);
-		
 		Vector3 impulse = normal * impulseScalar;
 		
-		// Apply impulse to velocities
 		aVel->value -= impulse * invMassA;
 		bVel->value += impulse * invMassB;
 
