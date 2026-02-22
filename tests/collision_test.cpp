@@ -46,6 +46,7 @@ int main() {
 	setup_camera(camera);
 
 	GameContext context;
+	context.config.init("assets/config/game_config.json");
 	resetGame(context);
 	
 	Renderer renderer(camera, context);

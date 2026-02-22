@@ -32,7 +32,7 @@ public:
 	int UNIT_COUNT = 4;
 
 	struct Physics {
-		float knockbackDampener = 0.5f;
+		float collisionElasticity = 0.5f;
 		float maxAngularKick = 0.5f;
 		float roughness = 2.5f;
 	} physics;

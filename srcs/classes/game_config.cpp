@@ -30,7 +30,7 @@ void GameConfig::initConstants() {
 	COMBAT_DIST = getFloat("game.combatDist", 1000.0f);
 	UNIT_COUNT = getInt("game.unitCount", 4);
 	
-	physics.knockbackDampener = getFloat("physics.knockbackDampener", 0.5f);
+	physics.collisionElasticity = getFloat("physics.collisionElasticity", 0.5f);
 	physics.maxAngularKick = getFloat("physics.maxAngularKick", 0.5f);
 	physics.roughness = getFloat("physics.roughness", 2.5f);
 

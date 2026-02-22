@@ -44,57 +44,63 @@ namespace {
 		spawnDebris(*context, collisionPos, scale, color, debrisCount, 5.0f, explosionDir);
 	}
 
-	void applyCollisionPhysics(const event::CollisionEvent &evt, const event::CollisionParty& victim, 
-	                        const event::CollisionParty& killer) {
+	void applyCollisionPhysics(const event::CollisionEvent &evt) {
+		const auto& a = evt.a;
+		const auto& b = evt.b;
 		entt::registry &registry = evt.context->registry;
 		
-		auto [vMass, vVel, vRot] = registry.try_get<Mass, Velocity, Rotation>(victim.id);
-		auto [kMass, kVel] = registry.try_get<Mass, Velocity>(killer.id);
+		auto [aMass, aVel, aRot] = registry.try_get<Mass, Velocity, Rotation>(a.id);
+		auto [bMass, bVel, bRot] = registry.try_get<Mass, Velocity, Rotation>(b.id);
 		
-		// Handle velocity change (elastic collision with dampening)
-		if (!vMass || !vVel || !kMass || !kVel)
-			return;
+		// Guard clause: Early return if any necessary component is missing
+		if (!aMass || !aVel || !bMass || !bVel) return;
 			
-		float totalMass = vMass->value + kMass->value;
-		if (totalMass <= 0.0f)
-			return;
+		// Guard clause: Avoid divide by zero if masses are invalid
+		if (aMass->value <= 0.0f || bMass->value <= 0.0f) return;
 			
-		Vector3 outwardNormal = Vector3Normalize(victim.pos - killer.pos);
-		Vector3 relativeVelocity = killer.vel - victim.vel;
-		float velAlongNormal = Vector3DotProduct(relativeVelocity, outwardNormal);
+		Vector3 normal = Vector3Normalize(b.pos - a.pos);
+		Vector3 relativeVelocity = b.vel - a.vel;
+		float velAlongNormal = Vector3DotProduct(relativeVelocity, normal);
 
-		if (velAlongNormal <= 0.0f)
-			return; // Moving apart or parallel, no push
+		// Guard clause: Objects moving apart or parallel means no collision push
+		if (velAlongNormal >= 0.0f) return;
 
-		// To prevent both applying force to each other, we can apply standard elastic collision impulse
-		// Impulse scalar: j = -(1 + e) * velAlongNormal / (1/m1 + 1/m2)
-		float knockbackDampener = evt.context->config.physics.knockbackDampener;
-		float restitution = knockbackDampener; // 1.0 = perfectly elastic
-		float impulseScalar = (1.0f + restitution) * velAlongNormal;
-		impulseScalar /= (1.0f / kMass->value + 1.0f / vMass->value);
+		float collisionElasticity = evt.context->config.physics.collisionElasticity;
+		float invMassA = 1.0f / aMass->value;
+		float invMassB = 1.0f / bMass->value;
+
+		// Calculate impulse scalar
+		float impulseScalar = -(1.0f + collisionElasticity) * velAlongNormal;
+		impulseScalar /= (invMassA + invMassB);
 		
-		Vector3 impulseNormal = outwardNormal * impulseScalar;
+		Vector3 impulse = normal * impulseScalar;
 		
-		vVel->value += impulseNormal / vMass->value;
+		// Apply impulse to velocities
+		aVel->value -= impulse * invMassA;
+		bVel->value += impulse * invMassB;
 
-		// Handle rotation change
-		if (!vRot)
-			return;
-		Vector3 hitToCenter = Vector3Normalize(killer.pos - victim.pos);
-		Vector3 impactForcePath = Vector3Normalize(relativeVelocity);
-		Vector3 torqueAxis = Vector3CrossProduct(hitToCenter, impactForcePath);
+		// Handle rotation changes
+		if (aRot && bRot) {
+			Vector3 torqueAxis = Vector3CrossProduct(normal, relativeVelocity);
+			float torqueMagnitude = Vector3Length(torqueAxis);
 
-		float torqueMagnitude = Vector3Length(torqueAxis);
-		if (torqueMagnitude <= 0.1f)
-			return;
+			if (torqueMagnitude > 0.1f) {
+				float roughness = evt.context->config.physics.roughness;
+				float maxKick = evt.context->config.physics.maxAngularKick;
 
-		// The angular kick is proportional to mass ratio and impact misalignment
-		float angularKickAmount = (kMass->value / vMass->value) * torqueMagnitude * knockbackDampener * evt.context->config.physics.roughness;
-		angularKickAmount = std::min(angularKickAmount, evt.context->config.physics.maxAngularKick);
+				// A's kick is proportional to B's mass ratio
+				float aKick = (bMass->value / aMass->value) * torqueMagnitude * roughness;
+				aKick = std::min(aKick, maxKick);
+				Quaternion aSpin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), aKick);
+				aRot->value = QuaternionMultiply(aSpin, aRot->value);
 
-		// Apply torque as a sudden angular rotation change
-		Quaternion spin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), angularKickAmount);
-		vRot->value = QuaternionMultiply(spin, vRot->value);
+				// B's kick is proportional to A's mass ratio (opposite direction)
+				float bKick = (aMass->value / bMass->value) * torqueMagnitude * roughness;
+				bKick = std::min(bKick, maxKick);
+				Quaternion bSpin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), -bKick);
+				bRot->value = QuaternionMultiply(bRot->value, bSpin); // bSpin * bRot depending on multiplication order defined
+			}
+		}
 	}
 
 	void applyDamageToEntity(const event::CollisionEvent &evt, const event::CollisionParty& victim, 
@@ -140,8 +146,8 @@ void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
 	// std::cout << evt.a.pos.x << " " << evt.b.pos.x << std::endl;
 	applyDamageToEntity(evt, evt.b, evt.a);
 	applyDamageToEntity(evt, evt.a, evt.b);
-	applyCollisionPhysics(evt, evt.b, evt.a);
-	applyCollisionPhysics(evt, evt.a, evt.b);
+	// apply physics once for the entire event
+	applyCollisionPhysics(evt);
 
 	// Emit hit sounds only if collision involves player
 	if (!entt_utils::involvesPlayer(*evt.context, evt.a.id) && !entt_utils::involvesPlayer(*evt.context, evt.b.id))
