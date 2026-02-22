@@ -59,6 +59,7 @@ int main() {
 		ecs_systems::aiFindTarget(context, dt);
 		ecs_systems::aiMoveControl(context, dt);
 		ecs_systems::aiShootControl(context, dt);
+		ecs_systems::processMoveRequest(context, dt);
 
 		ecs_systems::ammoReload(context, dt);
 		ecs_systems::bulletTargetAim(context, dt);
@@ -71,7 +72,6 @@ int main() {
 		ecs_systems::weaponShoot(context, dt);
 		ecs_systems::weaponUpdateFireStatus(context, dt);
 
-		ecs_systems::physicsInterpolation(context, dt);
 		ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context, dt);
 		ecs_systems::entityTransformation(context, dt);

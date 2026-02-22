@@ -46,6 +46,7 @@ private:
 	void drawBoundaryWarning();
 	void drawEnergyShield();
 	void handleLightSource();
+	void drawDebug();
 };
 
 #endif

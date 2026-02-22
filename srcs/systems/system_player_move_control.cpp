@@ -238,7 +238,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	auto& tVel = context.registry.get_or_emplace<TargetVelocity>(context.currentPlayer);
 	auto& tRot = context.registry.get_or_emplace<TargetRotation>(context.currentPlayer);
 	
-	tVel.value = Vector3Scale(getForwardVector(rotation), speed);
+	tVel.value = Vector3Scale(getForwardVector(newRotation), speed);
 	tRot.value = newRotation;
 
 	// Stay within arena

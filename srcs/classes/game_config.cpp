@@ -35,6 +35,7 @@ void GameConfig::initConstants() {
 	physics.roughness = getFloat("physics.roughness", 2.5f);
 
 	settings.showHPBar = getBool("settings.showHPBar", true);
+	debug.showTarget = getBool("debug.showTarget", false);
 }
 
 const nlohmann::json* GameConfig::navigatePath(const std::string& path) const {

@@ -5,7 +5,7 @@
 		"unitCount": 4
 	},
 	"physics": {
-		"collisionElasticity": 0.5,
+		"collisionElasticity": 0.75,
 		"maxAngularKick": 1.5,
 		"roughness": 0.5
 	},
@@ -17,6 +17,9 @@
 	},
 	"settings": {
 		"showHPBar": true
+	},
+	"debug": {
+		"showTarget": false
 	},
 	"sounds": {
 		"backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",

@@ -83,6 +83,7 @@ void Renderer::Render(float dt)
 	// drawTrails();
 	drawBoundaryWarning();
 	drawEnergyShield();
+	drawDebug();
 
 	EndMode3D();
 	// std::cout << "end draw\n" << std::endl;
@@ -332,5 +333,23 @@ void Renderer::drawBoundaryWarning()
 			lineEnd = Vector3Clamp(lineEnd, boundVec * -1, boundVec);
 			DrawLine3D(lineStart, lineEnd, warningColor);
 		}
+	}
+}
+
+void Renderer::drawDebug()
+{
+	if (!context.config.debug.showTarget)
+		return;
+
+	auto view = context.registry.view<Position, TargetRotation>();
+	for (auto [entity, pos, tRot] : view.each())
+	{
+		Vector3 start = pos.value;
+		Vector3 forward = getForwardVector(tRot.value);
+
+		Vector3 end = start + forward * 15.0f;
+
+		DrawCylinderEx(start, end, 0.2f, 0.2f, 8, RED);
+		DrawCylinderEx(end, end + forward * 3.0f, 0.6f, 0.0f, 8, RED);
 	}
 }

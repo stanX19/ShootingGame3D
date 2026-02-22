@@ -18,7 +18,7 @@ namespace ecs_systems
 	void aiFindTarget(GameContext &context, float dt);
 	void blueUnitRespawn(GameContext &context, float dt);
 	void redUnitRespawn(GameContext &context, float dt);
-	void physicsInterpolation(GameContext &context, float dt);
+	void processMoveRequest(GameContext &context, float dt);
 	void entityMovement(GameContext &context, float dt);
 	void applyImpulse(GameContext &context, float dt);
 	void entityTransformation(GameContext &context, float dt);

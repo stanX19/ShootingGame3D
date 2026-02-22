@@ -42,6 +42,10 @@ public:
 		bool showHPBar = true;
 	} settings;
 
+	struct Debug {
+		bool showTarget = false;
+	} debug;
+
 private:
 	nlohmann::json config;
 	bool loaded = false;

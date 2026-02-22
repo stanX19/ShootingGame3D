@@ -36,18 +36,8 @@ static void aiTurnControl(GameContext &context, [[maybe_unused]] float dt)
 		}
 
 		Quaternion targetRotation = vector3ToRotation(targetDir);
-		auto* tRot = context.registry.try_get<TargetRotation>(entity);
-		if (!tRot) {
-			tRot = &context.registry.emplace<TargetRotation>(entity);
-		}
-		
-		tRot->value = targetRotation;
-
-		if (context.registry.all_of<Velocity, tag::VelocitySyncRot>(entity)) {
-			auto* tVel = context.registry.try_get<TargetVelocity>(entity);
-			if (!tVel) tVel = &context.registry.emplace<TargetVelocity>(entity);
-			tVel->value = getForwardVector(rotation) * speed;
-		}
+		TargetRotation &tRot = context.registry.get_or_emplace<TargetRotation>(entity);
+		tRot.value = targetRotation;
 	}
 }
 
