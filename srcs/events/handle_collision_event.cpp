@@ -44,13 +44,14 @@ namespace {
 		spawnDebris(*context, collisionPos, scale, color, debrisCount, 5.0f, explosionDir);
 	}
 
-	void applyPhysicsToEntity(const event::CollisionEvent &evt, const event::CollisionParty& victim, 
+	void applyCollisionPhysics(const event::CollisionEvent &evt, const event::CollisionParty& victim, 
 	                        const event::CollisionParty& killer) {
 		entt::registry &registry = evt.context->registry;
 		
 		auto [vMass, vVel, vRot] = registry.try_get<Mass, Velocity, Rotation>(victim.id);
 		auto [kMass, kVel] = registry.try_get<Mass, Velocity>(killer.id);
 		
+		// Handle velocity change (elastic collision with dampening)
 		if (!vMass || !vVel || !kMass || !kVel)
 			return;
 			
@@ -59,15 +60,28 @@ namespace {
 			return;
 			
 		Vector3 outwardNormal = Vector3Normalize(victim.pos - killer.pos);
-		float pushMagnitude = Vector3Length(kVel->value) * (kMass->value / vMass->value);
-		
-		float knockbackDampener = evt.context->config.physics.knockbackDampener;
-		vVel->value += outwardNormal * pushMagnitude * knockbackDampener;
+		Vector3 relativeVelocity = killer.vel - victim.vel;
+		float velAlongNormal = Vector3DotProduct(relativeVelocity, outwardNormal);
 
+		if (velAlongNormal <= 0.0f)
+			return; // Moving apart or parallel, no push
+
+		// To prevent both applying force to each other, we can apply standard elastic collision impulse
+		// Impulse scalar: j = -(1 + e) * velAlongNormal / (1/m1 + 1/m2)
+		float knockbackDampener = evt.context->config.physics.knockbackDampener;
+		float restitution = knockbackDampener; // 1.0 = perfectly elastic
+		float impulseScalar = (1.0f + restitution) * velAlongNormal;
+		impulseScalar /= (1.0f / kMass->value + 1.0f / vMass->value);
+		
+		Vector3 impulseNormal = outwardNormal * impulseScalar;
+		
+		vVel->value += impulseNormal / vMass->value;
+
+		// Handle rotation change
 		if (!vRot)
 			return;
 		Vector3 hitToCenter = Vector3Normalize(killer.pos - victim.pos);
-		Vector3 impactForcePath = Vector3Normalize(kVel->value);
+		Vector3 impactForcePath = Vector3Normalize(relativeVelocity);
 		Vector3 torqueAxis = Vector3CrossProduct(hitToCenter, impactForcePath);
 
 		float torqueMagnitude = Vector3Length(torqueAxis);
@@ -126,8 +140,8 @@ void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
 	// std::cout << evt.a.pos.x << " " << evt.b.pos.x << std::endl;
 	applyDamageToEntity(evt, evt.b, evt.a);
 	applyDamageToEntity(evt, evt.a, evt.b);
-	applyPhysicsToEntity(evt, evt.b, evt.a);
-	applyPhysicsToEntity(evt, evt.a, evt.b);
+	applyCollisionPhysics(evt, evt.b, evt.a);
+	applyCollisionPhysics(evt, evt.a, evt.b);
 
 	// Emit hit sounds only if collision involves player
 	if (!entt_utils::involvesPlayer(*evt.context, evt.a.id) && !entt_utils::involvesPlayer(*evt.context, evt.b.id))

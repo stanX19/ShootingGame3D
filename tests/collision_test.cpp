@@ -18,9 +18,10 @@ entt::entity spawnBody(GameContext &context, const Vector3 &position, const Vect
 	context.registry.emplace<Position>(entity, Position{position});
 	context.registry.emplace<Velocity>(entity, Velocity{velocity});
 	context.registry.emplace<CollisionBody>(entity, CollisionBody{radius});
-	context.registry.emplace<RenderBody>(entity, context.modelManager.createSphere());
+	context.registry.emplace<RenderBody>(entity, context.modelManager.createSphere(), radius);
 	context.registry.emplace<HP>(entity, HP{hp});
 	context.registry.emplace<Damage>(entity, Damage{damagePerSecond});
+	context.registry.emplace<Mass>(entity, Mass{radius * radius * radius});
 	context.registry.emplace<tag::Shaded>(entity);
 	context.registry.emplace<tag::Targetable>(entity);
 	context.registry.emplace<tag::effect::DropDebris>(entity);
@@ -32,7 +33,7 @@ static void resetGame(GameContext &context) {
 	context.registry.clear();
 	spawnBody(context, {3, 0, 0}, {-0.5, 0, 0});
 	spawnBody(context, {-3, 0, 0}, {0.5, 0, 0});
-	spawnBody(context, {-50, 0, 0}, {500000000, 0, 0}, 0.001f, 0.01f);
+	// spawnBody(context, {-50, 0, 0}, {500000000, 0, 0}, 0.001f, 1.0f);
 	event::utils::hookAllListeners(context);
 }
 

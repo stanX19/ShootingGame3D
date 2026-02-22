@@ -5,9 +5,9 @@
 		"unitCount": 4
 	},
 	"physics": {
-		"knockbackDampener": 0.5,
-		"maxAngularKick": 0.5,
-		"roughness": 0.5
+		"knockbackDampener": 0.25,
+		"maxAngularKick": 100.0,
+		"roughness": 100.5
 	},
 	"audio": {
 		"masterVolume": 0.5,
