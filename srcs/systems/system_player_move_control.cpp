@@ -242,8 +242,8 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	tRot.value = newRotation;
 
 	// Use Lerp to glide actual physical states to targets
-	velocity.value = Vector3Lerp(velocity.value, tVel.value, Clamp(tVel.lerpSpeed * dt, 0.5f, 1.0f));
-	rotation.value = QuaternionSlerp(rotation.value, tRot.value, Clamp(tRot.slerpSpeed * dt, 0.5f, 1.0f));
+	velocity.value = Vector3Lerp(velocity.value, tVel.value, Clamp(tVel.lerpSpeed * dt, 0.0f, 1.0f));
+	rotation.value = QuaternionSlerp(rotation.value, tRot.value, Clamp(tRot.slerpSpeed * dt, 0.0f, 1.0f));
 
 	// Stay within arena
 	applySoftBoundary(position, velocity, dt, context);

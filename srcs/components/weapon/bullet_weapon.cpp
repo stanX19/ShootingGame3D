@@ -76,6 +76,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", 5.0f));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
@@ -120,6 +121,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 	context.templateReg.emplace_or_replace<ModelStrech>(bulletTemplate, ModelStrech{modelStretch / (radius * 2)});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", 5.0f));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
@@ -165,6 +167,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<Rotation>(bulletTemplate);
 	context.templateReg.emplace<RotationVelocity>(bulletTemplate, QuaternionFromAxisAngle(Vector3UnitY, PI));
 	context.templateReg.erase<ModelStrech>(bulletTemplate);
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", 5.0f));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = spreadMultiplier;
@@ -205,6 +208,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", 5.0f));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
@@ -244,6 +248,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", 5.0f));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
@@ -285,6 +290,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity)
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", 5.0f));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);

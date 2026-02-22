@@ -80,7 +80,7 @@
 				"cooldown": 0.25,
 				"ammo": 30,
 				"reloadTime": 2.0,
-				"mass": 500000000.0
+				"mass": 5.0
 			},
 			"machineGun": {
 				"radius": 0.05,
@@ -108,7 +108,7 @@
 				"reloadTime": 1.5,
 				"cooldown": 0.1,
 				"extendFireRequest": 1.0,
-				"mass": 5.0
+				"mass": 10.0
 			},
 			"bigBall": {
 				"radius": 1.5,
@@ -120,7 +120,7 @@
 				"lifespan": 15.0,
 				"ammo": 1,
 				"reloadTime": 7.0,
-				"mass": 5.0
+				"mass": 100.0
 			},
 			"sniper": {
 				"radius": 0.2,
@@ -132,7 +132,7 @@
 				"lifespan": 10.0,
 				"cooldown": 1.5,
 				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3",
-				"mass": 5.0
+				"mass": 20.0
 			},
 			"burstSniper": {
 				"radius": 0.2,
@@ -146,7 +146,7 @@
 				"ammo": 10,
 				"reloadTime": 10.0,
 				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3",
-				"mass": 5.0
+				"mass": 20.0
 			}
 		},
 		"lazer": {
@@ -327,7 +327,7 @@
 			"mass": 1000.0
 		},
 		"asteroid": {
-			"mass": 10000.0
+			"mass": 1000000000.0
 		},
 		"turret": {
 			"mass": 500.0

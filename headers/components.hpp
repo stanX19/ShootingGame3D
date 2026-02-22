@@ -44,13 +44,13 @@ struct RotationVelocity
 struct TargetVelocity
 {
 	Vector3 value = { 0, 0, 0 };
-	float lerpSpeed = 10.0f;
+	float lerpSpeed = 30.0f;
 };
 
 struct TargetRotation
 {
 	Quaternion value = QuaternionIdentity();
-	float slerpSpeed = 10.0f;
+	float slerpSpeed = 30.0f;
 };
 
 struct CollisionBody
