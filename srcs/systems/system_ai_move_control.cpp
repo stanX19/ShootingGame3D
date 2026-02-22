@@ -1,7 +1,7 @@
 #include "systems.hpp"
 #include "utils.hpp"
 
-static void aiTurnControl(GameContext &context, float dt)
+static void aiTurnControl(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto view = context.registry.view<Position, Rotation, Velocity, TurnSpeed, MoveTarget, tag::AIMoveControl>();
 
@@ -39,18 +39,15 @@ static void aiTurnControl(GameContext &context, float dt)
 		auto* tRot = context.registry.try_get<TargetRotation>(entity);
 		if (!tRot) {
 			tRot = &context.registry.emplace<TargetRotation>(entity);
-			tRot->value = rotation.value;
 		}
+		
+		tRot->value = targetRotation;
 
-		float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
-		float totalTargetTurn = angleDifference(targetRotation, rotation.value) * DEG2RAD;
-		tRot->value = QuaternionSlerp(tRot->value, targetRotation, std::min(turnSpeedDt / totalTargetTurn, 1.0f));
-
-		// Slerp actual physical rotation towards target
-		rotation.value = QuaternionSlerp(rotation.value, tRot->value, tRot->slerpSpeed * dt);
-
-		if (context.registry.all_of<Velocity, tag::VelocitySyncRot>(entity))
-			context.registry.get<Velocity>(entity).value = getForwardVector(rotation) * speed;
+		if (context.registry.all_of<Velocity, tag::VelocitySyncRot>(entity)) {
+			auto* tVel = context.registry.try_get<TargetVelocity>(entity);
+			if (!tVel) tVel = &context.registry.emplace<TargetVelocity>(entity);
+			tVel->value = getForwardVector(rotation) * speed;
+		}
 	}
 }
 
@@ -73,9 +70,6 @@ static void aiSpeedControl(GameContext &context, float dt)
 		}
 		
 		tVel->value = getForwardVector(rotation) * newSpeed;
-		
-		// Lerp actual physical velocity towards target
-		velocity.value = Vector3Lerp(velocity.value, tVel->value, tVel->lerpSpeed * dt);
 	}
 }
 

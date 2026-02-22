@@ -71,6 +71,7 @@ int main() {
 		ecs_systems::weaponShoot(context, dt);
 		ecs_systems::weaponUpdateFireStatus(context, dt);
 
+		ecs_systems::physicsInterpolation(context, dt);
 		ecs_systems::entityMovement(context, dt);
 		ecs_systems::entityAnchor(context, dt);
 		ecs_systems::entityTransformation(context, dt);

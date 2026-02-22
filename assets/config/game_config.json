@@ -4,6 +4,11 @@
 		"combatDist": 1750.0,
 		"unitCount": 4
 	},
+	"physics": {
+		"knockbackDampener": 0.5,
+		"maxAngularKick": 0.5,
+		"roughness": 0.5
+	},
 	"audio": {
 		"masterVolume": 0.5,
 		"soundAliasCount": 8,

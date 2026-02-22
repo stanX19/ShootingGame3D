@@ -51,35 +51,36 @@ namespace {
 		auto [vMass, vVel, vRot] = registry.try_get<Mass, Velocity, Rotation>(victim.id);
 		auto [kMass, kVel] = registry.try_get<Mass, Velocity>(killer.id);
 		
-		if (vMass && vVel && kMass && kVel) {
-			// Inelastic collision momentum transfer
-			float totalMass = vMass->value + kMass->value;
-			if (totalMass > 0.0f) {
-				// We apply a portion of the killer's momentum to the victim
-				Vector3 momentumTransfer = Vector3Scale(kVel->value, kMass->value / vMass->value);
-				
-				// Dampen the effect so it feels good in an arcade shooter
-				const float knockbackDampener = 0.5f; 
-				vVel->value = Vector3Add(vVel->value, Vector3Scale(momentumTransfer, knockbackDampener));
+		if (!vMass || !vVel || !kMass || !kVel)
+			return;
+			
+		float totalMass = vMass->value + kMass->value;
+		if (totalMass <= 0.0f)
+			return;
+			
+		Vector3 outwardNormal = Vector3Normalize(victim.pos - killer.pos);
+		float pushMagnitude = Vector3Length(kVel->value) * (kMass->value / vMass->value);
+		
+		float knockbackDampener = evt.context->config.physics.knockbackDampener;
+		vVel->value += outwardNormal * pushMagnitude * knockbackDampener;
 
-				// Apply a spin/torque based on hit location relative to center and mass ratio
-				if (vRot) {
-					Vector3 hitToCenter = Vector3Normalize(killer.pos - victim.pos);
-					Vector3 impactForcePath = Vector3Normalize(kVel->value);
-					Vector3 torqueAxis = Vector3CrossProduct(hitToCenter, impactForcePath);
+		if (!vRot)
+			return;
+		Vector3 hitToCenter = Vector3Normalize(killer.pos - victim.pos);
+		Vector3 impactForcePath = Vector3Normalize(kVel->value);
+		Vector3 torqueAxis = Vector3CrossProduct(hitToCenter, impactForcePath);
 
-					float torqueMagnitude = Vector3Length(torqueAxis);
-					if (torqueMagnitude > 0.1f) {
-						// The angular kick is proportional to mass ratio and impact misalignment
-						float angularKickAmount = (kMass->value / vMass->value) * torqueMagnitude * knockbackDampener * 2.5f;
+		float torqueMagnitude = Vector3Length(torqueAxis);
+		if (torqueMagnitude <= 0.1f)
+			return;
 
-						// Apply torque as a sudden angular rotation change
-						Quaternion spin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), angularKickAmount);
-						vRot->value = QuaternionMultiply(spin, vRot->value);
-					}
-				}
-			}
-		}
+		// The angular kick is proportional to mass ratio and impact misalignment
+		float angularKickAmount = (kMass->value / vMass->value) * torqueMagnitude * knockbackDampener * evt.context->config.physics.roughness;
+		angularKickAmount = std::min(angularKickAmount, evt.context->config.physics.maxAngularKick);
+
+		// Apply torque as a sudden angular rotation change
+		Quaternion spin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), angularKickAmount);
+		vRot->value = QuaternionMultiply(spin, vRot->value);
 	}
 
 	void applyDamageToEntity(const event::CollisionEvent &evt, const event::CollisionParty& victim, 
