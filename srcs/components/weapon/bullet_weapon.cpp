@@ -151,6 +151,8 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	float lifespan = cfg.getFloat(path + "lifespan", 15.0f);
 	int ammo = cfg.getInt(path + "ammo", 1);
 	float reloadTime = cfg.getFloat(path + "reloadTime", 7.0f);
+	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 2.0f);
+	float chargeTime = cfg.getFloat(path + "chargeTime", 1.0f);
 
 	t_model_id model = context.modelManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
 
@@ -173,6 +175,8 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
+	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
+	context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{chargeTime, ColorAlpha(WHITE, 0.25f)});
 }
 
 void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity)

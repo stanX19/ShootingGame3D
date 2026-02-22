@@ -2,6 +2,7 @@
 #define MODEL_MANAGER_HPP
 
 #include "includes.hpp"
+#include "game_config.hpp"
 #include "op_overloads.hpp"
 
 using t_model_id = size_t;
@@ -16,6 +17,8 @@ public:
 	t_model_id loadModel(const std::string &filePath, const Vector3 &scale);
 	t_model_id loadModel(const std::string &filePath, const Vector3 &scale, const Vector3 &rotation, const Vector3 &displacement);
 	t_model_id loadModel(const std::string &filePath, const Matrix &transform);
+
+	t_model_id loadModel(const GameConfig& config, const std::string& configPath);
 
 	t_model_id createCube(float width = 2.0f, float height = 2.0f, float length = 2.0f);
 	t_model_id createSphere(int rings = 16, int slices = 16, float radius = 1.0f);

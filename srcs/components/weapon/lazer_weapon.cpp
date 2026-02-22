@@ -136,8 +136,9 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 2.0f);
 	float chargeTime = cfg.getFloat(path + "chargeTime", 1.5f);
 	float extendFireDuration = cfg.getFloat(path + "extendFireDuration", 1.5f);
-	
-	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
+	Color color = getColor(context, entity);
+
+	entt::entity bulletTemplate = createBulletTemplate(context, radius, color);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	
@@ -151,7 +152,7 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
-	context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{chargeTime});
+	context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{chargeTime, ColorAlpha(color, 0.5f)});
 	context.registry.emplace_or_replace<ExtendFireDuration>(entity, ExtendFireDuration{extendFireDuration});
 }
 

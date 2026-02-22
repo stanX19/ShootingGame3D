@@ -8,7 +8,8 @@ namespace {
 		entt::entity weaponEntity,
 		const Vector3 &position,
 		float chargeRatio,
-		float remainingTime
+		float remainingTime,
+		Color color
 	) {
 		entt::entity chargeEffectEntity = context.registry.create();
 
@@ -16,7 +17,7 @@ namespace {
 
 		context.registry.emplace<RenderBody>(chargeEffectEntity, RenderBody{
 			context.modelManager.createSphere(),
-			ColorAlpha(GREEN, 0.5f),
+			color,
 			chargeRadius
 		});
 		context.registry.emplace<Lifespan>(chargeEffectEntity, Lifespan{remainingTime});
@@ -42,7 +43,8 @@ void ecs_systems::weaponUpdateCharged(GameContext &context, [[maybe_unused]] flo
 				entity,
 				position.value,
 				chargedWeapon.currentCharge / chargedWeapon.totalChargeNeeded,
-				chargedWeapon.totalChargeNeeded - chargedWeapon.currentCharge
+				chargedWeapon.totalChargeNeeded - chargedWeapon.currentCharge,
+				chargedWeapon.effectColor
 			);
 		} else if (!isCharging && chargedWeapon.chargeEffectEntity != entt::null) {
 			if (context.registry.valid(chargedWeapon.chargeEffectEntity))

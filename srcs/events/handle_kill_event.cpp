@@ -65,7 +65,7 @@ namespace {
 	void updateVictimVelocity(const KillEvent& evt) {
 		if (evt.context->registry.any_of<tag::bullet_type::Energy>(evt.killer.id))
 			return;
-		if (evt.context->registry.any_of<tag::bullet_type::Lazer>(evt.victim.id))
+		if (evt.context->registry.any_of<tag::bullet_type::Lazer, tag::bullet_type::Kinetic>(evt.victim.id))
 			return;
 
 		auto [victimVelPtr, victimBodyPtr] = evt.context->registry.try_get<Velocity, CollisionBody>(evt.victim.id);

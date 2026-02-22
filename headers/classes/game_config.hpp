@@ -31,6 +31,11 @@ public:
 	int COMBAT_DIST = 1000;
 	int UNIT_COUNT = 4;
 
+	// Settings
+	struct Settings {
+		bool showHPBar = true;
+	} settings;
+
 private:
 	nlohmann::json config;
 	bool loaded = false;

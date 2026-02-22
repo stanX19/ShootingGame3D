@@ -31,6 +31,7 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos, float radiu
 	context.registry.emplace<Score>(entity);
 	context.registry.emplace<KilledScore>(entity, baseScore);
 	context.registry.emplace<MoveTarget>(entity);
+	context.registry.emplace<Mass>(entity, cfg.getFloat("units.base.mass", 1000.0f));
 	
 	context.registry.emplace<tag::Targetable>(entity);
 	context.registry.emplace<tag::Spaceship>(entity);
@@ -75,6 +76,7 @@ entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<EnergyShieldRegen>(entity, cfg.getFloat("units.elite.shieldRegen", 25.0f));
 	context.registry.emplace_or_replace<MaxSpeed>(entity, baseSpeed * cfg.getFloat("units.elite.speedMultiplier", 0.5f));
 	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("units.elite.scoreMultiplier", 2));
+	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("units.elite.mass", 1000.0f));
 
 	weapon::emplaceRandomMissileWeapon(context, entity);
 	int subWeapons = GetRandomValue(0, 1000);
@@ -99,6 +101,7 @@ entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<HPRegen>(entity, cfg.getFloat("units.fastElite.hpRegen", 1.0f));
 	context.registry.emplace_or_replace<MaxSpeed>(entity, baseSpeed * cfg.getFloat("units.fastElite.speedMultiplier", 2.0f));
 	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("units.fastElite.scoreMultiplier", 2));
+	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("units.fastElite.mass", 1000.0f));
 
 	weapon::emplaceRandomMissileWeapon(context, entity);
 	int subWeapons = GetRandomValue(0, 1000);
@@ -127,6 +130,7 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<MaxSpeed>(entity, baseSpeed * cfg.getFloat("units.mothership.speedMultiplier", 0.25f));
 	context.registry.emplace_or_replace<TurnSpeed>(entity, baseTurn * cfg.getFloat("units.mothership.turnSpeedMultiplier", 0.5f));
 	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("units.mothership.scoreMultiplier", 5));
+	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("units.mothership.mass", 5000.0f));
 
 	weapon::emplaceWeaponMissileFlares(context, entity);
 	int randNum = GetRandomValue(0, 1000);

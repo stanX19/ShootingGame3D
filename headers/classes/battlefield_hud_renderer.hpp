@@ -26,6 +26,7 @@ public:
     void drawMainUIFrame();
     void drawCursorArrow();
     void drawCollisionWarning();
+    void drawMissileWarning();
 
 private:
     Camera3D &camera;

@@ -89,3 +89,23 @@ Vector3 calculateLeadDirection(
 	Vector3 aimPos = targetPos + targetVel * interceptTime;
 	return Vector3Normalize(aimPos - shooterPos);
 }
+
+
+// Run every frame to get the desired forward direction
+// use case: chaserVel = calculateVelocityBiasedDirection(...) * speed;
+Vector3 calculateVelocityBiasedDirection(
+    const Vector3& chaserPos,
+    const Vector3& targetPos,
+    const Vector3& targetVel,
+    float chaserSpeed
+) {
+	Vector3 finalDir = targetPos - chaserPos;
+
+	for (int i = 0; i < 5; i++) {
+		float dist = Vector3Length(finalDir);
+		float chaseTime = dist / chaserSpeed;
+		Vector3 futureTargetPos = targetPos + targetVel * chaseTime;
+		finalDir = futureTargetPos - chaserPos;
+	}
+	return Vector3Normalize(finalDir);
+}

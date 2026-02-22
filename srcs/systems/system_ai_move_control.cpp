@@ -17,12 +17,12 @@ static void aiTurnControl(GameContext &context, float dt)
 		float speed = Vector3Length(velocity.value);
 		float calc_speed = speed;
 		
-		if (context.registry.all_of<ScalarAcceleration>(entity)) {
-			float acceleration = context.registry.get<ScalarAcceleration>(entity).value;
-			float distance = Vector3Distance(position.value, targetPos);
-			float traverlTime = speed + sqrtf(speed * speed + 2 * acceleration * distance) / acceleration;
-			calc_speed += acceleration * traverlTime / 2.0f;
-		}
+		// if (context.registry.all_of<ScalarAcceleration>(entity)) {
+		// 	float acceleration = context.registry.get<ScalarAcceleration>(entity).value;
+		// 	float distance = Vector3Distance(position.value, targetPos);
+		// 	float traverlTime = speed + sqrtf(speed * speed + 2 * acceleration * distance) / acceleration;
+		// 	calc_speed += acceleration * traverlTime / 2.0f;
+		// }
 
 		// Vector3 toTargetEntt = targetPos - position.value;  // use normal aiming by default
 
@@ -36,9 +36,18 @@ static void aiTurnControl(GameContext &context, float dt)
 		}
 
 		Quaternion targetRotation = vector3ToRotation(targetDir);
+		auto* tRot = context.registry.try_get<TargetRotation>(entity);
+		if (!tRot) {
+			tRot = &context.registry.emplace<TargetRotation>(entity);
+			tRot->value = rotation.value;
+		}
+
 		float turnSpeedDt = turnSpeed.value / (1.0f + speed / 100.0f) * dt;
 		float totalTargetTurn = angleDifference(targetRotation, rotation.value) * DEG2RAD;
-		rotation.value = QuaternionSlerp(rotation.value, targetRotation, std::min(turnSpeedDt / totalTargetTurn, 1.0f));
+		tRot->value = QuaternionSlerp(tRot->value, targetRotation, std::min(turnSpeedDt / totalTargetTurn, 1.0f));
+
+		// Slerp actual physical rotation towards target
+		rotation.value = QuaternionSlerp(rotation.value, tRot->value, tRot->slerpSpeed * dt);
 
 		if (context.registry.all_of<Velocity, tag::VelocitySyncRot>(entity))
 			context.registry.get<Velocity>(entity).value = getForwardVector(rotation) * speed;
@@ -58,7 +67,15 @@ static void aiSpeedControl(GameContext &context, float dt)
 		float targetSpeed = maxSpeed.value * (0.5f + 0.5f * (180.0f - angleDifference(targetRotation, rotation.value)) / 180.0f);
 		float newSpeed = Clamp(speed + Clamp(targetSpeed - speed, -20.0f * dt, 20.0f * dt), 0.0f, maxSpeed.value);
 
-		velocity.value = getForwardVector(rotation) * newSpeed;
+		auto* tVel = context.registry.try_get<TargetVelocity>(entity);
+		if (!tVel) {
+			tVel = &context.registry.emplace<TargetVelocity>(entity);
+		}
+		
+		tVel->value = getForwardVector(rotation) * newSpeed;
+		
+		// Lerp actual physical velocity towards target
+		velocity.value = Vector3Lerp(velocity.value, tVel->value, tVel->lerpSpeed * dt);
 	}
 }
 

@@ -45,7 +45,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	const float damage = cfg.getFloat("units.player.damage", 500.0f);
 
 	// t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship2/Intergalactic_Spaceships_Version_2.gltf");
-	t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship_custom_100/Spaceship1.obj");
+	t_model_id shipModel = context.modelManager.loadModel(cfg, "units.player.modelPath");
 	// t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship_custom_2/Spaceship2.glb");
 	context.registry.emplace<Position>(player, pos);
 	context.registry.emplace<Velocity>(player);
@@ -61,6 +61,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<TurnSpeed>(player, turnSpeed);
 	context.registry.emplace<Score>(player);
 	context.registry.emplace<camera::UnitCamera>(player);
+	context.registry.emplace<Mass>(player, cfg.getFloat("units.player.mass", 1000.0f));
 
 	context.registry.emplace<faction::Faction>(player, faction::FAC_BLUE);
 	context.registry.emplace<tag::Targetable>(player);

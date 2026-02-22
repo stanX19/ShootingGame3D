@@ -24,7 +24,7 @@ void ecs_systems::weaponUpdateCanFire(GameContext &context, [[maybe_unused]] flo
 
 	for (auto [entity, ammo, charge] : context.registry.view<Ammo, ChargedWeapon, tag::weapon::IsWeapon>().each()) {
 		float ammoNeeded = charge.chargeAmmo * (1 - charge.currentCharge / charge.totalChargeNeeded);
-		if (ammo.value < ammoNeeded) {
+		if (ammo.value < ammoNeeded - 1e-6f) {
 			context.registry.remove<tag::weapon::CanFire>(entity);
 		}
 	}

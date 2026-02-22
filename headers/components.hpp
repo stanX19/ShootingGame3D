@@ -41,6 +41,18 @@ struct RotationVelocity
 	Quaternion value = QuaternionIdentity();  // rotation = rotation * (rotVel * dt)
 };
 
+struct TargetVelocity
+{
+	Vector3 value = { 0, 0, 0 };
+	float lerpSpeed = 10.0f;
+};
+
+struct TargetRotation
+{
+	Quaternion value = QuaternionIdentity();
+	float slerpSpeed = 10.0f;
+};
+
 struct CollisionBody
 {
 	float radius;
@@ -240,9 +252,13 @@ struct ExtendFireRequest : ExtendFireDuration
 struct ChargedWeapon
 {
 	float totalChargeNeeded;		// time needed to fully charge
+	Color effectColor = WHITE;
 	float chargeAmmo = 1.0f;		// ammo consumption on full charge
 	float currentCharge = 0.0f;		// current charge time
 	entt::entity chargeEffectEntity = entt::null;
+
+	ChargedWeapon(float chargeTime, Color color = WHITE)
+		: totalChargeNeeded(chargeTime), effectColor(color) {}
 };
 
 struct WeaponParent

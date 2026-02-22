@@ -29,6 +29,7 @@ void GameConfig::initConstants() {
 	ARENA_SIZE = getFloat("game.arenaSize", 2000.0f);
 	COMBAT_DIST = getFloat("game.combatDist", 1000.0f);
 	UNIT_COUNT = getInt("game.unitCount", 4);
+	settings.showHPBar = getBool("settings.showHPBar", true);
 }
 
 const nlohmann::json* GameConfig::navigatePath(const std::string& path) const {

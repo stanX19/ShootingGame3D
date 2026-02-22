@@ -72,6 +72,12 @@ t_model_id ModelManager::loadModel(const std::string &filePath)
 	return loadModel(filePath, identityMatrix);
 }
 
+t_model_id ModelManager::loadModel(const GameConfig& config, const std::string& configPath)
+{
+	std::string filePath = config.getString(configPath, "");
+	return loadModel(filePath);
+}
+
 t_model_id ModelManager::createCube(float width, float height, float length)
 {
 	return createAndAddModel("box", [=]()

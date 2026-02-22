@@ -40,6 +40,7 @@ void BattlefieldHUDRenderer::drawHUD()
     drawCrosshair();
     drawCursorArrow();
     drawCollisionWarning();
+    drawMissileWarning();
 }
 
 void BattlefieldHUDRenderer::drawTexts()
@@ -106,6 +107,9 @@ void BattlefieldHUDRenderer::drawTexts()
 
 void BattlefieldHUDRenderer::drawHealthBars()
 {
+	if (!context.config.settings.showHPBar)
+		return;
+
     auto view = context.registry.view<Position, CollisionBody, HP, tag::Targetable>();
     for (auto entity : view)
     {
@@ -620,14 +624,14 @@ void BattlefieldHUDRenderer::drawCursorArrow()
 void BattlefieldHUDRenderer::drawCollisionWarning()
 {
     const static float warningTime = 5.0f;
-    const static float warningDist = 10.0f;
+    [[maybe_unused]] const static float warningDist = 10.0f;
     std::vector<std::pair<Vector3, float>> warnings;
 
     // Play alert sound with cooldown
     static float alertSoundCooldown = 0.0f;
-	static bool canPlayAlertSound;
+    static bool canPlayAlertSound;
     alertSoundCooldown -= currentDt;
-	canPlayAlertSound = alertSoundCooldown <= 0.0f;
+    canPlayAlertSound = alertSoundCooldown <= 0.0f;
     if (alertSoundCooldown <= 0.0f) {
         alertSoundCooldown = 1.0f;
     }
@@ -636,28 +640,15 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
 
     if (!posA || !velA || !bodyA)
         return;
+
     for (auto [other, posB, bodyB, dmgB] : context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
         if (context.currentPlayer == other)
             continue;
-		Velocity velB = context.registry.all_of<Velocity>(other)? context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
+        Velocity velB = context.registry.all_of<Velocity>(other) ? context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
         if (willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime)) {
             warnings.push_back({posB.value, Vector3Distance(posA->value, posB.value) - bodyA->radius - bodyB.radius});
-			if (canPlayAlertSound)
-        		context.soundManager.queueSound(context.config, "sounds.collisionAlert", posB.value, 0.5f);
-        }
-    }
-    for (auto [other, posB, bodyB, dmgB, velB, target] : context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
-        if (context.currentPlayer == other || target.entity != context.currentPlayer)
-            continue;
-		// float relSpeed = Vector3Length(velA->value - velB.value);
-		float distance = Vector3Distance(posA->value, posB.value);
-		// float collisionTime = distance / relSpeed;
-		bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime * 2);
-		
-		if (willCollideFlag) {
-            warnings.push_back({posB.value, distance - bodyA->radius - bodyB.radius});
-			if (canPlayAlertSound)
-        		context.soundManager.queueSound(context.config, "sounds.missileAlert", posB.value, 0.5f);
+            if (canPlayAlertSound)
+                context.soundManager.queueSound(context.config, "sounds.collisionAlert", posB.value, 0.5f);
         }
     }
 
@@ -712,6 +703,126 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
             int textWidth = MeasureText(distText, 20);
             Vector2 textPos = screenCenter + directionToWarning * (uiFrameRadius + 50);
             DrawText(distText, textPos.x - textWidth/2, textPos.y - 8, 20, ColorAlpha(RED, alpha));
+        }
+    }
+}
+
+namespace {
+	Vector2 getTrianglePoint(Vector2 center, float radius, float angle) {
+		float angleRad = angle * DEG2RAD;
+		return Vector2{
+			center.x + cosf(angleRad) * radius,
+			center.y + sinf(angleRad) * radius
+		};
+	}
+
+	void drawEquiTriangle(Vector2 center, float radius, float angle, Color color) {
+		DrawTriangleLines(
+			getTrianglePoint(center, radius, angle),
+			getTrianglePoint(center, radius, angle + 120.0f),
+			getTrianglePoint(center, radius, angle + 240.0f),
+			color
+		);
+	}
+
+	[[maybe_unused]] void drawEquiTriangleCorners(Vector2 center, float radius, float angle, Color color, float cornerRad) {
+		for (int theta = 0; theta < 360; theta += 120) {
+			drawEquiTriangle(getTrianglePoint(center, radius, angle + theta), cornerRad, angle + theta, color);
+		}
+	}
+}
+
+void BattlefieldHUDRenderer::drawMissileWarning()
+{
+    [[maybe_unused]] const static float warningTime = 5.0f;
+    [[maybe_unused]] const static float warningDist = 10.0f;
+	Color color = ColorLerp(ORANGE, MAROON, 0.5f);
+    std::vector<std::pair<Vector3, float>> warnings;
+
+    // Play alert sound with cooldown
+    static float alertSoundCooldown = 0.0f;
+    static bool canPlayAlertSound;
+    alertSoundCooldown -= currentDt;
+    canPlayAlertSound = alertSoundCooldown <= 0.0f;
+    if (alertSoundCooldown <= 0.0f) {
+        alertSoundCooldown = 1.0f;
+    }
+
+    auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
+
+    if (!posA || !velA || !bodyA)
+        return;
+
+    for (auto [other, posB, bodyB, dmgB, velB, target] : context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
+        if (context.currentPlayer == other || target.entity != context.currentPlayer)
+            continue;
+        float distance = Vector3Distance(posA->value, posB.value);
+		if (warningTime * Vector3Length(velB.value - velA->value) < distance)
+			continue;
+        // bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime * 2);
+		bool willCollideFlag = Vector3DotProduct(posA->value - posB.value, velB.value - velA->value) > 0;
+        if (willCollideFlag) {
+            warnings.push_back({posB.value, distance - bodyA->radius - bodyB.radius});
+            if (canPlayAlertSound)
+                context.soundManager.queueSound(context.config, "sounds.missileAlert", posB.value, 0.5f);
+        }
+    }
+
+    if (warnings.empty())
+        return;
+
+    // const char* alertMsg = "MISSILE ALERT";
+    // int msgWidth = MeasureText(alertMsg, 24);
+    // Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
+
+    static float blinkTimer = 0.0f;
+    blinkTimer += currentDt * 6.0f;
+    float alpha = 0.7f + 0.3f * sinf(blinkTimer);
+
+    // DrawRectangle(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha * 0.3f));
+    // DrawRectangleLines(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha));
+
+    // DrawText(alertMsg, alertPos.x, alertPos.y, 24, ColorAlpha(RED, alpha));
+
+    Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+    float uiFrameRadius = GetUIFrameRadius();
+
+    for (const auto& [warningPos, distance]: warnings) {
+        Vector2 screenPos = GetWorldToScreen(warningPos, camera);
+        bool isOnScreen = (screenPos.x >= 0 && screenPos.x <= GetScreenWidth() &&
+                           screenPos.y >= 0 && screenPos.y <= GetScreenHeight() &&
+                           draw_utils::isInFrontOfCamera(warningPos, camera));
+
+        if (isOnScreen) {
+			Color aimColor = ColorAlpha(color, alpha);
+			// float radius = 30.0f + 10.0f * sinf(blinkTimer * 2.0f);
+            // drawEquiTriangle(screenPos, radius, blinkTimer * 10.0f, aimColor);
+            // drawEquiTriangle(screenPos, radius + 2, blinkTimer * 10.0f, aimColor);
+            // drawEquiTriangleCorners(screenPos, 20, -90, aimColor, 8);
+            drawEquiTriangle(screenPos, 15, -90, ColorAlpha(color, alpha * 0.5f));
+            drawEquiTriangle(screenPos, 15 + 4, -90, aimColor);
+
+            DrawText("!", screenPos.x - 1, screenPos.y - 10, 20, ColorAlpha(color, alpha));
+        } else {
+            Vector3 toWarning = warningPos - camera.position;
+            Vector3 camForward = Vector3Normalize(camera.target - camera.position);
+            Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
+            Vector3 camUp = Vector3CrossProduct(camRight, camForward) * -1;
+
+            Vector3 local;
+            local.x = Vector3DotProduct(toWarning, camRight);
+            local.y = Vector3DotProduct(toWarning, camUp);
+            local.z = Vector3DotProduct(toWarning, camForward);
+
+            Vector2 directionToWarning = {local.x, local.y};
+
+            directionToWarning = Vector2Normalize(directionToWarning);
+
+            char distText[32];
+            snprintf(distText, sizeof(distText), "%.0fm", distance);
+            int textWidth = MeasureText(distText, 20);
+            Vector2 textPos = screenCenter + directionToWarning * (uiFrameRadius + 50);
+            DrawText(distText, textPos.x - textWidth/2, textPos.y - 8, 20, ColorAlpha(color, alpha));
         }
     }
 }

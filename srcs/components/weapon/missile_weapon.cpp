@@ -39,6 +39,7 @@ namespace {
 		context.templateReg.emplace<tag::Missile>(missile);
 		context.templateReg.emplace<Lifespan>(missile, Lifespan{lifespan});
 		context.templateReg.emplace<sound::DeathSound>(missile, sound::RANDOM_EXPLOSION, std::min(1.0f, rad / 1.0f * 0.5f));
+		context.templateReg.emplace<Mass>(missile, cfg.getFloat("weapons.missile.mass", 20.0f));
 		return missile;
 	}
 

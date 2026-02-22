@@ -31,6 +31,7 @@ namespace {
 		context.registry.emplace<tag::Asteroid>(asteroid);
 		context.registry.emplace<tag::Shaded>(asteroid);
 		context.registry.emplace<tag::RotationSyncModel>(asteroid);
+		context.registry.emplace<Mass>(asteroid, context.config.getFloat("units.asteroid.mass", 10000.0f));
 		return asteroid;
 	}
 }
