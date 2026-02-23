@@ -220,16 +220,17 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 		accel *= 15.0f;
 	}
 
+	float speedChange = 0;
 	if ((
 		(IsKeyDown(KEY_W) || IsMouseButtonDown(MOUSE_BUTTON_EXTRA)
 			|| IsMouseButtonDown(MOUSE_BUTTON_RIGHT)))// && speed < maxSpeed.value)
 		|| boostDuration > 0)
 	{
-		speed += accel * dt;
+		speedChange += accel * dt;
 	}
 	else if (IsKeyDown(KEY_S) || IsMouseButtonDown(MOUSE_BUTTON_SIDE) || speed > maxSpeed.value)
 	{
-		speed -= accel * dt;
+		speedChange -= accel * dt;
 	}
 
 	// speed = Clamp(speed, 0, maxSpeed.value);
@@ -237,8 +238,12 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	// Ensure Target components exist
 	auto& tVel = context.registry.get_or_emplace<TargetVelocity>(context.currentPlayer);
 	auto& tRot = context.registry.get_or_emplace<TargetRotation>(context.currentPlayer);
-	
-	tVel.value = Vector3Scale(getForwardVector(newRotation), speed);
+
+	// tVel.value = getForwardVector(newRotation) * (Vector3Length(tVel.value) + speedChange);
+	Vector3 newForward = getForwardVector(newRotation);
+	// float newSpeed = Vector3DotProduct(velocity.value, newForward) + speedChange;
+	float newSpeed = speed + speedChange;
+	tVel.value = newForward * newSpeed;
 	tRot.value = newRotation;
 
 	// Stay within arena

@@ -20,7 +20,7 @@ namespace
 		prevHp = hpPtr->value;
 
 		if (isLowHp && tookDamage)
-			lowHpWarningDuration = context.config.getFloat("sounds.lowHpWarningDuration", 3.0f);
+			lowHpWarningDuration = context.config.getFloat("sounds.lowHpWarningDuration", 10.0f);
 		if (!isLowHp)
 			lowHpWarningDuration = 0.0f;
 		if (lowHpWarningDuration <= 0.0f)
@@ -33,6 +33,9 @@ namespace
 		lowHpWarningCooldown = context.config.getFloat("sounds.lowHpWarningInterval", 1.0f);
 		
 		float volume = context.config.getFloat("sounds.warningVolume", 1.0f);
+		float fadeDuration = context.config.getFloat("sounds.lowHpWarningFadeDuration", 5.0f);
+		if (lowHpWarningDuration <= fadeDuration)
+			volume *= lowHpWarningDuration / fadeDuration;
 		context.soundManager.playImmediate(context.config, "sounds.warning", volume);
 	}
 

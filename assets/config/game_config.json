@@ -6,7 +6,7 @@
 	},
 	"physics": {
 		"collisionElasticity": 0.1,
-		"maxAngularKick": 0.25,
+		"maxAngularKick": 0.5,
 		"roughness": 1.5
 	},
 	"audio": {
@@ -31,8 +31,9 @@
 		"warning": "assets/sounds/buzzer-1-181412.mp3",
 		"warningVolume": 0.25,
 		"lowHpWarningThreshold": 0.4,
-		"lowHpWarningDuration": 8.0,
+		"lowHpWarningDuration": 10.0,
 		"lowHpWarningInterval": 1.0,
+		"lowHpWarningFadeDuration": 3.0,
 		"gameStart": "assets/sounds/electronic-beep-3-453383.mp3",
 		"hyperBoost": "assets/sounds/static-noise-mechanical-whoosh-23-a-191050.mp3",
 		"thrust": "assets/sounds/engine3_up-75891.mp3",
@@ -210,7 +211,7 @@
 			"baseDamage": 250.0,
 			"lifespan": 20.0,
 			"effectiveRangeMultiplier": 5.0,
-			"mass": 500.0,
+			"mass": 100.0,
 			"basic": {
 				"radius": 0.5,
 				"hp": 1.0,
@@ -330,7 +331,13 @@
 			"mass": 10000.0
 		},
 		"asteroid": {
-			"mass": 1000000000.0
+			"mass": 10000000.0,
+			"modelPath": "assets/Models/asteroid/round_stone.glb",
+			"rotationSpeed": 0.01,
+			"damage": 100.0,
+			"baseRadFactor": 0.1,
+			"ringRadiusMin": 740.0,
+			"ringRadiusMax": 1000.0
 		},
 		"turret": {
 			"mass": 500.0

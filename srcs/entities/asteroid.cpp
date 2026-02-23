@@ -11,9 +11,8 @@ namespace {
 	}
 
 	t_model_id getAsteroidModel(GameContext &context) {
-		// return context.modelManager.createSphere(64, 64);
-		// return context.modelManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
-		return context.modelManager.loadModel("assets/Models/asteroid/round_stone.glb");
+		std::string path = context.config.getString("units.asteroid.modelPath", "assets/Models/asteroid/round_stone.glb");
+		return context.modelManager.loadModel(path);
 	}
 
 	Color getRandomAsteroidColor() {
@@ -23,22 +22,28 @@ namespace {
 	}
 
 	entt::entity spawnBaseAsteroid(GameContext &context) {
+		float rotLerp = context.config.getFloat("units.asteroid.rotationSpeed", 0.01f);
+		float damageVal = context.config.getFloat("units.asteroid.damage", 10000.0f);
+		float massVal = context.config.getFloat("units.asteroid.mass", 10000.0f);
+
 		entt::entity asteroid = context.registry.create();
 		context.registry.emplace<Rotation>(asteroid, randomRotation());
-		context.registry.emplace<RotationVelocity>(asteroid, QuaternionLerp(QuaternionIdentity(), randomRotation(), 0.01));
-		context.registry.emplace<Damage>(asteroid, 10000.0f);
+		context.registry.emplace<RotationVelocity>(asteroid, QuaternionLerp(QuaternionIdentity(), randomRotation(), rotLerp));
+		context.registry.emplace<Damage>(asteroid, damageVal);
 		context.registry.emplace<DisappearBound>(asteroid, getArenaSizeVec(context) * -1, getArenaSizeVec(context));
 		context.registry.emplace<tag::Asteroid>(asteroid);
 		context.registry.emplace<tag::Shaded>(asteroid);
 		context.registry.emplace<tag::RotationSyncModel>(asteroid);
-		context.registry.emplace<Mass>(asteroid, context.config.getFloat("units.asteroid.mass", 10000.0f));
+		context.registry.emplace<Mass>(asteroid, massVal);
 		return asteroid;
 	}
 }
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {
-	spawnAsteroid(context, pos, dir, context.config.COMBAT_DIST * (0.1 + GetRandomValue(0, 20) * 0.02));
+	float baseFactor = context.config.getFloat("units.asteroid.baseRadFactor", 0.1f);
+	float rad = context.config.COMBAT_DIST * (baseFactor + GetRandomValue(0, 20) * 0.02f);
+	spawnAsteroid(context, pos, dir, rad);
 }
 
 void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir, float rad)
@@ -63,7 +68,9 @@ void spawnAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir,
 
 void spawnRingAsteroid(GameContext &context, const Vector3 &pos, const Vector3 &dir)
 {
-	float radius = GetRandomValue(74000, 100000) / 100.0f; // 750-1000 units
+	float rmin = context.config.getFloat("units.asteroid.ringRadiusMin", 740.0f);
+	float rmax = context.config.getFloat("units.asteroid.ringRadiusMax", 1000.0f);
+	float radius = GetRandomValue((int)(rmin * 100), (int)(rmax * 100)) / 100.0f;
 	Vector3 ringNormal = Vector3Normalize(randomUnitVector3());
 	spawnRingAsteroid(context, pos, dir, radius, ringNormal, 10);
 }
