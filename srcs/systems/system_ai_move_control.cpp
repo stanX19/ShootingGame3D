@@ -54,7 +54,7 @@ static void aiSpeedControl(GameContext &context, float dt)
 		float targetSpeed = maxSpeed.value * (0.5f + 0.5f * (180.0f - angleDifference(targetRotation, rotation.value)) / 180.0f);
 		float newSpeed = Clamp(speed + Clamp(targetSpeed - speed, -20.0f * dt, 20.0f * dt), 0.0f, maxSpeed.value);
 
-		TargetVelocity tVel = context.registry.get_or_emplace<TargetVelocity>(entity);
+		TargetVelocity &tVel = context.registry.get_or_emplace<TargetVelocity>(entity);
 		tVel.value = getForwardVector(rotation) * newSpeed;
 	}
 }
