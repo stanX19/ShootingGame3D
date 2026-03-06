@@ -5,8 +5,8 @@
 		"unitCount": 4
 	},
 	"physics": {
-		"collisionElasticity": 0.1,
-		"maxAngularKick": 0.5,
+		"collisionElasticity": 0.05,
+		"maxAngularKick": 0.25,
 		"roughness": 1.5
 	},
 	"audio": {
@@ -122,14 +122,14 @@
 			"bigBall": {
 				"radius": 1.5,
 				"hp": 1000000000000.0,
-				"damageMultiplier": 15.0,
+				"damageMultiplier": 3.0,
 				"spreadMultiplier": 0.0,
 				"bulletCount": 1,
-				"speedMultiplier": 0.25,
+				"speedMultiplier": 1,
 				"lifespan": 15.0,
 				"ammo": 1,
-				"reloadTime": 7.0,
-				"mass": 100.0
+				"reloadTime": 4.0,
+				"mass": 5000.0
 			},
 			"sniper": {
 				"radius": 0.2,
@@ -234,18 +234,18 @@
 				"ammo": 3,
 				"reloadTime": 25.0,
 				"cooldown": 0.25,
-				"extendFireRequest": 2.0
+				"extendFireRequest": 5.0
 			},
 			"torpedo": {
 				"radius": 0.25,
 				"hp": 1.0,
 				"damageMultiplier": 0.25,
 				"speedMultiplier": 4.0,
-				"turnSpeed": 0.1,
-				"ammo": 4,
+				"turnSpeed": 0.0,
+				"ammo": 8,
 				"reloadTime": 20.0,
-				"cooldown": 0.2,
-				"extendFireRequest": 2.0
+				"cooldown": 0.1,
+				"extendFireRequest": 5.0
 			},
 			"nuke": {
 				"radius": 2.0,

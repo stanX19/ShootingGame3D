@@ -49,14 +49,20 @@ namespace {
 		const auto& b = evt.b;
 		entt::registry &registry = evt.context->registry;
 		
-		auto [aMass, aVel, aRot] = registry.try_get<Mass, Velocity, Rotation>(a.id);
-		auto [bMass, bVel, bRot] = registry.try_get<Mass, Velocity, Rotation>(b.id);
+		auto [aMass, aVel, aRot, aHp] = registry.try_get<Mass, Velocity, Rotation, HP>(a.id);
+		auto [bMass, bVel, bRot, bHp] = registry.try_get<Mass, Velocity, Rotation, HP>(b.id);
 		
 		// handle velocity changes
 		if (!aMass || !aVel || !bMass || !bVel)
 			return;
 			
 		if (aMass->value <= 0.0f || bMass->value <= 0.0f)
+			return;
+
+		bool aIsDead = aHp && aHp->value <= 0.0f;
+		bool bIsDead = bHp && bHp->value <= 0.0f;
+
+		if (aIsDead && bIsDead)
 			return;
 				
 		Vector3 normal = Vector3Normalize(b.pos - a.pos);
@@ -73,30 +79,36 @@ namespace {
 		impulseScalar /= (invMassA + invMassB);
 		Vector3 impulse = normal * impulseScalar;
 		
-		aVel->value -= impulse * invMassA;
-		bVel->value += impulse * invMassB;
+		if (!aIsDead) aVel->value -= impulse * invMassA;
+		if (!bIsDead) bVel->value += impulse * invMassB;
 
 		// Handle rotation changes
-		if (aRot && bRot) {
-			Vector3 torqueAxis = Vector3CrossProduct(normal, relativeVelocity);
-			float torqueMagnitude = Vector3Length(torqueAxis);
+		if (!aRot || !bRot)
+			return;
+			
+		Vector3 torqueAxis = Vector3CrossProduct(normal, relativeVelocity);
+		float torqueMagnitude = Vector3Length(torqueAxis);
 
-			if (torqueMagnitude > 0.1f) {
-				float roughness = evt.context->config.physics.roughness;
-				float maxKick = evt.context->config.physics.maxAngularKick;
+		if (torqueMagnitude <= 0.1f)
+			return;
+		
+		float roughness = evt.context->config.physics.roughness;
+		float maxKick = evt.context->config.physics.maxAngularKick;
 
-				// A's kick is proportional to B's mass ratio
-				float aKick = (bMass->value / aMass->value) * torqueMagnitude * roughness;
-				aKick = std::min(aKick, maxKick);
-				Quaternion aSpin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), aKick);
-				aRot->value = QuaternionMultiply(aSpin, aRot->value);
+		if (!aIsDead) {
+			// A's kick is proportional to B's mass ratio
+			float aKick = (bMass->value / aMass->value) * torqueMagnitude * roughness;
+			aKick = std::min(aKick, maxKick);
+			Quaternion aSpin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), aKick);
+			aRot->value = QuaternionMultiply(aSpin, aRot->value);
+		}
 
-				// B's kick is proportional to A's mass ratio (opposite direction)
-				float bKick = (aMass->value / bMass->value) * torqueMagnitude * roughness;
-				bKick = std::min(bKick, maxKick);
-				Quaternion bSpin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), -bKick);
-				bRot->value = QuaternionMultiply(bRot->value, bSpin); // bSpin * bRot depending on multiplication order defined
-			}
+		if (!bIsDead) {
+			// B's kick is proportional to A's mass ratio (opposite direction)
+			float bKick = (aMass->value / bMass->value) * torqueMagnitude * roughness;
+			bKick = std::min(bKick, maxKick);
+			Quaternion bSpin = QuaternionFromAxisAngle(Vector3Normalize(torqueAxis), -bKick);
+			bRot->value = QuaternionMultiply(bRot->value, bSpin); // bSpin * bRot depending on multiplication order defined
 		}
 	}
 

@@ -11,6 +11,8 @@ namespace {
 		return baseColor;
 	}
 
+	const float DEFAULT_MASS = 0.0f;
+
 	t_model_id getBulletModel(GameContext &context) {
 		std::string path = context.config.getString("weapons.lazer.modelPath", "");
 		if (!path.empty())
@@ -71,6 +73,7 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", DEFAULT_MASS));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
@@ -104,6 +107,7 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", DEFAULT_MASS));
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
@@ -141,6 +145,7 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 	entt::entity bulletTemplate = createBulletTemplate(context, radius, color);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", DEFAULT_MASS));
 	
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = spreadMultiplier;
@@ -177,6 +182,7 @@ void weapon::emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity
 	entt::entity bulletTemplate = createBulletTemplate(context, radius, getColor(context, entity));
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat(path + "mass", DEFAULT_MASS));
 	
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(baseSpread * spreadMultiplier);
