@@ -33,7 +33,7 @@ namespace {
 		context.registry.emplace<DisappearBound>(asteroid, getArenaSizeVec(context) * -1, getArenaSizeVec(context));
 		context.registry.emplace<tag::Asteroid>(asteroid);
 		context.registry.emplace<tag::Shaded>(asteroid);
-		context.registry.emplace<tag::RotationSyncModel>(asteroid);
+		// context.registry.emplace<tag::RotationSyncModel>(asteroid);
 		context.registry.emplace<Mass>(asteroid, massVal);
 		return asteroid;
 	}

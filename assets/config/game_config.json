@@ -129,7 +129,7 @@
 				"lifespan": 15.0,
 				"ammo": 1,
 				"reloadTime": 3.0,
-				"mass": 5000.0
+				"mass": 500.0
 			},
 			"sniper": {
 				"radius": 0.2,
