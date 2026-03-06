@@ -30,7 +30,10 @@ void ecs_systems::playerShootControl(GameContext &context, [[maybe_unused]] floa
 				weaponEntities.push_back(weaponEntity);
 		}
 		for (size_t i = 0; i < weaponEntities.size() && i < numberKeys.size(); ++i) {
-			setFireRequestStatus(context.registry, weaponEntities[i], globalFire || IsKeyDown(numberKeys[i]));
+			bool shouldFire = globalFire;
+			if (context.registry.all_of<tag::weapon::IsSpecialWeapon>(weaponEntities[i]))
+				shouldFire = IsKeyDown(KEY_E);
+			setFireRequestStatus(context.registry, weaponEntities[i], shouldFire || IsKeyDown(numberKeys[i]));
 		}
 	}
 }

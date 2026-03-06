@@ -326,6 +326,7 @@ namespace tag {
 		struct ParentControlledFire {};		// dont do anything, parent updates AimTarget; TODO
 		struct AIControlledFire {};			// decide IsFiring using distance and angle
 		struct FollowParentFire {};			// follow parent firing
+		struct IsSpecialWeapon {};			// special weapon, only fires on `E` key
 
 		struct FireRequest {};
 		struct IsFiring {};

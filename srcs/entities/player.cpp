@@ -24,7 +24,11 @@ namespace {
 		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * 0.5 + front * -2), subWeapons);
 		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * -0.5 + front * -2), subWeapons);
 		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * -0.5 + front * -2), subWeapons);
+	}
+
+	void addSpecialWeapons(GameContext &context, entt::entity &player, [[maybe_unused]] Color color) noexcept {
 		weapon::emplaceRandomMissileWeapon(context, player);
+		context.registry.emplace<tag::weapon::IsSpecialWeapon>(player);
 	}
 }
 
@@ -74,6 +78,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<sound::DeathSound>(player, sound::RANDOM_EXPLOSION, 0.5f);
 
 	addWeapons(context, player, SKYBLUE);
+	addSpecialWeapons(context, player, SKYBLUE);
 	context.currentPlayer = player;
 	return player;
 }

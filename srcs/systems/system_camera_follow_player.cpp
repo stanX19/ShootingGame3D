@@ -65,7 +65,7 @@ void ecs_systems::cameraFollowPlayer(GameContext &context, float dt) {
 		unitCamera->isAiming = false;
 	}
 	
-	bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+	bool shift = IsKeyDown(KEY_F);
 	
 	// Select POV based on shift and aim state
 	camera::CameraPOV pov;

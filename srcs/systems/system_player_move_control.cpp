@@ -207,7 +207,7 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	static float boostCooldown = 0;
 	static float boostDuration = 0;
 	float accel = 40.0f;
-	if ((IsKeyDown(KEY_E) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	if ((IsKeyDown(KEY_LEFT_SHIFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 	&& boostCooldown <= 0) {
 		boostDuration = 0.5f;
 		boostCooldown = 6.0f;

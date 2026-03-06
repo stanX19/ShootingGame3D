@@ -53,6 +53,7 @@ entt::entity spawnUnit(GameContext &context, const Vector3& pos) {
 	entt::entity entity = spawnBaseUnit(context, pos, radius);
 
 	weapon::emplaceWeaponMissileBasic(context, entity);
+	context.registry.emplace<tag::weapon::IsSpecialWeapon>(entity);
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
 	int subWeapons = GetRandomValue(0, 1000);
 	weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
