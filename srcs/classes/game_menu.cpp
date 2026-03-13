@@ -1,5 +1,6 @@
 #include "game_menu.hpp"
 #include "engine.hpp"
+#include "utils/draw_utils.hpp"
 
 GameMenu::GameMenu(GameContext &context)
 	: context(context),
@@ -50,16 +51,8 @@ void GameMenu::drawMenuUI(EngineState &nextState)
 	DrawText(title, screenWidth / 2 - titleWidth / 2, screenHeight / 4, 60, SKYBLUE);
 
 	Rectangle btnStart = {(float)screenWidth / 2 - 100, (float)screenHeight / 2 - 25, 200, 50};
-	bool hovered = CheckCollisionPointRec(GetMousePosition(), btnStart);
 
-	DrawRectangleRec(btnStart, hovered ? SKYBLUE : DARKBLUE);
-	DrawRectangleLinesEx(btnStart, 2, WHITE);
-
-	const char *btnText = "START GAME";
-	int textWidth = MeasureText(btnText, 20);
-	DrawText(btnText, screenWidth / 2 - textWidth / 2, screenHeight / 2 - 10, 20, WHITE);
-
-	if (hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+	if (draw_utils::draw_text_button("START GAME", btnStart, SKYBLUE, 20))
 	{
 		nextState = EngineState::GAME;
 	}
