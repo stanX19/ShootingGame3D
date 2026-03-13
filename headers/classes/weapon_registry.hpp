@@ -35,10 +35,10 @@ public:
     std::vector<std::string> getSpecialWeaponIds() const;
     std::vector<std::string> getStandardWeaponIds() const;
 
-    void emplaceRandomAttackWeapon(GameContext& context, entt::entity entity) const;
-    void emplaceRandomAttackWeapon(GameContext& context, entt::entity entity, int value) const;
-    void emplaceRandomMissileWeapon(GameContext& context, entt::entity entity) const;
-    void emplaceRandomMissileWeapon(GameContext& context, entt::entity entity, int value) const;
+    void emplaceRandomWeapon(GameContext& context, entt::entity entity) const;
+    void emplaceRandomWeapon(GameContext& context, entt::entity entity, int value) const;
+    void emplaceRandomSpecialWeapon(GameContext& context, entt::entity entity) const;
+    void emplaceRandomSpecialWeapon(GameContext& context, entt::entity entity, int value) const;
 
 private:
     std::map<std::string, WeaponEmplaceFunc> predefinedFunctions;

@@ -17,18 +17,18 @@ namespace {
 		context.registry.emplace<tag::weapon::PlayerControlledFire>(player);
 		static int subWeapons = -1;
 		++subWeapons;
-		context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
-		context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
-		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
-		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
-		context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * 0.5 + front * -2), subWeapons);
-		context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * 0.5 + front * -2), subWeapons);
+		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
+		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
+		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
+		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
+		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * 0.5 + front * -2), subWeapons);
+		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * 0.5 + front * -2), subWeapons);
 		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * -0.5 + front * -2), subWeapons);
 		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * -0.5 + front * -2), subWeapons);
 	}
 
 	void addSpecialWeapons(GameContext &context, entt::entity &player, [[maybe_unused]] Color color) noexcept {
-		context.weaponRegistry.emplaceRandomMissileWeapon(context, player);
+		context.weaponRegistry.emplaceRandomSpecialWeapon(context, player);
 		context.registry.emplace<tag::weapon::IsSpecialWeapon>(player);
 	}
 }

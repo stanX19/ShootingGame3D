@@ -12,15 +12,17 @@ namespace
 		return baseColor;
 	}
 
-	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_BULLET_SHOOT) {
+	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_BULLET_SHOOT)
+	{
 		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
 		context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.5f);
 	}
 
-	entt::entity createBulletTemplate(GameContext &context) {
-		const auto& cfg = context.config;
+	entt::entity createBulletTemplate(GameContext &context)
+	{
+		const auto &cfg = context.config;
 		Vector3 bulletBound = {cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2};
 
 		entt::entity bullet = context.templateReg.create();
@@ -34,13 +36,15 @@ namespace
 		return bullet;
 	}
 
-	float getBaseSpread(const GameConfig& cfg) {
+	float getBaseSpread(const GameConfig &cfg)
+	{
 		float rangeMultiplier = cfg.getFloat("weapons.bullet.effectiveRangeMultiplier", 2.0f);
 		float effectiveRange = cfg.COMBAT_DIST * rangeMultiplier;
 		return std::atan2(1.0f, effectiveRange);
 	}
 
-	t_model_id getBulletModel(GameContext &context) {
+	t_model_id getBulletModel(GameContext &context)
+	{
 		std::string path = context.config.getString("weapons.bullet.modelPath", "");
 		if (!path.empty())
 			return context.modelManager.loadModel(path);
@@ -48,9 +52,9 @@ namespace
 	}
 }
 
-void weapon::emplaceGenericBullet(GameContext &context, entt::entity entity, const GameConfig& cfg)
+void weapon::emplaceGenericBullet(GameContext &context, entt::entity entity, const GameConfig &cfg)
 {
-	const auto& globalCfg = context.config;
+	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
 	float baseDamage = globalCfg.getFloat("weapons.bullet.baseDamage", 25.0f);
@@ -63,9 +67,9 @@ void weapon::emplaceGenericBullet(GameContext &context, entt::entity entity, con
 	int bulletCount = cfg.getInt("bulletCount", 1);
 	float speedMultiplier = cfg.getFloat("speedMultiplier", 1.0f);
 	float lifespan = cfg.getFloat("lifespan", 10.0f);
-	
+
 	t_model_id model = getBulletModel(context);
-	
+
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
@@ -78,24 +82,24 @@ void weapon::emplaceGenericBullet(GameContext &context, entt::entity entity, con
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
+	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	
+
 	if (float cooldown = cfg.getFloat("cooldown", -1.0f); cooldown > 0)
 		context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
-		
+
 	if (int ammo = cfg.getInt("ammo", -1); ammo > 0)
 		context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
-		
+
 	if (float reloadTime = cfg.getFloat("reloadTime", -1.0f); reloadTime > 0)
 		context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 
 	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Generic Bullet"));
 }
 
-void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, const GameConfig& cfg)
+void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, const GameConfig &cfg)
 {
-	const auto& globalCfg = context.config;
+	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
 	float baseDamage = globalCfg.getFloat("weapons.bullet.baseDamage", 25.0f);
@@ -113,7 +117,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, 
 	float cooldown = cfg.getFloat("cooldown", 0.1f);
 
 	t_model_id model = getBulletModel(context);
-	
+
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
@@ -126,7 +130,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, 
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
+	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -135,9 +139,9 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, 
 	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Machine Gun"));
 }
 
-void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity, const GameConfig& cfg)
+void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity, const GameConfig &cfg)
 {
-	const auto& globalCfg = context.config;
+	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
 	float baseDamage = globalCfg.getFloat("weapons.bullet.baseDamage", 25.0f);
@@ -171,7 +175,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity, con
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
+	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -181,9 +185,9 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity, con
 	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Shotgun"));
 }
 
-void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, const GameConfig& cfg)
+void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, const GameConfig &cfg)
 {
-	const auto& globalCfg = context.config;
+	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
 	float baseDamage = globalCfg.getFloat("weapons.bullet.baseDamage", 25.0f);
@@ -217,7 +221,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, con
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
+	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -227,9 +231,9 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, con
 	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Big Ball"));
 }
 
-void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity, const GameConfig& cfg)
+void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity, const GameConfig &cfg)
 {
-	const auto& globalCfg = context.config;
+	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
 	float baseDamage = globalCfg.getFloat("weapons.bullet.baseDamage", 25.0f);
@@ -258,16 +262,16 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity, cons
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
+	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 
 	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Sniper"));
 }
 
-void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity, const GameConfig& cfg)
+void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity, const GameConfig &cfg)
 {
-	const auto& globalCfg = context.config;
+	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
 	float baseDamage = globalCfg.getFloat("weapons.bullet.baseDamage", 25.0f);
@@ -298,7 +302,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity,
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
+	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
@@ -307,9 +311,9 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity,
 	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Burst Sniper"));
 }
 
-void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity, const GameConfig& cfg)
+void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity, const GameConfig &cfg)
 {
-	const auto& globalCfg = context.config;
+	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.bullet.baseSpeed", 800.0f);
 	float baseDamage = globalCfg.getFloat("weapons.bullet.baseDamage", 25.0f);
@@ -340,7 +344,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity, const
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
+	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
@@ -348,5 +352,3 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity, const
 
 	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Gunner"));
 }
-
-
