@@ -4,12 +4,12 @@
 
 const std::vector<weapon::WeaponDescriptor>& weapon::getAllBulletWeapons() {
     static const std::vector<WeaponDescriptor> registry = {
-        {"Basic", "Bullet", emplaceWeaponBasic},
+        {"Gunner", "Bullet", emplaceWeaponBasic},
         {"Sniper", "Bullet", emplaceWeaponSniper},
         {"Burst Sniper", "Bullet", emplaceWeaponBurstSniper},
         {"Machine Gun", "Bullet", emplaceWeaponMachineGun},
         {"Shotgun", "Bullet", emplaceWeaponShotgun},
-        {"Asteroid Launcher", "Bullet", emplaceWeaponBigBall},
+        {"Big Ball", "Bullet", emplaceWeaponBigBall},
     };
     return registry;
 }

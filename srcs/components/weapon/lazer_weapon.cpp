@@ -82,8 +82,9 @@ void weapon::emplaceWeaponLazerBasic(GameContext &context, entt::entity entity)
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Basic"));
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
+	
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Basic"));
 }
 
 void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity entity)
@@ -117,11 +118,12 @@ void weapon::emplaceWeaponLazerMachineGun(GameContext &context, entt::entity ent
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Machine Gun"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo + 40)});
 	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
+	
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Machine Gun"));
 }
 
 void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity)
@@ -156,12 +158,13 @@ void weapon::emplaceWeaponLazerDeletor(GameContext &context, entt::entity entity
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Deletor"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
 	context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{chargeTime, ColorAlpha(color, 0.5f)});
 	context.registry.emplace_or_replace<ExtendFireDuration>(entity, ExtendFireDuration{extendFireDuration});
+	
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Deletor"));
 }
 
 void weapon::emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity)
@@ -194,8 +197,9 @@ void weapon::emplaceWeaponLazerShotgun(GameContext &context, entt::entity entity
 
 	emplaceLazerWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Shotgun"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
+	
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Lazer Shotgun"));
 }
