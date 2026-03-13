@@ -51,11 +51,17 @@ void GameMenu::drawMenuUI(EngineState &nextState)
 	DrawText(title, screenWidth / 2 - titleWidth / 2, screenHeight / 4, 60, SKYBLUE);
 
 	Rectangle btnStart = {(float)screenWidth / 2 - 100, (float)screenHeight / 2 - 25, 200, 50};
-	Rectangle btnSettings = {(float)screenWidth / 2 - 100, (float)screenHeight / 2 + 35, 200, 50};
+	Rectangle btnHangar = {(float)screenWidth / 2 - 100, (float)screenHeight / 2 + 35, 200, 50};
+	Rectangle btnSettings = {(float)screenWidth / 2 - 100, (float)screenHeight / 2 + 95, 200, 50};
 
 	if (draw_utils::draw_text_button("START GAME", btnStart, SKYBLUE, 20))
 	{
 		nextState = EngineState::GAME;
+	}
+
+	if (draw_utils::draw_text_button("HANGAR", btnHangar, SKYBLUE, 20))
+	{
+		nextState = EngineState::HANGAR;
 	}
 
 	if (draw_utils::draw_text_button("SETTINGS", btnSettings, SKYBLUE, 20))

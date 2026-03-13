@@ -28,6 +28,7 @@ void Engine::shutdown() {
 void Engine::run() {
     GameMenu menu(context);
     Game game(context);
+    GameHangar hangar(context);
     SettingsMenu settings(context);
 
     while (state != EngineState::EXIT) {
@@ -45,6 +46,9 @@ void Engine::run() {
                 break;
             case EngineState::GAME:
                 state = game.run();
+                break;
+            case EngineState::HANGAR:
+                state = hangar.run();
                 break;
             case EngineState::SETTINGS:
                 state = settings.run();

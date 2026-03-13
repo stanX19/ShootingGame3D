@@ -13,12 +13,26 @@
         "combatDist": 1750.0,
         "unitCount": 4
     },
+    "loadout": {
+        "special": "missile.nuke",
+        "w1": "bullet.sniper",
+        "w2": "bullet.sniper",
+        "w3": "bullet.burstSniper",
+        "w4": "bullet.burstSniper"
+    },
     "physics": {
         "collisionElasticity": 0.05,
         "maxAngularKick": 0.25,
         "roughness": 1.5
     },
     "settings": {
+        "loadout": {
+            "special": "missile.basic",
+            "w1": "bullet.sniper",
+            "w2": "bullet.machineGun",
+            "w3": "lazer.basic",
+            "w4": "lazer.basic"
+        },
         "showHPBar": false
     },
     "sounds": {

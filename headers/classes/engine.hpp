@@ -4,10 +4,12 @@
 #include "shoot_3d.hpp"
 #include "game.hpp"
 #include "game_menu.hpp"
+#include "game_hangar.hpp"
 
 enum class EngineState {
     MENU,
     GAME,
+    HANGAR,
     SETTINGS,
     EXIT
 };

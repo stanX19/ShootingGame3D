@@ -141,4 +141,16 @@ namespace weapon
 		allWeapons.at(chosenId).emplaceFunc(context, entity, subCfg);
 	}
 
+	void WeaponRegistry::emplaceWeaponById(GameContext& context, entt::entity entity, const std::string& id) const
+	{
+		auto it = allWeapons.find(id);
+		if (it != allWeapons.end())
+		{
+			const std::string type = it->second.type;
+			const std::string subId = id.substr(id.find('.') + 1);
+			const SubGameConfig subCfg = context.config.getSubConfig("weapons." + type + ".weapons." + subId);
+			it->second.emplaceFunc(context, entity, subCfg);
+		}
+	}
+
 } // namespace weapon

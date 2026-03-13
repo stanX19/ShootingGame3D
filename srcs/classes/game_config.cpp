@@ -35,6 +35,12 @@ void GameConfig::initConstants() {
 
 	settings.showHPBar = getBool("settings.showHPBar", true);
 	settings.masterVolume = getFloat("audio.masterVolume", 0.5f);
+	loadout.w1 = getString("loadout.w1", "bullet.machineGun");
+	loadout.w2 = getString("loadout.w2", "bullet.machineGun");
+	loadout.w3 = getString("loadout.w3", "lazer.basic");
+	loadout.w4 = getString("loadout.w4", "lazer.basic");
+	loadout.special = getString("loadout.special", "missile.basic");
+
 	debug.showTarget = getBool("debug.showTarget", false);
 }
 
@@ -96,6 +102,18 @@ nlohmann::json GameConfig::getSection(const std::string& path) const {
 }
 
 void GameConfig::setFloat(const std::string& path, float value) {
+	std::istringstream ss(path);
+	std::string token;
+	nlohmann::json* current = &config;
+
+	while (std::getline(ss, token, '.')) {
+		current = &((*current)[token]);
+	}
+	*current = value;
+	initConstants(); // Re-sync cached constants
+}
+
+void GameConfig::setString(const std::string& path, const std::string& value) {
 	std::istringstream ss(path);
 	std::string token;
 	nlohmann::json* current = &config;

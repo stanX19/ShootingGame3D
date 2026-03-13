@@ -15,20 +15,29 @@ namespace {
 		context.registry.emplace<AimTarget>(player);
 		context.registry.emplace<tag::weapon::AIControlledAim>(player);
 		context.registry.emplace<tag::weapon::PlayerControlledFire>(player);
-		static int subWeapons = -1;
-		++subWeapons;
-		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
-		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
-		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
-		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
-		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * 0.5 + front * -2), subWeapons);
-		context.weaponRegistry.emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * 0.5 + front * -2), subWeapons);
-		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * -0.5 + front * -2), subWeapons);
-		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * -0.5 + front * -2), subWeapons);
+
+		auto hookWeapon = [&](const std::string& id, Vector3 posOffset) {
+			entt::entity turret = spawnLinkedTurret(context, color, player, posOffset);
+			if (id.empty() || context.weaponRegistry.getAllWeaponsMap().find(id) == context.weaponRegistry.getAllWeaponsMap().end()) {
+				context.weaponRegistry.emplaceRandomWeapon(context, turret);
+			} else {
+				context.weaponRegistry.emplaceWeaponById(context, turret, id);
+			}
+		};
+
+		hookWeapon(context.config.loadout.w1, left * 3 + up * 0.5f + front * -1);
+		hookWeapon(context.config.loadout.w2, left * -3 + up * 0.5f + front * -1);
+		hookWeapon(context.config.loadout.w3, left * 4 + up * 0.5f + front * -2);
+		hookWeapon(context.config.loadout.w4, left * -4 + up * 0.5f + front * -2);
 	}
 
 	void addSpecialWeapons(GameContext &context, entt::entity &player, [[maybe_unused]] Color color) noexcept {
-		context.weaponRegistry.emplaceRandomSpecialWeapon(context, player);
+		std::string id = context.config.loadout.special;
+		if (id.empty() || context.weaponRegistry.getAllWeaponsMap().find(id) == context.weaponRegistry.getAllWeaponsMap().end()) {
+			context.weaponRegistry.emplaceRandomSpecialWeapon(context, player);
+		} else {
+			context.weaponRegistry.emplaceWeaponById(context, player, id);
+		}
 		context.registry.emplace<tag::weapon::IsSpecialWeapon>(player);
 	}
 }

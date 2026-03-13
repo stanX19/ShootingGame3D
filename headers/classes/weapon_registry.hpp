@@ -39,6 +39,7 @@ public:
     void emplaceRandomWeapon(GameContext& context, entt::entity entity, int value) const;
     void emplaceRandomSpecialWeapon(GameContext& context, entt::entity entity) const;
     void emplaceRandomSpecialWeapon(GameContext& context, entt::entity entity, int value) const;
+    void emplaceWeaponById(GameContext& context, entt::entity entity, const std::string& id) const;
 
 private:
     std::map<std::string, WeaponEmplaceFunc> predefinedFunctions;

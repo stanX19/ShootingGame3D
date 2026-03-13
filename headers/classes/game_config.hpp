@@ -24,6 +24,7 @@ public:
 	
 	void setFloat(const std::string& path, float value);
 	void setBool(const std::string& path, bool value);
+	void setString(const std::string& path, const std::string& value);
 	
 	void save(const std::string& configPath);
 
@@ -48,6 +49,14 @@ public:
 		bool showHPBar = true;
 		float masterVolume = 0.5f;
 	} settings;
+
+	struct PlayerLoadout {
+		std::string w1;
+		std::string w2;
+		std::string w3;
+		std::string w4;
+		std::string special;
+	} loadout;
 
 	struct Debug {
 		bool showTarget = false;
