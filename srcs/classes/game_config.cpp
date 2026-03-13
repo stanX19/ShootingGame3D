@@ -24,7 +24,6 @@ void GameConfig::init(const std::string& configPath) {
 	initConstants();
 }
 
-// load default values at construction
 void GameConfig::initConstants() {
 	ARENA_SIZE = getFloat("game.arenaSize", 2000.0f);
 	COMBAT_DIST = getFloat("game.combatDist", 1000.0f);
