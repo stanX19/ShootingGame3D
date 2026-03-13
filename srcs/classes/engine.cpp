@@ -15,6 +15,7 @@ void Engine::init() {
     SetExitKey(KEY_NULL);
 
     context.config.init("assets/config/game_config.json");
+    context.weaponRegistry.init(context.config);
     context.soundManager.init(context.config);
 }
 

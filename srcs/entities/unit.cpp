@@ -57,8 +57,8 @@ entt::entity spawnUnit(GameContext &context, const Vector3& pos) {
 	weapon::emplaceWeaponMissileBasic(context, entity);
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
 	int subWeapons = GetRandomValue(0, 1000);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
 	return entity;
 }
 
@@ -80,10 +80,10 @@ entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("units.elite.scoreMultiplier", 2));
 	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("units.elite.mass", 1000.0f));
 
-	weapon::emplaceRandomMissileWeapon(context, entity);
+	context.weaponRegistry.emplaceRandomMissileWeapon(context, entity);
 	int subWeapons = GetRandomValue(0, 1000);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
 
 	context.registry.emplace_or_replace<tag::EliteUnit>(entity);
 	return entity;
@@ -105,10 +105,10 @@ entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos) {
 	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("units.fastElite.scoreMultiplier", 2));
 	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("units.fastElite.mass", 1000.0f));
 
-	weapon::emplaceRandomMissileWeapon(context, entity);
+	context.weaponRegistry.emplaceRandomMissileWeapon(context, entity);
 	int subWeapons = GetRandomValue(0, 1000);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, 0, 0}), subWeapons);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, 0, 0}), subWeapons);
 
 	context.registry.emplace_or_replace<tag::EliteUnit>(entity);
 	return entity;
@@ -136,10 +136,10 @@ entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
 
 	weapon::emplaceWeaponMissileFlares(context, entity);
 	int randNum = GetRandomValue(0, 1000);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, +radius * 0.8f, -2}), randNum);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, -radius * 0.8f, -2}), randNum);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, +radius * 0.8f, -2}), randNum);
-	weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, -radius * 0.8f, -2}), randNum);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, +radius * 0.8f, -2}), randNum);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 1.5f, -radius * 0.8f, -2}), randNum);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, +radius * 0.8f, -2}), randNum);
+	context.weaponRegistry.emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, renderBody.color, entity, {-radius * 1.5f, -radius * 0.8f, -2}), randNum);
 
 	weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 2.0f, +radius * 1.2f, -1}));
 	weapon::emplaceWeaponBasic(context, spawnLinkedTurret(context, renderBody.color, entity, {+radius * 2.0f, -radius * 1.2f, -1}));

@@ -51,25 +51,74 @@ namespace {
 	}
 }
 
-void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity)
+void weapon::emplaceGenericMissile(GameContext &context, entt::entity entity, const GameConfig& cfg)
 {
-	const auto& cfg = context.config;
+	const auto& globalCfg = context.config;
+
+	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
+	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
+	float baseSpread = getBaseSpread(globalCfg);
+
+	float radius = cfg.getFloat("radius", 0.5f);
+	float hp = cfg.getFloat("hp", 1.0f);
+	float damageMultiplier = cfg.getFloat("damageMultiplier", 1.0f);
+	float speedMultiplier = cfg.getFloat("speedMultiplier", 1.0f);
+	float turnSpeed = cfg.getFloat("turnSpeed", 0.5f);
+    int bulletCount = cfg.getInt("bulletCount", 1);
+	float cooldown = cfg.getFloat("cooldown", 1.0f);
+	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+
+	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
+	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
+
+    if (float acceleration = cfg.getFloat("acceleration", 0.0f); acceleration > 0.0f)
+	    context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{acceleration});
+
+	Weapon weapon{bulletTemplate};
+	weapon.bulletData.spreadSin = std::sin(baseSpread);
+	weapon.bulletData.bulletCount = bulletCount;
+	weapon.bulletData.speed = baseSpeed * speedMultiplier;
+
+	emplaceMissileWeaponCommon(context, entity);
+	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
+    
+    if (int ammo = cfg.getInt("ammo", 0); ammo > 0) {
+        context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
+        if (float ammoRegen = cfg.getFloat("ammoRegen", 0.0f); ammoRegen > 0.0f)
+            context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
+        if (float ammoReload = cfg.getFloat("reloadTime", cfg.getFloat("ammoReload", 0.0f)); ammoReload > 0.0f)
+            context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{ammoReload});
+    }
+
+    if (float extendFireRequest = cfg.getFloat("extendFireRequest", 0.0f); extendFireRequest > 0.0f)
+        context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
+
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Generic Missile"));
+}
+
+void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity, const GameConfig& cfg)
+{
+	const auto& globalCfg = context.config;
 	const std::string path = "weapons.missile.basic.";
 
-	float baseSpeed = cfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseDamage = cfg.getFloat("weapons.missile.baseDamage", 250.0f);
-	float baseSpread = getBaseSpread(cfg);
+	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
+	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
+	float baseSpread = getBaseSpread(globalCfg);
 
-	float radius = cfg.getFloat(path + "radius", 0.5f);
-	float hp = cfg.getFloat(path + "hp", 1.0f);
-	float damageMultiplier = cfg.getFloat(path + "damageMultiplier", 1.0f);
-	float speedMultiplier = cfg.getFloat(path + "speedMultiplier", 1.0f);
-	float acceleration = cfg.getFloat(path + "acceleration", 100.0f);
-	float turnSpeed = cfg.getFloat(path + "turnSpeed", 0.5f);
-	int ammo = cfg.getInt(path + "ammo", 2);
-	float ammoRegen = cfg.getFloat(path + "ammoRegen", 0.0667f);
-	float cooldown = cfg.getFloat(path + "cooldown", 1.0f);
-	float mass = cfg.getFloat(path + "mass", cfg.getFloat("weapons.missile.mass", 20.0f));
+	float radius = cfg.getFloat("radius", 0.5f);
+	float hp = cfg.getFloat("hp", 1.0f);
+	float damageMultiplier = cfg.getFloat("damageMultiplier", 1.0f);
+	float speedMultiplier = cfg.getFloat("speedMultiplier", 1.0f);
+	float acceleration = cfg.getFloat("acceleration", 100.0f);
+	float turnSpeed = cfg.getFloat("turnSpeed", 0.5f);
+	int ammo = cfg.getInt("ammo", 2);
+	float ammoRegen = cfg.getFloat("ammoRegen", 0.0667f);
+	float cooldown = cfg.getFloat("cooldown", 1.0f);
+	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -89,29 +138,29 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Missile Basic"));
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Missile Basic"));
 }
 
-void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity)
+void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity, const GameConfig& cfg)
 {
-	const auto& cfg = context.config;
+	const auto& globalCfg = context.config;
 	const std::string path = "weapons.missile.swarm.";
 
-	float baseSpeed = cfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseLifespan = cfg.getFloat("weapons.missile.lifespan", 20.0f);
+	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
+	float baseLifespan = globalCfg.getFloat("weapons.missile.lifespan", 20.0f);
 
-	float radius = cfg.getFloat(path + "radius", 0.15f);
-	float hp = cfg.getFloat(path + "hp", 1.0f);
-	float turnSpeed = cfg.getFloat(path + "turnSpeed", 0.75f);
-	float lifespanMultiplier = cfg.getFloat(path + "lifespanMultiplier", 0.5f);
-	float spreadAngle = cfg.getFloat(path + "spreadAngle", 0.785f);
-	int bulletCount = cfg.getInt(path + "bulletCount", 4);
-	float speedMultiplier = cfg.getFloat(path + "speedMultiplier", 2.0f);
-	int ammo = cfg.getInt(path + "ammo", 3);
-	float reloadTime = cfg.getFloat(path + "reloadTime", 15.0f);
-	float cooldown = cfg.getFloat(path + "cooldown", 0.25f);
-	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 2.0f);
-	float mass = cfg.getFloat(path + "mass", cfg.getFloat("weapons.missile.mass", 20.0f));
+	float radius = cfg.getFloat("radius", 0.15f);
+	float hp = cfg.getFloat("hp", 1.0f);
+	float turnSpeed = cfg.getFloat("turnSpeed", 0.75f);
+	float lifespanMultiplier = cfg.getFloat("lifespanMultiplier", 0.5f);
+	float spreadAngle = cfg.getFloat("spreadAngle", 0.785f);
+	int bulletCount = cfg.getInt("bulletCount", 4);
+	float speedMultiplier = cfg.getFloat("speedMultiplier", 2.0f);
+	int ammo = cfg.getInt("ammo", 3);
+	float reloadTime = cfg.getFloat("reloadTime", 15.0f);
+	float cooldown = cfg.getFloat("cooldown", 0.25f);
+	float extendFireRequest = cfg.getFloat("extendFireRequest", 2.0f);
+	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -131,28 +180,28 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
 	
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Missile Swarm"));
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Missile Swarm"));
 }
 
-void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity entity)
+void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity entity, const GameConfig& cfg)
 {
-	const auto& cfg = context.config;
+	const auto& globalCfg = context.config;
 	const std::string path = "weapons.missile.torpedo.";
 
-	float baseDamage = cfg.getFloat("weapons.missile.baseDamage", 250.0f);
-	float baseSpeed = cfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseSpread = getBaseSpread(cfg);
+	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
+	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
+	float baseSpread = getBaseSpread(globalCfg);
 
-	float radius = cfg.getFloat(path + "radius", 0.25f);
-	float hp = cfg.getFloat(path + "hp", 1.0f);
-	float damageMultiplier = cfg.getFloat(path + "damageMultiplier", 0.25f);
-	float turnSpeed = cfg.getFloat(path + "turnSpeed", 0.1f);
-	int ammo = cfg.getInt(path + "ammo", 4);
-	float reloadTime = cfg.getFloat(path + "reloadTime", 20.0f);
-	float cooldown = cfg.getFloat(path + "cooldown", 0.2f);
-	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 2.0f);
-	float speedMultiplier = cfg.getFloat(path + "speedMultiplier", 2.0f);
-	float mass = cfg.getFloat(path + "mass", cfg.getFloat("weapons.missile.mass", 20.0f));
+	float radius = cfg.getFloat("radius", 0.25f);
+	float hp = cfg.getFloat("hp", 1.0f);
+	float damageMultiplier = cfg.getFloat("damageMultiplier", 0.25f);
+	float turnSpeed = cfg.getFloat("turnSpeed", 0.1f);
+	int ammo = cfg.getInt("ammo", 4);
+	float reloadTime = cfg.getFloat("reloadTime", 20.0f);
+	float cooldown = cfg.getFloat("cooldown", 0.2f);
+	float extendFireRequest = cfg.getFloat("extendFireRequest", 2.0f);
+	float speedMultiplier = cfg.getFloat("speedMultiplier", 2.0f);
+	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -172,28 +221,28 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
 	
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Torpedo"));
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Torpedo"));
 }
 
-void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity)
+void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity, const GameConfig& cfg)
 {
-	const auto& cfg = context.config;
+	const auto& globalCfg = context.config;
 	const std::string path = "weapons.missile.nuke.";
 
-	float baseSpeed = cfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseDamage = cfg.getFloat("weapons.missile.baseDamage", 250.0f);
-	float baseSpread = getBaseSpread(cfg);
+	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
+	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
+	float baseSpread = getBaseSpread(globalCfg);
 
-	float radius = cfg.getFloat(path + "radius", 2.0f);
-	float hp = cfg.getFloat(path + "hp", 250.0f);
-	float damageMultiplier = cfg.getFloat(path + "damageMultiplier", 10.0f);
-	float turnSpeed = cfg.getFloat(path + "turnSpeed", 1.5f);
-	float speedMultiplier = cfg.getFloat(path + "speedMultiplier", 0.5f);
-	float delayedDamageTime = cfg.getFloat(path + "delayedDamageTime", 40.0f);
-	float delayedDamage = cfg.getFloat(path + "delayedDamage", 1000000.0f);
-	int ammo = cfg.getInt(path + "ammo", 1);
-	float reloadTime = cfg.getFloat(path + "reloadTime", 30.0f);
-	float mass = cfg.getFloat(path + "mass", cfg.getFloat("weapons.missile.mass", 20.0f));
+	float radius = cfg.getFloat("radius", 2.0f);
+	float hp = cfg.getFloat("hp", 250.0f);
+	float damageMultiplier = cfg.getFloat("damageMultiplier", 10.0f);
+	float turnSpeed = cfg.getFloat("turnSpeed", 1.5f);
+	float speedMultiplier = cfg.getFloat("speedMultiplier", 0.5f);
+	float delayedDamageTime = cfg.getFloat("delayedDamageTime", 40.0f);
+	float delayedDamage = cfg.getFloat("delayedDamage", 1000000.0f);
+	int ammo = cfg.getInt("ammo", 1);
+	float reloadTime = cfg.getFloat("reloadTime", 30.0f);
+	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -213,22 +262,22 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity)
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 	
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Nuke"));
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Nuke"));
 }
 
-void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entity)
+void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entity, const GameConfig& cfg)
 {
-	const auto& cfg = context.config;
+	const auto& globalCfg = context.config;
 	const std::string path = "weapons.missile.sniper.";
 	
-	float baseSpeed = cfg.getFloat("weapons.missile.baseSpeed", 100.0f);
+	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
 	
-	float radius = cfg.getFloat(path + "radius", 0.5f);
-	float hp = cfg.getFloat(path + "hp", 1.0f);
-	float speedMultiplier = cfg.getFloat(path + "speedMultiplier", 10.0f);
-	float cooldown = cfg.getFloat(path + "cooldown", 2.0f);
-	float spreadAngle = cfg.getFloat(path + "spreadAngle", 0.0f);
-	float mass = cfg.getFloat(path + "mass", cfg.getFloat("weapons.missile.mass", 20.0f));
+	float radius = cfg.getFloat("radius", 0.5f);
+	float hp = cfg.getFloat("hp", 1.0f);
+	float speedMultiplier = cfg.getFloat("speedMultiplier", 10.0f);
+	float cooldown = cfg.getFloat("cooldown", 2.0f);
+	float spreadAngle = cfg.getFloat("spreadAngle", 0.0f);
+	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -243,29 +292,29 @@ void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entit
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Missile Sniper"));
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Missile Sniper"));
 }
 
-void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entity)
+void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entity, const GameConfig& cfg)
 {
-	const auto& cfg = context.config;
+	const auto& globalCfg = context.config;
 	const std::string path = "weapons.missile.flares.";
 
-	float baseSpeed = cfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseLifespan = cfg.getFloat("weapons.missile.lifespan", 20.0f);
+	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
+	float baseLifespan = globalCfg.getFloat("weapons.missile.lifespan", 20.0f);
 
-	float radius = cfg.getFloat(path + "radius", 0.15f);
-	float hp = cfg.getFloat(path + "hp", 1.0f);
-	float turnSpeed = cfg.getFloat(path + "turnSpeed", 0.05f);
-	float lifespanMultiplier = cfg.getFloat(path + "lifespanMultiplier", 0.2f);
-	float spreadAngle = cfg.getFloat(path + "spreadAngle", 1.571f);
-	int bulletCount = cfg.getInt(path + "bulletCount", 2);
-	float speedMultiplier = cfg.getFloat(path + "speedMultiplier", 0.5f);
-	int ammo = cfg.getInt(path + "ammo", 4);
-	float ammoReload = cfg.getFloat(path + "ammoReload", 8.0f);
-	float cooldown = cfg.getFloat(path + "cooldown", 0.2f);
-	float extendFireRequest = cfg.getFloat(path + "extendFireRequest", 1.0f);
-	float mass = cfg.getFloat(path + "mass", cfg.getFloat("weapons.missile.mass", 20.0f));
+	float radius = cfg.getFloat("radius", 0.15f);
+	float hp = cfg.getFloat("hp", 1.0f);
+	float turnSpeed = cfg.getFloat("turnSpeed", 0.05f);
+	float lifespanMultiplier = cfg.getFloat("lifespanMultiplier", 0.2f);
+	float spreadAngle = cfg.getFloat("spreadAngle", 1.571f);
+	int bulletCount = cfg.getInt("bulletCount", 2);
+	float speedMultiplier = cfg.getFloat("speedMultiplier", 0.5f);
+	int ammo = cfg.getInt("ammo", 4);
+	float ammoReload = cfg.getFloat("ammoReload", 8.0f);
+	float cooldown = cfg.getFloat("cooldown", 0.2f);
+	float extendFireRequest = cfg.getFloat("extendFireRequest", 1.0f);
+	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -286,5 +335,5 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireRequest});
 	
-	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Flares"));
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString("name", "Flares"));
 }

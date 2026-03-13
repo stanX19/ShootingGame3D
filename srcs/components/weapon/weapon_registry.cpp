@@ -1,72 +1,127 @@
-#include "weapon_registry.hpp"
+#include "classes/weapon_registry.hpp"
 #include "weapons.hpp"
 #include "basic_utils.hpp"
+#include <iostream>
+#include <vector>
 
-const std::vector<weapon::WeaponDescriptor>& weapon::getAllBulletWeapons() {
-    static const std::vector<WeaponDescriptor> registry = {
-        {"Gunner", "Bullet", emplaceWeaponBasic},
-        {"Sniper", "Bullet", emplaceWeaponSniper},
-        {"Burst Sniper", "Bullet", emplaceWeaponBurstSniper},
-        {"Machine Gun", "Bullet", emplaceWeaponMachineGun},
-        {"Shotgun", "Bullet", emplaceWeaponShotgun},
-        {"Big Ball", "Bullet", emplaceWeaponBigBall},
-    };
-    return registry;
+namespace weapon {
+
+void WeaponRegistry::init(const GameConfig& globalCfg) {
+    registerPredefinedFunctions();
+    
+    parseWeaponsOfType(globalCfg, "bullet");
+    parseWeaponsOfType(globalCfg, "lazer");
+    parseWeaponsOfType(globalCfg, "missile");
 }
 
-const std::vector<weapon::WeaponDescriptor>& weapon::getAllLazerWeapons() {
-    static const std::vector<WeaponDescriptor> registry = {
-        {"Lazer", "Lazer", emplaceWeaponLazerBasic},
-        {"Lazer Machine Gun", "Lazer", emplaceWeaponLazerMachineGun},
-        {"Deletor", "Lazer", emplaceWeaponLazerDeletor},
-        {"Lazer Shotgun", "Lazer", emplaceWeaponLazerShotgun},
-    };
-    return registry;
+void WeaponRegistry::registerPredefinedFunctions() {
+    predefinedFunctions["bullet.basic"] = emplaceWeaponBasic;
+    predefinedFunctions["bullet.sniper"] = emplaceWeaponSniper;
+    predefinedFunctions["bullet.burstSniper"] = emplaceWeaponBurstSniper;
+    predefinedFunctions["bullet.machineGun"] = emplaceWeaponMachineGun;
+    predefinedFunctions["bullet.shotgun"] = emplaceWeaponShotgun;
+    predefinedFunctions["bullet.bigBall"] = emplaceWeaponBigBall;
+
+    predefinedFunctions["lazer.basic"] = emplaceWeaponLazerBasic;
+    predefinedFunctions["lazer.machineGun"] = emplaceWeaponLazerMachineGun;
+    predefinedFunctions["lazer.deletor"] = emplaceWeaponLazerDeletor;
+    predefinedFunctions["lazer.shotgun"] = emplaceWeaponLazerShotgun;
+
+    predefinedFunctions["missile.basic"] = emplaceWeaponMissileBasic;
+    predefinedFunctions["missile.swarm"] = emplaceWeaponMissileSwarm;
+    predefinedFunctions["missile.torpedo"] = emplaceWeaponMissileTorpedo;
+    predefinedFunctions["missile.nuke"] = emplaceWeaponMissileNuke;
+    predefinedFunctions["missile.sniper"] = emplaceWeaponMissileSniper;
+    predefinedFunctions["missile.flares"] = emplaceWeaponMissileFlares;
 }
 
-const std::vector<weapon::WeaponDescriptor>& weapon::getAllMissileWeapons() {
-    static const std::vector<WeaponDescriptor> registry = {
-        {"Basic Missile", "Missile", emplaceWeaponMissileBasic},
-        {"Swarm Missile", "Missile", emplaceWeaponMissileSwarm},
-        {"Torpedo", "Missile", emplaceWeaponMissileTorpedo},
-        {"Nuke", "Missile", emplaceWeaponMissileNuke},
-        {"Sniper Missile", "Missile", emplaceWeaponMissileSniper},
-        {"Flares", "Missile", emplaceWeaponMissileFlares}
-    };
-    return registry;
+void WeaponRegistry::parseWeaponsOfType(const GameConfig& globalCfg, const std::string& category) {
+    nlohmann::json section = globalCfg.getSection("weapons." + category + ".weapons");
+    if (section.is_null() || !section.is_object()) return;
+
+    for (auto& [key, value] : section.items()) {
+        std::string id = category + "." + key;
+        
+        SubGameConfig subCfg = globalCfg.getSubConfig("weapons." + category + ".weapons." + key);
+        std::string name = subCfg.getString("name", "Unknown " + category);
+        bool isSpecial = subCfg.getBool("isSpecial", false);
+
+        WeaponEmplaceFunc func;
+        auto it = predefinedFunctions.find(id);
+        if (it != predefinedFunctions.end()) {
+            func = it->second;
+        } else {
+            if (category == "bullet") func = emplaceGenericBullet;
+            else if (category == "lazer") func = emplaceGenericLazer;
+            else if (category == "missile") func = emplaceGenericMissile;
+        }
+
+        allWeapons[id] = {id, name, category, isSpecial, func};
+    }
 }
 
-const std::vector<weapon::WeaponDescriptor>& weapon::getAllWeapons() {
-    static const std::vector<WeaponDescriptor> registry = merge_vectors(
-        getAllBulletWeapons(),
-        getAllLazerWeapons(),
-        getAllMissileWeapons()
-    );
-    return registry;
+std::vector<std::string> WeaponRegistry::getWeaponIdsByType(const std::string& type) const {
+    std::vector<std::string> ids;
+    for (const auto& [id, data] : allWeapons) {
+        if (data.type == type) {
+            ids.push_back(id);
+        }
+    }
+    return ids;
 }
 
-const std::vector<weapon::WeaponDescriptor>& weapon::getAllAttackWeapons() {
-    static const std::vector<WeaponDescriptor> registry = merge_vectors(
-        getAllBulletWeapons(),
-        getAllLazerWeapons()
-    );
-    return registry;
+std::vector<std::string> WeaponRegistry::getSpecialWeaponIds() const {
+    std::vector<std::string> ids;
+    for (const auto& [id, data] : allWeapons) {
+        if (data.isSpecial) {
+            ids.push_back(id);
+        }
+    }
+    return ids;
 }
 
-void weapon::emplaceRandomAttackWeapon(GameContext &context, entt::entity entity) {
+std::vector<std::string> WeaponRegistry::getStandardWeaponIds() const {
+    std::vector<std::string> ids;
+    for (const auto& [id, data] : allWeapons) {
+        if (!data.isSpecial) {
+            ids.push_back(id);
+        }
+    }
+    return ids;
+}
+
+void WeaponRegistry::emplaceRandomAttackWeapon(GameContext& context, entt::entity entity) const {
     emplaceRandomAttackWeapon(context, entity, GetRandomValue(0, 100000));
 }
 
-void weapon::emplaceRandomAttackWeapon(GameContext &context, entt::entity entity, int value) {
-    const auto& list = getAllAttackWeapons();
-    list[value % list.size()].emplaceFunc(context, entity);
+void WeaponRegistry::emplaceRandomAttackWeapon(GameContext& context, entt::entity entity, int value) const {
+    std::vector<std::string> candidates;
+    for (const auto& [id, data] : allWeapons) {
+        if (!data.isSpecial && (data.type == "bullet" || data.type == "lazer")) {
+            candidates.push_back(id);
+        }
+    }
+    if (candidates.empty()) return;
+    const std::string& chosenId = candidates[value % candidates.size()];
+    const SubGameConfig subCfg = context.config.getSubConfig("weapons." + allWeapons.at(chosenId).type + ".weapons." + chosenId.substr(chosenId.find('.') + 1));
+    allWeapons.at(chosenId).emplaceFunc(context, entity, subCfg);
 }
 
-void weapon::emplaceRandomMissileWeapon(GameContext &context, entt::entity entity) {
+void WeaponRegistry::emplaceRandomMissileWeapon(GameContext& context, entt::entity entity) const {
     emplaceRandomMissileWeapon(context, entity, GetRandomValue(0, 100000));
 }
 
-void weapon::emplaceRandomMissileWeapon(GameContext &context, entt::entity entity, int value) {
-    const auto& list = getAllMissileWeapons();
-    list[value % list.size()].emplaceFunc(context, entity);
+void WeaponRegistry::emplaceRandomMissileWeapon(GameContext& context, entt::entity entity, int value) const {
+    std::vector<std::string> candidates;
+    for (const auto& [id, data] : allWeapons) {
+        if (!data.isSpecial && data.type == "missile") {
+            candidates.push_back(id);
+        }
+    }
+    if (candidates.empty()) return;
+    const std::string& chosenId = candidates[value % candidates.size()];
+    const SubGameConfig subCfg = context.config.getSubConfig("weapons." + allWeapons.at(chosenId).type + ".weapons." + chosenId.substr(chosenId.find('.') + 1));
+    allWeapons.at(chosenId).emplaceFunc(context, entity, subCfg);
 }
+
+} // namespace weapon
