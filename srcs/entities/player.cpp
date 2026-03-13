@@ -1,5 +1,6 @@
 #include "entities.hpp"
 #include "weapons.hpp"
+#include "weapon_registry.hpp"
 #include "utils.hpp"
 #include "components/factions.hpp"
 #include "components/unit_camera.hpp"
@@ -16,14 +17,14 @@ namespace {
 		context.registry.emplace<tag::weapon::PlayerControlledFire>(player);
 		static int subWeapons = -1;
 		++subWeapons;
-		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
-		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
-		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
-		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
-		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * 0.5 + front * -2), subWeapons);
-		weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * 0.5 + front * -2), subWeapons);
-		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * -0.5 + front * -2), subWeapons);
-		// weapon::emplaceRandomWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * -0.5 + front * -2), subWeapons);
+		weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * 0.5 + front * -1), subWeapons);
+		weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * 0.5 + front * -1), subWeapons);
+		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 3 + up * -0.5 + front * -1), subWeapons);
+		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -3 + up * -0.5 + front * -1), subWeapons);
+		weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * 0.5 + front * -2), subWeapons);
+		weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * 0.5 + front * -2), subWeapons);
+		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * 4 + up * -0.5 + front * -2), subWeapons);
+		// weapon::emplaceRandomAttackWeapon(context, spawnLinkedTurret(context, color, player, left * -4 + up * -0.5 + front * -2), subWeapons);
 	}
 
 	void addSpecialWeapons(GameContext &context, entt::entity &player, [[maybe_unused]] Color color) noexcept {

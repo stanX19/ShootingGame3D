@@ -85,6 +85,7 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Missile Basic"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
@@ -124,6 +125,7 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Missile Swarm"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
@@ -163,6 +165,7 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Torpedo"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
@@ -204,6 +207,7 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity)
 
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Nuke"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 }
@@ -233,6 +237,7 @@ void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entit
 
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Missile Sniper"));
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 }
 
@@ -271,6 +276,7 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 
 	emplaceMissileWeaponCommon(context, entity);
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
+	context.registry.emplace_or_replace<WeaponName>(entity, cfg.getString(path + "name", "Missile Flares"));
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{ammoReload});
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});

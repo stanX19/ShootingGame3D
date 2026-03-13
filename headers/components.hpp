@@ -192,6 +192,11 @@ struct AimDirection
 	Vector3 value = {0, 1, 0};
 };
 
+struct WeaponName
+{
+	std::string value;
+};
+
 struct Weapon
 {
     struct
