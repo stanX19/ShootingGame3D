@@ -8,6 +8,7 @@
 enum class EngineState {
     MENU,
     GAME,
+    SETTINGS,
     EXIT
 };
 

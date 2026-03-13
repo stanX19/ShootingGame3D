@@ -21,6 +21,11 @@ public:
 	bool getBool(const std::string& path, bool defaultVal) const;
 	std::string getString(const std::string& path, const std::string& defaultVal) const;
 	Vector3 getVector3(const std::string& path, Vector3 defaultVal) const;
+	
+	void setFloat(const std::string& path, float value);
+	void setBool(const std::string& path, bool value);
+	
+	void save(const std::string& configPath);
 
 	// Access raw JSON for arrays/complex structures
 	const nlohmann::json& getJson() const { return config; }
@@ -40,6 +45,7 @@ public:
 	// Settings
 	struct Settings {
 		bool showHPBar = true;
+		float masterVolume = 0.5f;
 	} settings;
 
 	struct Debug {

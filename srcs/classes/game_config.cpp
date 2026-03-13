@@ -34,6 +34,7 @@ void GameConfig::initConstants() {
 	physics.roughness = getFloat("physics.roughness", 2.5f);
 
 	settings.showHPBar = getBool("settings.showHPBar", true);
+	settings.masterVolume = getFloat("audio.masterVolume", 0.5f);
 	debug.showTarget = getBool("debug.showTarget", false);
 }
 
@@ -92,4 +93,38 @@ nlohmann::json GameConfig::getSection(const std::string& path) const {
 	const nlohmann::json* node = navigatePath(path);
 	if (!node) return nlohmann::json{};
 	return *node;
+}
+
+void GameConfig::setFloat(const std::string& path, float value) {
+	std::istringstream ss(path);
+	std::string token;
+	nlohmann::json* current = &config;
+
+	while (std::getline(ss, token, '.')) {
+		current = &((*current)[token]);
+	}
+	*current = value;
+	initConstants(); // Re-sync cached constants
+}
+
+void GameConfig::setBool(const std::string& path, bool value) {
+	std::istringstream ss(path);
+	std::string token;
+	nlohmann::json* current = &config;
+
+	while (std::getline(ss, token, '.')) {
+		current = &((*current)[token]);
+	}
+	*current = value;
+	initConstants(); // Re-sync cached constants
+}
+
+void GameConfig::save(const std::string& configPath) {
+	std::ofstream file(configPath);
+	if (!file.is_open()) {
+		TraceLog(LOG_WARNING, "CONFIG: Failed to open config file for saving: %s", configPath.c_str());
+		return;
+	}
+	file << config.dump(4);
+	TraceLog(LOG_INFO, "CONFIG: Saved config to %s", configPath.c_str());
 }

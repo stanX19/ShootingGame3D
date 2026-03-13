@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "settings_menu.hpp"
 
 Engine::Engine() {
     init();
@@ -26,6 +27,7 @@ void Engine::shutdown() {
 void Engine::run() {
     GameMenu menu(context);
     Game game(context);
+    SettingsMenu settings(context);
 
     while (state != EngineState::EXIT) {
         if (WindowShouldClose()) {
@@ -42,6 +44,9 @@ void Engine::run() {
                 break;
             case EngineState::GAME:
                 state = game.run();
+                break;
+            case EngineState::SETTINGS:
+                state = settings.run();
                 break;
             case EngineState::EXIT:
                 break;
