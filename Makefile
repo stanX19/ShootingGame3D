@@ -22,7 +22,14 @@ HEADERS		:= $(shell find $(HEADER_DIR) -name '*.hpp')
 HEADERS_INC	= $(addprefix -I,$(sort $(dir $(HEADERS))) $(INCLUDE_DIR))
 
 IFLAGS		:= -I. $(HEADERS_INC)
-LFLAGS		= -Lincludes/raylib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+
+ifneq ($(shell command -v mold 2>/dev/null),)
+    LINKER := -fuse-ld=mold
+else ifneq ($(shell command -v lld 2>/dev/null),)
+    LINKER := -fuse-ld=lld
+else
+    LINKER := 
+endif
 
 CC_BASE		= g++
 ifneq ($(shell command -v ccache 2>/dev/null),)
@@ -31,6 +38,7 @@ else
 CC			= $(CC_BASE)
 endif
 
+LFLAGS		= $(LINKER) -Lincludes/raylib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 CFLAGS		= -std=c++20 -Wall -Wextra -Werror -MMD -MP -fmax-errors=3# -g3 -fsanitize=address
 AR			= ar -rcs
 RM			= rm -rf

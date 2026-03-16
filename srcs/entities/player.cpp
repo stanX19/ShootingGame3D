@@ -63,7 +63,7 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	// t_model_id shipModel = context.modelManager.loadModel("assets/Models/spaceship_custom_2/Spaceship2.glb");
 	context.registry.emplace<Position>(player, pos);
 	context.registry.emplace<Velocity>(player);
-	context.registry.emplace<Rotation>(player, QuaternionFromAxisAngle(Vector3UnitY, 0.0f));
+	context.registry.emplace<Rotation>(player, vector3ToRotation(Vector3{0, 0, 1}));
 	context.registry.emplace<CollisionBody>(player, 1.0f);
 	context.registry.emplace<RenderBody>(player, RenderBody{shipModel, BLUE, 1.0f});
 	context.registry.emplace<HP>(player, hp);

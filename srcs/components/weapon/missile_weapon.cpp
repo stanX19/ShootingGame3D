@@ -6,6 +6,7 @@
 namespace
 {
 	const Color BASE_COLOR = GRAY;
+	const float DEFAULT_MASS = 5.0f;
 
 	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = BASE_COLOR)
 	{
@@ -70,7 +71,7 @@ void weapon::emplaceGenericMissile(GameContext &context, entt::entity entity, co
 	float turnSpeed = cfg.getFloat("turnSpeed", 0.5f);
 	int bulletCount = cfg.getInt("bulletCount", 1);
 	float cooldown = cfg.getFloat("cooldown", 1.0f);
-	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -123,7 +124,7 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 	int ammo = cfg.getInt("ammo", 2);
 	float ammoRegen = cfg.getFloat("ammoRegen", 0.0667f);
 	float cooldown = cfg.getFloat("cooldown", 1.0f);
-	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -165,7 +166,7 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 	float reloadTime = cfg.getFloat("reloadTime", 15.0f);
 	float cooldown = cfg.getFloat("cooldown", 0.25f);
 	float extendFireRequest = cfg.getFloat("extendFireRequest", 2.0f);
-	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -206,7 +207,7 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 	float cooldown = cfg.getFloat("cooldown", 0.2f);
 	float extendFireRequest = cfg.getFloat("extendFireRequest", 2.0f);
 	float speedMultiplier = cfg.getFloat("speedMultiplier", 2.0f);
-	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -247,7 +248,7 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity,
 	float delayedDamage = cfg.getFloat("delayedDamage", 1000000.0f);
 	int ammo = cfg.getInt("ammo", 1);
 	float reloadTime = cfg.getFloat("reloadTime", 30.0f);
-	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -282,7 +283,7 @@ void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entit
 	float speedMultiplier = cfg.getFloat("speedMultiplier", 10.0f);
 	float cooldown = cfg.getFloat("cooldown", 2.0f);
 	float spreadAngle = cfg.getFloat("spreadAngle", 0.0f);
-	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
@@ -319,7 +320,7 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	float ammoReload = cfg.getFloat("ammoReload", 8.0f);
 	float cooldown = cfg.getFloat("cooldown", 0.2f);
 	float extendFireRequest = cfg.getFloat("extendFireRequest", 1.0f);
-	float mass = cfg.getFloat("mass", globalCfg.getFloat("weapons.missile.mass", 20.0f));
+	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});

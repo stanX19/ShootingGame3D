@@ -20,6 +20,8 @@ namespace
 		context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.5f);
 	}
 
+	const float DEFAULT_MASS = 0.0f;
+	
 	entt::entity createBulletTemplate(GameContext &context)
 	{
 		const auto &cfg = context.config;
@@ -73,6 +75,7 @@ void weapon::emplaceGenericBullet(GameContext &context, entt::entity entity, con
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
@@ -82,7 +85,7 @@ void weapon::emplaceGenericBullet(GameContext &context, entt::entity entity, con
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 
 	if (float cooldown = cfg.getFloat("cooldown", -1.0f); cooldown > 0)
@@ -121,6 +124,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, 
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
@@ -130,7 +134,7 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, 
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -165,6 +169,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity, con
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
@@ -175,7 +180,7 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity, con
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -209,11 +214,13 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, con
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 	context.templateReg.emplace<Rotation>(bulletTemplate);
 	context.templateReg.emplace<RotationVelocity>(bulletTemplate, QuaternionFromAxisAngle(Vector3UnitY, PI));
+	context.templateReg.emplace<SpawnsTrailParticle>(bulletTemplate, SpawnsTrailParticle{radius / 2.0f, 1.0f, GRAY});
 	context.templateReg.erase<ModelStrech>(bulletTemplate);
 
 	Weapon weapon{bulletTemplate};
@@ -221,7 +228,7 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, con
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{0.0f, static_cast<float>(ammo)});
 	context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
@@ -253,6 +260,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity, cons
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
@@ -262,7 +270,7 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity, cons
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 
@@ -293,6 +301,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity,
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
@@ -302,7 +311,7 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity,
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});
@@ -335,6 +344,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity, const
 	entt::entity bulletTemplate = createBulletTemplate(context);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
+	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
 	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
@@ -344,7 +354,7 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity, const
 	weapon.bulletData.bulletCount = bulletCount;
 	weapon.bulletData.speed = baseSpeed * speedMultiplier;
 
-	emplaceBulletWeaponCommon(context, entity, cfg.getString("sound", "").empty() ? sound::RANDOM_BULLET_SHOOT : context.soundManager.loadSound(cfg.getString("sound", "")));
+	emplaceBulletWeaponCommon(context, entity, context.soundManager.loadSound(globalCfg, cfg.getString("sound", ""), sound::RANDOM_BULLET_SHOOT));
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	context.registry.emplace_or_replace<Ammo>(entity, Ammo{static_cast<float>(ammo), static_cast<float>(ammo)});

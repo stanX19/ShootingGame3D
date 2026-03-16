@@ -18,10 +18,12 @@ namespace {
 
 static Vector3 generateSpawnPos(GameContext const &context, Vector3 const &playerPos) {
 	float arenaSize = context.config.ARENA_SIZE;
+	const float box = 0.2f;
+	const float dist = 0.2f;
 
 	return game_utils::randomPosInBoxOffCombat(
-		Vector3{-arenaSize * 0.5f, -arenaSize * 0.5f, -arenaSize},
-		Vector3{+arenaSize * 0.5f, +arenaSize * 0.5f, -arenaSize * 0.5f},
+		Vector3{-arenaSize * box, -arenaSize * box, -arenaSize * (1.0f - dist)},
+		Vector3{+arenaSize * box, +arenaSize * box, -arenaSize * (1.0f - box - dist)},
 		playerPos,
 		context.config.COMBAT_DIST
 	);

@@ -15,10 +15,10 @@
     },
     "loadout": {
         "special": "missile.nuke",
-        "w1": "bullet.sniper",
-        "w2": "bullet.sniper",
-        "w3": "bullet.burstSniper",
-        "w4": "bullet.burstSniper"
+        "w1": "bullet.bigBall",
+        "w2": "bullet.bigBall",
+        "w3": "bullet.bigBall",
+        "w4": "bullet.bigBall"
     },
     "physics": {
         "collisionElasticity": 0.05,
@@ -217,7 +217,7 @@
                     "ammo": 5,
                     "bulletCount": 10,
                     "cooldown": 0.1,
-                    "damageMultiplier": 1.0,
+                    "damageMultiplier": 0.5,
                     "extendFireRequest": 1.0,
                     "hp": 1.0,
                     "lifespan": 5.0,
@@ -227,7 +227,7 @@
                     "radius": 0.025,
                     "reloadTime": 1.5,
                     "speedMultiplier": 2.0,
-                    "spreadMultiplier": 100.0
+                    "spreadMultiplier": 50.0
                 },
                 "sniper": {
                     "bulletCount": 1,
@@ -339,12 +339,12 @@
                     "damageMultiplier": 10.0,
                     "delayedDamage": 1000000.0,
                     "delayedDamageTime": 40.0,
-                    "hp": 250.0,
+                    "hp": 50.0,
                     "isSpecial": true,
                     "mass": 100.0,
                     "name": "Nuke",
                     "radius": 2.0,
-                    "reloadTime": 60.0,
+                    "reloadTime": 40.0,
                     "speedMultiplier": 0.5,
                     "turnSpeed": 1.5
                 },
@@ -366,7 +366,7 @@
                     "lifespanMultiplier": 0.5,
                     "name": "Missile Swarm",
                     "radius": 0.15,
-                    "reloadTime": 25.0,
+                    "reloadTime": 15.0,
                     "speedMultiplier": 2.0,
                     "spreadAngle": 0.785,
                     "turnSpeed": 0.75
@@ -374,7 +374,7 @@
                 "torpedo": {
                     "ammo": 8,
                     "cooldown": 0.1,
-                    "damageMultiplier": 0.25,
+                    "damageMultiplier": 0.5,
                     "extendFireRequest": 5.0,
                     "hp": 1.0,
                     "isSpecial": true,
