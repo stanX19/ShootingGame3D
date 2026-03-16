@@ -15,10 +15,10 @@
     },
     "loadout": {
         "special": "missile.nuke",
-        "w1": "bullet.bigBall",
-        "w2": "bullet.bigBall",
-        "w3": "bullet.bigBall",
-        "w4": "bullet.bigBall"
+        "w1": "bullet.machineGun",
+        "w2": "bullet.machineGun",
+        "w3": "bullet.machineGun",
+        "w4": "bullet.machineGun"
     },
     "physics": {
         "collisionElasticity": 0.05,
@@ -26,13 +26,6 @@
         "roughness": 1.5
     },
     "settings": {
-        "loadout": {
-            "special": "missile.basic",
-            "w1": "bullet.sniper",
-            "w2": "bullet.machineGun",
-            "w3": "lazer.basic",
-            "w4": "lazer.basic"
-        },
         "showHPBar": false
     },
     "sounds": {
