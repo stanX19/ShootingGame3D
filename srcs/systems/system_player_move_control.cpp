@@ -5,13 +5,30 @@
 #include <cmath>
 
 namespace {
-	float getSensitivityDistanceFactor(float sensitivity) {
-		const float clampedSensitivity = Clamp(sensitivity, 0.01f, 1.0f);
-		const float squaredSensitivity = clampedSensitivity * clampedSensitivity;
-		float curveValue = 3.0f * squaredSensitivity * squaredSensitivity
-			- 2.0f * squaredSensitivity * squaredSensitivity * squaredSensitivity;
+	/* 
+	P = E * (1-k)
+	y = cx + (1-c)x^P
+	
+	where:
+	 y: [0, 1] = output magnitude
+	 x: [0, 1] = input magnitude
+	 E: [1, inf) = max exponent, higher means more curve
+	 c: [0, 1] = minimum gradient, higher means more linear, 1 = completely linear
+	 k: (0, 2] = settings sensitivity
+	*/ 
+	Vector2 applySensitivityCurve(Vector2 mouseDirection, float sensitivity) {
+		const float x = Clamp(Vector2Length(mouseDirection), 0.0f, 1.0f);
+		const float E = 10.0f;
+		const float c = 0.2f;
+		const float k = Clamp(sensitivity, 0.01f, 2.0f);
 
-		return 1.0f - 0.9f * curveValue;
+		if (x <= 0.0001f)
+			return {0.0f, 0.0f};
+
+		const float P = E * (1 - k);
+		const float y = c * x + (1 - c) * powf(x, P);
+
+		return Vector2Normalize(mouseDirection) * y;
 	}
 
 	Vector2 getMouseDirectionRelRot(
@@ -20,8 +37,8 @@ namespace {
 		float sensitivity
 	) {
 		const float mouseUnitRatio = 0.8f;
-		const float distanceFactor = getSensitivityDistanceFactor(sensitivity);
-		Vector2 mouseDirection = getMouseDirectionNormalized(mouseUnitRatio * distanceFactor);
+		Vector2 mouseDirection = getMouseDirectionNormalized(mouseUnitRatio);
+		mouseDirection = applySensitivityCurve(mouseDirection, sensitivity);
 			
 		if (std::abs(mouseDirection.x) < 0.01f && std::abs(mouseDirection.y) < 0.01f) {
 			return {0.0f, 0.0f};

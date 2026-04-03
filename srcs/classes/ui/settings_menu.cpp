@@ -15,8 +15,8 @@ SettingsMenu::SettingsMenu(GameContext &context)
       sensitivityWidget(
           "SENSITIVITY",
           context.config.settings.controlSensitivity,
-          0.00001f,
-          0.5f,
+          0.01f,
+          2.0f,
           0.01f,
           Rectangle{0.0f, 0.0f, 0.0f, 0.0f},
           SKYBLUE
