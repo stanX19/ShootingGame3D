@@ -2,7 +2,7 @@
 
 SettingsMenu::SettingsMenu(GameContext &context)
     : context(context),
-      hpToggleWidget("HP BAR: ON", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, LIME, 20),
+      hpToggleWidget("HP BAR: ON", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
       volumeWidget(
           "VOLUME",
           context.config.settings.masterVolume,
@@ -16,7 +16,7 @@ SettingsMenu::SettingsMenu(GameContext &context)
           "SENSITIVITY",
           context.config.settings.controlSensitivity,
           0.01f,
-          2.0f,
+          1.0f,
           0.01f,
           Rectangle{0.0f, 0.0f, 0.0f, 0.0f},
           SKYBLUE
@@ -69,7 +69,6 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
     const Rectangle hpBounds = {(float)screenWidth / 2 - buttonWidth / 2, (float)startY, buttonWidth, buttonHeight};
     hpToggleWidget.setBounds(hpBounds);
     hpToggleWidget.setText(context.config.settings.showHPBar ? "HP BAR: ON" : "HP BAR: OFF");
-    hpToggleWidget.setColor(context.config.settings.showHPBar ? LIME : RED);
     if (hpToggleWidget.tick_and_draw()) {
         context.config.setBool("settings.showHPBar", !context.config.settings.showHPBar);
     }

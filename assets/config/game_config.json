@@ -26,9 +26,9 @@
         "roughness": 1.5
     },
     "settings": {
-        "controlSensitivity": 2.0,
+        "controlSensitivity": 0.7799999713897705,
         "controlSensitivityCurve": "smoothstep",
-        "showHPBar": true
+        "showHPBar": false
     },
     "sounds": {
         "backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",
@@ -66,8 +66,8 @@
         ],
         "lockOn": "assets/sounds/electronic-beep-1-453381.mp3",
         "lockOnVolume": 0.25,
-        "lowHpWarningDuration": 10.0,
-        "lowHpWarningFadeDuration": 3.0,
+        "lowHpWarningDuration": 12.0,
+        "lowHpWarningFadeDuration": 6.0,
         "lowHpWarningInterval": 1.0,
         "lowHpWarningThreshold": 0.4,
         "missileAlert": "assets/sounds/buzzer-2-181415.mp3",
