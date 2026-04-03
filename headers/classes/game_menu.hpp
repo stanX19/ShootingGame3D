@@ -3,6 +3,7 @@
 
 #include "shoot_3d.hpp"
 #include "renderer.hpp"
+#include "classes/ui/text_button_widget.hpp"
 
 enum class EngineState; // Forward declaration
 
@@ -16,6 +17,9 @@ public:
 private:
     GameContext &context;
     Renderer renderer;
+    ui::TextButtonWidget startButton;
+    ui::TextButtonWidget hangarButton;
+    ui::TextButtonWidget settingsButton;
 
     void drawMenuUI(EngineState &nextState);
 	void inputControls([[maybe_unused]] float dt, EngineState &nextState);

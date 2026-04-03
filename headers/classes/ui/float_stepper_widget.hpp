@@ -14,9 +14,9 @@ public:
     FloatStepperWidget(
         const std::string &label,
         float &valueRef,
-        float step,
         float minValue,
         float maxValue,
+        float step,
         Rectangle bounds,
         Color color
     );

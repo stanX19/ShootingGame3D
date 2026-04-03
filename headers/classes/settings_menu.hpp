@@ -17,7 +17,7 @@ public:
 private:
     GameContext &context;
     ui::TextButtonWidget hpToggleWidget;
-    ui::FloatStepperWidget volumeWidget;
+    ui::FloatSliderWidget volumeWidget;
     ui::FloatSliderWidget sensitivityWidget;
     ui::TextButtonWidget backWidget;
 

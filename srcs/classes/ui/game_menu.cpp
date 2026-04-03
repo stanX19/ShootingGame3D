@@ -1,10 +1,12 @@
 #include "game_menu.hpp"
 #include "engine.hpp"
-#include "utils/draw_utils.hpp"
 
 GameMenu::GameMenu(GameContext &context)
 	: context(context),
-	  renderer(context.mainCamera, context)
+	  renderer(context.mainCamera, context),
+	  startButton("START GAME", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	  hangarButton("HANGAR", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	  settingsButton("SETTINGS", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20)
 {
 }
 
@@ -54,17 +56,21 @@ void GameMenu::drawMenuUI(EngineState &nextState)
 	Rectangle btnHangar = {(float)screenWidth / 2 - 100, (float)screenHeight / 2 + 35, 200, 50};
 	Rectangle btnSettings = {(float)screenWidth / 2 - 100, (float)screenHeight / 2 + 95, 200, 50};
 
-	if (draw_utils::draw_text_button("START GAME", btnStart, SKYBLUE, 20))
+	startButton.setBounds(btnStart);
+	hangarButton.setBounds(btnHangar);
+	settingsButton.setBounds(btnSettings);
+
+	if (startButton.tick_and_draw())
 	{
 		nextState = EngineState::GAME;
 	}
 
-	if (draw_utils::draw_text_button("HANGAR", btnHangar, SKYBLUE, 20))
+	if (hangarButton.tick_and_draw())
 	{
 		nextState = EngineState::HANGAR;
 	}
 
-	if (draw_utils::draw_text_button("SETTINGS", btnSettings, SKYBLUE, 20))
+	if (settingsButton.tick_and_draw())
 	{
 		nextState = EngineState::SETTINGS;
 	}

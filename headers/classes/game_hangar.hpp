@@ -3,6 +3,7 @@
 
 #include "shoot_3d.hpp"
 #include "renderer.hpp"
+#include "classes/ui/text_button_widget.hpp"
 #include <vector>
 #include <string>
 
@@ -27,6 +28,14 @@ private:
 
     std::vector<std::string> standardWeapons;
     std::vector<std::string> specialWeapons;
+
+    ui::TextButtonWidget w1Button;
+    ui::TextButtonWidget w2Button;
+    ui::TextButtonWidget w3Button;
+    ui::TextButtonWidget w4Button;
+    ui::TextButtonWidget specialButton;
+    ui::TextButtonWidget backButton;
+
     void cycleWeapon(const std::string& path, std::string &currentWeapon, const std::vector<std::string> &options);
 };
 

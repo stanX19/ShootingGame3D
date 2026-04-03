@@ -6,20 +6,20 @@ SettingsMenu::SettingsMenu(GameContext &context)
       volumeWidget(
           "VOLUME",
           context.config.settings.masterVolume,
-          0.1f,
           0.0f,
           1.0f,
+          0.1f,
           Rectangle{0.0f, 0.0f, 0.0f, 0.0f},
           SKYBLUE
       ),
       sensitivityWidget(
-          "CONTROL SENS",
+          "SENSITIVITY",
           context.config.settings.controlSensitivity,
-          0.01f,
-          1.0f,
+          0.00001f,
+          0.5f,
           0.01f,
           Rectangle{0.0f, 0.0f, 0.0f, 0.0f},
-          ORANGE
+          SKYBLUE
       ),
       backWidget("BACK", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, GRAY, 20)
 {

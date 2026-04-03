@@ -1,12 +1,17 @@
 #include "game_hangar.hpp"
 #include "engine.hpp"
-#include "utils/draw_utils.hpp"
 #include "entities.hpp"
 
 GameHangar::GameHangar(GameContext &context)
 	: context(context),
 	  renderer(context.mainCamera, context),
-	  previewPlayer(entt::null)
+	  previewPlayer(entt::null),
+	  w1Button("L-Wing 1", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	  w2Button("R-Wing 1", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	  w3Button("L-Wing 2", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	  w4Button("R-Wing 2", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	  specialButton("Heavy Weapon", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	  backButton("BACK TO MENU", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, GRAY, 20)
 {
 	standardWeapons = context.weaponRegistry.getStandardWeaponIds();
 	specialWeapons = context.weaponRegistry.getSpecialWeaponIds();
@@ -94,7 +99,7 @@ void GameHangar::drawUI(EngineState &nextState)
 	int titleWidth = MeasureText(title, 40);
 	DrawText(title, screenWidth / 2 - titleWidth / 2, 50, 40, SKYBLUE);
 
-	auto drawWeaponButton = [&](const char* path, const char* label, std::string& currentId, const std::vector<std::string>& options, Rectangle bounds) {
+	auto drawWeaponButton = [&](ui::TextButtonWidget &widget, const char* path, const char* label, std::string& currentId, const std::vector<std::string>& options, Rectangle bounds) {
 		std::string name = "None";
 		if (!currentId.empty()) {
 			auto map = context.weaponRegistry.getAllWeaponsMap();
@@ -103,21 +108,24 @@ void GameHangar::drawUI(EngineState &nextState)
 			}
 		}
 		std::string fullText = std::string(label) + ": " + name;
+		widget.setBounds(bounds);
+		widget.setText(fullText);
 
-		if (draw_utils::draw_text_button(fullText.c_str(), bounds, SKYBLUE, 20)) {
+		if (widget.tick_and_draw()) {
 			cycleWeapon(path, currentId, options);
 		}
 	};
 
 	float startY = screenHeight - 400.0f;
-	drawWeaponButton("loadout.w1", "L-Wing 1", context.config.loadout.w1, standardWeapons, { 50, startY, 400, 50 });
-	drawWeaponButton("loadout.w2", "R-Wing 1", context.config.loadout.w2, standardWeapons, { 50, startY + 60, 400, 50 });
-	drawWeaponButton("loadout.w3", "L-Wing 2", context.config.loadout.w3, standardWeapons, { 50, startY + 120, 400, 50 });
-	drawWeaponButton("loadout.w4", "R-Wing 2", context.config.loadout.w4, standardWeapons, { 50, startY + 180, 400, 50 });
-	drawWeaponButton("loadout.special", "Heavy Weapon", context.config.loadout.special, specialWeapons, { 50, startY + 240, 400, 50 });
+	drawWeaponButton(w1Button, "loadout.w1", "L-Wing 1", context.config.loadout.w1, standardWeapons, { 50, startY, 400, 50 });
+	drawWeaponButton(w2Button, "loadout.w2", "R-Wing 1", context.config.loadout.w2, standardWeapons, { 50, startY + 60, 400, 50 });
+	drawWeaponButton(w3Button, "loadout.w3", "L-Wing 2", context.config.loadout.w3, standardWeapons, { 50, startY + 120, 400, 50 });
+	drawWeaponButton(w4Button, "loadout.w4", "R-Wing 2", context.config.loadout.w4, standardWeapons, { 50, startY + 180, 400, 50 });
+	drawWeaponButton(specialButton, "loadout.special", "Heavy Weapon", context.config.loadout.special, specialWeapons, { 50, startY + 240, 400, 50 });
 
 	Rectangle btnBack = {(float)screenWidth / 2 - 100, (float)screenHeight - 80, 200, 50};
-	if (draw_utils::draw_text_button("BACK TO MENU", btnBack, GRAY, 20))
+	backButton.setBounds(btnBack);
+	if (backButton.tick_and_draw())
 	{
 		nextState = EngineState::MENU;
 	}
