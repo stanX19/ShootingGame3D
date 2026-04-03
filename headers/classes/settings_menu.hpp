@@ -3,6 +3,9 @@
 
 #include "shoot_3d.hpp"
 #include "engine.hpp"
+#include "classes/ui/text_button_widget.hpp"
+#include "classes/ui/float_stepper_widget.hpp"
+#include "classes/ui/float_slider_widget.hpp"
 
 class SettingsMenu {
 public:
@@ -13,6 +16,10 @@ public:
 
 private:
     GameContext &context;
+    ui::TextButtonWidget hpToggleWidget;
+    ui::FloatStepperWidget volumeWidget;
+    ui::FloatSliderWidget sensitivityWidget;
+    ui::TextButtonWidget backWidget;
 
     void drawSettingsUI(EngineState &nextState);
     void inputControls(float dt, EngineState &nextState);

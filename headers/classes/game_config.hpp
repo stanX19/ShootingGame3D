@@ -48,6 +48,7 @@ public:
 	struct Settings {
 		bool showHPBar = true;
 		float masterVolume = 0.5f;
+		float controlSensitivity = 0.5f;
 	} settings;
 
 	struct PlayerLoadout {

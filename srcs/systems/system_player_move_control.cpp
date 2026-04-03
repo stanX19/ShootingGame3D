@@ -5,8 +5,23 @@
 #include <cmath>
 
 namespace {
-	Vector2 getMouseDirectionRelRot(const Quaternion &entRot, const Camera3D &camera) { 
-		Vector2 mouseDirection = getMouseDirectionNormalized(0.5f);
+	float getSensitivityDistanceFactor(float sensitivity) {
+		const float clampedSensitivity = Clamp(sensitivity, 0.01f, 1.0f);
+		const float squaredSensitivity = clampedSensitivity * clampedSensitivity;
+		float curveValue = 3.0f * squaredSensitivity * squaredSensitivity
+			- 2.0f * squaredSensitivity * squaredSensitivity * squaredSensitivity;
+
+		return 1.0f - 0.9f * curveValue;
+	}
+
+	Vector2 getMouseDirectionRelRot(
+		const Quaternion &entRot,
+		const Camera3D &camera,
+		float sensitivity
+	) {
+		const float mouseUnitRatio = 0.8f;
+		const float distanceFactor = getSensitivityDistanceFactor(sensitivity);
+		Vector2 mouseDirection = getMouseDirectionNormalized(mouseUnitRatio * distanceFactor);
 			
 		if (std::abs(mouseDirection.x) < 0.01f && std::abs(mouseDirection.y) < 0.01f) {
 			return {0.0f, 0.0f};
@@ -182,7 +197,11 @@ void ecs_systems::playerMoveControl(GameContext &context, float dt)
 	Vector3 upVector = getUpVector(rotation);
 	Vector3 rightVector = getRightVector(rotation);
 
-	Vector2 mouseDirection = getMouseDirectionRelRot(rotation.value, context.mainCamera);
+	Vector2 mouseDirection = getMouseDirectionRelRot(
+		rotation.value,
+		context.mainCamera,
+		context.config.settings.controlSensitivity
+	);
 	if (std::abs(mouseDirection.x) >= 0.01f) {
 		newRotation = rotateAroundAxis(newRotation, upVector, -mouseDirection.x * turnSpeedDt);
 		newRotation = rotateAroundAxis(newRotation, fowardVector, mouseDirection.x * turnSpeedDt * (mouseDirection.y <= -0.0f? 1: 0.2));

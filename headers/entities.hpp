@@ -8,10 +8,11 @@
 #include <cmath>
 #include <iostream>
 
-entt::entity spawnUnit(GameContext &context, const Vector3 &pos);
-entt::entity spawnFastEliteUnit(GameContext &context, const Vector3 &pos);
-entt::entity spawnEliteUnit(GameContext &context, const Vector3 &pos);
-entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos);
+entt::entity spawnUnit(GameContext &context, const Vector3 &pos, faction::Faction faction);
+entt::entity spawnFastEliteUnit(GameContext &context, const Vector3 &pos, faction::Faction faction);
+entt::entity spawnEliteUnit(GameContext &context, const Vector3 &pos, faction::Faction faction);
+entt::entity spawnTerminatorUnit(GameContext &context, const Vector3 &pos, faction::Faction faction);
+entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnPlayer(GameContext &context);
 entt::entity spawnPlayer(GameContext &context, Vector3 pos);
 entt::entity spawnUnlinkedAutoTurret(GameContext &context, Color color);

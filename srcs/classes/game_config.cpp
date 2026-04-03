@@ -35,6 +35,7 @@ void GameConfig::initConstants() {
 
 	settings.showHPBar = getBool("settings.showHPBar", true);
 	settings.masterVolume = getFloat("audio.masterVolume", 0.5f);
+	settings.controlSensitivity = Clamp(getFloat("settings.controlSensitivity", 0.5f), 0.01f, 1.0f);
 	loadout.w1 = getString("loadout.w1", "bullet.machineGun");
 	loadout.w2 = getString("loadout.w2", "bullet.machineGun");
 	loadout.w3 = getString("loadout.w3", "lazer.basic");

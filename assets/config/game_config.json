@@ -1,7 +1,7 @@
 {
     "audio": {
         "explosionMaxDistance": 500.0,
-        "masterVolume": 0.49999991059303284,
+        "masterVolume": 0.5,
         "maxSoundsPerIdPerFrame": 10,
         "soundAliasCount": 8
     },
@@ -15,10 +15,10 @@
     },
     "loadout": {
         "special": "missile.nuke",
-        "w1": "bullet.machineGun",
-        "w2": "bullet.machineGun",
-        "w3": "bullet.machineGun",
-        "w4": "bullet.machineGun"
+        "w1": "bullet.shotgun",
+        "w2": "bullet.shotgun",
+        "w3": "bullet.shotgun",
+        "w4": "bullet.shotgun"
     },
     "physics": {
         "collisionElasticity": 0.05,
@@ -26,7 +26,9 @@
         "roughness": 1.5
     },
     "settings": {
-        "showHPBar": false
+        "controlSensitivity": 1.0,
+        "controlSensitivityCurve": "smoothstep",
+        "showHPBar": true
     },
     "sounds": {
         "backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",
@@ -153,7 +155,7 @@
                 "basic": {
                     "ammo": 30,
                     "bulletCount": 1,
-                    "cooldown": 0.25,
+                    "cooldown": 0.15,
                     "damageMultiplier": 1.0,
                     "hp": 1.0,
                     "lifespan": 10.0,
@@ -167,14 +169,14 @@
                 "bigBall": {
                     "ammo": 1,
                     "bulletCount": 1,
-                    "damageMultiplier": 3.0,
-                    "hp": 1000000000000.0,
+                    "damageMultiplier": 4.0,
+                    "hp": 10000000.0,
                     "lifespan": 15.0,
                     "mass": 500.0,
                     "name": "Big Ball",
                     "radius": 1.5,
                     "reloadTime": 3.0,
-                    "speedMultiplier": 1,
+                    "speedMultiplier": 0.5,
                     "spreadMultiplier": 0.0
                 },
                 "burstSniper": {
@@ -245,7 +247,7 @@
             "weapons": {
                 "basic": {
                     "bulletCount": 1,
-                    "cooldown": 0.4,
+                    "cooldown": 0.3,
                     "damageMultiplier": 2.0,
                     "hp": 1.0,
                     "name": "Lazer Basic",

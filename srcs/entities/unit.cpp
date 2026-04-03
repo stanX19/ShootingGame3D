@@ -2,8 +2,10 @@
 #include "weapons.hpp"
 #include "weapon_registry.hpp"
 #include "components/sound.hpp"
+#include "factions.hpp"
+#include "utils.hpp"
 
-entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos, float radius) {
+entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos, float radius, faction::Faction faction) {
 	entt::entity entity = context.registry.create();
 	
 	const GameConfig& cfg = context.config;
@@ -46,13 +48,14 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos, float radiu
 	context.registry.emplace<tag::weapon::AIControlledFire>(entity);
 	context.registry.emplace<tag::weapon::IsSpecialWeapon>(entity);
 	context.registry.emplace<tag::AIMoveControl>(entity);
+	context.registry.emplace<faction::Faction>(entity, faction);
 	return entity;
 }
 
-entt::entity spawnUnit(GameContext &context, const Vector3& pos) {
+entt::entity spawnUnit(GameContext &context, const Vector3& pos, faction::Faction faction) {
 	const GameConfig& cfg = context.config;
 	const float radius = cfg.getFloat("units.basic.radius", 1.0f);
-	entt::entity entity = spawnBaseUnit(context, pos, radius);
+	entt::entity entity = spawnBaseUnit(context, pos, radius, faction);
 
 	weapon::emplaceWeaponMissileBasic(context, entity, context.config.getSubConfig("weapons.missile.weapons.basic"));
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
@@ -62,11 +65,11 @@ entt::entity spawnUnit(GameContext &context, const Vector3& pos) {
 	return entity;
 }
 
-entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos) {
+entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos, faction::Faction faction) {
 	const GameConfig& cfg = context.config;
 	const float radius = cfg.getFloat("units.elite.radius", 3.0f);
 
-	entt::entity entity = spawnBaseUnit(context, pos, radius);
+	entt::entity entity = spawnBaseUnit(context, pos, radius, faction);
 
 	const float baseSpeed = cfg.getFloat("units.base.speed", 80.0f);
 	const int baseScore = cfg.getInt("units.base.score", 500);
@@ -89,11 +92,11 @@ entt::entity spawnEliteUnit(GameContext &context, const Vector3& pos) {
 	return entity;
 }
 
-entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos) {
+entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos, faction::Faction faction) {
 	const GameConfig& cfg = context.config;
 	const float radius = cfg.getFloat("units.fastElite.radius", 2.0f);
 
-	entt::entity entity = spawnBaseUnit(context, pos, radius);
+	entt::entity entity = spawnBaseUnit(context, pos, radius, faction);
 
 	const float baseSpeed = cfg.getFloat("units.base.speed", 80.0f);
 	const int baseScore = cfg.getInt("units.base.score", 500);
@@ -114,11 +117,58 @@ entt::entity spawnFastEliteUnit(GameContext &context, const Vector3& pos) {
 	return entity;
 }
 
-entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos) {
+entt::entity spawnTerminatorUnit(GameContext &context, const Vector3& pos, faction::Faction faction) {
+	const float baseSpeed = context.config.getFloat("units.base.speed", 80.0f);
+	const float baseTurn = context.config.getFloat("units.base.turnSpeed", 1.5f);
+	const int baseScore = context.config.getInt("units.base.score", 500);
+
+	const GameConfig& cfg = context.config.getSubConfig("units.terminator");
+	const float radius = cfg.getFloat("radius", 2.0f);
+
+	entt::entity entity = spawnBaseUnit(context, pos, radius, faction);
+
+	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
+	renderBody.modelID = context.modelManager.createSphere(32, 32);
+	context.registry.emplace_or_replace<HP>(entity, cfg.getFloat("hp", 3200.0f));
+	context.registry.emplace_or_replace<HPRegen>(entity, cfg.getFloat("hpRegen", 150.0f));
+	context.registry.emplace_or_replace<EnergyShield>(entity, cfg.getFloat("shield", 1500.0f));
+	context.registry.emplace_or_replace<EnergyShieldRegen>(entity, cfg.getFloat("shieldRegen", 200.0f));
+	context.registry.emplace_or_replace<MaxSpeed>(entity, baseSpeed * cfg.getFloat("speedMultiplier", 2.0f));
+	context.registry.emplace_or_replace<TurnSpeed>(entity, baseTurn * cfg.getFloat("turnSpeedMultiplier", 2.5f));
+	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("scoreMultiplier", 50));
+	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("mass", 1000.0f));
+
+	int randNum = GetRandomValue(0, 1000);
+	// spawn in all directions since it's a terminator
+	const int directions = 8;
+	const int heightLevels = 4;
+	for (int h = 0; h < heightLevels; h++) {
+		for (int i = 0; i < directions; i++) {
+			Vector3 direction = Vector3Normalize({
+				std::cos(i * PI * 2 / directions),
+				std::sin(i * PI * 2 / directions),
+				h - (heightLevels - 1) / 2.0f
+			});
+			entt::entity turret = spawnLinkedAutoTurret(
+				context,
+				renderBody.color,
+				entity,
+				direction * radius * 1.5f
+			);
+			RotationAnchor &rotAnchor = context.registry.get_or_emplace<RotationAnchor>(turret);
+			rotAnchor.relrot = vector3ToRotation(direction);
+			context.weaponRegistry.emplaceRandomWeapon(context, turret, randNum);
+		}
+	}
+	context.registry.emplace_or_replace<tag::EliteUnit>(entity);
+	return entity;
+}
+
+entt::entity spawnMothershipUnit(GameContext &context, const Vector3& pos, faction::Faction faction) {
 	const GameConfig& cfg = context.config;
 	const float radius = cfg.getFloat("units.mothership.radius", 6.0f);
 
-	entt::entity entity = spawnBaseUnit(context, pos, radius);
+	entt::entity entity = spawnBaseUnit(context, pos, radius, faction);
 
 	const float baseSpeed = cfg.getFloat("units.base.speed", 80.0f);
 	const float baseTurn = cfg.getFloat("units.base.turnSpeed", 1.5f);
