@@ -11,9 +11,29 @@ OBJDIRS		= $(sort $(dir $(OBJS)))
 MAINCPP		= main/main.cpp
 
 TESTDIR		= tests
-TESTS		:= $(shell find $(TESTDIR) -name '*.cpp')
 TESTBINDIR	= objs/test_bin
-TESTOBJS    = $(patsubst $(TESTDIR)/%.cpp,$(TESTBINDIR)/%,$(TESTS))
+TESTOBJDIR	= objs/test
+TEST_FRAMEWORK_DIR = includes/catch2
+CATCH_SRC	= $(TEST_FRAMEWORK_DIR)/catch_amalgamated.cpp
+CATCH_OBJ	= objs/catch2/catch_amalgamated.o
+CATCH_DEP	= $(CATCH_OBJ:.o=.d)
+
+UNIT_TEST_SRCS	:= $(shell find $(TESTDIR)/unit -name '*.cpp' 2>/dev/null)
+INTEGRATION_TEST_SRCS := $(shell find $(TESTDIR)/integration -name '*.cpp' 2>/dev/null)
+SMOKE_TEST_SRCS	:= $(shell find $(TESTDIR)/smoke -name '*.cpp' 2>/dev/null)
+MANUAL_TEST_SRCS := $(shell find $(TESTDIR)/manual -name '*.cpp' 2>/dev/null)
+
+UNIT_TEST_OBJS	:= $(patsubst $(TESTDIR)/unit/%.cpp,$(TESTOBJDIR)/unit/%.o,$(UNIT_TEST_SRCS))
+INTEGRATION_TEST_OBJS := $(patsubst $(TESTDIR)/integration/%.cpp,$(TESTOBJDIR)/integration/%.o,$(INTEGRATION_TEST_SRCS))
+SMOKE_TEST_OBJS	:= $(patsubst $(TESTDIR)/smoke/%.cpp,$(TESTOBJDIR)/smoke/%.o,$(SMOKE_TEST_SRCS))
+MANUAL_TEST_BINS := $(patsubst $(TESTDIR)/manual/%.cpp,$(TESTBINDIR)/manual/%,$(MANUAL_TEST_SRCS))
+
+UNIT_TEST_BIN	= $(TESTBINDIR)/unit_tests
+INTEGRATION_TEST_BIN = $(TESTBINDIR)/integration_tests
+SMOKE_TEST_BIN	= $(TESTBINDIR)/smoke_tests
+TEST_ARCHIVE	= $(OBJDIR)/libshooting_game.a
+INTEGRATION_BIN_TARGET := $(if $(strip $(INTEGRATION_TEST_SRCS)),$(INTEGRATION_TEST_BIN),)
+TEST_OBJDIRS	:= $(sort $(dir $(CATCH_OBJ) $(UNIT_TEST_OBJS) $(INTEGRATION_TEST_OBJS) $(SMOKE_TEST_OBJS) $(MANUAL_TEST_BINS) $(TEST_ARCHIVE)))
 
 CWD			:= $(shell pwd)
 INCLUDE_DIR	= includes/raylib includes/entt includes
@@ -61,35 +81,89 @@ $(NAME): $(OBJDIRS) $(PCH) $(OBJS) $(MAINCPP)
 
 all: $(NAME)
 
-LATEST_TEST_EXEC := $(TESTBINDIR)/$(basename $(notdir $(shell ls -t $(TESTDIR)/*.cpp | head -1)))
+test: test-unit test-integration test-smoke
 
-test: $(LATEST_TEST_EXEC)
-	@echo "Running $(LATEST_TEST_EXEC)..."
-	@./$(LATEST_TEST_EXEC) || exit 1
+test-unit: $(UNIT_TEST_BIN)
+	@echo "Running $<..."
+	@./$<
 
-all_test: $(TESTBINDIR) $(OBJS) $(TESTOBJS)
-	@for test_exec in $(TESTOBJS); do \
-		echo "Running $$test_exec..."; \
-		./$$test_exec || exit 1; \
-	done
+test-integration:
+	@if [ -z "$(strip $(INTEGRATION_TEST_SRCS))" ]; then \
+		echo "No integration tests found."; \
+	else \
+		$(MAKE) --no-print-directory $(INTEGRATION_TEST_BIN); \
+		echo "Running $(INTEGRATION_TEST_BIN)..."; \
+		./$(INTEGRATION_TEST_BIN); \
+	fi
 
-testbin: $(TESTBINDIR) $(OBJS) $(TESTOBJS)
-	
-$(OBJDIRS) $(TESTBINDIR):
+test-smoke: $(SMOKE_TEST_BIN)
+	@echo "Running $<..."
+	@./$<
+
+test-manual-bin: $(MANUAL_TEST_BINS)
+
+test-manual:
+	@if [ -z "$(TEST)" ]; then \
+		echo "Usage: make test-manual TEST=<basename>"; \
+		echo "Available manual tests:"; \
+		for test_src in $(MANUAL_TEST_SRCS); do basename "$$test_src" .cpp; done; \
+		exit 2; \
+	fi
+	@if [ ! -f "$(TESTDIR)/manual/$(TEST).cpp" ]; then \
+		echo "Unknown manual test: $(TEST)"; \
+		echo "Run 'make test-manual' to list available tests."; \
+		exit 2; \
+	fi
+	@$(MAKE) --no-print-directory $(TESTBINDIR)/manual/$(TEST)
+	@echo "Running $(TESTBINDIR)/manual/$(TEST)..."
+	@./$(TESTBINDIR)/manual/$(TEST)
+
+all_test: test
+
+testbin: $(UNIT_TEST_BIN) $(INTEGRATION_BIN_TARGET) $(SMOKE_TEST_BIN)
+
+$(OBJDIRS) $(TEST_OBJDIRS) $(TESTBINDIR) $(TESTBINDIR)/manual:
 	mkdir -p $@
 	@echo "$(UP)$(FLUSH)$(UP)$(FLUSH)$(UP)"
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(PCH) | $(OBJDIRS)
 	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) -c $< -o $@
 
-$(TESTBINDIR)/%: $(TESTDIR)/%.cpp $(OBJS) $(PCH) | $(TESTBINDIR)
+$(CATCH_OBJ): $(CATCH_SRC) | $(TEST_OBJDIRS)
+	$(CC) -std=c++20 -Wall -Wextra -MMD -MP -I$(TEST_FRAMEWORK_DIR) -c $< -o $@
+
+$(TEST_ARCHIVE): $(OBJS) | $(TEST_OBJDIRS)
+	$(AR) $@ $(OBJS)
+
+$(TESTOBJDIR)/unit/%.o: $(TESTDIR)/unit/%.cpp $(PCH) | $(TEST_OBJDIRS)
+	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) -c $< -o $@
+
+$(TESTOBJDIR)/integration/%.o: $(TESTDIR)/integration/%.cpp $(PCH) | $(TEST_OBJDIRS)
+	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) -c $< -o $@
+
+$(TESTOBJDIR)/smoke/%.o: $(TESTDIR)/smoke/%.cpp $(PCH) | $(TEST_OBJDIRS)
+	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) -c $< -o $@
+
+$(UNIT_TEST_BIN): $(UNIT_TEST_OBJS) $(CATCH_OBJ) | $(TESTBINDIR)
+	$(CC) $(CFLAGS) $(UNIT_TEST_OBJS) $(CATCH_OBJ) -o $@
+
+$(INTEGRATION_TEST_BIN): $(INTEGRATION_TEST_OBJS) $(CATCH_OBJ) $(TEST_ARCHIVE) | $(TESTBINDIR)
+	$(CC) $(CFLAGS) $(INTEGRATION_TEST_OBJS) $(CATCH_OBJ) $(TEST_ARCHIVE) $(IFLAGS) $(LFLAGS) -o $@
+
+$(SMOKE_TEST_BIN): $(SMOKE_TEST_OBJS) $(CATCH_OBJ) | $(TESTBINDIR)
+	$(CC) $(CFLAGS) $(SMOKE_TEST_OBJS) $(CATCH_OBJ) -o $@
+
+$(TESTBINDIR)/manual/%: $(TESTDIR)/manual/%.cpp $(OBJS) $(PCH) | $(TESTBINDIR)/manual
 	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) $< $(OBJS) $(LFLAGS) -o $@
 
 $(PCH): $(PCH_HEADER) | $(OBJDIRS)
 	$(CC) $(CFLAGS) $(IFLAGS) -x c++-header $< -o $@
 
 clean:
-	@$(RM) $(OBJS) $(OBJS:.o=.d) $(PCH) $(PCH_DEPS)
+	@$(RM) $(OBJS) $(OBJS:.o=.d) $(PCH) $(PCH_DEPS) $(CATCH_OBJ) $(CATCH_DEP) $(TEST_ARCHIVE) \
+		$(UNIT_TEST_OBJS) $(INTEGRATION_TEST_OBJS) $(SMOKE_TEST_OBJS) \
+		$(UNIT_TEST_OBJS:.o=.d) $(INTEGRATION_TEST_OBJS:.o=.d) $(SMOKE_TEST_OBJS:.o=.d) \
+		$(UNIT_TEST_BIN) $(INTEGRATION_TEST_BIN) $(SMOKE_TEST_BIN) $(MANUAL_TEST_BINS)
 
 fclean:	clean
 	@$(RM) $(NAME)
@@ -106,5 +180,5 @@ push:
 code:
 	find $(SRCDIR) $(HEADER_DIR) -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec cat {} + > ../code.txt
 
-.PHONY: all clean fclean re bonus push test run_test test all_test
--include $(OBJS:.o=.d) $(PCH_DEPS)
+.PHONY: all clean fclean re bonus push run test test-unit test-integration test-smoke test-manual test-manual-bin testbin all_test
+-include $(OBJS:.o=.d) $(PCH_DEPS) $(CATCH_DEP)

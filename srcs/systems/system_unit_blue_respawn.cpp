@@ -43,10 +43,6 @@ void ecs_systems::blueUnitRespawn(GameContext &context, [[maybe_unused]] float d
 	{
 		entt::entity unit;
 		switch (rand() % 4) {
-			case 0:
-				unit = spawnEliteUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_BLUE});
-				// std::cout << "Spawned EliteUnit entity " << (int)unit << std::endl;
-				break;
 			case 1:
 				unit = spawnFastEliteUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_BLUE});
 				// std::cout << "Spawned FastEliteUnit entity " << (int)unit << std::endl;
@@ -55,9 +51,13 @@ void ecs_systems::blueUnitRespawn(GameContext &context, [[maybe_unused]] float d
 				unit = spawnMothershipUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_BLUE});
 				// std::cout << "Spawned MothershipUnit entity " << (int)unit << std::endl;
 				break;
-			case 3:
-				unit = spawnTerminatorUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_BLUE});
-				// std::cout << "Spawned TerminatorUnit entity " << (int)unit << std::endl;
+			// case 3:
+			// 	unit = spawnTerminatorUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_BLUE});
+			// 	// std::cout << "Spawned TerminatorUnit entity " << (int)unit << std::endl;
+			// 	break;
+			default:
+				unit = spawnEliteUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_BLUE});
+				// std::cout << "Spawned EliteUnit entity " << (int)unit << std::endl;
 				break;
 		}
 		applyTags(context, unit);

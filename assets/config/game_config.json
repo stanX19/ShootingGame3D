@@ -1,7 +1,7 @@
 {
     "audio": {
         "explosionMaxDistance": 500.0,
-        "masterVolume": 1.0,
+        "masterVolume": 0.5,
         "maxSoundsPerIdPerFrame": 10,
         "soundAliasCount": 8
     },
@@ -14,11 +14,11 @@
         "unitCount": 4
     },
     "loadout": {
-        "special": "missile.nuke",
-        "w1": "bullet.shotgun",
-        "w2": "bullet.shotgun",
-        "w3": "bullet.shotgun",
-        "w4": "bullet.shotgun"
+        "special": "missile.flares",
+        "w1": "bullet.burstSniper",
+        "w2": "bullet.burstSniper",
+        "w3": "bullet.burstSniper",
+        "w4": "bullet.burstSniper"
     },
     "physics": {
         "collisionElasticity": 0.05,
@@ -26,7 +26,7 @@
         "roughness": 1.5
     },
     "settings": {
-        "controlSensitivity": 0.7799999713897705,
+        "controlSensitivity": 0.4399999976158142,
         "controlSensitivityCurve": "smoothstep",
         "showHPBar": false
     },

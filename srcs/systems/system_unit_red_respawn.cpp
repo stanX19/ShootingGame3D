@@ -56,10 +56,6 @@ void ecs_systems::redUnitRespawn(GameContext &context, [[maybe_unused]] float dt
 	{
 		entt::entity unit;
 		switch (rand() % 4) {
-			case 0:
-				unit = spawnEliteUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_RED});
-				// std::cout << "Spawned EliteUnit entity " << (int)unit << std::endl;
-				break;
 			case 1:
 				unit = spawnFastEliteUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_RED});
 				// std::cout << "Spawned FastEliteUnit entity " << (int)unit << std::endl;
@@ -71,6 +67,10 @@ void ecs_systems::redUnitRespawn(GameContext &context, [[maybe_unused]] float dt
 			case 3:
 				unit = spawnTerminatorUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_RED});
 				// std::cout << "Spawned TerminatorUnit entity " << (int)unit << std::endl;
+				break;
+			default:
+				unit = spawnEliteUnit(context, generateSpawnPos(context, playerPos), {faction::FAC_RED});
+				// std::cout << "Spawned EliteUnit entity " << (int)unit << std::endl;
 				break;
 		}
 		applyTags(context, unit);

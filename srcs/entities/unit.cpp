@@ -130,13 +130,13 @@ entt::entity spawnTerminatorUnit(GameContext &context, const Vector3& pos, facti
 	RenderBody &renderBody = context.registry.get<RenderBody>(entity);
 	renderBody.modelID = context.modelManager.createSphere(32, 32);
 	context.registry.emplace_or_replace<HP>(entity, cfg.getFloat("hp", 3200.0f));
-	context.registry.emplace_or_replace<HPRegen>(entity, cfg.getFloat("hpRegen", 150.0f));
+	context.registry.emplace_or_replace<HPRegen>(entity, cfg.getFloat("hpRegen", 50.0f));
 	context.registry.emplace_or_replace<EnergyShield>(entity, cfg.getFloat("shield", 1500.0f));
-	context.registry.emplace_or_replace<EnergyShieldRegen>(entity, cfg.getFloat("shieldRegen", 200.0f));
-	context.registry.emplace_or_replace<MaxSpeed>(entity, baseSpeed * cfg.getFloat("speedMultiplier", 2.0f));
+	context.registry.emplace_or_replace<EnergyShieldRegen>(entity, cfg.getFloat("shieldRegen", 100.0f));
+	context.registry.emplace_or_replace<MaxSpeed>(entity, baseSpeed * cfg.getFloat("speedMultiplier", 1.5f));
 	context.registry.emplace_or_replace<TurnSpeed>(entity, baseTurn * cfg.getFloat("turnSpeedMultiplier", 2.5f));
 	context.registry.emplace_or_replace<KilledScore>(entity, baseScore * cfg.getInt("scoreMultiplier", 50));
-	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("mass", 1000.0f));
+	context.registry.emplace_or_replace<Mass>(entity, cfg.getFloat("mass", 10000.0f));
 
 	int randNum = GetRandomValue(0, 1000);
 	// spawn in all directions since it's a terminator
