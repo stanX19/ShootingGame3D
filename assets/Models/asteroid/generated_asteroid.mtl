@@ -1,0 +1,7 @@
+newmtl generated_asteroid
+Ka 0.200000 0.180000 0.160000
+Kd 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ns 8.000000
+map_Kd generated_asteroid.png
+bump generated_asteroid_normal.png

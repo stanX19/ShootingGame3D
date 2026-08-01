@@ -7,11 +7,36 @@
 #include "model_manager.hpp"
 #include "utils.hpp"
 
+
 ModelManager::ModelManager() {}
 
 ModelManager::~ModelManager()
 {
 	unloadAll();
+}
+
+namespace {
+	void prepareTexture(Texture2D &texture)
+	{
+		if (texture.id == 0 || texture.width <= 1 || texture.height <= 1)
+			return;
+		if (texture.mipmaps <= 1)
+			GenTextureMipmaps(&texture);
+		if (texture.mipmaps > 1)
+			SetTextureFilter(texture, TEXTURE_FILTER_TRILINEAR);
+	}
+
+	void prepareModelTextures(Model &model)
+	{
+		for (int i = 0; i < model.materialCount; ++i)
+		{
+			Material &material = model.materials[i];
+			if (material.maps == nullptr)
+				continue;
+			prepareTexture(material.maps[MATERIAL_MAP_DIFFUSE].texture);
+			prepareTexture(material.maps[MATERIAL_MAP_NORMAL].texture);
+		}
+	}
 }
 
 t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &transform)
@@ -36,6 +61,7 @@ t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &tr
 	std::filesystem::current_path(modelDir);
 	Model model = LoadModel(modelFile.string().c_str());
 	std::filesystem::current_path(originalPath);
+	prepareModelTextures(model);
 
 	// apply transformation
 	model.transform = transform;

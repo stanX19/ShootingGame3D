@@ -27,6 +27,7 @@ private:
 	int lightPosLoc;
 	int lightColorLoc;
 	int ambientStrengthLoc;
+	int normalMapAvailableLoc;
 
 	struct StrechDat {
 		float strech;

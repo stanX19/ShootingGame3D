@@ -14,11 +14,11 @@
         "unitCount": 4
     },
     "loadout": {
-        "special": "missile.flares",
-        "w1": "bullet.burstSniper",
-        "w2": "bullet.burstSniper",
-        "w3": "bullet.burstSniper",
-        "w4": "bullet.burstSniper"
+        "special": "missile.nuke",
+        "w1": "bullet.machineGun",
+        "w2": "bullet.machineGun",
+        "w3": "bullet.machineGun",
+        "w4": "bullet.machineGun"
     },
     "physics": {
         "collisionElasticity": 0.05,
@@ -87,7 +87,7 @@
             "baseRadFactor": 0.1,
             "damage": 100.0,
             "mass": 10000000.0,
-            "modelPath": "assets/Models/asteroid/round_stone.glb",
+            "modelPath": "assets/Models/asteroid/generated_asteroid.obj",
             "ringRadiusMax": 1000.0,
             "ringRadiusMin": 740.0,
             "rotationSpeed": 0.01

@@ -58,6 +58,7 @@ void Renderer::setupShaderUniforms()
 {
 	lightPosLoc = GetShaderLocation(lightedShader, "lightPosition");
 	lightColorLoc = GetShaderLocation(lightedShader, "lightColor");
+	normalMapAvailableLoc = GetShaderLocation(lightedShader, "normalMapAvailable");
 
 	Vector3 lightPos = { 100000, 100000, 100000 };
 	SetShaderValue(lightedShader, lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
@@ -194,9 +195,14 @@ void Renderer::drawEntitiesWithShader()
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
 		Model &model = context.modelManager.getModel(body.modelID);
+		bool hasNormalMap = false;
 		for (int i = 0; i < model.materialCount; i++) {
 			model.materials[i].shader = lightedShader;
+			if (model.materials[i].maps != nullptr && model.materials[i].maps[MATERIAL_MAP_NORMAL].texture.id > 0)
+				hasNormalMap = true;
 		}
+		const int normalMapAvailable = hasNormalMap ? 1 : 0;
+		SetShaderValue(lightedShader, normalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
 		// SetShaderValueTexture(shader, GetShaderLocation(shader, "texture0"), model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture);
 		drawEntityModel(pos, body, getStrech(entity));
 	}

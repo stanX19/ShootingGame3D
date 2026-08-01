@@ -4,6 +4,8 @@
 
 Before broad exploration, read [docs/project-context.md](docs/project-context.md). Follow [docs/development-protocols.md](docs/development-protocols.md) for planning, approval, implementation, testing, and recovery.
 
+For model or asset pipeline work, also read [docs/model-asset-conventions.md](docs/model-asset-conventions.md).
+
 ## Editing Philosophy
 
 - **Less is More:** If changing 1 line can fix the issue, do not write 50 lines just to make it look "complete".
