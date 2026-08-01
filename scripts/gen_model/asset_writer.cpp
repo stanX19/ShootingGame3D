@@ -7,16 +7,14 @@
 
 namespace gen_model {
 	namespace {
-		constexpr const char* MODEL_NAME = "generated_asteroid";
-
-		void writeObj(const gen_types::MeshData& mesh, const std::filesystem::path& path) {
+		void writeObj(const gen_types::MeshData& mesh, const std::filesystem::path& path, const std::string& modelName) {
 			std::ofstream output(path);
 			if (!output) {
 				throw std::runtime_error("Unable to write OBJ: " + path.string());
 			}
 			output << std::fixed << std::setprecision(8);
-			output << "mtllib " << MODEL_NAME << ".mtl\n";
-			output << "o " << MODEL_NAME << "\n";
+			output << "mtllib " << modelName << ".mtl\n";
+			output << "o " << modelName << "\n";
 			for (const auto& point : mesh.positions) {
 				output << "v " << point.x << ' ' << point.y << ' ' << point.z << "\n";
 			}
@@ -26,7 +24,7 @@ namespace gen_model {
 			for (const auto& normal : mesh.normals) {
 				output << "vn " << normal.x << ' ' << normal.y << ' ' << normal.z << "\n";
 			}
-			output << "usemtl " << MODEL_NAME << "\n";
+			output << "usemtl " << modelName << "\n";
 			output << "s off\n";
 			for (const auto& triangle : mesh.triangles) {
 				output << "f";
@@ -42,18 +40,18 @@ namespace gen_model {
 			}
 		}
 
-		void writeMtl(const std::filesystem::path& path) {
+		void writeMtl(const std::filesystem::path& path, const std::string& modelName) {
 			std::ofstream output(path);
 			if (!output) {
 				throw std::runtime_error("Unable to write MTL: " + path.string());
 			}
-			output << "newmtl " << MODEL_NAME << "\n"
+			output << "newmtl " << modelName << "\n"
 					<< "Ka 0.200000 0.180000 0.160000\n"
 					<< "Kd 1.000000 1.000000 1.000000\n"
 					<< "Ks 0.050000 0.050000 0.050000\n"
 					<< "Ns 8.000000\n"
-					<< "map_Kd " << MODEL_NAME << ".png\n"
-					<< "bump " << MODEL_NAME << "_normal.png\n";
+					<< "map_Kd " << modelName << ".png\n"
+					<< "bump " << modelName << "_normal.png\n";
 			if (!output) {
 				throw std::runtime_error("Unable to finish MTL: " + path.string());
 			}
@@ -74,13 +72,20 @@ namespace gen_model {
 	}
 
 	void writeAsteroidAssets(const gen_types::AssetData& asset, const std::filesystem::path& outputDirectory) {
+		writeAsteroidAssets(asset, outputDirectory, "generated_asteroid");
+	}
+
+	void writeAsteroidAssets(const gen_types::AssetData& asset, const std::filesystem::path& outputDirectory, const std::string& basename) {
 		if (asset.mesh.positions.empty() || asset.mesh.triangles.empty() || asset.texture.rgba.empty() || asset.normalMap.rgba.empty()) {
 			throw std::invalid_argument("Cannot write an empty asteroid asset");
 		}
 		std::filesystem::create_directories(outputDirectory);
-		writeObj(asset.mesh, outputDirectory / (std::string(MODEL_NAME) + ".obj"));
-		writeMtl(outputDirectory / (std::string(MODEL_NAME) + ".mtl"));
-		writePng(asset.texture, outputDirectory / (std::string(MODEL_NAME) + ".png"));
-		writePng(asset.normalMap, outputDirectory / (std::string(MODEL_NAME) + "_normal.png"));
+		if (basename.empty()) {
+			throw std::invalid_argument("Asteroid asset basename cannot be empty");
+		}
+		writeObj(asset.mesh, outputDirectory / (basename + ".obj"), basename);
+		writeMtl(outputDirectory / (basename + ".mtl"), basename);
+		writePng(asset.texture, outputDirectory / (basename + ".png"));
+		writePng(asset.normalMap, outputDirectory / (basename + "_normal.png"));
 	}
 } // namespace gen_model

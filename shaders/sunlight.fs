@@ -38,7 +38,7 @@ void main() {
 
 	vec4 texelColor = texture(texture0, fragTexCoord);
 
-	vec4 baseColor = mix(texelColor * colDiffuse, colDiffuse, 0.5);
+	vec4 baseColor = texelColor * colDiffuse;
 
 	float diff = max(dot(norm, lightDir), 0.0);  // how much direct light
 	vec3 diffuse = diff * lightColor;

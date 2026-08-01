@@ -16,7 +16,7 @@ namespace {
 	}
 
 	Color getRandomAsteroidColor() {
-		const int baseVal = 50;
+		const int baseVal = 175;
 		unsigned char brightness = (unsigned char)GetRandomValue(baseVal + 5, baseVal + 55);
 		return Color{brightness, brightness, brightness, 255};
 	}

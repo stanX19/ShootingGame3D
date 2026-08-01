@@ -6,6 +6,8 @@
 #include <vector>
 
 #include "gen_model/asteroid_generator.hpp"
+#include "gen_model/asteroid_big.hpp"
+#include "gen_model/asteroid_small.hpp"
 
 namespace {
 	float radius(const gen_model::gen_types::Point3& point) {
@@ -188,4 +190,75 @@ TEST_CASE("asteroid generator rejects invalid settings", "[unit][gen_model]")
 		settings.textureWidth = 1;
 		REQUIRE_THROWS_AS(gen_model::asteroid::generate(settings), std::invalid_argument);
 	}
+}
+
+TEST_CASE("asteroid profiles share the generator with explicit topology budgets", "[unit][gen_model]")
+{
+	const auto small = gen_model::asteroid::small::settings();
+	const auto big = gen_model::asteroid::big::settings();
+
+	REQUIRE_FALSE(small.useMacroGeometry);
+	REQUIRE(big.useMacroGeometry);
+	REQUIRE(small.macroCraters.count == 0);
+	REQUIRE(small.mediumCraters.count == 0);
+	REQUIRE(small.fineCraters.count == 64);
+	REQUIRE(big.macroCraters.count == 10);
+	REQUIRE(big.mediumCraters.count == 36);
+	REQUIRE(big.fineCraters.count == 80);
+	REQUIRE(big.broadFeatureStrength > small.broadFeatureStrength);
+	REQUIRE(big.grainFeatureStrength < small.grainFeatureStrength);
+	REQUIRE(small.normalMapStrength == Catch::Approx(12.0f));
+	REQUIRE(big.normalMapStrength == Catch::Approx(64.0f));
+	REQUIRE(small.latitudeSegments == 24);
+	REQUIRE(small.longitudeSegments == 36);
+	REQUIRE(big.latitudeSegments == 32);
+	REQUIRE(big.longitudeSegments == 48);
+	REQUIRE(2 * small.longitudeSegments * (small.latitudeSegments - 1) == 1656);
+	REQUIRE(2 * big.longitudeSegments * (big.latitudeSegments - 1) == 2976);
+	REQUIRE(small.minRadius == Catch::Approx(0.95f));
+	REQUIRE(small.maxRadius == Catch::Approx(1.05f));
+	REQUIRE(big.minRadius == Catch::Approx(0.95f));
+	REQUIRE(big.maxRadius == Catch::Approx(1.05f));
+
+	auto generatedBigSettings = big;
+	generatedBigSettings.textureWidth = 64;
+	generatedBigSettings.textureHeight = 32;
+	const auto generatedBig = gen_model::asteroid::generate(generatedBigSettings);
+	REQUIRE(generatedBig.mesh.triangles.size() == 2976);
+	float minimumBigRadius = 2.0f;
+	float maximumBigRadius = 0.0f;
+	for (const auto& point : generatedBig.mesh.positions) {
+		const float pointRadius = radius(point);
+		minimumBigRadius = std::min(minimumBigRadius, pointRadius);
+		maximumBigRadius = std::max(maximumBigRadius, pointRadius);
+	}
+	REQUIRE(minimumBigRadius == Catch::Approx(0.95f).margin(0.0001f));
+	REQUIRE(maximumBigRadius == Catch::Approx(1.05f).margin(0.0001f));
+	std::uint8_t minimumRed = 255;
+	std::uint8_t maximumRed = 0;
+	std::uint8_t minimumBlue = 255;
+	std::uint8_t maximumBlue = 0;
+	for (std::size_t offset = 0; offset < generatedBig.texture.rgba.size(); offset += 4) {
+		minimumRed = std::min(minimumRed, generatedBig.texture.rgba[offset]);
+		maximumRed = std::max(maximumRed, generatedBig.texture.rgba[offset]);
+		minimumBlue = std::min(minimumBlue, generatedBig.texture.rgba[offset + 2]);
+		maximumBlue = std::max(maximumBlue, generatedBig.texture.rgba[offset + 2]);
+	}
+	REQUIRE(maximumRed - minimumRed >= 20);
+	REQUIRE(maximumBlue - minimumBlue >= 15);
+}
+
+TEST_CASE("asteroid generator accepts the 4096-wide benchmark texture limit", "[unit][gen_model]")
+{
+	auto settings = gen_model::asteroid::big::settings();
+	settings.textureWidth = 4096;
+	settings.textureHeight = 2;
+	settings.latitudeSegments = 3;
+	settings.longitudeSegments = 3;
+	const auto asset = gen_model::asteroid::generate(settings);
+
+	REQUIRE(asset.texture.width == 4096);
+	REQUIRE(asset.texture.height == 2);
+	REQUIRE(asset.normalMap.width == 4096);
+	REQUIRE(asset.normalMap.height == 2);
 }

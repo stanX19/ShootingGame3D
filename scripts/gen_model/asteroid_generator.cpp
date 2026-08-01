@@ -72,8 +72,8 @@ namespace {
                 if (settings.minRadius <= 0.0f || settings.maxRadius < settings.minRadius) {
                         throw std::invalid_argument("radius bounds must be positive and ordered");
 		}
-		if (settings.textureWidth < 2 || settings.textureWidth > 2048 || settings.textureHeight < 2 || settings.textureHeight > 2048) {
-			throw std::invalid_argument("texture dimensions must be between 2 and 2048");
+		if (settings.textureWidth < 2 || settings.textureWidth > 4096 || settings.textureHeight < 2 || settings.textureHeight > 2048) {
+			throw std::invalid_argument("texture dimensions must be between 2 and 4096 wide and 2 and 2048 high");
 		}
 	}
 
@@ -105,22 +105,20 @@ namespace {
                 return static_cast<float>(hashLattice(x, y, z, seed)) / 4294967295.0f;
         }
 
-        std::vector<Crater> generateCraters(std::uint32_t seed) {
-                constexpr int CRATER_COUNT = 64;
-                constexpr float MIN_RADIUS = 0.025f;
-                constexpr float MAX_RADIUS = 0.09f;
+        std::vector<Crater> generateCraters(std::uint32_t seed, const gen_model::asteroid::CraterBandSettings& settings, int seedOffset) {
                 std::vector<Crater> craters;
-                craters.reserve(CRATER_COUNT);
-                for (int index = 0; index < CRATER_COUNT; ++index) {
-                        const float y = hashUnit(index, 0, 0, seed) * 2.0f - 1.0f;
-                        const float longitude = hashUnit(index, 1, 0, seed) * 2.0f * PI;
+                craters.reserve(static_cast<std::size_t>(std::max(0, settings.count)));
+                for (int index = 0; index < settings.count; ++index) {
+                        const int sampleIndex = index + seedOffset;
+                        const float y = hashUnit(sampleIndex, 0, 0, seed) * 2.0f - 1.0f;
+                        const float longitude = hashUnit(sampleIndex, 1, 0, seed) * 2.0f * PI;
                         const float radial = std::sqrt(std::max(0.0f, 1.0f - y * y));
-                        const float radius = MIN_RADIUS + (MAX_RADIUS - MIN_RADIUS) * hashUnit(index, 2, 0, seed);
+                        const float radius = settings.minRadius + (settings.maxRadius - settings.minRadius) * hashUnit(sampleIndex, 2, 0, seed);
                         craters.push_back({
                                 {radial * std::cos(longitude), y, radial * std::sin(longitude)},
                                 std::cos(radius),
-                                0.018f + hashUnit(index, 3, 0, seed) * 0.035f,
-                                0.012f + hashUnit(index, 4, 0, seed) * 0.018f
+                                settings.minDepth + hashUnit(sampleIndex, 3, 0, seed) * (settings.maxDepth - settings.minDepth),
+                                settings.minRimHeight + hashUnit(sampleIndex, 4, 0, seed) * (settings.maxRimHeight - settings.minRimHeight)
                         });
                 }
                 return craters;
@@ -147,12 +145,76 @@ namespace {
                 return height;
         }
 
-        float surfaceHeight(gen_model::gen_types::Point3 direction, const gen_model::asteroid::Settings& settings, const std::vector<Crater>& craters) {
-                const float broadNoise = fractalNoise(direction * 3.0f, settings.seed + 1543u);
-                const float ridgedNoise = 1.0f - std::abs(fractalNoise(direction * 12.0f, settings.seed + 7919u) * 2.0f - 1.0f);
-                const float grainNoise = fractalNoise(direction * 48.0f, settings.seed + 12347u);
-                return broadNoise * 0.24f + (ridgedNoise - 0.5f) * 0.38f + (grainNoise - 0.5f) * 0.12f + craterHeight(direction, craters);
+        struct SurfaceFeatures {
+                std::vector<Crater> macroCraters;
+                std::vector<Crater> mediumCraters;
+                std::vector<Crater> fineCraters;
+        };
+
+        SurfaceFeatures generateSurfaceFeatures(std::uint32_t seed, const gen_model::asteroid::Settings& settings) {
+                return {
+                        generateCraters(seed, settings.macroCraters, 0),
+                        generateCraters(seed + 17u, settings.mediumCraters, 1000),
+                        generateCraters(seed + 31u, settings.fineCraters, 2000)
+                };
         }
+
+        float surfaceHeight(gen_model::gen_types::Point3 direction, const gen_model::asteroid::Settings& settings, const SurfaceFeatures& features) {
+                const float broadScale = settings.useMacroGeometry ? settings.macroFeatureFrequency : 3.0f;
+                const float ridgeScale = settings.useMacroGeometry ? settings.mediumFeatureFrequency : 12.0f;
+                const float grainScale = settings.useMacroGeometry ? settings.microFeatureFrequency : 48.0f;
+                const float broadNoise = fractalNoise(direction * broadScale, settings.seed + 1543u);
+                const float ridgedNoise = 1.0f - std::abs(fractalNoise(direction * ridgeScale, settings.seed + 7919u) * 2.0f - 1.0f);
+                const float grainNoise = fractalNoise(direction * grainScale, settings.seed + 12347u);
+                float height = broadNoise * settings.broadFeatureStrength
+                        + (ridgedNoise - 0.5f) * settings.ridgeFeatureStrength
+                        + (grainNoise - 0.5f) * settings.grainFeatureStrength
+                        + craterHeight(direction, features.fineCraters);
+                if (!settings.useMacroGeometry)
+                        return height;
+                return height
+                        + craterHeight(direction, features.macroCraters) * 1.45f
+                        + craterHeight(direction, features.mediumCraters) * 1.05f;
+        }
+
+	float macroSurfaceHeight(gen_model::gen_types::Point3 direction, const gen_model::asteroid::Settings& settings, const SurfaceFeatures& features) {
+		const float broadNoise = fractalNoise(direction * settings.macroFeatureFrequency, settings.seed + 1543u);
+		const float ridgeNoise = 1.0f - std::abs(fractalNoise(direction * settings.mediumFeatureFrequency, settings.seed + 7919u) * 2.0f - 1.0f);
+		const float ravineNoise = 1.0f - std::abs(fractalNoise(direction * (settings.mediumFeatureFrequency * 2.0f), settings.seed + 23111u) * 2.0f - 1.0f);
+		return broadNoise * 0.42f + (ridgeNoise - 0.5f) * 0.32f + (ravineNoise - 0.5f) * 0.14f
+			+ craterHeight(direction, features.macroCraters) * 1.55f
+			+ craterHeight(direction, features.mediumCraters) * 0.85f;
+	}
+
+	gen_model::gen_types::Point3 surfaceColor(gen_model::gen_types::Point3 direction, const gen_model::asteroid::Settings& settings, const SurfaceFeatures& features, float height) {
+		if (!settings.useMacroGeometry)
+			return {
+				48.0f + height * 120.0f,
+				43.0f + height * 100.0f,
+				38.0f + height * 80.0f
+			};
+
+		const float broadColor = fractalNoise(direction * (settings.macroFeatureFrequency * 2.0f), settings.seed + 18431u);
+		const float mediumColor = fractalNoise(direction * settings.mediumFeatureFrequency, settings.seed + 19333u);
+		const float ravineColor = 1.0f - fractalNoise(direction * (settings.mediumFeatureFrequency * 1.5f), settings.seed + 20707u);
+		const float macroRelief = craterHeight(direction, features.macroCraters);
+		const float mediumRelief = craterHeight(direction, features.mediumCraters);
+		const float macroBasin = std::clamp(-macroRelief * 8.0f, 0.0f, 1.0f);
+		const float macroRim = std::clamp(macroRelief * 8.0f, 0.0f, 1.0f);
+		const float mediumBasin = std::clamp(-mediumRelief * 12.0f, 0.0f, 1.0f);
+		const float stonePatch = std::clamp((mediumColor - 0.35f) * 1.8f, 0.0f, 1.0f);
+		const float ravine = std::clamp((ravineColor - 0.45f) * 1.8f, 0.0f, 1.0f);
+		const auto blend = [](gen_model::gen_types::Point3 left, gen_model::gen_types::Point3 right, float amount) {
+			return left * (1.0f - amount) + right * amount;
+		};
+		gen_model::gen_types::Point3 color = blend({26.0f, 31.0f, 36.0f}, {112.0f, 68.0f, 34.0f}, 0.18f + broadColor * 0.62f);
+		color = blend(color, {108.0f, 101.0f, 83.0f}, mediumColor * 0.42f);
+		color = blend(color, {150.0f, 82.0f, 38.0f}, macroRim * 0.65f);
+		color = blend(color, {18.0f, 25.0f, 32.0f}, macroBasin * 0.75f);
+		color = blend(color, {31.0f, 36.0f, 39.0f}, mediumBasin * 0.55f);
+		color = blend(color, {16.0f, 22.0f, 28.0f}, ravine * 0.62f);
+		return blend(color, {124.0f, 119.0f, 101.0f}, stonePatch * 0.35f);
+	}
 
 	std::uint8_t encodeNormalComponent(float value) {
 		return static_cast<std::uint8_t>(std::clamp((value * 0.5f + 0.5f) * 255.0f, 0.0f, 255.0f));
@@ -185,6 +247,7 @@ namespace {
 gen_model::gen_types::AssetData gen_model::asteroid::generate(const gen_model::asteroid::Settings& settings) {
 	validate(settings);
 	gen_model::gen_types::AssetData asset;
+	const SurfaceFeatures features = generateSurfaceFeatures(settings.seed, settings);
 	const int rowWidth = settings.longitudeSegments + 1;
 	asset.mesh.positions.reserve(static_cast<std::size_t>((settings.latitudeSegments + 1) * rowWidth));
 	asset.mesh.texcoords.reserve(asset.mesh.positions.capacity());
@@ -200,7 +263,9 @@ gen_model::gen_types::AssetData gen_model::asteroid::generate(const gen_model::a
                 for (int column = 0; column <= settings.longitudeSegments; ++column) {
                         const float u = static_cast<float>(column) / static_cast<float>(settings.longitudeSegments);
                         const gen_model::gen_types::Point3 direction = directionAt(u, v);
-                        const float sample = fractalNoise(direction * 3.0f, settings.seed);
+						const float sample = settings.useMacroGeometry
+							? macroSurfaceHeight(direction, settings, features)
+							: fractalNoise(direction * 3.0f, settings.seed);
                         radialSamples.push_back(sample);
                         minimumSample = std::min(minimumSample, sample);
                         maximumSample = std::max(maximumSample, sample);
@@ -262,7 +327,6 @@ gen_model::gen_types::AssetData gen_model::asteroid::generate(const gen_model::a
 		asset.mesh.normals[index] = asset.mesh.normals[static_cast<std::size_t>(normalOwners[index])];
 	}
 
-        const std::vector<Crater> craters = generateCraters(settings.seed);
         const std::size_t texelCount = static_cast<std::size_t>(settings.textureWidth * settings.textureHeight);
         std::vector<float> heights(texelCount);
         asset.texture.width = settings.textureWidth;
@@ -273,13 +337,14 @@ gen_model::gen_types::AssetData gen_model::asteroid::generate(const gen_model::a
                 for (int column = 0; column < settings.textureWidth; ++column) {
                         const float u = static_cast<float>(column) / static_cast<float>(settings.textureWidth - 1);
                         const gen_model::gen_types::Point3 direction = directionAt(u, v);
-                        const float height = surfaceHeight(direction, settings, craters);
+                        const float height = surfaceHeight(direction, settings, features);
+                        const gen_model::gen_types::Point3 color = surfaceColor(direction, settings, features, height);
                         const std::size_t texel = static_cast<std::size_t>(row * settings.textureWidth + column);
                         const std::size_t offset = texel * 4;
                         heights[texel] = height;
-                        asset.texture.rgba[offset] = static_cast<std::uint8_t>(std::clamp(48.0f + height * 120.0f, 0.0f, 255.0f));
-                        asset.texture.rgba[offset + 1] = static_cast<std::uint8_t>(std::clamp(43.0f + height * 100.0f, 0.0f, 255.0f));
-                        asset.texture.rgba[offset + 2] = static_cast<std::uint8_t>(std::clamp(38.0f + height * 80.0f, 0.0f, 255.0f));
+                        asset.texture.rgba[offset] = static_cast<std::uint8_t>(std::clamp(color.x, 0.0f, 255.0f));
+                        asset.texture.rgba[offset + 1] = static_cast<std::uint8_t>(std::clamp(color.y, 0.0f, 255.0f));
+                        asset.texture.rgba[offset + 2] = static_cast<std::uint8_t>(std::clamp(color.z, 0.0f, 255.0f));
                         asset.texture.rgba[offset + 3] = 255;
                 }
         }
@@ -287,8 +352,7 @@ gen_model::gen_types::AssetData gen_model::asteroid::generate(const gen_model::a
         asset.normalMap.width = settings.textureWidth;
         asset.normalMap.height = settings.textureHeight;
         asset.normalMap.rgba.resize(texelCount * 4);
-        constexpr float NORMAL_STRENGTH = 12.0f;
-        const int lastColumn = settings.textureWidth - 1;
+	        const int lastColumn = settings.textureWidth - 1;
         const int lastRow = settings.textureHeight - 1;
         for (int row = 0; row < settings.textureHeight; ++row) {
                 const int previousRow = std::max(0, row - 1);
@@ -296,8 +360,8 @@ gen_model::gen_types::AssetData gen_model::asteroid::generate(const gen_model::a
                 for (int column = 0; column < settings.textureWidth; ++column) {
                         const int previousColumn = column == 0 ? lastColumn - 1 : column - 1;
                         const int nextColumn = column == lastColumn ? 1 : column + 1;
-                        const float slopeU = (heights[static_cast<std::size_t>(row * settings.textureWidth + nextColumn)] - heights[static_cast<std::size_t>(row * settings.textureWidth + previousColumn)]) * NORMAL_STRENGTH;
-                        const float slopeV = (heights[static_cast<std::size_t>(nextRow * settings.textureWidth + column)] - heights[static_cast<std::size_t>(previousRow * settings.textureWidth + column)]) * NORMAL_STRENGTH;
+						const float slopeU = (heights[static_cast<std::size_t>(row * settings.textureWidth + nextColumn)] - heights[static_cast<std::size_t>(row * settings.textureWidth + previousColumn)]) * settings.normalMapStrength;
+						const float slopeV = (heights[static_cast<std::size_t>(nextRow * settings.textureWidth + column)] - heights[static_cast<std::size_t>(previousRow * settings.textureWidth + column)]) * settings.normalMapStrength;
                         const gen_model::gen_types::Point3 normal = gen_model::gen_types::normalize({-slopeU, -slopeV, 1.0f});
                         const std::size_t offset = static_cast<std::size_t>((row * settings.textureWidth + column) * 4);
                         asset.normalMap.rgba[offset] = encodeNormalComponent(normal.x);
