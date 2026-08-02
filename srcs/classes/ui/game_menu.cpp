@@ -1,5 +1,13 @@
 #include "game_menu.hpp"
 #include "engine.hpp"
+#include "entities.hpp"
+
+namespace {
+	void spawnInitialMenuScene(GameContext &context)
+	{
+		spawnSunAndStars(context);
+	}
+}
 
 GameMenu::GameMenu(GameContext &context)
 	: context(context),
@@ -14,6 +22,9 @@ GameMenu::~GameMenu() {}
 
 EngineState GameMenu::run()
 {
+	if (context.registry.storage<entt::entity>().empty())
+		spawnInitialMenuScene(context);
+
 	// Basic camera setup for menu background
 	float arenaSize = context.config.ARENA_SIZE;
 	context.mainCamera.position = Vector3{arenaSize, arenaSize, arenaSize};

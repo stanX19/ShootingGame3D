@@ -43,6 +43,7 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - Runtime entities should primarily hold identity and mutable state. Canonical metadata belongs in definitions; behavior belongs in systems, strategies, or focused utilities.
 - A user-facing concept must have one canonical definition. Do not independently hardcode names, labels, IDs, aliases, balance values, resistances, capabilities, or spawn metadata.
 - Keep systems explicit about their required component views and update order.
+- When unsure of usage and API, grep includes/entt/entt.hpp directly
 
 ## Testing
 
