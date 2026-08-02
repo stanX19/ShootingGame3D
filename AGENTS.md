@@ -4,7 +4,9 @@
 
 Before broad exploration, read [docs/project-context.md](docs/project-context.md). Follow [docs/development-protocols.md](docs/development-protocols.md) for planning, approval, implementation, testing, and recovery.
 
-For model or asset pipeline work, also read [docs/model-asset-conventions.md](docs/model-asset-conventions.md).
+For model or asset pipeline work, read [docs/model-asset-conventions.md](docs/model-asset-conventions.md).
+For asteroid asset work and repeated-render benchmarks, also read [procedural asteroid generator and rendering evidence rules](docs/specs/procedural-asteroid-and-wsl-rendering.md)
+
 
 ## Editing Philosophy
 

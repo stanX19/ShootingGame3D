@@ -31,6 +31,30 @@ The shared generator keeps actual vertex radii within `0.95–1.05`, uses `2048x
 
 The generated files are runtime source assets and are kept with the project so a fresh checkout does not require the generator before launching the game. Generator build outputs remain under `objs/`.
 
+## Procedural Asteroid Generator
+
+- Keep the generator split into six files: `asteroid_generator.hpp/.cpp` for shared algorithms, `asteroid_small.hpp/.cpp` for the small profile, and `asteroid_big.hpp/.cpp` for the big profile.
+- Profile modules must explicitly define every setting they own. Do not hide profile policy behind aggregate defaults or a shared `Profile` branch.
+- Keep visual model generation independent from collision-proxy generation; collision preprocessing reads completed model files through its own pipeline.
+- Use shared feature masks for geometry, normal maps, and albedo. The intended hierarchy is micro, medium, and macro feature spacing of `1:10:100`; only microdetail may disappear through mipmapping.
+- Normal-map strength is profile-specific. Do not compensate for missing material identity by silently changing global shader lighting.
+
+The six-file split is an ownership boundary, not just a naming convention: shared topology, noise, feature-mask, texture, and normal-map algorithms stay in `asteroid_generator.*`; each profile explicitly defines its complete settings in its own pair. This prevents a later profile change from silently changing the other asteroid.
+
+The big profile uses three identity bands with spatial spacing `micro:medium:macro = 1:10:100`. Macro and medium bands must be present in geometry, the lower-frequency normal field, and the albedo masks. Micro stones, pores, and grain are intentionally allowed to fade through mipmapping. Normal-map strength is profile-specific because one global slope multiplier cannot make both small stones and large terrain landmarks readable.
+
+Material identity belongs in the generated albedo and its shared feature masks: crater floors, rims, ravines, and stone clusters need distinct color regions, not only lighting relief. The shaded material samples that albedo directly; gameplay visibility adjustments belong to the entity/render-body brightness, not to an unrelated global shader-lighting increase.
+
+## Rendering Evidence
+
+- Generator wall time is not render performance. For repeated-asteroid decisions, benchmark a fixed 100-instance scene separately from asset generation.
+- Uncapped WSL/D3D12 measurements must record frame latency and synchronized render latency separately. `glFinish()` measures GPU-plus-driver time, not a pure GPU timer-query interval.
+- Triangle-count choices require both performance measurements and visual silhouette/feature review. A benchmark winner is not automatically a locked profile default.
+
+The current benchmark recommends 396 triangles for repeated small asteroids and 720 for the big profile's 100-instance stress scene. Those are evidence-backed candidates, not an automatic permission to change profile defaults: lock them only after the matching close-up silhouette and landmark review.
+
+The benchmark harness is scratch-only. Generation timing, frame latency, and synchronized render latency are separate measurements; a `glFinish()` result represents GPU-plus-driver time and must not be reported as a pure GPU timer query.
+
 ## Runtime configuration
 
 The canonical setting remains:
