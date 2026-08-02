@@ -21,6 +21,7 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - **Plan First:** Do not modify tracked code, tests, configuration, shaders, build files, or documentation until explicitly approved by the user.
 - **Visual Planning:** Plans must include detailed Mermaid graphs of the current status and the status after the planned edit. Store them in workspace-level `scratch/plans/`, outside this repository.
 - **Write Ahead Log:** Plans must be written before implementation in `../scratch/plans/`, with a descriptive name and local datetime using `YYYY-MM-DD_HHmmss_short-kebab-description.md`. Update the plan with progress, verification, deviations, and recovery notes.
+- **Plan Diff Preview:** Every plan must include a concise `git diff` preview showing the intended additions, removals, and edits before implementation begins.
 - **Clean Workspace:** Implementation plans, ad hoc scripts, and walkthroughs belong in `../scratch/` and must not be committed.
 
 ## Scope and Quality
@@ -28,11 +29,22 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - Do not go and optimize existing code unless explicitly requested in chat.
 - Always aim for optimization when adding new code, with proportionate attention to hot paths, allocations, data locality, ECS iteration, rendering, audio, collision, and algorithmic cost.
 - An optimization or refactoring observation is not permission to expand scope. Request it explicitly and obtain a separate approved plan.
-- Follow DRY and KISS. Functions must remain focused, readable, and accurately named.
 - Do not delete old material accidentally. Prefer stable, incremental, surgical edits.
 - Do not add dependencies, alter public interfaces, change build/CI configuration, or reorganize tests without explicit approval.
 - Preserve unrelated user changes and do not reformat files outside the approved scope.
-- Github Copilot will review your actions after this.
+- Github Copilot will review your actions after every PR.
+- Follow SRP, DRY and KISS. Functions must remain focused, readable, and accurately named.
+- Examples:
+  * bad: forcing model processing logic into project/srcs/entities when its supposed to be ModelManager's scope
+  * good: entity code stays stupid calling ModelManager's API, implement in model manager, makes logic reusable (DRY)
+  * bad: hardcoding sound fx exclusive to a specific entity when there is an existing sound system
+  * good: generalise the sound feature to sound system, the entity is just a caller of the feature
+  * bad: adding lots of fields into an existing component when it can be implemented as new component + new system
+  * good: Add a new component with target fields, and a new system that view<ExistingComponent, NewComponent>
+  * bad: writing a god file just because adding logic to it is least resistance path: god_file.cpp(common_util, feat_a, feat_b)
+  * good: DRY, split reusable components into different files, reusable by future codebase: common_util.cpp/hpp, feat_a.cpp/hpp, feat_b.cpp/hpp
+  * bad: inventing 10+ systems just to solve one requirement, when a simplified tweak in upstream code can simplify the problem
+  * good: clearly consider available options before choosing the approach
 
 ## C++ and ECS Rules
 

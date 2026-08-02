@@ -3,10 +3,10 @@
 gen_model::asteroid::Settings gen_model::asteroid::small::settings() {
 	gen_model::asteroid::Settings result;
 	result.seed = 1337;
-	result.latitudeSegments = 24;
-	result.longitudeSegments = 36;
-	result.minRadius = 0.95f;
-	result.maxRadius = 1.05f;
+	result.latitudeSegments = 12;
+	result.longitudeSegments = 18;
+	result.minRadius = 0.8f;
+	result.maxRadius = 1.0f;
 	result.textureWidth = 2048;
 	result.textureHeight = 1024;
 	result.useMacroGeometry = false;

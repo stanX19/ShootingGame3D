@@ -32,19 +32,12 @@ UNIT_TEST_BIN	= $(TESTBINDIR)/unit_tests
 INTEGRATION_TEST_BIN = $(TESTBINDIR)/integration_tests
 SMOKE_TEST_BIN	= $(TESTBINDIR)/smoke_tests
 TEST_ARCHIVE	= $(OBJDIR)/libshooting_game.a
-GEN_MODEL_DIR	= scripts/gen_model
-GEN_MODEL_OBJDIR	= $(OBJDIR)/scripts/gen_model
-GEN_MODEL_TYPES_OBJ	= $(GEN_MODEL_OBJDIR)/gen_types.o
-GEN_MODEL_CORE_OBJ	= $(GEN_MODEL_OBJDIR)/asteroid_generator.o
-GEN_MODEL_SMALL_OBJ	= $(GEN_MODEL_OBJDIR)/asteroid_small.o
-GEN_MODEL_BIG_OBJ	= $(GEN_MODEL_OBJDIR)/asteroid_big.o
-GEN_MODEL_WRITER_OBJ	= $(GEN_MODEL_OBJDIR)/asset_writer.o
-GEN_MODEL_MAIN_OBJ	= $(GEN_MODEL_OBJDIR)/main.o
-GEN_MODEL_OBJS	= $(GEN_MODEL_TYPES_OBJ) $(GEN_MODEL_CORE_OBJ) $(GEN_MODEL_SMALL_OBJ) $(GEN_MODEL_BIG_OBJ) $(GEN_MODEL_WRITER_OBJ) $(GEN_MODEL_MAIN_OBJ)
-GEN_MODEL_BIN	= $(GEN_MODEL_OBJDIR)/gen_model
-GEN_MODEL_IFLAGS	= -Iscripts -Iincludes/raylib
+SCRIPT_DIR	= scripts
+GEN_MODEL_LIB	= $(OBJDIR)/scripts/libgen_model.a
+GEN_COLLISION_LIB	= $(OBJDIR)/scripts/libgen_collision.a
+SCRIPT_IFLAGS	= -Iscripts
 INTEGRATION_BIN_TARGET := $(if $(strip $(INTEGRATION_TEST_SRCS)),$(INTEGRATION_TEST_BIN),)
-TEST_OBJDIRS	:= $(sort $(dir $(CATCH_OBJ) $(UNIT_TEST_OBJS) $(INTEGRATION_TEST_OBJS) $(SMOKE_TEST_OBJS) $(MANUAL_TEST_BINS) $(TEST_ARCHIVE) $(GEN_MODEL_OBJS) $(GEN_MODEL_BIN)))
+TEST_OBJDIRS	:= $(sort $(dir $(CATCH_OBJ) $(UNIT_TEST_OBJS) $(INTEGRATION_TEST_OBJS) $(SMOKE_TEST_OBJS) $(MANUAL_TEST_BINS) $(TEST_ARCHIVE)))
 
 WSL_D3D12_AVAILABLE := $(shell if [ -e /dev/dxg ] && [ -f /usr/lib/x86_64-linux-gnu/dri/d3d12_dri.so ]; then echo 1; fi)
 RUN_DRIVER_ENV :=
@@ -106,8 +99,11 @@ test-unit: $(UNIT_TEST_BIN)
 	@echo "Running $<..."
 	@./$<
 
-gen_model: $(GEN_MODEL_BIN)
-	@./$(GEN_MODEL_BIN)
+gen_model:
+	$(MAKE) -C $(SCRIPT_DIR) gen_model
+
+gen_collision:
+	$(MAKE) -C $(SCRIPT_DIR) gen_collision INPUT="$(INPUT)"
 
 test-integration:
 	@if [ -z "$(strip $(INTEGRATION_TEST_SRCS))" ]; then \
@@ -158,7 +154,7 @@ $(TEST_ARCHIVE): $(OBJS) | $(TEST_OBJDIRS)
 	$(AR) $@ $(OBJS)
 
 $(TESTOBJDIR)/unit/%.o: $(TESTDIR)/unit/%.cpp $(PCH) | $(TEST_OBJDIRS)
-	$(CC) $(CFLAGS) $(IFLAGS) $(GEN_MODEL_IFLAGS) $(PCH_FLAG) -c $< -o $@
+	$(CC) $(CFLAGS) $(IFLAGS) $(SCRIPT_IFLAGS) $(PCH_FLAG) -c $< -o $@
 
 $(TESTOBJDIR)/integration/%.o: $(TESTDIR)/integration/%.cpp $(PCH) | $(TEST_OBJDIRS)
 	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) -c $< -o $@
@@ -166,20 +162,20 @@ $(TESTOBJDIR)/integration/%.o: $(TESTDIR)/integration/%.cpp $(PCH) | $(TEST_OBJD
 $(TESTOBJDIR)/smoke/%.o: $(TESTDIR)/smoke/%.cpp $(PCH) | $(TEST_OBJDIRS)
 	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) -c $< -o $@
 
-$(UNIT_TEST_BIN): $(UNIT_TEST_OBJS) $(CATCH_OBJ) $(GEN_MODEL_TYPES_OBJ) $(GEN_MODEL_CORE_OBJ) $(GEN_MODEL_SMALL_OBJ) $(GEN_MODEL_BIG_OBJ) | $(TESTBINDIR)
-	$(CC) $(CFLAGS) $(UNIT_TEST_OBJS) $(CATCH_OBJ) $(GEN_MODEL_TYPES_OBJ) $(GEN_MODEL_CORE_OBJ) $(GEN_MODEL_SMALL_OBJ) $(GEN_MODEL_BIG_OBJ) -o $@
+$(UNIT_TEST_BIN): $(UNIT_TEST_OBJS) $(CATCH_OBJ) $(GEN_MODEL_LIB) $(GEN_COLLISION_LIB) | $(TESTBINDIR)
+	$(CC) $(CFLAGS) $(UNIT_TEST_OBJS) $(CATCH_OBJ) $(GEN_MODEL_LIB) $(GEN_COLLISION_LIB) -o $@
+
+$(GEN_MODEL_LIB):
+	$(MAKE) -C $(SCRIPT_DIR) gen_model_lib
+
+$(GEN_COLLISION_LIB):
+	$(MAKE) -C $(SCRIPT_DIR) gen_collision_lib
 
 $(INTEGRATION_TEST_BIN): $(INTEGRATION_TEST_OBJS) $(CATCH_OBJ) $(TEST_ARCHIVE) | $(TESTBINDIR)
 	$(CC) $(CFLAGS) $(INTEGRATION_TEST_OBJS) $(CATCH_OBJ) $(TEST_ARCHIVE) $(IFLAGS) $(LFLAGS) -o $@
 
 $(SMOKE_TEST_BIN): $(SMOKE_TEST_OBJS) $(CATCH_OBJ) | $(TESTBINDIR)
 	$(CC) $(CFLAGS) $(SMOKE_TEST_OBJS) $(CATCH_OBJ) -o $@
-
-$(GEN_MODEL_BIN): $(GEN_MODEL_OBJS) | $(GEN_MODEL_OBJDIR)
-	$(CC) $(CFLAGS) $(GEN_MODEL_OBJS) $(LFLAGS) -o $@
-
-$(GEN_MODEL_OBJDIR)/%.o: $(GEN_MODEL_DIR)/%.cpp | $(GEN_MODEL_OBJDIR)
-	$(CC) $(CFLAGS) $(GEN_MODEL_IFLAGS) -c $< -o $@
 
 $(TESTBINDIR)/manual/%: $(TESTDIR)/manual/%.cpp $(OBJS) $(PCH) | $(TESTBINDIR)/manual
 	$(CC) $(CFLAGS) $(IFLAGS) $(PCH_FLAG) $< $(OBJS) $(LFLAGS) -o $@
@@ -191,8 +187,8 @@ clean:
 	@$(RM) $(OBJS) $(OBJS:.o=.d) $(PCH) $(PCH_DEPS) $(CATCH_OBJ) $(CATCH_DEP) $(TEST_ARCHIVE) \
 		$(UNIT_TEST_OBJS) $(INTEGRATION_TEST_OBJS) $(SMOKE_TEST_OBJS) \
 		$(UNIT_TEST_OBJS:.o=.d) $(INTEGRATION_TEST_OBJS:.o=.d) $(SMOKE_TEST_OBJS:.o=.d) \
-		$(UNIT_TEST_BIN) $(INTEGRATION_TEST_BIN) $(SMOKE_TEST_BIN) $(MANUAL_TEST_BINS) \
-		$(GEN_MODEL_OBJS) $(GEN_MODEL_OBJS:.o=.d) $(GEN_MODEL_BIN)
+		$(UNIT_TEST_BIN) $(INTEGRATION_TEST_BIN) $(SMOKE_TEST_BIN) $(MANUAL_TEST_BINS)
+	@$(MAKE) -C $(SCRIPT_DIR) clean
 
 fclean:	clean
 	@$(RM) $(NAME)
@@ -209,5 +205,5 @@ push:
 code:
 	find $(SRCDIR) $(HEADER_DIR) -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec cat {} + > ../code.txt
 
-.PHONY: all clean fclean re bonus push run gen_model test test-unit test-integration test-smoke test-manual test-manual-bin testbin all_test
--include $(OBJS:.o=.d) $(PCH_DEPS) $(CATCH_DEP) $(GEN_MODEL_OBJS:.o=.d)
+.PHONY: all clean fclean re bonus push run gen_model gen_collision test test-unit test-integration test-smoke test-manual test-manual-bin testbin all_test
+-include $(OBJS:.o=.d) $(PCH_DEPS) $(CATCH_DEP)

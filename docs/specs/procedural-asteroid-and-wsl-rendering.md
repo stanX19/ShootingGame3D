@@ -27,7 +27,7 @@ The generator writes the compatibility asset and two named visual profiles:
 - `assets/Models/asteroid/asteroid_small.obj/.mtl/.png/_normal.png`
 - `assets/Models/asteroid/asteroid_big.obj/.mtl/.png/_normal.png`
 
-The shared generator keeps actual vertex radii within `0.95–1.05`, uses `2048x1024` maps by default, and emits seam-safe spherical sampling with shared smooth normals. `asteroid_small` uses the current 24x36 / 1,656-triangle profile. `asteroid_big` uses the higher 32x48 / 2,976-triangle profile and separate macro, medium, and fine crater bands. Broad and medium bands feed both the macro geometry and lower-frequency normal-map height field so important basins, rims, ravines, and rock-scale relief survive texture mip reduction; only fine grain, pores, and tiny cracks are allowed to fade at distance. Big texture identity is procedural rather than monochrome: low-frequency material patches, crater-floor darkening, warm rims, cool ravines, and stone-cluster color variation share the same feature masks as the relief. The sunlight shader uses the sampled albedo directly rather than blending it halfway with white. These are candidate defaults pending the approved geometry and texture A/B benchmark. The albedo and normal textures use deterministic broad noise, ridged rock detail, fine grain, and seeded crater bowls/rims with identical first/last longitude columns. `ModelManager` generates diffuse/normal mipmaps once on first file-model load and applies trilinear filtering.
+The shared generator keeps actual vertex radii within `0.8–1.0`, uses `2048x1024` maps by default, and emits seam-safe spherical sampling with shared smooth normals. `asteroid_small` uses the approved 12x18 / 396-triangle profile. `asteroid_big` uses the approved 16x24 / 720-triangle profile and separate macro, medium, and fine crater bands. Broad and medium bands feed both the macro geometry and lower-frequency normal-map height field so important basins, rims, ravines, and rock-scale relief survive texture mip reduction; only fine grain, pores, and tiny cracks are allowed to fade at distance. Big texture identity is procedural rather than monochrome: low-frequency material patches, crater-floor darkening, warm rims, cool ravines, and stone-cluster color variation share the same feature masks as the relief. The sunlight shader uses the sampled albedo directly rather than blending it halfway with white. The albedo and normal textures use deterministic broad noise, ridged rock detail, fine grain, and seeded crater bowls/rims with identical first/last longitude columns. `ModelManager` generates diffuse/normal mipmaps once on first file-model load and applies trilinear filtering.
 
 The generated files are runtime source assets and are kept with the project so a fresh checkout does not require the generator before launching the game. Generator build outputs remain under `objs/`.
 
@@ -69,7 +69,7 @@ The canonical setting remains:
 
 The existing asteroid entity and model manager continue to use this path. OBJ material and texture references are relative to the model directory.
 
-All runtime models follow the nominal unit-radius convention documented in [model-asset-conventions.md](../model-asset-conventions.md). The asteroid's `0.95–1.05` local geometry range is an explicit visual tolerance around nominal radius `1.0`; runtime loading applies no asset-specific corrective transform. `RenderBody.scale` and `CollisionBody.radius` both continue to use the nominal asteroid `rad`.
+All runtime models follow the nominal unit-radius convention documented in [model-asset-conventions.md](../model-asset-conventions.md). The asteroid's `0.8–1.0` local geometry range stays inside the nominal broad-phase sphere; runtime loading applies no asset-specific corrective transform. `RenderBody.scale` and `CollisionBody.radius` both continue to use the nominal asteroid `rad`.
 
 ## WSL launch contract
 
@@ -83,7 +83,7 @@ The override applies only to the game process. Compilation, tests, generator exe
 
 ## Testing contract
 
-The pure generator is covered by deterministic Catch2 unit tests without a window, GPU, audio device, input, network, or runtime asset pack. Tests verify topology, exact `0.95–1.05` radius bounds, deterministic output, texture dimensions/variation, cratered normal variation, seam equality, and invalid-setting rejection. Runtime GPU texture preparation is verified by build/source review and bounded manual launch, not headless unit tests.
+The pure generator is covered by deterministic Catch2 unit tests without a window, GPU, audio device, input, network, or runtime asset pack. Tests verify topology, exact `0.8–1.0` radius bounds, deterministic output, texture dimensions/variation, cratered normal variation, seam equality, and invalid-setting rejection. Runtime GPU texture preparation is verified by build/source review and bounded manual launch, not headless unit tests.
 
 The shared sunlight shader samples the normal map only when the current material has `MATERIAL_MAP_NORMAL`; other shaded models keep the geometric-normal path. The tangent frame is derived from screen-space position/UV derivatives, so the OBJ does not need tangent attributes.
 
@@ -96,7 +96,7 @@ Frustum/distance culling, LOD, batching/instancing, particle profiling, collisio
 ## Success criteria
 
 1. `make gen_model` produces deterministic compatibility, small, and big visual assets.
-2. The generated model contains 1,656 triangles instead of approximately 200,000 and remains within the nominal `0.95–1.05` radius tolerance.
+2. The approved small and big generated models contain 396 and 720 triangles respectively instead of approximately 200,000 and remain within the nominal `0.8–1.0` radius range.
 3. The existing asteroid runtime path loads the generated OBJ and both material textures without GLB texture extraction; `getAsteroidModel` remains an entity selection helper but contains no material or texture mutation.
 4. `ModelManager` prepares diffuse/normal mipmaps and trilinear filtering once per newly loaded file model; cache hits do not repeat preparation.
 5. `make all`, deterministic tests, and a bounded WSL launch pass.

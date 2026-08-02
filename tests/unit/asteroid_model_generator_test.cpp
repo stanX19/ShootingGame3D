@@ -17,14 +17,14 @@ namespace {
 
 TEST_CASE("asteroid generator produces deterministic low-poly assets", "[unit][gen_model]")
 {
-	const gen_model::asteroid::Settings settings{};
+	const auto settings = gen_model::asteroid::small::settings();
 	auto generationSettings = settings;
 	generationSettings.textureWidth = 64;
 	generationSettings.textureHeight = 32;
 	const auto first = gen_model::asteroid::generate(generationSettings);
 	const auto second = gen_model::asteroid::generate(generationSettings);
 
-	REQUIRE(first.mesh.triangles.size() == 1656);
+	REQUIRE(first.mesh.triangles.size() == 396);
 	REQUIRE(first.mesh.positions.size() == static_cast<std::size_t>((settings.latitudeSegments + 1) * (settings.longitudeSegments + 1)));
 	REQUIRE(first.mesh.texcoords.size() == first.mesh.positions.size());
         REQUIRE(first.mesh.normals.size() == first.mesh.positions.size());
@@ -39,11 +39,11 @@ TEST_CASE("asteroid generator produces deterministic low-poly assets", "[unit][g
 		const float pointRadius = radius(point);
 		minimumRadius = std::min(minimumRadius, pointRadius);
 		maximumRadius = std::max(maximumRadius, pointRadius);
-		REQUIRE(pointRadius >= 0.95f);
-		REQUIRE(pointRadius <= 1.05f);
+		REQUIRE(pointRadius >= 0.8f);
+		REQUIRE(pointRadius <= 1.0f);
 	}
-	REQUIRE(minimumRadius == Catch::Approx(0.95f).margin(0.0001f));
-	REQUIRE(maximumRadius == Catch::Approx(1.05f).margin(0.0001f));
+	REQUIRE(minimumRadius == Catch::Approx(0.8f).margin(0.0001f));
+	REQUIRE(maximumRadius == Catch::Approx(1.0f).margin(0.0001f));
 	for (const auto& triangle : first.mesh.triangles) {
 		const auto& a = first.mesh.positions[triangle.positionIndices[0]];
 		const auto& b = first.mesh.positions[triangle.positionIndices[1]];
@@ -181,7 +181,7 @@ TEST_CASE("asteroid generator rejects invalid settings", "[unit][gen_model]")
 
 	SECTION("radius ordering") {
 		auto settings = gen_model::asteroid::Settings{};
-		settings.maxRadius = 0.9f;
+		settings.maxRadius = 0.7f;
 		REQUIRE_THROWS_AS(gen_model::asteroid::generate(settings), std::invalid_argument);
 	}
 
@@ -209,22 +209,22 @@ TEST_CASE("asteroid profiles share the generator with explicit topology budgets"
 	REQUIRE(big.grainFeatureStrength < small.grainFeatureStrength);
 	REQUIRE(small.normalMapStrength == Catch::Approx(12.0f));
 	REQUIRE(big.normalMapStrength == Catch::Approx(64.0f));
-	REQUIRE(small.latitudeSegments == 24);
-	REQUIRE(small.longitudeSegments == 36);
-	REQUIRE(big.latitudeSegments == 32);
-	REQUIRE(big.longitudeSegments == 48);
-	REQUIRE(2 * small.longitudeSegments * (small.latitudeSegments - 1) == 1656);
-	REQUIRE(2 * big.longitudeSegments * (big.latitudeSegments - 1) == 2976);
-	REQUIRE(small.minRadius == Catch::Approx(0.95f));
-	REQUIRE(small.maxRadius == Catch::Approx(1.05f));
-	REQUIRE(big.minRadius == Catch::Approx(0.95f));
-	REQUIRE(big.maxRadius == Catch::Approx(1.05f));
+	REQUIRE(small.latitudeSegments == 12);
+	REQUIRE(small.longitudeSegments == 18);
+	REQUIRE(big.latitudeSegments == 16);
+	REQUIRE(big.longitudeSegments == 24);
+	REQUIRE(2 * small.longitudeSegments * (small.latitudeSegments - 1) == 396);
+	REQUIRE(2 * big.longitudeSegments * (big.latitudeSegments - 1) == 720);
+	REQUIRE(small.minRadius == Catch::Approx(0.8f));
+	REQUIRE(small.maxRadius == Catch::Approx(1.0f));
+	REQUIRE(big.minRadius == Catch::Approx(0.8f));
+	REQUIRE(big.maxRadius == Catch::Approx(1.0f));
 
 	auto generatedBigSettings = big;
 	generatedBigSettings.textureWidth = 64;
 	generatedBigSettings.textureHeight = 32;
 	const auto generatedBig = gen_model::asteroid::generate(generatedBigSettings);
-	REQUIRE(generatedBig.mesh.triangles.size() == 2976);
+	REQUIRE(generatedBig.mesh.triangles.size() == 720);
 	float minimumBigRadius = 2.0f;
 	float maximumBigRadius = 0.0f;
 	for (const auto& point : generatedBig.mesh.positions) {
@@ -232,8 +232,8 @@ TEST_CASE("asteroid profiles share the generator with explicit topology budgets"
 		minimumBigRadius = std::min(minimumBigRadius, pointRadius);
 		maximumBigRadius = std::max(maximumBigRadius, pointRadius);
 	}
-	REQUIRE(minimumBigRadius == Catch::Approx(0.95f).margin(0.0001f));
-	REQUIRE(maximumBigRadius == Catch::Approx(1.05f).margin(0.0001f));
+	REQUIRE(minimumBigRadius == Catch::Approx(0.8f).margin(0.0001f));
+	REQUIRE(maximumBigRadius == Catch::Approx(1.0f).margin(0.0001f));
 	std::uint8_t minimumRed = 255;
 	std::uint8_t maximumRed = 0;
 	std::uint8_t minimumBlue = 255;
