@@ -1,6 +1,8 @@
 #include "systems.hpp"
 #include "utils.hpp"
 #include "events.hpp"
+
+#include <algorithm>
 #include <vector>
 #include <iostream>
 
@@ -42,16 +44,24 @@ void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 				continue;
 
 			float combinedRadius = A.rad + B.rad;
-			float collisionDt = calculateCollisionTime(A.pos, A.vel, B.pos, B.vel, combinedRadius);
-			if (willCollide(collisionDt, 1.0f)) {
-				context.dispatcher.enqueue<event::CollisionEvent>(event::CollisionEvent{
-					&context,
-					event::CollisionParty{A.id, A.pos + A.vel * collisionDt, A.vel / dt},
-					event::CollisionParty{B.id, B.pos + B.vel * collisionDt, B.vel / dt},
-					dt,
-					collisionDt}
-				);
-			}
+			std::optional<CollisionInterval> interval = calculateCollisionInterval(
+				A.pos,
+				A.vel,
+				B.pos,
+				B.vel,
+				combinedRadius
+			);
+			if (!willCollide(interval, 1.0f))
+				continue;
+
+			float collisionDt = std::max(interval->collisionStartDt, 0.0f);
+			context.dispatcher.enqueue<event::CollisionEvent>(event::CollisionEvent{
+				&context,
+				event::CollisionParty{A.id, A.pos + A.vel * collisionDt, A.vel / dt},
+				event::CollisionParty{B.id, B.pos + B.vel * collisionDt, B.vel / dt},
+				dt,
+				collisionDt}
+			);
 		}
 	}
 }
