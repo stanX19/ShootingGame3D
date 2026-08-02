@@ -3,6 +3,7 @@
 #include "includes.hpp"
 #include "game_config.hpp"
 #include "model_manager.hpp"
+#include "collision_body_manager.hpp"
 #include "sound_manager.hpp"
 #include "factions.hpp"
 #include "classes/weapon_registry.hpp"
@@ -17,6 +18,7 @@ struct FactionData {
 struct GameContext {
 	GameConfig config;
 	ModelManager modelManager;
+	CollisionBodyManager collisionBodyManager;
 	SoundManager soundManager;
 	weapon::WeaponRegistry weaponRegistry;
 	entt::registry templateReg;

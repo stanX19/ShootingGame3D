@@ -67,6 +67,7 @@ t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &tr
 	model.transform = transform;
 
 	models.push_back(model);
+	modelPaths.emplace_back(filePath);
 	t_model_id id = models.size() - 1;
 	loadedFromFile[key] = id;
 	return id;
@@ -164,6 +165,13 @@ const Model &ModelManager::getModel(t_model_id id) const
 	return models[id];
 }
 
+std::optional<std::string> ModelManager::getModelPath(t_model_id id) const
+{
+	if (!isValid(id))
+		throw std::out_of_range("Invalid model ID");
+	return modelPaths[id];
+}
+
 void ModelManager::unloadAll()
 {
 	for (auto &model : models)
@@ -171,6 +179,7 @@ void ModelManager::unloadAll()
 		UnloadModel(model);
 	}
 	models.clear();
+	modelPaths.clear();
 	proceduralCache.clear();
 	loadedFromFile.clear();
 }
@@ -203,6 +212,7 @@ t_model_id ModelManager::createAndAddModel(const std::string &keyBase, Func mode
 	Model model = modelGenerator(); // Call the generator function
 	t_model_id id = models.size();
 	models.push_back(model);
+	modelPaths.emplace_back(std::nullopt);
 	proceduralCache[key] = id;
 	return id;
 }

@@ -5,6 +5,8 @@
 #include "game_config.hpp"
 #include "op_overloads.hpp"
 
+#include <optional>
+
 using t_model_id = size_t;
 
 class ModelManager {
@@ -27,12 +29,14 @@ public:
 
 	Model& getModel(t_model_id id);
 	const Model& getModel(t_model_id id) const;
+	std::optional<std::string> getModelPath(t_model_id id) const;
 
 	void unloadAll();
 
 	bool isValid(t_model_id id) const;
 private:
 	std::vector<Model> models;
+	std::vector<std::optional<std::string>> modelPaths;
 	std::map<std::pair<std::string, Matrix>, t_model_id> loadedFromFile; // filepath -> id
 	std::map<std::string, t_model_id> proceduralCache;
 

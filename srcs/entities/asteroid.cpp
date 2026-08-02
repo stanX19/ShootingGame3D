@@ -11,7 +11,7 @@ namespace {
 	}
 
 	t_model_id getAsteroidModel(GameContext &context) {
-		std::string path = context.config.getString("units.asteroid.modelPath", "assets/Models/asteroid/round_stone.glb");
+		std::string path = context.config.getString("units.asteroid.modelPath", "assets/Models/asteroid/asteroid_big.obj");
 		return context.modelManager.loadModel(path);
 	}
 
@@ -26,6 +26,7 @@ namespace {
 		float damageVal = context.config.getFloat("units.asteroid.damage", 10000.0f);
 		float massVal = context.config.getFloat("units.asteroid.mass", 10000.0f);
 		t_model_id asteroidModel = getAsteroidModel(context);
+		t_collision_mesh_id asteroidCollisionModel = context.collisionBodyManager.loadCollisionModel(context, asteroidModel);
 
 		entt::entity asteroid = context.registry.create();
 		context.registry.emplace<Rotation>(asteroid, randomRotation());
@@ -36,6 +37,7 @@ namespace {
 		context.registry.emplace<tag::Shaded>(asteroid);
 		// context.registry.emplace<tag::RotationSyncModel>(asteroid);
 		context.registry.emplace<CollisionBody>(asteroid, rad);
+		context.registry.emplace<CollisionBodyModel>(asteroid, asteroidCollisionModel);
 		context.registry.emplace<RenderBody>(asteroid, RenderBody{
 			asteroidModel, getRandomAsteroidColor(), rad
 		});

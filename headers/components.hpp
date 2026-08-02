@@ -3,6 +3,7 @@
 
 #include "includes.hpp"
 #include "model_manager.hpp"
+#include "collision_body_manager.hpp"
 
 // Components
 struct Position
@@ -56,6 +57,11 @@ struct TargetRotation
 struct CollisionBody
 {
 	float radius;
+};
+
+struct CollisionBodyModel
+{
+	t_collision_mesh_id modelID;
 };
 
 struct RenderBody
