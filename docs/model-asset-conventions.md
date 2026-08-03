@@ -6,7 +6,7 @@ These conventions apply to runtime 3D models and to offline model generators.
 
 Runtime model loading assumes that a model is authored around a nominal local radius of `1.0`. `RenderBody.scale` is the world-space nominal radius; a model is not corrected or normalized on the loading path.
 
-Asteroid visual geometry uses the approved local-radius range `0.8–1.0`. Its `CollisionBody.radius` remains the nominal radius `1.0`, so the sphere is a conservative broad-phase proxy: the visual model never extends beyond the initial collision radius. Future mesh-collision refinement may reject broad-phase false positives without changing this asset convention.
+Asteroid visual geometry uses the approved local-radius range `0.5–1.0`. Its `CollisionBody.radius` remains the nominal radius `1.0`, so the sphere is a conservative broad-phase proxy: the visual model never extends beyond the initial collision radius. Future mesh-collision refinement may reject broad-phase false positives without changing this asset convention.
 
 Models should be centered at their intended local origin. Any asset-specific normalization or geometry generation belongs in the offline asset pipeline under `scripts/gen_model/`, not in entity factories or the runtime renderer.
 

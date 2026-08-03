@@ -15,10 +15,10 @@
     },
     "loadout": {
         "special": "missile.nuke",
-        "w1": "bullet.shotgun",
-        "w2": "bullet.shotgun",
-        "w3": "bullet.shotgun",
-        "w4": "bullet.shotgun"
+        "w1": "bullet.burstSniper",
+        "w2": "bullet.burstSniper",
+        "w3": "bullet.burstSniper",
+        "w4": "bullet.burstSniper"
     },
     "physics": {
         "collisionElasticity": 0.05,

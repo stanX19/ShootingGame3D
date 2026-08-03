@@ -8,6 +8,7 @@
 namespace
 {
 	constexpr float epsilon = 0.000001f;
+	constexpr float twoPi = 6.283185307179586f;
 
 	struct SweepContext
 	{
@@ -136,6 +137,18 @@ namespace
 		);
 	}
 
+	CollisionTriangle transformTriangle(
+		const CollisionTriangle &triangle,
+		const Matrix &transform
+	)
+	{
+		return CollisionTriangle{
+			Vector3Transform(triangle.a, transform),
+			Vector3Transform(triangle.b, transform),
+			Vector3Transform(triangle.c, transform)
+		};
+	}
+
 	Vector3 getMeshStart(const CollisionMeshInstance &instance)
 	{
 		return addVector(
@@ -220,6 +233,57 @@ namespace
 				scaleVector(ac, barycentricC)
 			)
 		);
+	}
+
+	float getTriangleSolidAngle(
+		const Vector3 &point,
+		const CollisionTriangle &triangle
+	)
+	{
+		const Vector3 a = subtractVector(triangle.a, point);
+		const Vector3 b = subtractVector(triangle.b, point);
+		const Vector3 c = subtractVector(triangle.c, point);
+		const float lengthA = Vector3Length(a);
+		const float lengthB = Vector3Length(b);
+		const float lengthC = Vector3Length(c);
+		if (lengthA < epsilon || lengthB < epsilon || lengthC < epsilon)
+			return 0.0f;
+
+		const float numerator = Vector3DotProduct(
+			a,
+			Vector3CrossProduct(b, c)
+		);
+		const float denominator =
+			lengthA * lengthB * lengthC
+			+ Vector3DotProduct(a, b) * lengthC
+			+ Vector3DotProduct(b, c) * lengthA
+			+ Vector3DotProduct(c, a) * lengthB;
+
+		return 2.0f * std::atan2(numerator, denominator);
+	}
+
+	bool isPointInsideMesh(const SweepContext &context)
+	{
+		const BoundingBox bounds = transformBounds(
+			context.mesh.bounds,
+			context.baseTransform
+		);
+		if (context.sphereStart.x < bounds.min.x || context.sphereStart.x > bounds.max.x ||
+			context.sphereStart.y < bounds.min.y || context.sphereStart.y > bounds.max.y ||
+			context.sphereStart.z < bounds.min.z || context.sphereStart.z > bounds.max.z)
+			return false;
+
+		float solidAngle = 0.0f;
+		for (const CollisionTriangle &localTriangle : context.mesh.triangles)
+		{
+			const CollisionTriangle triangle = transformTriangle(
+				localTriangle,
+				context.baseTransform
+			);
+			solidAngle += getTriangleSolidAngle(context.sphereStart, triangle);
+		}
+
+		return std::fabs(solidAngle) > twoPi;
 	}
 
 	bool pointInsideTriangle(
@@ -409,11 +473,10 @@ namespace
 		const CollisionTriangle &localTriangle
 	)
 	{
-		const CollisionTriangle triangle{
-			Vector3Transform(localTriangle.a, context.baseTransform),
-			Vector3Transform(localTriangle.b, context.baseTransform),
-			Vector3Transform(localTriangle.c, context.baseTransform)
-		};
+		const CollisionTriangle triangle = transformTriangle(
+			localTriangle,
+			context.baseTransform
+		);
 		const Vector3 normal = Vector3Normalize(Vector3CrossProduct(
 			subtractVector(triangle.b, triangle.a),
 			subtractVector(triangle.c, triangle.a)
@@ -539,6 +602,19 @@ std::optional<CollisionHit> sweepSphereAgainstMesh(
 		endDt,
 		std::nullopt
 	};
+
+	if (isPointInsideMesh(context))
+	{
+		// Containment in a closed mesh is an initial collision.
+		// A hole remains outside because its winding number is zero.
+		considerHit(
+			context,
+			context.startDt,
+			context.sphereStart,
+			Vector3{0.0f, 1.0f, 0.0f}
+		);
+		return context.earliestHit;
+	}
 
 	visitBvhNode(context, 0);
 	return context.earliestHit;
