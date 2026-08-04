@@ -15,17 +15,31 @@ void ecs_systems::hpCleanup(GameContext &context, [[maybe_unused]] float dt) {
 	for (auto entity : toDestroy) {
 		if (!context.registry.valid(entity)) continue;
 
-		auto [posPtr, bodyPtr, velPtr] = context.registry.try_get<Position, RenderBody, Velocity>(entity);
-		if (posPtr && bodyPtr) {
-			float scale = std::cbrt(bodyPtr->scale.x * bodyPtr->scale.y * bodyPtr->scale.z);
-			int count = static_cast<int>(std::sqrt(scale)) * 25;
-			if (context.registry.any_of<tag::effect::DropDebris>(entity))
-				spawnDebris(context, posPtr->value, scale, bodyPtr->color, count, 5.0, velPtr? velPtr->value: Vector3Zeros);
-			entt::entity parent = entt::null;
-			if (context.registry.any_of<ScoreParent>(entity))
-				parent = context.registry.get<ScoreParent>(entity).parent;
-			if (context.registry.any_of<tag::effect::ExplodeOnDeath>(entity))
-				spawnExplosion(context, posPtr->value, scale * 10, velPtr? velPtr->value: Vector3Zeros, parent);
+		auto [posPtr, bodyPtr, velPtr, scoreParentPtr, explodePtr, instantDamagePtr] = context.registry.try_get<
+			Position,
+			RenderBody,
+			Velocity,
+			ScoreParent,
+			effect::ExplodeOnDeath,
+			effect::InstantDamageOnDeath
+		>(entity);
+
+		if (!posPtr) {
+			context.registry.destroy(entity);
+			continue;
+		}
+
+		const Vector3 velocity = velPtr ? velPtr->value : Vector3Zeros;
+		entt::entity parent = scoreParentPtr ? scoreParentPtr->parent : entt::null;
+
+		if (bodyPtr && context.registry.any_of<tag::effect::DropDebris>(entity)) {
+			spawnDebris(context, posPtr->value, bodyPtr, 5.0f, velocity);
+		}
+		if (explodePtr) {
+			spawnExplosion(context, posPtr->value, *explodePtr, velocity, parent);
+		}
+		if (instantDamagePtr) {
+			spawnInstantDamage(context, posPtr->value, *instantDamagePtr, parent);
 		}
 
 		context.registry.destroy(entity);

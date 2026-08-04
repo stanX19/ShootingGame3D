@@ -62,7 +62,7 @@ namespace {
 		bool aIsDead = aHp && aHp->value <= 0.0f;
 		bool bIsDead = bHp && bHp->value <= 0.0f;
 
-		if (aIsDead && bIsDead)
+		if (aIsDead || bIsDead)
 			return;
 				
 		Vector3 normal = Vector3Normalize(b.pos - a.pos);
@@ -112,30 +112,34 @@ namespace {
 		}
 	}
 
-	void applyDamageToEntity(const event::CollisionEvent &evt, const event::CollisionParty& victim, 
-	                        const event::CollisionParty& killer) {
+	// assumes killer is eligible to deal damage to victim
+	void applyKillerDamageToVictim(
+		const event::CollisionEvent &evt,
+		const event::CollisionParty &killer,
+		const event::CollisionParty &victim
+	) {
 		entt::registry &registry = evt.context->registry;
 		
-		auto [dmgPtr, killerHpPtr] = registry.try_get<Damage, HP>(killer.id);
+		Damage *dmgPtr = registry.try_get<Damage>(killer.id);
 		auto [shieldPtr, hpPtr] = registry.try_get<EnergyShield, HP>(victim.id);
 
-		if (!hpPtr || !dmgPtr || hpPtr->value <= 0 || (killerHpPtr && killerHpPtr->value <= 0))
+		if (!dmgPtr || !hpPtr || hpPtr->value <= 0)
 			return;
 			
-		float dmg = dmgPtr->value;
+		float remainingDmg = dmgPtr->value;
 
 		// Use shield to block if it's an energy weapon
 		if (registry.all_of<tag::bullet_type::Energy>(killer.id) && shieldPtr && shieldPtr->hp > 0) {
-			if (shieldPtr->hp > dmg) {  // Can block all damage
-				shieldPtr->hp -= dmg;
+			if (shieldPtr->hp > remainingDmg) {  // Can block all damage
+				shieldPtr->hp -= remainingDmg;
 				shieldPtr->activeTimer = shieldPtr->activeDuration;
 				return;
 			}
-			dmg -= shieldPtr->hp;  // Cannot block all damage
+			remainingDmg -= shieldPtr->hp;  // Cannot block all damage
 			shieldPtr->hp = 0;
 		}
 
-		hpPtr->value -= dmg;
+		hpPtr->value -= remainingDmg;
 
 		if (hpPtr->value < 0) {
 			evt.context->dispatcher.enqueue<event::KillEvent>(event::KillEvent{
@@ -149,12 +153,26 @@ namespace {
 		// Try to spawn debris after applying damage
 		trySpawnDebris(evt.context, victim, killer);
 	}
+
+	void handleCollisionDamage(const event::CollisionEvent &evt) {
+		entt::registry &registry = evt.context->registry;
+		HP *aHpPtr = registry.try_get<HP>(evt.a.id);
+		HP *bHpPtr = registry.try_get<HP>(evt.b.id);
+
+		bool aWasAlive = !aHpPtr || aHpPtr->value > 0;
+		bool bWasAlive = !bHpPtr || bHpPtr->value > 0;
+
+		if (aWasAlive)
+			applyKillerDamageToVictim(evt, evt.a, evt.b);
+		if (bWasAlive)
+			applyKillerDamageToVictim(evt, evt.b, evt.a);
+	}
 }
 
 void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
 	// std::cout << evt.a.pos.x << " " << evt.b.pos.x << std::endl;
-	applyDamageToEntity(evt, evt.b, evt.a);
-	applyDamageToEntity(evt, evt.a, evt.b);
+	handleCollisionDamage(evt);
+
 	// apply physics once for the entire event
 	applyCollisionPhysics(evt);
 

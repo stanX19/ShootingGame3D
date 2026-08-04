@@ -2,10 +2,12 @@
 #include "utils.hpp"
 #include "components/sound.hpp"
 #include "game_config.hpp"
+#include <algorithm>
 
 namespace
 {
 	const Color BASE_COLOR = GRAY;
+	const Color NUKE_EXPLOSION_COLOR = {0, 255, 255, 255};
 	const float DEFAULT_MASS = 5.0f;
 
 	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = BASE_COLOR)
@@ -21,17 +23,69 @@ namespace
 		context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.5f);
 	}
 
+	float getDefaultInstantDamage(const GameConfig &globalCfg, const GameConfig &cfg, float legacyMultiplier)
+	{
+		const float baseDamage = globalCfg.getFloat(
+			"weapons.missile.instantDamage",
+			globalCfg.getFloat("weapons.missile.baseDamage", 250.0f)
+		);
+		return cfg.getFloat(
+			"instantDamage",
+			baseDamage * cfg.getFloat("damageMultiplier", legacyMultiplier)
+		);
+	}
+
+	void emplaceMissileDeathEffects(
+		GameContext &context,
+		entt::entity bulletTemplate,
+		const GameConfig &cfg,
+		float radius,
+		float defaultInstantDamage,
+		Color explosionColor = effect::EXPLOSION_COLOR
+	)
+	{
+		const float defaultExplosionStartRadius = radius * 0.5f;
+		// Keep pulse damage and visual growth independent. Rule of thumb: a missile with
+		// a large instant AOE should usually start its visible explosion near that radius;
+		// small missiles can start smaller to preserve gradual visual expansion.
+		const float instantRadius = std::max(0.0f, cfg.getFloat("instantRadius", defaultExplosionStartRadius));
+		const float explosionStartRadius = std::max(
+			0.0f,
+			cfg.getFloat("explosionStartRadius", defaultExplosionStartRadius)
+		);
+
+		context.templateReg.emplace<effect::InstantDamageOnDeath>(
+			bulletTemplate,
+			effect::InstantDamageOnDeath{
+				defaultInstantDamage,
+				instantRadius
+			}
+		);
+		context.templateReg.emplace<effect::ExplodeOnDeath>(
+			bulletTemplate,
+			effect::ExplodeOnDeath{
+				cfg.getFloat("explosionFinalRadius", radius * 10.0f),
+				explosionStartRadius,
+				cfg.getFloat("explosionDuration", effect::DEFAULT_EXPLOSION_DURATION),
+				cfg.getFloat("explosionDamage", effect::DEFAULT_EXPLOSION_DAMAGE),
+				explosionColor
+			}
+		);
+	}
+
 	entt::entity createMissileTemplate(GameContext &context, float rad, Color color, float mass)
 	{
 		const auto &cfg = context.config;
 		float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
 		float lifespan = cfg.getFloat("weapons.missile.lifespan", 20.0f);
+		float bodyDamage = cfg.getFloat("weapons.missile.bodyDamage", 2.5f);
 		Vector3 missileBound = {arenaSize * 2, arenaSize * 2, arenaSize * 2};
 
 		entt::entity missile = context.templateReg.create();
 		t_model_id model = context.modelManager.loadModel("assets/Models/missile/missile.glb");
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(missile);
 		context.templateReg.emplace<CollisionBody>(missile, CollisionBody{rad});
+		context.templateReg.emplace<Damage>(missile, Damage{bodyDamage});
 		context.templateReg.emplace<RenderBody>(missile, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(missile, missileBound * -1, missileBound);
 		context.templateReg.emplace<SpawnsTrailParticle>(missile, SpawnsTrailParticle{rad * 0.5f, 0.5f});
@@ -61,12 +115,11 @@ void weapon::emplaceGenericMissile(GameContext &context, entt::entity entity, co
 	const auto &globalCfg = context.config;
 
 	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
 	float baseSpread = getBaseSpread(globalCfg);
 
 	float radius = cfg.getFloat("radius", 0.5f);
 	float hp = cfg.getFloat("hp", 1.0f);
-	float damageMultiplier = cfg.getFloat("damageMultiplier", 1.0f);
+	float instantDamage = getDefaultInstantDamage(globalCfg, cfg, 1.0f);
 	float speedMultiplier = cfg.getFloat("speedMultiplier", 1.0f);
 	float turnSpeed = cfg.getFloat("turnSpeed", 0.5f);
 	int bulletCount = cfg.getInt("bulletCount", 1);
@@ -75,8 +128,7 @@ void weapon::emplaceGenericMissile(GameContext &context, entt::entity entity, co
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
-	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 
 	if (float acceleration = cfg.getFloat("acceleration", 0.0f); acceleration > 0.0f)
@@ -112,12 +164,11 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 	const std::string path = "weapons.missile.basic.";
 
 	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
 	float baseSpread = getBaseSpread(globalCfg);
 
 	float radius = cfg.getFloat("radius", 0.5f);
 	float hp = cfg.getFloat("hp", 1.0f);
-	float damageMultiplier = cfg.getFloat("damageMultiplier", 1.0f);
+	float instantDamage = getDefaultInstantDamage(globalCfg, cfg, 1.0f);
 	float speedMultiplier = cfg.getFloat("speedMultiplier", 1.0f);
 	float acceleration = cfg.getFloat("acceleration", 100.0f);
 	float turnSpeed = cfg.getFloat("turnSpeed", 0.5f);
@@ -128,8 +179,7 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
-	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage);
 	context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{acceleration});
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 
@@ -170,7 +220,13 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
-	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	emplaceMissileDeathEffects(
+		context,
+		bulletTemplate,
+		cfg,
+		radius,
+		getDefaultInstantDamage(globalCfg, cfg, 0.0f)
+	);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{baseLifespan * lifespanMultiplier});
 
@@ -194,13 +250,12 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 	const auto &globalCfg = context.config;
 	const std::string path = "weapons.missile.torpedo.";
 
-	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
 	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
 	float baseSpread = getBaseSpread(globalCfg);
 
 	float radius = cfg.getFloat("radius", 0.25f);
 	float hp = cfg.getFloat("hp", 1.0f);
-	float damageMultiplier = cfg.getFloat("damageMultiplier", 0.25f);
+	float instantDamage = getDefaultInstantDamage(globalCfg, cfg, 0.25f);
 	float turnSpeed = cfg.getFloat("turnSpeed", 0.1f);
 	int ammo = cfg.getInt("ammo", 4);
 	float reloadTime = cfg.getFloat("reloadTime", 20.0f);
@@ -211,8 +266,7 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
-	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 
 	Weapon weapon{bulletTemplate};
@@ -236,12 +290,11 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity,
 	const std::string path = "weapons.missile.nuke.";
 
 	float baseSpeed = globalCfg.getFloat("weapons.missile.baseSpeed", 100.0f);
-	float baseDamage = globalCfg.getFloat("weapons.missile.baseDamage", 250.0f);
 	float baseSpread = getBaseSpread(globalCfg);
 
 	float radius = cfg.getFloat("radius", 2.0f);
 	float hp = cfg.getFloat("hp", 250.0f);
-	float damageMultiplier = cfg.getFloat("damageMultiplier", 10.0f);
+	float instantDamage = getDefaultInstantDamage(globalCfg, cfg, 10.0f);
 	float turnSpeed = cfg.getFloat("turnSpeed", 1.5f);
 	float speedMultiplier = cfg.getFloat("speedMultiplier", 0.5f);
 	float delayedDamageTime = cfg.getFloat("delayedDamageTime", 40.0f);
@@ -252,8 +305,7 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity,
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
-	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
-	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage, NUKE_EXPLOSION_COLOR);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 	context.templateReg.remove<Lifespan>(bulletTemplate);
 	context.templateReg.emplace<DelayedDamage>(bulletTemplate, DelayedDamage{delayedDamageTime, delayedDamage});
@@ -287,7 +339,13 @@ void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entit
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
-	context.templateReg.emplace<tag::effect::ExplodeOnDeath>(bulletTemplate);
+	emplaceMissileDeathEffects(
+		context,
+		bulletTemplate,
+		cfg,
+		radius,
+		getDefaultInstantDamage(globalCfg, cfg, 0.0f)
+	);
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(spreadAngle);

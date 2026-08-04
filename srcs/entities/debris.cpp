@@ -21,3 +21,11 @@ void spawnDebris(GameContext &context, const Vector3& position, float originalRa
 	}
 }
 
+void spawnDebris(GameContext &context, const Vector3& position, const RenderBody *bodyPtr, float lifespan, Vector3 velocity) {
+	if (!bodyPtr)
+		return;
+
+	const float originalRadius = std::cbrt(bodyPtr->scale.x * bodyPtr->scale.y * bodyPtr->scale.z);
+	const int count = static_cast<int>(std::sqrt(originalRadius)) * 25;
+	spawnDebris(context, position, originalRadius, bodyPtr->color, count, lifespan, velocity);
+}

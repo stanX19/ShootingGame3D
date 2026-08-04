@@ -84,6 +84,8 @@ The order is behaviorally significant. Do not move or early-return from frame-lo
 
 The configuration currently contains `audio`, `debug`, `game`, `loadout`, `physics`, `settings`, `sounds`, `units`, and `weapons` sections. Avoid duplicating names, IDs, balance values, spawn data, or other canonical metadata in code when configuration or definitions already own them.
 
+Missile death effects keep `instantRadius` and `explosionStartRadius` independent: the former controls the model-less one-frame damage pulse, while the latter controls the visible explosion's initial radius. As a rule of thumb, missiles with a large instant-damage radius should usually start their visible explosion near that radius; small missiles may use a smaller start radius to preserve gradual visual growth.
+
 ## Build Commands
 
 Run these through WSL from the `project/` directory:

@@ -6,6 +6,8 @@ void weapon::utils::assureBulletTypes(entt::registry &registry) {
 	entt_utils::assureTypes<
 		HP,
 		Damage,
+		effect::ExplodeOnDeath,
+		effect::InstantDamageOnDeath,
 		CollisionBody,
 		RenderBody,
 		Lifespan,

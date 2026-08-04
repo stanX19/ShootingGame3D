@@ -300,6 +300,38 @@ struct RadiusExpand {
 	float speed;  // radius += speed * dt
 };
 
+namespace effect {
+	inline constexpr float DEFAULT_EXPLOSION_DURATION = 5.0f;
+	inline constexpr float DEFAULT_EXPLOSION_DAMAGE = 50.0f;
+	inline const Color EXPLOSION_COLOR = ORANGE;
+
+	struct ExplodeOnDeath
+	{
+		float finalRadius = 0.0f;
+		float startRadius = 0.0f;
+		float explosionDuration = DEFAULT_EXPLOSION_DURATION; // seconds
+		float damage = DEFAULT_EXPLOSION_DAMAGE;
+		Color color = EXPLOSION_COLOR;
+
+		static ExplodeOnDeath createFromRadDmg(float parentRad, float parentDmg) // Legacy helper: parent means the original entity.
+		{
+			return ExplodeOnDeath{
+				parentRad * 10.0f,
+				0.0f,
+				parentRad * 5.0f, // Preserve the legacy expansion rate.
+				parentDmg,
+				EXPLOSION_COLOR
+			};
+		}
+	};
+
+	struct InstantDamageOnDeath
+	{
+		float instantDamage = 0.0f;
+		float radius = 0.0f;
+	};
+}
+
 struct SpawnsTrailParticle {
 	float radius = 0.5f;
 	float lifespan = 1.0f;
@@ -325,7 +357,6 @@ namespace tag {
 	struct Spaceship {};
 	
 	namespace effect {
-		struct ExplodeOnDeath {};
 		struct DropDebris {};
 	}
 	namespace weapon {

@@ -41,7 +41,10 @@ entt::entity spawnBaseUnit(GameContext &context, const Vector3& pos, float radiu
 	context.registry.emplace<tag::Shaded>(entity);
 	context.registry.emplace<tag::RotationSyncModel>(entity);
 	context.registry.emplace<tag::effect::DropDebris>(entity);
-	context.registry.emplace<tag::effect::ExplodeOnDeath>(entity);
+	context.registry.emplace<effect::ExplodeOnDeath>(
+		entity,
+		effect::ExplodeOnDeath::createFromRadDmg(radius, baseDamage)
+	);
 	context.registry.emplace_or_replace<sound::DeathSound>(entity, sound::RANDOM_EXPLOSION, 0.5f * radius);
 
 	context.registry.emplace<tag::weapon::AIControlledAim>(entity);

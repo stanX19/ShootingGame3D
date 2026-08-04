@@ -18,7 +18,10 @@ static entt::entity spawnBaseTurret(GameContext &context, Color color) {
 	context.registry.emplace<tag::Shaded>(turret);
 	context.registry.emplace<tag::AimDirectionSyncModel>(turret);
 	context.registry.emplace<tag::effect::DropDebris>(turret);
-	context.registry.emplace<tag::effect::ExplodeOnDeath>(turret);
+	context.registry.emplace<effect::ExplodeOnDeath>(
+		turret,
+		effect::ExplodeOnDeath::createFromRadDmg(0.25f, effect::DEFAULT_EXPLOSION_DAMAGE)
+	);
 	context.registry.emplace<Mass>(turret, context.config.getFloat("units.turret.mass", 500.0f));
 	return turret;
 }

@@ -83,7 +83,10 @@ entt::entity spawnPlayer(GameContext &context, Vector3 pos) {
 	context.registry.emplace<tag::Shaded>(player);
 	context.registry.emplace<tag::RotationSyncModel>(player);
 	context.registry.emplace<tag::effect::DropDebris>(player);
-	context.registry.emplace<tag::effect::ExplodeOnDeath>(player);
+	context.registry.emplace<effect::ExplodeOnDeath>(
+		player,
+		effect::ExplodeOnDeath::createFromRadDmg(1.0f, damage)
+	);
 	context.registry.emplace<SpawnsTrailParticle>(player, SpawnsTrailParticle{0.3f, 0.1f});
 	context.registry.emplace<sound::DeathSound>(player, sound::RANDOM_EXPLOSION, 0.5f);
 
