@@ -46,7 +46,18 @@ int main() {
 	setup_camera(camera);
 
 	GameContext context;
-	context.config.init("assets/config/game_config.json");
+	context.config.init({
+		{"audio", "assets/config/audio.json"},
+		{"debug", "assets/config/debug.json"},
+		{"game", "assets/config/game.json"},
+		{"loadout", "assets/config/loadout.json"},
+		{"physics", "assets/config/physics.json"},
+		{"settings", "assets/config/settings.json"},
+		{"sounds", "assets/config/sounds.json"},
+		{"units", "assets/config/units.json"},
+		{"weapons", "assets/config/weapons.json"},
+		{"spaceship", "assets/config/spaceships.json"}
+	});
 	resetGame(context);
 	
 	Renderer renderer(camera, context);

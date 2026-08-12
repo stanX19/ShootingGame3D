@@ -1,0 +1,7 @@
+newmtl spaceship_terminator
+Ka 0.060000 0.070000 0.080000
+Kd 0.920000 0.940000 0.960000
+Ks 0.620000 0.660000 0.720000
+Ns 48.000000
+map_Kd spaceship_terminator.png
+bump spaceship_terminator_normal.png

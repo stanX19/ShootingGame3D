@@ -62,7 +62,7 @@ EngineState GameHangar::run()
 		context.config.setString("loadout.w3", context.config.loadout.w3);
 		context.config.setString("loadout.w4", context.config.loadout.w4);
 		context.config.setString("loadout.special", context.config.loadout.special);
-		context.config.save("assets/config/game_config.json");
+		context.config.saveChanged();
 	}
 
 	return nextState;

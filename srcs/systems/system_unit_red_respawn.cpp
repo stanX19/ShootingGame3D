@@ -8,12 +8,14 @@
 namespace {
 	struct RedTag {};
 
+	const Color bodyColor = WHITE; //ColorLerp(WHITE, YELLOW, 0.1f);
+
 	void applyTags(GameContext &context, entt::entity entity) {
 		context.registry.emplace<RedTag>(entity);
 		context.registry.emplace_or_replace<faction::Faction>(entity, faction::FAC_RED);
 		RenderBody *body = context.registry.try_get<RenderBody>(entity);
 		if (body)
-			body->color = YELLOW;
+			body->color = bodyColor;
 
 		// std::cout << "[applyTags] Applied RedTag + Faction::FAC_RED to entity " 
 		// 		  << (int)entity << std::endl;

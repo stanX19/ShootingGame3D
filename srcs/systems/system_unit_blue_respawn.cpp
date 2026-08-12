@@ -7,12 +7,14 @@
 namespace {
 	struct BlueTag {};
 
+	const Color bodyColor = ColorLerp(WHITE, SKYBLUE, 0.1f);
+
 	void applyTags(GameContext &context, entt::entity entity) {
 		context.registry.emplace<BlueTag>(entity);
 		context.registry.emplace_or_replace<faction::Faction>(entity, faction::FAC_BLUE);
 		RenderBody *body = context.registry.try_get<RenderBody>(entity);
 		if (body)
-			body->color = SKYBLUE;
+			body->color = bodyColor;
 	}
 }
 

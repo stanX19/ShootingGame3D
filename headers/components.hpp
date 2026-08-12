@@ -317,7 +317,7 @@ namespace effect {
 		{
 			return ExplodeOnDeath{
 				parentRad * 10.0f,
-				0.0f,
+				parentRad * 0.7f,
 				parentRad * 5.0f, // Preserve the legacy expansion rate.
 				parentDmg,
 				EXPLOSION_COLOR

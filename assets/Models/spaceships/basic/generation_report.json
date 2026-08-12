@@ -1,0 +1,184 @@
+{
+  "bounds": {
+    "maximum": {
+      "x": 1.899999976158142,
+      "y": 0.7035999894142151,
+      "z": 1.9500000476837158
+    },
+    "maximumRadius": 2.185518503189087,
+    "minimum": {
+      "x": -1.899999976158142,
+      "y": -0.5166000127792358,
+      "z": -2.1396615505218506
+    }
+  },
+  "design": {
+    "availableThrust": 5.58597993850708,
+    "engineVolume": 0.4345042407512665,
+    "fuelVolume": 0.47505801916122437,
+    "magazineVolume": 1.1700000762939453,
+    "massCenter": {
+      "x": 0.0,
+      "y": 0.04161471128463745,
+      "z": -0.3735162913799286
+    },
+    "massProxy": 2.425139904022217,
+    "reactorVolume": 0.22717082500457764,
+    "requiredThrust": 2.085620403289795,
+    "selectedLayout": "central_cluster",
+    "thrustCenter": {
+      "x": 0.0,
+      "y": 0.040779758244752884,
+      "z": -1.3260000944137573
+    },
+    "weaponBurden": 4.745114326477051
+  },
+  "material": {
+    "accentCoverage": 0.013708077371120453,
+    "normalSlopeMaximum": 0.21607692539691925,
+    "normalSlopeMean": 0.017349129542708397,
+    "normalSlopeP95": 0.062745101749897,
+    "secondaryCoverage": 0.19604834914207458,
+    "thermalCoverage": 0.4018442630767822
+  },
+  "mounts": [
+    {
+      "attachmentPoint": {
+        "x": 1.2672799825668335,
+        "y": 0.1122230589389801,
+        "z": -0.2890700399875641
+      },
+      "directBlister": true,
+      "facingErrorDegrees": 0.0,
+      "id": "mount_0",
+      "minimumClearance": 0.12586987018585205,
+      "parentCollisionClearance": 0.30077850818634033,
+      "resolvedForward": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "structurallyConnected": true,
+      "supportLength": 0.18944737315177917,
+      "supportThickness": 0.5,
+      "takeoffAngleDegrees": 84.16981506347656
+    },
+    {
+      "attachmentPoint": {
+        "x": -1.2672799825668335,
+        "y": 0.1122230589389801,
+        "z": -0.2890700399875641
+      },
+      "directBlister": true,
+      "facingErrorDegrees": 0.0,
+      "id": "mount_1",
+      "minimumClearance": 0.12586995959281921,
+      "parentCollisionClearance": 0.30077850818634033,
+      "resolvedForward": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "structurallyConnected": true,
+      "supportLength": 0.18944737315177917,
+      "supportThickness": 0.5,
+      "takeoffAngleDegrees": 84.16981506347656
+    }
+  ],
+  "resolvedEngines": [
+    {
+      "center": {
+        "x": -0.23589462041854858,
+        "y": 0.040779758244752884,
+        "z": -1.3260000944137573
+      },
+      "length": 1.1327134370803833,
+      "nozzleCells": 2,
+      "nozzleDepth": 0.17727838456630707,
+      "radius": 0.28593286871910095
+    },
+    {
+      "center": {
+        "x": 0.23589462041854858,
+        "y": 0.040779758244752884,
+        "z": -1.3260000944137573
+      },
+      "length": 1.1327134370803833,
+      "nozzleCells": 2,
+      "nozzleDepth": 0.17727838456630707,
+      "radius": 0.28593286871910095
+    }
+  ],
+  "resolvedMounts": [
+    {
+      "barrelLength": 3.25,
+      "barrelRadius": 0.25,
+      "facingDirection": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "forward": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "id": "mount_0",
+      "position": {
+        "x": 1.4500000476837158,
+        "y": 0.4966300427913666,
+        "z": -0.23616136610507965
+      },
+      "socketHeight": 0.18000000715255737,
+      "supportHeight": 0.5,
+      "supportRoot": {
+        "x": 0.9000000357627869,
+        "y": 0.02663002908229828,
+        "z": -0.26116135716438293
+      },
+      "supportWidth": 0.6000000238418579,
+      "traverseHalfAngleDegrees": 20.0,
+      "turretRadius": 0.25
+    },
+    {
+      "barrelLength": 3.25,
+      "barrelRadius": 0.25,
+      "facingDirection": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "forward": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "id": "mount_1",
+      "position": {
+        "x": -1.4500000476837158,
+        "y": 0.4966300427913666,
+        "z": -0.23616136610507965
+      },
+      "socketHeight": 0.18000000715255737,
+      "supportHeight": 0.5,
+      "supportRoot": {
+        "x": -0.9000000357627869,
+        "y": 0.02663002908229828,
+        "z": -0.26116135716438293
+      },
+      "supportWidth": 0.6000000238418579,
+      "traverseHalfAngleDegrees": 20.0,
+      "turretRadius": 0.25
+    }
+  ],
+  "settingsFingerprint": 14885985183911101710,
+  "systems": {
+    "feedTrunks": 2,
+    "fuelHousings": 2,
+    "radiatorPanels": 2,
+    "reactorShields": 1,
+    "serviceAccessPanels": 1
+  },
+  "triangles": 4564,
+  "vertices": 2314
+}

@@ -48,7 +48,7 @@ void ecs_systems::cameraFollowPlayer(GameContext &context, float dt) {
 	if (!context.registry.valid(context.currentPlayer))
 		return;
 
-	auto [posPtr, rotPtr] = context.registry.try_get<Position, Rotation>(context.currentPlayer);
+	auto [posPtr, rotPtr, colBodyPtr] = context.registry.try_get<Position, Rotation, CollisionBody>(context.currentPlayer);
 	if (!posPtr || !rotPtr)
 		return;
 	camera::UnitCamera *unitCamera = &defaultCamera;
@@ -65,20 +65,25 @@ void ecs_systems::cameraFollowPlayer(GameContext &context, float dt) {
 		unitCamera->isAiming = false;
 	}
 	
-	bool shift = IsKeyDown(KEY_F);
+	bool lookback = IsKeyDown(KEY_F);
 	
-	// Select POV based on shift and aim state
+	// Select POV based on lookback and aim state
 	camera::CameraPOV pov;
-	if (shift) {
+	float scale = 1.0f;
+	if (lookback) {
 		pov = unitCamera->lookBackPOV;
 	} else if (unitCamera->isAiming) {
 		pov = getAimModePOV(context, context.currentPlayer, unitCamera->aimPOV);
 	} else {
 		pov = unitCamera->mainPOV;
+		if (colBodyPtr) {
+			scale = colBodyPtr->radius;
+		}
+		std::cout << "Camera scale: " << scale << std::endl;
 	}
 
-	Vector3 desiredPosition = Vector3RotateByQuaternion(pov.positionOffset, rot.value) + pos.value;
-	Vector3 desiredTarget = Vector3RotateByQuaternion(pov.targetOffset, rot.value) + pos.value;
+	Vector3 desiredPosition = Vector3RotateByQuaternion(pov.positionOffset, rot.value) * scale + pos.value;
+	Vector3 desiredTarget = Vector3RotateByQuaternion(pov.targetOffset, rot.value) * scale + pos.value;
 	
 	float smoothing = unitCamera->lerpExp;
 	float lerp = 1.0f - std::exp(-smoothing * dt);

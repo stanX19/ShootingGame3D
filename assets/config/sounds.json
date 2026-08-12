@@ -1,0 +1,52 @@
+{
+	"backgroundMusic": "assets/sounds/space-flight-10-422488.mp3",
+	"backgroundMusicDefault": "assets/sounds/space-flight-10-422488.mp3",
+	"bulletHit": [
+		"assets/sounds/metal/metal-hit-18-193284.mp3",
+		"assets/sounds/metal/metal-hit-28-193294.mp3",
+		"assets/sounds/metal/metal-hit-29-193293.mp3",
+		"assets/sounds/metal/metal-hit-30-193295.mp3",
+		"assets/sounds/metal/metal-hit-58-193319.mp3",
+		"assets/sounds/metal/metal-hit-68-193329.mp3",
+		"assets/sounds/metal/metal-hit-95-200424.mp3"
+	],
+	"bulletShoot": [
+		"assets/sounds/gunshot/gunshot_smg_shot_1-203471.mp3",
+		"assets/sounds/gunshot/gunshot_smg_shot_2-203472.mp3",
+		"assets/sounds/gunshot/gunshot_smg_shot_4-203474.mp3",
+		"assets/sounds/gunshot/gunshot_smg_shot_5-203475.mp3"
+	],
+	"bulletShootPitch": 1,
+	"collisionAlert": "assets/sounds/classic-game-action-positive-16-224566.mp3",
+	"explosion": [
+		"assets/sounds/explosion/medium-explosion-40472.mp3",
+		"assets/sounds/explosion/explosion-fx-343683.mp3"
+	],
+	"gameStart": "assets/sounds/electronic-beep-3-453383.mp3",
+	"hyperBoost": "assets/sounds/static-noise-mechanical-whoosh-23-a-191050.mp3",
+	"lazerHit": [
+		"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3",
+		"assets/sounds/lazer/lazer-sound-46104.mp3"
+	],
+	"lazerShoot": [
+		"assets/sounds/lazer/scifi-gun-shoot-1-266417.mp3",
+		"assets/sounds/lazer/lazer-sound-46104.mp3"
+	],
+	"lockOn": "assets/sounds/electronic-beep-1-453381.mp3",
+	"lockOnVolume": 0.25,
+	"lowHpWarningDuration": 12,
+	"lowHpWarningFadeDuration": 6,
+	"lowHpWarningInterval": 1,
+	"lowHpWarningThreshold": 0.4,
+	"missileAlert": "assets/sounds/buzzer-2-181415.mp3",
+	"missileShoot": [
+		"assets/sounds/missile/cas-missile-launching-with-some-reverb-66630.mp3"
+	],
+	"thrust": "assets/sounds/engine3_up-75891.mp3",
+	"thrustFadeIn": 1,
+	"thrustFadeOut": 5,
+	"thrustRestartThreshold": 2,
+	"thrustVolume": 0.25,
+	"warning": "assets/sounds/buzzer-1-181412.mp3",
+	"warningVolume": 0.25
+}

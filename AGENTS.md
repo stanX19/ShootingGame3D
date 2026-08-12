@@ -5,6 +5,7 @@
 Before broad exploration, read [docs/project-context.md](docs/project-context.md). Follow [docs/development-protocols.md](docs/development-protocols.md) for planning, approval, implementation, testing, and recovery.
 
 For model or asset pipeline work, read [docs/model-asset-conventions.md](docs/model-asset-conventions.md).
+For procedural model design, implementation, benchmarking, and screenshot QC, read [procedural model generation workflow](docs/workflows/procedural-model-generation.md).
 For asteroid asset work and repeated-render benchmarks, also read [procedural asteroid generator and rendering evidence rules](docs/specs/procedural-asteroid-and-wsl-rendering.md)
 
 
@@ -21,7 +22,7 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - **Plan First:** Do not modify tracked code, tests, configuration, shaders, build files, or documentation until explicitly approved by the user.
 - **Visual Planning:** Plans must include detailed Mermaid graphs of the current status and the status after the planned edit. Store them in workspace-level `scratch/plans/`, outside this repository.
 - **Write Ahead Log:** Plans must be written before implementation in `../scratch/plans/`, with a descriptive name and local datetime using `YYYY-MM-DD_HHmmss_short-kebab-description.md`. Update the plan with progress, verification, deviations, and recovery notes.
-- **Plan Diff Preview:** Every plan must include a concise `git diff` preview showing the intended additions, removals, and edits before implementation begins.
+- **One-File Diff Preview:** Before approval, filesystem writes are limited to the plan and `../scratch/plans/<plan-basename>_diff.patch`. Author the complete unified diff directly as text in that patch. Do not copy or mirror project files, create candidate files, modify existing files, or derive the patch by comparing filesystem contents—including under `scratch/`.
 - **Clean Workspace:** Implementation plans, ad hoc scripts, and walkthroughs belong in `../scratch/` and must not be committed.
 
 ## Scope and Quality

@@ -46,7 +46,7 @@ EngineState SettingsMenu::run()
     }
     
     // Save on exit from settings
-    context.config.save("assets/config/game_config.json");
+    context.config.saveChanged();
     
     return nextState;
 }

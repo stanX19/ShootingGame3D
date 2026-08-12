@@ -1,0 +1,6 @@
+{
+	"explosionMaxDistance": 500,
+	"masterVolume": 0.5,
+	"maxSoundsPerIdPerFrame": 10,
+	"soundAliasCount": 8
+}

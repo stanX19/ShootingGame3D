@@ -1,41 +1,68 @@
 #include "game_config.hpp"
+
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
+
 #include "raylib.h"
 
-void GameConfig::init(const std::string& configPath) {
-	if (loaded) return;
+void GameConfig::init(std::initializer_list<RootSource> sources) {
+	init(std::vector<RootSource>(sources));
+}
 
-	std::ifstream file(configPath);
-	if (!file.is_open()) {
-		TraceLog(LOG_WARNING, "CONFIG: Failed to open config file: %s", configPath.c_str());
+void GameConfig::init(const std::vector<RootSource>& sources) {
+	if (loaded)
 		return;
+	if (sources.empty())
+		throw std::invalid_argument("CONFIG: at least one root source is required");
+
+	nlohmann::json candidate = nlohmann::json::object();
+	std::map<std::string, RootJsonFile> candidateFiles;
+	config::SpaceshipConfig candidateSpaceship;
+
+	for (const auto& [rootName, sourcePath] : sources) {
+		if (rootName.empty() || sourcePath.empty())
+			throw std::invalid_argument("CONFIG: root name and source path are required");
+		if (!candidateFiles.emplace(rootName, RootJsonFile{sourcePath, false}).second)
+			throw std::invalid_argument("CONFIG: duplicate root: " + rootName);
+
+		std::ifstream file(sourcePath);
+		if (!file)
+			throw std::runtime_error(
+				"CONFIG: failed to open root " + rootName + ": " + sourcePath
+			);
+		try {
+			file >> candidate[rootName];
+		} catch (const nlohmann::json::parse_error& error) {
+			throw std::runtime_error(
+				"CONFIG: failed to parse root " + rootName + ": " + error.what()
+			);
+		}
+		if (rootName == "spaceship")
+			candidateSpaceship.init(candidate.at(rootName), sourcePath);
 	}
 
-	try {
-		file >> config;
-		loaded = true;
-		TraceLog(LOG_INFO, "CONFIG: Loaded config from %s", configPath.c_str());
-	} catch (const nlohmann::json::parse_error& e) {
-		TraceLog(LOG_WARNING, "CONFIG: Failed to parse config: %s", e.what());
-		return;
-	}
-
+	config = std::move(candidate);
+	roots = std::move(candidateFiles);
+	spaceshipConfig = std::move(candidateSpaceship);
+	loaded = true;
 	initConstants();
 }
 
 void GameConfig::initConstants() {
 	ARENA_SIZE = getFloat("game.arenaSize", 2000.0f);
-	COMBAT_DIST = getFloat("game.combatDist", 1000.0f);
+	COMBAT_DIST = getInt("game.combatDist", 1000);
 	UNIT_COUNT = getInt("game.unitCount", 4);
-	
+
 	physics.collisionElasticity = getFloat("physics.collisionElasticity", 0.5f);
 	physics.maxAngularKick = getFloat("physics.maxAngularKick", 0.5f);
 	physics.roughness = getFloat("physics.roughness", 2.5f);
 
 	settings.showHPBar = getBool("settings.showHPBar", true);
 	settings.masterVolume = getFloat("audio.masterVolume", 0.5f);
-	settings.controlSensitivity = Clamp(getFloat("settings.controlSensitivity", 1.0f), 0.01f, 1.0f);
+	settings.controlSensitivity = Clamp(
+		getFloat("settings.controlSensitivity", 1.0f), 0.01f, 1.0f
+	);
 	loadout.w1 = getString("loadout.w1", "bullet.machineGun");
 	loadout.w2 = getString("loadout.w2", "bullet.machineGun");
 	loadout.w3 = getString("loadout.w3", "lazer.basic");
@@ -46,16 +73,35 @@ void GameConfig::initConstants() {
 }
 
 const nlohmann::json* GameConfig::navigatePath(const std::string& path) const {
-	if (!loaded) return nullptr;
+	if (!loaded)
+		return nullptr;
 
 	const nlohmann::json* current = &config;
-	std::istringstream ss(path);
+	std::istringstream stream(path);
 	std::string token;
-
-	while (std::getline(ss, token, '.')) {
-		if (!current->is_object() || !current->contains(token)) {
+	while (std::getline(stream, token, '.')) {
+		if (token.empty() || !current->is_object() || !current->contains(token))
 			return nullptr;
-		}
+		current = &(*current)[token];
+	}
+	return current;
+}
+
+nlohmann::json* GameConfig::navigatePath(
+	nlohmann::json& root,
+	const std::string& path
+) const {
+	if (path.empty())
+		return nullptr;
+
+	nlohmann::json* current = &root;
+	std::istringstream stream(path);
+	std::string token;
+	while (std::getline(stream, token, '.')) {
+		if (token.empty())
+			return nullptr;
+		if (!current->is_object())
+			*current = nlohmann::json::object();
 		current = &(*current)[token];
 	}
 	return current;
@@ -63,32 +109,42 @@ const nlohmann::json* GameConfig::navigatePath(const std::string& path) const {
 
 float GameConfig::getFloat(const std::string& path, float defaultVal) const {
 	const nlohmann::json* node = navigatePath(path);
-	if (!node || !node->is_number()) return defaultVal;
+	if (node == nullptr || !node->is_number())
+		return defaultVal;
 	return node->get<float>();
 }
 
 int GameConfig::getInt(const std::string& path, int defaultVal) const {
 	const nlohmann::json* node = navigatePath(path);
-	if (!node || !node->is_number()) return defaultVal;
+	if (node == nullptr || !node->is_number())
+		return defaultVal;
 	return node->get<int>();
 }
 
 bool GameConfig::getBool(const std::string& path, bool defaultVal) const {
 	const nlohmann::json* node = navigatePath(path);
-	if (!node || !node->is_boolean()) return defaultVal;
+	if (node == nullptr || !node->is_boolean())
+		return defaultVal;
 	return node->get<bool>();
 }
 
-std::string GameConfig::getString(const std::string& path, const std::string& defaultVal) const {
+std::string GameConfig::getString(
+	const std::string& path,
+	const std::string& defaultVal
+) const {
 	const nlohmann::json* node = navigatePath(path);
-	if (!node || !node->is_string()) return defaultVal;
+	if (node == nullptr || !node->is_string())
+		return defaultVal;
 	return node->get<std::string>();
 }
 
-Vector3 GameConfig::getVector3(const std::string& path, Vector3 defaultVal) const {
+Vector3 GameConfig::getVector3(
+	const std::string& path,
+	Vector3 defaultVal
+) const {
 	const nlohmann::json* node = navigatePath(path);
-	if (!node || !node->is_object()) return defaultVal;
-
+	if (node == nullptr || !node->is_object())
+		return defaultVal;
 	return Vector3{
 		node->value("x", defaultVal.x),
 		node->value("y", defaultVal.y),
@@ -98,52 +154,91 @@ Vector3 GameConfig::getVector3(const std::string& path, Vector3 defaultVal) cons
 
 nlohmann::json GameConfig::getSection(const std::string& path) const {
 	const nlohmann::json* node = navigatePath(path);
-	if (!node) return nlohmann::json{};
-	return *node;
+	return node == nullptr ? nlohmann::json{} : *node;
+}
+
+void GameConfig::setJsonValue(const std::string& path, nlohmann::json value) {
+	const std::size_t separator = path.find('.');
+	if (separator == std::string::npos || separator == 0 || separator + 1 >= path.size())
+		throw std::invalid_argument(
+			"CONFIG: setters require a root-qualified path: " + path
+		);
+	const std::string rootName = path.substr(0, separator);
+	auto root = roots.find(rootName);
+	if (root == roots.end())
+		throw std::invalid_argument("CONFIG: unknown root: " + rootName);
+
+	nlohmann::json updatedRoot = config.at(rootName);
+	nlohmann::json* node = navigatePath(
+		updatedRoot,
+		path.substr(separator + 1)
+	);
+	if (node == nullptr)
+		throw std::invalid_argument("CONFIG: invalid path: " + path);
+	if (*node == value)
+		return;
+	*node = std::move(value);
+
+	if (rootName == "spaceship") {
+		config::SpaceshipConfig updatedSpaceship;
+		updatedSpaceship.init(updatedRoot, root->second.sourcePath);
+		spaceshipConfig = std::move(updatedSpaceship);
+	}
+	config[rootName] = std::move(updatedRoot);
+	root->second.dirty = true;
+	initConstants();
 }
 
 void GameConfig::setFloat(const std::string& path, float value) {
-	std::istringstream ss(path);
-	std::string token;
-	nlohmann::json* current = &config;
-
-	while (std::getline(ss, token, '.')) {
-		current = &((*current)[token]);
-	}
-	*current = value;
-	initConstants(); // Re-sync cached constants
+	setJsonValue(path, value);
 }
 
 void GameConfig::setString(const std::string& path, const std::string& value) {
-	std::istringstream ss(path);
-	std::string token;
-	nlohmann::json* current = &config;
-
-	while (std::getline(ss, token, '.')) {
-		current = &((*current)[token]);
-	}
-	*current = value;
-	initConstants(); // Re-sync cached constants
+	setJsonValue(path, value);
 }
 
 void GameConfig::setBool(const std::string& path, bool value) {
-	std::istringstream ss(path);
-	std::string token;
-	nlohmann::json* current = &config;
-
-	while (std::getline(ss, token, '.')) {
-		current = &((*current)[token]);
-	}
-	*current = value;
-	initConstants(); // Re-sync cached constants
+	setJsonValue(path, value);
 }
 
-void GameConfig::save(const std::string& configPath) {
-	std::ofstream file(configPath);
-	if (!file.is_open()) {
-		TraceLog(LOG_WARNING, "CONFIG: Failed to open config file for saving: %s", configPath.c_str());
-		return;
+void GameConfig::saveRootJsonFile(
+	const std::string& rootName,
+	RootJsonFile& file
+) {
+	std::ofstream output(file.sourcePath, std::ios::trunc);
+	if (!output)
+		throw std::runtime_error(
+			"CONFIG: failed to open root for saving " + rootName + ": " + file.sourcePath
+		);
+	output << config.at(rootName).dump(4) << '\n';
+	if (!output)
+		throw std::runtime_error(
+			"CONFIG: failed while saving root " + rootName + ": " + file.sourcePath
+		);
+	file.dirty = false;
+	TraceLog(
+		LOG_INFO,
+		"CONFIG: Saved root %s to %s",
+		rootName.c_str(),
+		file.sourcePath.c_str()
+	);
+}
+
+void GameConfig::saveRoot(const std::string& rootName) {
+	auto iterator = roots.find(rootName);
+	if (iterator == roots.end())
+		throw std::invalid_argument("CONFIG: unknown root: " + rootName);
+	saveRootJsonFile(rootName, iterator->second);
+}
+
+void GameConfig::saveChanged() {
+	for (auto& [rootName, file] : roots) {
+		if (file.dirty)
+			saveRootJsonFile(rootName, file);
 	}
-	file << config.dump(4);
-	TraceLog(LOG_INFO, "CONFIG: Saved config to %s", configPath.c_str());
+}
+
+void GameConfig::saveAll() {
+	for (auto& [rootName, file] : roots)
+		saveRootJsonFile(rootName, file);
 }

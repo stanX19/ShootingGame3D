@@ -1,0 +1,2589 @@
+{
+  "schemaVersion": 1,
+  "defaults": {
+    "turretRadius": 0.25,
+    "barrelRadius": 0.25,
+    "barrelLength": 3.25,
+    "traverseHalfAngleDegrees": 45,
+    "mountAttachment": {
+      "preferredTakeoffAngleDegrees": 30.0,
+      "minimumTakeoffAngleDegrees": 25.0,
+      "maximumTakeoffAngleDegrees": 40.0,
+      "directBlisterGapScale": 1.8,
+      "distanceWeight": 0.35,
+      "angleWeight": 1.0,
+      "blisterRadiusScale": 1.35
+    }
+  },
+  "ships": {
+    "player": {
+      "modelPath": "assets/Models/spaceships/player/spaceship_player.obj",
+      "runtime": {
+        "modelRadius": 3.879911184310913
+      },
+      "seed": 4101,
+      "design": {
+        "propulsionLayout": "wing_nacelles",
+        "propulsionPlacement": "auto",
+        "targetAcceleration": 1.15,
+        "endurance": 1.0,
+        "armorMassScale": 1.0,
+        "engineTechnology": 1.0,
+        "moduleClearance": 0.14,
+        "hardSurfaceBias": 0.72,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "forward",
+          "symmetry": "bilateral",
+          "batteryStyle": "integrated",
+          "turretCount": 4,
+          "minimumSeparationScale": 1.35,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.58,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.58,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.64,
+              "supportHeight": 0.44,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.64,
+              "supportHeight": 0.44,
+              "socketHeight": 0.22
+            }
+          ]
+        }
+      },
+      "mountAttachment": {
+        "directBlisterGapScale": 2.0
+      },
+      "dimensions": {
+        "width": 8.8,
+        "height": 2.5,
+        "length": 5
+      },
+      "hull": {
+        "width": 2.30,
+        "height": 1.15,
+        "length": 4.95,
+        "crown": 0.13,
+        "keel": 0.1,
+        "noseSharpness": 0.78,
+        "rearTaper": 0.72
+      },
+      "wings": {
+        "halfSpan": 3.7,
+        "rootFrontZ": 0.85,
+        "rootRearZ": -2.2,
+        "tipFrontZ": -0.65,
+        "tipRearZ": -1.15,
+        "rootX": 0.82,
+        "topY": -0.16,
+        "bottomY": -0.46,
+        "shoulderWidth": 0.62
+      },
+      "cockpit": {
+        "center": {
+          "x": 0,
+          "y": 0.68,
+          "z": 0.95
+        },
+        "size": {
+          "x": 1.08,
+          "y": 0.4,
+          "z": 1.35
+        },
+        "browDepth": 0.12
+      },
+      "layout": {
+        "archetype": "multirole",
+        "crew": 2,
+        "primarySpineWidth": 0.72,
+        "reactorRadius": 0.58,
+        "serviceBayLength": 1.35,
+        "radiatorScale": 0.65,
+        "weaponDeckCantDegrees": 0
+      },
+      "engines": [
+        {
+          "center": {
+            "x": -1.7690277099609375,
+            "y": 0.024482883512973785,
+            "z": -1.6829999685287476
+          },
+          "radius": 0.5272376537322998,
+          "length": 1.461185097694397,
+          "nozzleDepth": 0.3268873393535614
+        },
+        {
+          "center": {
+            "x": 1.7690277099609375,
+            "y": 0.024482883512973785,
+            "z": -1.6829999685287476
+          },
+          "radius": 0.5272376537322998,
+          "length": 1.461185097694397,
+          "nozzleDepth": 0.3268873393535614
+        }
+      ],
+      "mounts": [
+        {
+          "id": "mount_0",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 2.2819437980651855,
+            "y": 0.6035819053649902,
+            "z": -0.21732240915298462
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 1.7319438457489014,
+            "y": 0.0935819074511528,
+            "z": -0.2423224151134491
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.2199999988079071
+        },
+        {
+          "id": "mount_1",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -2.2819437980651855,
+            "y": 0.6035819053649902,
+            "z": -0.21732240915298462
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -1.7319438457489014,
+            "y": 0.0935819074511528,
+            "z": -0.2423224151134491
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.2199999988079071
+        },
+        {
+          "id": "mount_2",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 3.0952000617980957,
+            "y": 0.4619719684123993,
+            "z": -0.658618688583374
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 2.5452001094818115,
+            "y": -0.04802803695201874,
+            "z": -0.6836186647415161
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6399999856948853,
+          "supportHeight": 0.5,
+          "socketHeight": 0.2199999988079071
+        },
+        {
+          "id": "mount_3",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -3.0952000617980957,
+            "y": 0.4619719684123993,
+            "z": -0.658618688583374
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -2.5452001094818115,
+            "y": -0.04802803695201874,
+            "z": -0.6836186647415161
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6399999856948853,
+          "supportHeight": 0.5,
+          "socketHeight": 0.2199999988079071
+        }
+      ],
+      "material": {
+        "armorBase": [86, 103, 118],
+        "armorSecondary": [42, 55, 69],
+        "accent": [202, 132, 45],
+        "structure": [52, 62, 72],
+        "canopy": [18, 112, 148],
+        "engine": [74, 177, 225],
+        "pattern": "chevron",
+        "secondaryCoverage": 0.32,
+        "accentCoverage": 0.1,
+        "normalStrength": 0.12,
+        "detailScale": 1.0
+      },
+      "wear": {
+        "paintLoss": 0.24,
+        "oxidation": 0.08,
+        "heatStaining": 0.28,
+        "repairPanels": 4
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "texture": {
+        "width": 1024,
+        "height": 1024
+      },
+      "armorDepth": 0.1
+    },
+    "basic": {
+      "modelPath": "assets/Models/spaceships/basic/spaceship_basic.obj",
+      "runtime": {
+        "modelRadius": 2.2811813354492188
+      },
+      "seed": 4201,
+      "design": {
+        "propulsionLayout": "central_cluster",
+        "propulsionPlacement": "auto",
+        "targetAcceleration": 0.86,
+        "endurance": 0.82,
+        "armorMassScale": 0.82,
+        "engineTechnology": 1.0,
+        "moduleClearance": 0.11,
+        "hardSurfaceBias": 0.64,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "forward",
+          "symmetry": "bilateral",
+          "batteryStyle": "integrated",
+          "turretCount": 2,
+          "minimumSeparationScale": 1.3,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.4,
+              "supportHeight": 0.38,
+              "socketHeight": 0.18
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.4,
+              "supportHeight": 0.38,
+              "socketHeight": 0.18
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "width": 4.2,
+        "height": 2,
+        "length": 4.2
+      },
+      "hull": {
+        "width": 1.65,
+        "height": 0.92,
+        "length": 3.9,
+        "crown": 0.1,
+        "keel": 0.075,
+        "noseSharpness": 0.9,
+        "rearTaper": 0.62
+      },
+      "wings": {
+        "halfSpan": 1.9,
+        "rootFrontZ": 0.85,
+        "rootRearZ": -1.55,
+        "tipFrontZ": -0.45,
+        "tipRearZ": -0.90,
+        "rootX": 0.54,
+        "topY": -0.12,
+        "bottomY": -0.36,
+        "shoulderWidth": 0.36
+      },
+      "cockpit": {
+        "center": {
+          "x": 0,
+          "y": 0.55,
+          "z": 0.9
+        },
+        "size": {
+          "x": 0.78,
+          "y": 0.32,
+          "z": 1.05
+        },
+        "browDepth": 0.08
+      },
+      "layout": {
+        "archetype": "patrol_fighter",
+        "crew": 1,
+        "primarySpineWidth": 0.46,
+        "reactorRadius": 0.36,
+        "serviceBayLength": 0.75,
+        "radiatorScale": 0.38,
+        "weaponDeckCantDegrees": 0
+      },
+      "engines": [
+        {
+          "center": {
+            "x": -0.23589462041854858,
+            "y": 0.040779758244752884,
+            "z": -1.3260000944137573
+          },
+          "radius": 0.28593286871910095,
+          "length": 1.1327134370803833,
+          "nozzleDepth": 0.17727838456630707
+        },
+        {
+          "center": {
+            "x": 0.23589462041854858,
+            "y": 0.040779758244752884,
+            "z": -1.3260000944137573
+          },
+          "radius": 0.28593286871910095,
+          "length": 1.1327134370803833,
+          "nozzleDepth": 0.17727838456630707
+        }
+      ],
+      "mounts": [
+        {
+          "id": "mount_0",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 1.4500000476837158,
+            "y": 0.4966300427913666,
+            "z": -0.23616136610507965
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 0.9000000357627869,
+            "y": 0.02663002908229828,
+            "z": -0.26116135716438293
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.18000000715255737
+        },
+        {
+          "id": "mount_1",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -1.4500000476837158,
+            "y": 0.4966300427913666,
+            "z": -0.23616136610507965
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -0.9000000357627869,
+            "y": 0.02663002908229828,
+            "z": -0.26116135716438293
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.18000000715255737
+        }
+      ],
+      "material": {
+        "armorBase": [132, 140, 142],
+        "armorSecondary": [78, 88, 90],
+        "accent": [211, 166, 55],
+        "structure": [64, 70, 74],
+        "canopy": [28, 101, 122],
+        "engine": [75, 164, 202],
+        "pattern": "wing_bands",
+        "secondaryCoverage": 0.26,
+        "accentCoverage": 0.08,
+        "normalStrength": 0.11,
+        "detailScale": 0.9
+      },
+      "wear": {
+        "paintLoss": 0.3,
+        "oxidation": 0.12,
+        "heatStaining": 0.2,
+        "repairPanels": 2
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "texture": {
+        "width": 1024,
+        "height": 1024
+      },
+      "armorDepth": 0.1
+    },
+    "elite": {
+      "modelPath": "assets/Models/spaceships/elite/spaceship_elite.obj",
+      "runtime": {
+        "modelRadius": 3.164418935775757
+      },
+      "seed": 4301,
+      "design": {
+        "propulsionLayout": "spine_cluster",
+        "propulsionPlacement": "auto",
+        "targetAcceleration": 1.02,
+        "endurance": 1.08,
+        "armorMassScale": 1.18,
+        "engineTechnology": 1.06,
+        "moduleClearance": 0.14,
+        "hardSurfaceBias": 0.78,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "forward",
+          "symmetry": "bilateral",
+          "batteryStyle": "integrated",
+          "turretCount": 2,
+          "minimumSeparationScale": 1.3,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.52,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.52,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "width": 6.4,
+        "height": 2.4,
+        "length": 4.8
+      },
+      "hull": {
+        "width": 2.10,
+        "height": 1.15,
+        "length": 4.65,
+        "crown": 0.16,
+        "keel": 0.11,
+        "noseSharpness": 0.76,
+        "rearTaper": 0.76
+      },
+      "wings": {
+        "halfSpan": 2.8,
+        "rootFrontZ": 1.1,
+        "rootRearZ": -2.05,
+        "tipFrontZ": -0.45,
+        "tipRearZ": -0.90,
+        "rootX": 0.72,
+        "topY": -0.22,
+        "bottomY": -0.55,
+        "shoulderWidth": 0.52
+      },
+      "cockpit": {
+        "center": {
+          "x": 0,
+          "y": 0.7,
+          "z": 1.0
+        },
+        "size": {
+          "x": 1.04,
+          "y": 0.4,
+          "z": 1.25
+        },
+        "browDepth": 0.12
+      },
+      "layout": {
+        "archetype": "heavy_fighter",
+        "crew": 2,
+        "primarySpineWidth": 0.66,
+        "reactorRadius": 0.52,
+        "serviceBayLength": 1.25,
+        "radiatorScale": 0.72,
+        "weaponDeckCantDegrees": 0
+      },
+      "engines": [
+        {
+          "center": {
+            "x": -1.2741825580596924,
+            "y": 0.03950605168938637,
+            "z": -1.740272879600525
+          },
+          "radius": 0.35393962264060974,
+          "length": 1.318559169769287,
+          "nozzleDepth": 0.21944256126880646
+        },
+        {
+          "center": {
+            "x": 0.0,
+            "y": 0.03950605168938637,
+            "z": -1.5810000896453857
+          },
+          "radius": 0.35393962264060974,
+          "length": 1.318559169769287,
+          "nozzleDepth": 0.21944256126880646
+        },
+        {
+          "center": {
+            "x": 1.2741825580596924,
+            "y": 0.03950605168938637,
+            "z": -1.740272879600525
+          },
+          "radius": 0.35393962264060974,
+          "length": 1.318559169769287,
+          "nozzleDepth": 0.21944256126880646
+        }
+      ],
+      "mounts": [
+        {
+          "id": "mount_0",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 2.3031997680664062,
+            "y": 0.4222111701965332,
+            "z": -0.30625244975090027
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 1.753199815750122,
+            "y": -0.08778881281614304,
+            "z": -0.33125245571136475
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.2199999988079071
+        },
+        {
+          "id": "mount_1",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -2.3031997680664062,
+            "y": 0.4222111701965332,
+            "z": -0.30625244975090027
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -1.753199815750122,
+            "y": -0.08778881281614304,
+            "z": -0.33125245571136475
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.2199999988079071
+        }
+      ],
+      "material": {
+        "armorBase": [74, 88, 108],
+        "armorSecondary": [32, 41, 55],
+        "accent": [177, 51, 46],
+        "structure": [48, 55, 65],
+        "canopy": [20, 93, 140],
+        "engine": [64, 150, 222],
+        "pattern": "spine_band",
+        "secondaryCoverage": 0.34,
+        "accentCoverage": 0.09,
+        "normalStrength": 0.13,
+        "detailScale": 1.1
+      },
+      "wear": {
+        "paintLoss": 0.2,
+        "oxidation": 0.07,
+        "heatStaining": 0.3,
+        "repairPanels": 5
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "texture": {
+        "width": 1024,
+        "height": 1024
+      },
+      "armorDepth": 0.1
+    },
+    "fastElite": {
+      "modelPath": "assets/Models/spaceships/fastElite/spaceship_fastElite.obj",
+      "runtime": {
+        "modelRadius": 3.589148759841919
+      },
+      "seed": 4401,
+      "design": {
+        "propulsionLayout": "twin_boom",
+        "propulsionPlacement": "auto",
+        "targetAcceleration": 1.48,
+        "endurance": 0.70,
+        "armorMassScale": 0.72,
+        "engineTechnology": 1.12,
+        "moduleClearance": 0.11,
+        "hardSurfaceBias": 0.76,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "forward",
+          "symmetry": "bilateral",
+          "batteryStyle": "integrated",
+          "turretCount": 2,
+          "minimumSeparationScale": 1.3,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.42,
+              "supportHeight": 0.38,
+              "socketHeight": 0.18
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.42,
+              "supportHeight": 0.38,
+              "socketHeight": 0.18
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "width": 5.0,
+        "height": 2,
+        "length": 5.6
+      },
+      "hull": {
+        "width": 1.65,
+        "height": 0.88,
+        "length": 5.35,
+        "crown": 0.09,
+        "keel": 0.075,
+        "noseSharpness": 0.94,
+        "rearTaper": 0.58
+      },
+      "wings": {
+        "halfSpan": 2.1,
+        "rootFrontZ": 1.3,
+        "rootRearZ": -2.65,
+        "tipFrontZ": -0.85,
+        "tipRearZ": -1.22,
+        "rootX": 0.5,
+        "topY": -0.12,
+        "bottomY": -0.34,
+        "shoulderWidth": 0.38
+      },
+      "cockpit": {
+        "center": {
+          "x": 0,
+          "y": 0.52,
+          "z": 1.1
+        },
+        "size": {
+          "x": 0.78,
+          "y": 0.3,
+          "z": 1.3
+        },
+        "browDepth": 0.08
+      },
+      "layout": {
+        "archetype": "interceptor",
+        "crew": 1,
+        "primarySpineWidth": 0.42,
+        "reactorRadius": 0.43,
+        "serviceBayLength": 0.70,
+        "radiatorScale": 0.82,
+        "weaponDeckCantDegrees": 0
+      },
+      "engines": [
+        {
+          "center": {
+            "x": -1.0397628545761108,
+            "y": 0.021488986909389496,
+            "z": -1.6734800338745117
+          },
+          "radius": 0.3500984013080597,
+          "length": 1.5209441184997559,
+          "nozzleDepth": 0.21706101298332214
+        },
+        {
+          "center": {
+            "x": 1.0397628545761108,
+            "y": 0.021488986909389496,
+            "z": -1.6734800338745117
+          },
+          "radius": 0.3500984013080597,
+          "length": 1.5209441184997559,
+          "nozzleDepth": 0.21706101298332214
+        }
+      ],
+      "mounts": [
+        {
+          "id": "mount_0",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 1.8787498474121094,
+            "y": 0.45695385336875916,
+            "z": -0.45291799306869507
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 1.3287498950958252,
+            "y": -0.013046152889728546,
+            "z": -0.47791799902915955
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.18000000715255737
+        },
+        {
+          "id": "mount_1",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -1.8787498474121094,
+            "y": 0.45695385336875916,
+            "z": -0.45291799306869507
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -1.3287498950958252,
+            "y": -0.013046152889728546,
+            "z": -0.47791799902915955
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.6000000238418579,
+          "supportHeight": 0.5,
+          "socketHeight": 0.18000000715255737
+        }
+      ],
+      "material": {
+        "armorBase": [118, 128, 138],
+        "armorSecondary": [48, 60, 74],
+        "accent": [226, 103, 34],
+        "structure": [52, 60, 70],
+        "canopy": [15, 110, 155],
+        "engine": [70, 190, 240],
+        "pattern": "wing_bands",
+        "secondaryCoverage": 0.3,
+        "accentCoverage": 0.09,
+        "normalStrength": 0.14,
+        "detailScale": 1.15
+      },
+      "wear": {
+        "paintLoss": 0.34,
+        "oxidation": 0.1,
+        "heatStaining": 0.34,
+        "repairPanels": 2
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "texture": {
+        "width": 1024,
+        "height": 1024
+      },
+      "armorDepth": 0.1
+    },
+    "terminator": {
+      "modelPath": "assets/Models/spaceships/terminator/spaceship_terminator.obj",
+      "runtime": {
+        "modelRadius": 8.674443244934082
+      },
+      "mountAttachment": {
+        "directBlisterGapScale": 4.2
+      },
+      "seed": 4501,
+      "design": {
+        "propulsionLayout": "distributed_aft",
+        "propulsionPlacement": "auto",
+        "targetAcceleration": 0.82,
+        "endurance": 1.30,
+        "armorMassScale": 1.72,
+        "engineTechnology": 1.18,
+        "moduleClearance": 0.20,
+        "hardSurfaceBias": 0.88,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "omnidirectional",
+          "symmetry": "bilateral",
+          "batteryStyle": "external",
+          "turretCount": 32,
+          "minimumSeparationScale": 1.25,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 5.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 20.0,
+              "supportWidth": 0.54,
+              "supportHeight": 0.48,
+              "socketHeight": 0.28,
+              "facingDirection": null
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "width": 10,
+        "height": 4.8,
+        "length": 8
+      },
+      "hull": {
+        "width": 4.8,
+        "height": 2.8,
+        "length": 6.4,
+        "crown": 0.28,
+        "keel": 0.22,
+        "noseSharpness": 0.62,
+        "rearTaper": 0.84
+      },
+      "wings": {
+        "halfSpan": 5,
+        "rootFrontZ": 1.4,
+        "rootRearZ": -2.6,
+        "tipFrontZ": 0.9,
+        "tipRearZ": -2.9,
+        "rootX": 2,
+        "topY": -0.65,
+        "bottomY": -1,
+        "shoulderWidth": 0.75
+      },
+      "cockpit": {
+        "center": {
+          "x": 0,
+          "y": 1.35,
+          "z": 1.4
+        },
+        "size": {
+          "x": 2.1,
+          "y": 0.9,
+          "z": 1.9
+        },
+        "browDepth": 0.25
+      },
+      "layout": {
+        "archetype": "siege_gunship",
+        "crew": 24,
+        "primarySpineWidth": 1.25,
+        "reactorRadius": 1.05,
+        "serviceBayLength": 2.40,
+        "radiatorScale": 1.15,
+        "weaponDeckCantDegrees": 32
+      },
+      "engines": [
+        {
+          "center": {
+            "x": -6.077113151550293,
+            "y": -0.02740931138396263,
+            "z": -3.2460317611694336
+          },
+          "radius": 0.48091310262680054,
+          "length": 2.2132017612457275,
+          "nozzleDepth": 0.2981661260128021
+        },
+        {
+          "center": {
+            "x": -4.430556297302246,
+            "y": 0.07839156687259674,
+            "z": -2.7651188373565674
+          },
+          "radius": 0.48091310262680054,
+          "length": 2.2132017612457275,
+          "nozzleDepth": 0.2981661260128021
+        },
+        {
+          "center": {
+            "x": -2.7839999198913574,
+            "y": 0.18419243395328522,
+            "z": -2.284205675125122
+          },
+          "radius": 0.48091310262680054,
+          "length": 2.2132017612457275,
+          "nozzleDepth": 0.2981661260128021
+        },
+        {
+          "center": {
+            "x": 2.7839999198913574,
+            "y": 0.18419243395328522,
+            "z": -2.284205675125122
+          },
+          "radius": 0.48091310262680054,
+          "length": 2.2132017612457275,
+          "nozzleDepth": 0.2981661260128021
+        },
+        {
+          "center": {
+            "x": 4.430556297302246,
+            "y": 0.07839156687259674,
+            "z": -2.7651188373565674
+          },
+          "radius": 0.48091310262680054,
+          "length": 2.2132017612457275,
+          "nozzleDepth": 0.2981661260128021
+        },
+        {
+          "center": {
+            "x": 6.077113151550293,
+            "y": -0.02740931138396263,
+            "z": -3.2460317611694336
+          },
+          "radius": 0.48091310262680054,
+          "length": 2.2132017612457275,
+          "nozzleDepth": 0.2981661260128021
+        }
+      ],
+      "mounts": [
+        {
+          "id": "mount_0",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 5.620756149291992,
+            "y": 3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 5.620756149291992,
+            "y": 2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_1",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -5.620756149291992,
+            "y": 3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -5.620756149291992,
+            "y": 2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_2",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 6.4207563400268555,
+            "y": 3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 6.4207563400268555,
+            "y": 2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_3",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -6.4207563400268555,
+            "y": 3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -6.4207563400268555,
+            "y": 2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_4",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 5.620756149291992,
+            "y": -3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 5.620756149291992,
+            "y": -2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_5",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -5.620756149291992,
+            "y": -3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -5.620756149291992,
+            "y": -2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_6",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 6.4207563400268555,
+            "y": -3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 6.4207563400268555,
+            "y": -2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_7",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -6.4207563400268555,
+            "y": -3.1112563610076904,
+            "z": 1.7920000553131104
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -6.4207563400268555,
+            "y": -2.3500001430511475,
+            "z": 1.7920000553131104
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_8",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 6.449065685272217,
+            "y": 3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 6.449065685272217,
+            "y": 2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_9",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -6.449065685272217,
+            "y": 3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -6.449065685272217,
+            "y": 2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_10",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 7.24906587600708,
+            "y": 3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": 1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 7.24906587600708,
+            "y": 2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_11",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -7.24906587600708,
+            "y": 3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -7.24906587600708,
+            "y": 2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_12",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 6.449065685272217,
+            "y": -3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 6.449065685272217,
+            "y": -2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_13",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -6.449065685272217,
+            "y": -3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -6.449065685272217,
+            "y": -2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_14",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 7.24906587600708,
+            "y": -3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": 1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 7.24906587600708,
+            "y": -2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_15",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -7.24906587600708,
+            "y": -3.939565658569336,
+            "z": 0.5546666383743286
+          },
+          "forward": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -7.24906587600708,
+            "y": -2.3500001430511475,
+            "z": 0.5546666383743286
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_16",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 5.620756149291992,
+            "y": 3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 5.620756149291992,
+            "y": 2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_17",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -5.620756149291992,
+            "y": 3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -5.620756149291992,
+            "y": 2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_18",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 6.4207563400268555,
+            "y": 3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": 1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 6.4207563400268555,
+            "y": 2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_19",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -6.4207563400268555,
+            "y": 3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -6.4207563400268555,
+            "y": 2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_20",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 5.620756149291992,
+            "y": -3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 5.620756149291992,
+            "y": -2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_21",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -5.620756149291992,
+            "y": -3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -5.620756149291992,
+            "y": -2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_22",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": 6.4207563400268555,
+            "y": -3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": 1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": 6.4207563400268555,
+            "y": -2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_23",
+          "traverseHalfAngleDegrees": 5.0,
+          "position": {
+            "x": -6.4207563400268555,
+            "y": -3.1112563610076904,
+            "z": -0.6826667785644531
+          },
+          "forward": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "supportRoot": {
+            "x": -6.4207563400268555,
+            "y": -2.3500001430511475,
+            "z": -0.6826667785644531
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.5112561583518982
+        },
+        {
+          "id": "mount_24",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 6.449065685272217,
+            "y": 3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": 6.449065685272217,
+            "y": 2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_25",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -6.449065685272217,
+            "y": 3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": -6.449065685272217,
+            "y": 2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_26",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 7.24906587600708,
+            "y": 3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": 7.24906587600708,
+            "y": 2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_27",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -7.24906587600708,
+            "y": 3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": -7.24906587600708,
+            "y": 2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_28",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 6.449065685272217,
+            "y": -3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": 6.449065685272217,
+            "y": -2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_29",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -6.449065685272217,
+            "y": -3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": -6.449065685272217,
+            "y": -2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_30",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": 7.24906587600708,
+            "y": -3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": 7.24906587600708,
+            "y": -2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        },
+        {
+          "id": "mount_31",
+          "traverseHalfAngleDegrees": 20.0,
+          "position": {
+            "x": -7.24906587600708,
+            "y": -3.939565658569336,
+            "z": -1.9200000762939453
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "supportRoot": {
+            "x": -7.24906587600708,
+            "y": -2.3500001430511475,
+            "z": -1.9200000762939453
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 1.3395655155181885
+        }
+      ],
+      "material": {
+        "armorBase": [70, 76, 82],
+        "armorSecondary": [30, 34, 40],
+        "accent": [168, 30, 26],
+        "structure": [54, 61, 68],
+        "canopy": [65, 13, 16],
+        "engine": [94, 168, 202],
+        "pattern": "hazard",
+        "secondaryCoverage": 0.5,
+        "accentCoverage": 0.11,
+        "normalStrength": 0.16,
+        "detailScale": 1.15
+      },
+      "wear": {
+        "paintLoss": 0.12,
+        "oxidation": 0.18,
+        "heatStaining": 0.48,
+        "repairPanels": 8
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "texture": {
+        "width": 1024,
+        "height": 1024
+      },
+      "armorDepth": 0.1
+    },
+    "mothership": {
+      "modelPath": "assets/Models/spaceships/mothership/spaceship_mothership.obj",
+      "runtime": {
+        "modelRadius": 9.046356201171875
+      },
+      "mountAttachment": {
+        "directBlisterGapScale": 4.2
+      },
+      "seed": 4601,
+      "design": {
+        "propulsionLayout": "capital_side_blocks",
+        "propulsionPlacement": "auto",
+        "targetAcceleration": 0.54,
+        "endurance": 1.85,
+        "armorMassScale": 1.46,
+        "engineTechnology": 1.12,
+        "moduleClearance": 0.24,
+        "hardSurfaceBias": 0.82,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "omnidirectional",
+          "symmetry": "bilateral",
+          "batteryStyle": "external",
+          "turretCount": 8,
+          "minimumSeparationScale": 1.25,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.72,
+              "supportHeight": 0.58,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.72,
+              "supportHeight": 0.58,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.72,
+              "supportHeight": 0.58,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.72,
+              "supportHeight": 0.58,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.52,
+              "supportHeight": 0.46,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.52,
+              "supportHeight": 0.46,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.52,
+              "supportHeight": 0.46,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 12.0,
+              "supportWidth": 0.52,
+              "supportHeight": 0.46,
+              "socketHeight": 0.3,
+              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "width": 12,
+        "height": 5.6,
+        "length": 8
+      },
+      "hull": {
+        "width": 4.2,
+        "height": 2.4,
+        "length": 7.6,
+        "crown": 0.24,
+        "keel": 0.22,
+        "noseSharpness": 0.58,
+        "rearTaper": 0.9
+      },
+      "wings": {
+        "halfSpan": 5.8,
+        "rootFrontZ": 1.6,
+        "rootRearZ": -2.9,
+        "tipFrontZ": 0.85,
+        "tipRearZ": -2.8,
+        "rootX": 2,
+        "topY": -0.7,
+        "bottomY": -1.1,
+        "shoulderWidth": 0.8
+      },
+      "cockpit": {
+        "center": {
+          "x": 0,
+          "y": 1.45,
+          "z": 1.7
+        },
+        "size": {
+          "x": 2,
+          "y": 0.8,
+          "z": 2
+        },
+        "browDepth": 0.24
+      },
+      "layout": {
+        "archetype": "carrier",
+        "crew": 120,
+        "primarySpineWidth": 1.55,
+        "reactorRadius": 1.30,
+        "serviceBayLength": 3.10,
+        "radiatorScale": 1.45,
+        "weaponDeckCantDegrees": 0
+      },
+      "engines": [
+        {
+          "center": {
+            "x": -4.194413185119629,
+            "y": -0.02586197666823864,
+            "z": -3.1958060264587402
+          },
+          "radius": 0.49943336844444275,
+          "length": 2.2253260612487793,
+          "nozzleDepth": 0.30964869260787964
+        },
+        {
+          "center": {
+            "x": -2.435999870300293,
+            "y": 0.08401337265968323,
+            "z": -2.6963725090026855
+          },
+          "radius": 0.49943336844444275,
+          "length": 2.2253260612487793,
+          "nozzleDepth": 0.30964869260787964
+        },
+        {
+          "center": {
+            "x": 2.435999870300293,
+            "y": 0.08401337265968323,
+            "z": -2.6963725090026855
+          },
+          "radius": 0.49943336844444275,
+          "length": 2.2253260612487793,
+          "nozzleDepth": 0.30964869260787964
+        },
+        {
+          "center": {
+            "x": 4.194413185119629,
+            "y": -0.02586197666823864,
+            "z": -3.1958060264587402
+          },
+          "radius": 0.49943336844444275,
+          "length": 2.2253260612487793,
+          "nozzleDepth": 0.30964869260787964
+        }
+      ],
+      "mounts": [
+        {
+          "id": "mount_0",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": 6.813213348388672,
+            "y": 3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 6.813213348388672,
+            "y": 2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        },
+        {
+          "id": "mount_1",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": -6.813213348388672,
+            "y": 3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -6.813213348388672,
+            "y": 2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        },
+        {
+          "id": "mount_2",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": 7.613213539123535,
+            "y": 3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 7.613213539123535,
+            "y": 2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        },
+        {
+          "id": "mount_3",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": -7.613213539123535,
+            "y": 3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -7.613213539123535,
+            "y": 2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        },
+        {
+          "id": "mount_4",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": 6.813213348388672,
+            "y": -3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 6.813213348388672,
+            "y": -2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        },
+        {
+          "id": "mount_5",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": -6.813213348388672,
+            "y": -3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -6.813213348388672,
+            "y": -2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        },
+        {
+          "id": "mount_6",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": 7.613213539123535,
+            "y": -3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": 7.613213539123535,
+            "y": -2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        },
+        {
+          "id": "mount_7",
+          "traverseHalfAngleDegrees": 12.0,
+          "position": {
+            "x": -7.613213539123535,
+            "y": -3.6337132453918457,
+            "z": 2.128000020980835
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "supportRoot": {
+            "x": -7.613213539123535,
+            "y": -2.4800002574920654,
+            "z": 2.128000020980835
+          },
+          "turretRadius": 0.25,
+          "barrelRadius": 0.25,
+          "barrelLength": 3.25,
+          "supportWidth": 0.75,
+          "supportHeight": 0.6000000238418579,
+          "socketHeight": 0.9037129878997803
+        }
+      ],
+      "material": {
+        "armorBase": [116, 123, 128],
+        "armorSecondary": [50, 62, 73],
+        "accent": [211, 150, 40],
+        "structure": [70, 80, 88],
+        "canopy": [20, 95, 128],
+        "engine": [75, 168, 210],
+        "pattern": "blocked",
+        "secondaryCoverage": 0.38,
+        "accentCoverage": 0.08,
+        "normalStrength": 0.12,
+        "detailScale": 0.85
+      },
+      "wear": {
+        "paintLoss": 0.1,
+        "oxidation": 0.16,
+        "heatStaining": 0.42,
+        "repairPanels": 10
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "texture": {
+        "width": 1024,
+        "height": 1024
+      },
+      "armorDepth": 0.1
+    }
+  }
+}

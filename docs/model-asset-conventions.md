@@ -10,6 +10,30 @@ Asteroid visual geometry uses the approved local-radius range `0.5–1.0`. Its `
 
 Models should be centered at their intended local origin. Any asset-specific normalization or geometry generation belongs in the offline asset pipeline under `scripts/gen_model/`, not in entity factories or the runtime renderer.
 
+The generated spaceship family uses the same local-unit contract for every
+profile. The parent collision proxy is authored at radius `1.0`; its OBJ
+geometry, resolved engine coordinates, and resolved mount coordinates share
+those local units. `spaceship::factory` uniformly multiplies the model, engines,
+mounts, turret dimensions, and `CollisionBody.radius` by the caller's requested
+positive radius. `runtime.modelRadius` records the generated mesh bound for
+inspection and is not a normalization factor. This permits wings, engines,
+radiators, and weapon structures to extend beyond the gameplay collision sphere
+while allowing callers to choose any desired world size without moving turrets
+back toward the origin.
+
+Automatic weapon mounts are authored as indexed capabilities. A missing
+`facingDirection` is fixed local front (`+Z`); `null` delegates direction to the
+coverage solver and is currently reserved for Terminator's distributed battery.
+Both generator and serialized-OBJ gates sweep the complete configured traverse
+cone (64 azimuth samples over eight radial rings plus the center) with a
+positive clearance margin. A 75% barrel-tip probe is diagnostic only.
+
+Propulsion geometry is not a universal nozzle prefab. The selected propulsion
+layout determines the rear manifold, collar profile, shroud, service fairing,
+and tapered aft pressure volume around the resolved nozzle cells. This keeps a
+fighter's paired nacelles, a spine cluster, and a capital side-block bank
+visibly distinct while preserving the same unit-radius runtime contract.
+
 ## Collision proxy conventions
 
 A `.collision.obj` is a CPU-side physics/query asset, not a render LOD. It may be much simpler than the visual model and should contain only surfaces that matter to gameplay. Its use is explicit: a caller loads the collision model and adds `CollisionBodyModel` to the entity. The presence of a companion file alone does not opt an entity into mesh-based collision.

@@ -80,9 +80,9 @@ The order is behaviorally significant. Do not move or early-return from frame-lo
 
 ## Configuration and Data
 
-`GameConfig` loads `assets/config/game_config.json`, exposes typed dotted-path getters, caches game/physics/settings/loadout/debug constants, and supports controlled setting and saving. `SubGameConfig` provides read-only scoped access for weapon definitions.
+`GameConfig` loads an explicit list of root JSON files, exposes typed dotted-path getters, caches game/physics/settings/loadout/debug constants, and supports controlled setting and saving. Each root is tracked independently, so `saveChanged()` writes only modified files. `SubGameConfig` provides read-only scoped access for weapon definitions.
 
-The configuration currently contains `audio`, `debug`, `game`, `loadout`, `physics`, `settings`, `sounds`, `units`, and `weapons` sections. Avoid duplicating names, IDs, balance values, spawn data, or other canonical metadata in code when configuration or definitions already own them.
+The runtime roots are `audio.json`, `debug.json`, `game.json`, `loadout.json`, `physics.json`, `settings.json`, `sounds.json`, `units.json`, `weapons.json`, and `spaceships.json` under `assets/config/`. Spaceship definitions are parsed once into the typed `config::SpaceshipConfig` projection and consumed by the spaceship factory; callers do not parse spaceship JSON directly. Avoid duplicating names, IDs, balance values, spawn data, or other canonical metadata in code when configuration or definitions already own them.
 
 Missile death effects keep `instantRadius` and `explosionStartRadius` independent: the former controls the model-less one-frame damage pulse, while the latter controls the visible explosion's initial radius. As a rule of thumb, missiles with a large instant-damage radius should usually start their visible explosion near that radius; small missiles may use a smaller start radius to preserve gradual visual growth.
 

@@ -1,0 +1,5 @@
+{
+	"controlSensitivity": 0.5,
+	"controlSensitivityCurve": "smoothstep",
+	"showHPBar": true
+}

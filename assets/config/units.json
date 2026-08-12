@@ -1,0 +1,64 @@
+{
+	"asteroid": {
+		"baseRadFactor": 0.1,
+		"damage": 100,
+		"mass": 10000000,
+		"modelPath": "assets/Models/asteroid/asteroid_big.obj",
+		"ringRadiusMax": 1000,
+		"ringRadiusMin": 740,
+		"rotationSpeed": 0.01
+	},
+	"base": {
+		"damage": 500,
+		"hp": 1500,
+		"mass": 10000,
+		"score": 500,
+		"shield": 3000,
+		"shieldRegenDivisor": 15,
+		"speed": 80,
+		"turnSpeed": 1.5
+	},
+	"elite": {
+		"hp": 3500,
+		"hpRegen": 50,
+		"mass": 10000,
+		"radius": 3,
+		"scoreMultiplier": 2,
+		"shield": 3000,
+		"shieldRegen": 25,
+		"speedMultiplier": 0.5
+	},
+	"fastElite": {
+		"hp": 2000,
+		"hpRegen": 10,
+		"mass": 10000,
+		"radius": 2,
+		"scoreMultiplier": 2,
+		"speedMultiplier": 4
+	},
+	"mothership": {
+		"hp": 6000,
+		"hpRegen": 50,
+		"mass": 50000,
+		"radius": 6,
+		"scoreMultiplier": 5,
+		"shield": 3000,
+		"shieldRegen": 100,
+		"speedMultiplier": 0.25,
+		"turnSpeedMultiplier": 0.5
+	},
+	"player": {
+		"damage": 500,
+		"hp": 1500,
+		"hpRegen": 25,
+		"mass": 10000,
+		"modelPath": "assets/Models/spaceships/player/spaceship_player.obj",
+		"shield": 3000,
+		"shieldRegenDivisor": 15,
+		"speed": 80,
+		"turnSpeed": 2
+	},
+	"turret": {
+		"mass": 500
+	}
+}
