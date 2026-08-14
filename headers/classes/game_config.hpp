@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "config/spaceship_config.hpp"
+#include "config/unit_config.hpp"
 #include "json.hpp"
 #include "raylib.h"
 
@@ -49,6 +50,10 @@ public:
 		return spaceshipConfig;
 	}
 
+	const config::UnitConfig& units() const noexcept {
+		return unitConfig;
+	}
+
 	float ARENA_SIZE = 2000.0f;
 	int COMBAT_DIST = 1000;
 	int UNIT_COUNT = 4;
@@ -86,6 +91,7 @@ private:
 	nlohmann::json config;
 	std::map<std::string, RootJsonFile> roots;
 	config::SpaceshipConfig spaceshipConfig;
+	config::UnitConfig unitConfig;
 	bool loaded = false;
 
 	const nlohmann::json* navigatePath(const std::string& path) const;

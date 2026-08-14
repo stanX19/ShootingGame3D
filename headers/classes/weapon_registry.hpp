@@ -34,6 +34,8 @@ public:
     std::vector<std::string> getWeaponIdsByType(const std::string& type) const;
     std::vector<std::string> getSpecialWeaponIds() const;
     std::vector<std::string> getStandardWeaponIds() const;
+    std::string getRandomSpecialWeaponId(int value) const;
+    std::string getRandomStandardWeaponId(int value) const;
 
     void emplaceRandomWeapon(GameContext& context, entt::entity entity) const;
     void emplaceRandomWeapon(GameContext& context, entt::entity entity, int value) const;
@@ -47,6 +49,7 @@ private:
 
     void registerPredefinedFunctions();
     void parseWeaponsOfType(const GameConfig& globalCfg, const std::string& category);
+    std::string getRandomWeaponId(bool special, int value) const;
 };
 
 } // namespace weapon

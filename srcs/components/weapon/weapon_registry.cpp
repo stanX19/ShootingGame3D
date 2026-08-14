@@ -111,6 +111,44 @@ namespace weapon
 		return ids;
 	}
 
+	std::string WeaponRegistry::getRandomWeaponId(bool special, int value) const
+	{
+		std::size_t matchingCount = 0;
+		for (const auto &[id, data] : allWeapons)
+		{
+			if (data.isSpecial == special)
+				++matchingCount;
+		}
+		if (matchingCount == 0)
+			return {};
+
+		const long long nonNegativeValue = value < 0
+			? -static_cast<long long>(value)
+			: static_cast<long long>(value);
+		const std::size_t selectedIndex =
+			static_cast<std::size_t>(nonNegativeValue) % matchingCount;
+		std::size_t currentIndex = 0;
+		for (const auto &[id, data] : allWeapons)
+		{
+			if (data.isSpecial != special)
+				continue;
+			if (currentIndex == selectedIndex)
+				return id;
+			++currentIndex;
+		}
+		return {};
+	}
+
+	std::string WeaponRegistry::getRandomSpecialWeaponId(int value) const
+	{
+		return getRandomWeaponId(true, value);
+	}
+
+	std::string WeaponRegistry::getRandomStandardWeaponId(int value) const
+	{
+		return getRandomWeaponId(false, value);
+	}
+
 	void WeaponRegistry::emplaceRandomWeapon(GameContext &context, entt::entity entity) const
 	{
 		emplaceRandomWeapon(context, entity, GetRandomValue(0, 100000));
@@ -118,12 +156,10 @@ namespace weapon
 
 	void WeaponRegistry::emplaceRandomWeapon(GameContext &context, entt::entity entity, int value) const
 	{
-		std::vector<std::string> candidates = getStandardWeaponIds();
-		if (candidates.empty())
+		const std::string chosenId = getRandomStandardWeaponId(value);
+		if (chosenId.empty())
 			return;
-		const std::string &chosenId = candidates[value % candidates.size()];
-		const SubGameConfig subCfg = context.config.getSubConfig("weapons." + allWeapons.at(chosenId).type + ".weapons." + chosenId.substr(chosenId.find('.') + 1));
-		allWeapons.at(chosenId).emplaceFunc(context, entity, subCfg);
+		emplaceWeaponById(context, entity, chosenId);
 	}
 
 	void WeaponRegistry::emplaceRandomSpecialWeapon(GameContext &context, entt::entity entity) const
@@ -133,12 +169,10 @@ namespace weapon
 
 	void WeaponRegistry::emplaceRandomSpecialWeapon(GameContext &context, entt::entity entity, int value) const
 	{
-		std::vector<std::string> candidates = getSpecialWeaponIds();
-		if (candidates.empty())
+		const std::string chosenId = getRandomSpecialWeaponId(value);
+		if (chosenId.empty())
 			return;
-		const std::string &chosenId = candidates[value % candidates.size()];
-		const SubGameConfig subCfg = context.config.getSubConfig("weapons." + allWeapons.at(chosenId).type + ".weapons." + chosenId.substr(chosenId.find('.') + 1));
-		allWeapons.at(chosenId).emplaceFunc(context, entity, subCfg);
+		emplaceWeaponById(context, entity, chosenId);
 	}
 
 	void WeaponRegistry::emplaceWeaponById(GameContext& context, entt::entity entity, const std::string& id) const

@@ -18,7 +18,6 @@ void GameConfig::init(const std::vector<RootSource>& sources) {
 
 	nlohmann::json candidate = nlohmann::json::object();
 	std::map<std::string, RootJsonFile> candidateFiles;
-	config::SpaceshipConfig candidateSpaceship;
 
 	for (const auto& [rootName, sourcePath] : sources) {
 		if (rootName.empty() || sourcePath.empty())
@@ -38,13 +37,34 @@ void GameConfig::init(const std::vector<RootSource>& sources) {
 				"CONFIG: failed to parse root " + rootName + ": " + error.what()
 			);
 		}
-		if (rootName == "spaceship")
-			candidateSpaceship.init(candidate.at(rootName), sourcePath);
+	}
+
+	config::SpaceshipConfig candidateSpaceship;
+	const auto spaceshipRoot = candidate.find("spaceship");
+	if (spaceshipRoot != candidate.end())
+		candidateSpaceship.init(
+			*spaceshipRoot,
+			candidateFiles.at("spaceship").sourcePath
+		);
+
+	config::UnitConfig candidateUnits;
+	const auto unitsRoot = candidate.find("units");
+	if (unitsRoot != candidate.end()) {
+		if (spaceshipRoot == candidate.end())
+			throw std::invalid_argument(
+				"CONFIG: units root requires a spaceship root"
+			);
+		candidateUnits.init(
+			*unitsRoot,
+			candidateFiles.at("units").sourcePath,
+			candidateSpaceship
+		);
 	}
 
 	config = std::move(candidate);
 	roots = std::move(candidateFiles);
 	spaceshipConfig = std::move(candidateSpaceship);
+	unitConfig = std::move(candidateUnits);
 	loaded = true;
 	initConstants();
 }
@@ -179,12 +199,37 @@ void GameConfig::setJsonValue(const std::string& path, nlohmann::json value) {
 		return;
 	*node = std::move(value);
 
+	config::SpaceshipConfig updatedSpaceship = spaceshipConfig;
+	config::UnitConfig updatedUnits = unitConfig;
 	if (rootName == "spaceship") {
-		config::SpaceshipConfig updatedSpaceship;
 		updatedSpaceship.init(updatedRoot, root->second.sourcePath);
-		spaceshipConfig = std::move(updatedSpaceship);
+		const auto unitsRoot = config.find("units");
+		if (unitsRoot != config.end()) {
+			const auto unitsFile = roots.find("units");
+			if (unitsFile == roots.end())
+				throw std::logic_error("CONFIG: units root has no source file");
+			updatedUnits.init(
+				*unitsRoot,
+				unitsFile->second.sourcePath,
+				updatedSpaceship
+			);
+		}
+	}
+	if (rootName == "units") {
+		const auto spaceshipRoot = config.find("spaceship");
+		if (spaceshipRoot == config.end())
+			throw std::invalid_argument(
+				"CONFIG: units root requires a spaceship root"
+			);
+		updatedUnits.init(
+			updatedRoot,
+			root->second.sourcePath,
+			spaceshipConfig
+		);
 	}
 	config[rootName] = std::move(updatedRoot);
+	spaceshipConfig = std::move(updatedSpaceship);
+	unitConfig = std::move(updatedUnits);
 	root->second.dirty = true;
 	initConstants();
 }

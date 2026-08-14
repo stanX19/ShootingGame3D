@@ -5,6 +5,7 @@
 #include "components.hpp"
 #include "game_context.hpp"
 #include "entities/spaceship_factory.hpp"
+#include "entities/unit.hpp"
 #include "entities/turret.hpp"
 
 #include <cmath>

@@ -40,6 +40,54 @@ TEST_CASE("GameConfig loads spaceship roots into typed definitions", "[integrati
 	CHECK(terminator.modelRadius == Catch::Approx(8.6744432449f));
 }
 
+TEST_CASE("GameConfig loads materialized unit definitions", "[integration][unit]") {
+	GameConfig config;
+	config.init(kConfigRoots);
+
+	const auto& units = config.units();
+	CHECK(units.contains("player"));
+	CHECK(units.contains("basic"));
+	CHECK(units.contains("terminator"));
+	CHECK(units.ids() == std::vector<std::string>{
+		"basic",
+		"elite",
+		"fastElite",
+		"mothership",
+		"player",
+		"terminator"
+	});
+	CHECK(units.get("player").spaceshipReference == "player");
+	CHECK(units.get("player").stats.collisionRadius == Catch::Approx(1.0f));
+	CHECK(units.get("player").stats.shieldRegen == Catch::Approx(200.0f));
+	CHECK(units.get("elite").elite);
+	CHECK(units.get("elite").stats.maxSpeed == Catch::Approx(40.0f));
+}
+
+TEST_CASE("GameConfig rejects a unit with an unknown spaceship reference", "[integration][unit]") {
+	const std::filesystem::path directory =
+		std::filesystem::temp_directory_path() / "shooting_game_unit_reference_test";
+	std::filesystem::remove_all(directory);
+	std::filesystem::create_directories(directory);
+	const std::filesystem::path unitsPath = directory / "units.json";
+
+	std::ifstream input("assets/config/units.json");
+	REQUIRE(input.good());
+	nlohmann::json unitsRoot;
+	input >> unitsRoot;
+	unitsRoot["definitions"]["player"]["spaceshipReference"] = "missing";
+	std::ofstream(unitsPath) << unitsRoot.dump(2);
+
+	GameConfig config;
+	REQUIRE_THROWS_AS(
+		config.init({
+			{"units", unitsPath.string()},
+			{"spaceship", "assets/config/spaceships.json"}
+		}),
+		std::invalid_argument
+	);
+	std::filesystem::remove_all(directory);
+}
+
 TEST_CASE("Spaceship factory scales the unit-radius model by collision radius", "[integration][spaceship]") {
 	GameConfig config;
 	config.init(kConfigRoots);

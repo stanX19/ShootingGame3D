@@ -1,4 +1,5 @@
 {
+	"schemaVersion": 2,
 	"asteroid": {
 		"baseRadFactor": 0.1,
 		"damage": 100,
@@ -8,57 +9,135 @@
 		"ringRadiusMin": 740,
 		"rotationSpeed": 0.01
 	},
-	"base": {
-		"damage": 500,
-		"hp": 1500,
-		"mass": 10000,
-		"score": 500,
-		"shield": 3000,
-		"shieldRegenDivisor": 15,
-		"speed": 80,
-		"turnSpeed": 1.5
-	},
-	"elite": {
-		"hp": 3500,
-		"hpRegen": 50,
-		"mass": 10000,
-		"radius": 3,
-		"scoreMultiplier": 2,
-		"shield": 3000,
-		"shieldRegen": 25,
-		"speedMultiplier": 0.5
-	},
-	"fastElite": {
-		"hp": 2000,
-		"hpRegen": 10,
-		"mass": 10000,
-		"radius": 2,
-		"scoreMultiplier": 2,
-		"speedMultiplier": 4
-	},
-	"mothership": {
-		"hp": 6000,
-		"hpRegen": 50,
-		"mass": 50000,
-		"radius": 6,
-		"scoreMultiplier": 5,
-		"shield": 3000,
-		"shieldRegen": 100,
-		"speedMultiplier": 0.25,
-		"turnSpeedMultiplier": 0.5
-	},
-	"player": {
-		"damage": 500,
-		"hp": 1500,
-		"hpRegen": 25,
-		"mass": 10000,
-		"modelPath": "assets/Models/spaceships/player/spaceship_player.obj",
-		"shield": 3000,
-		"shieldRegenDivisor": 15,
-		"speed": 80,
-		"turnSpeed": 2
-	},
 	"turret": {
 		"mass": 500
+	},
+	"definitions": {
+		"player": {
+			"spaceshipReference": "player",
+			"stats": {
+				"collisionRadius": 1.0,
+				"hp": 1500.0,
+				"hpRegen": 25.0,
+				"shield": 3000.0,
+				"shieldRegen": 200.0,
+				"damage": 500.0,
+				"maxSpeed": 80.0,
+				"turnSpeed": 2.0,
+				"mass": 10000.0,
+				"score": 0,
+				"killedScore": 0
+			},
+			"effects": {
+				"explosionRadiusScale": 1.0,
+				"deathSoundRadiusScale": 0.5
+			},
+			"elite": false
+		},
+		"basic": {
+			"spaceshipReference": "basic",
+			"stats": {
+				"collisionRadius": 1.0,
+				"hp": 1500.0,
+				"hpRegen": 0.0,
+				"shield": 3000.0,
+				"shieldRegen": 200.0,
+				"damage": 500.0,
+				"maxSpeed": 80.0,
+				"turnSpeed": 2.0,
+				"mass": 10000.0,
+				"score": 0,
+				"killedScore": 500
+			},
+			"effects": {
+				"explosionRadiusScale": 1.0,
+				"deathSoundRadiusScale": 0.5
+			},
+			"elite": false
+		},
+		"elite": {
+			"spaceshipReference": "elite",
+			"stats": {
+				"collisionRadius": 3.0,
+				"hp": 3500.0,
+				"hpRegen": 50.0,
+				"shield": 3000.0,
+				"shieldRegen": 25.0,
+				"damage": 500.0,
+				"maxSpeed": 40.0,
+				"turnSpeed": 2.0,
+				"mass": 10000.0,
+				"score": 0,
+				"killedScore": 1000
+			},
+			"effects": {
+				"explosionRadiusScale": 1.0,
+				"deathSoundRadiusScale": 0.5
+			},
+			"elite": true
+		},
+		"fastElite": {
+			"spaceshipReference": "fastElite",
+			"stats": {
+				"collisionRadius": 2.0,
+				"hp": 2000.0,
+				"hpRegen": 10.0,
+				"shield": 3000.0,
+				"shieldRegen": 200.0,
+				"damage": 500.0,
+				"maxSpeed": 320.0,
+				"turnSpeed": 2.0,
+				"mass": 10000.0,
+				"score": 0,
+				"killedScore": 1000
+			},
+			"effects": {
+				"explosionRadiusScale": 1.0,
+				"deathSoundRadiusScale": 0.5
+			},
+			"elite": true
+		},
+		"terminator": {
+			"spaceshipReference": "terminator",
+			"stats": {
+				"collisionRadius": 2.0,
+				"hp": 3200.0,
+				"hpRegen": 50.0,
+				"shield": 1500.0,
+				"shieldRegen": 100.0,
+				"damage": 500.0,
+				"maxSpeed": 120.0,
+				"turnSpeed": 5.0,
+				"mass": 10000.0,
+				"score": 0,
+				"killedScore": 25000
+			},
+			"effects": {
+				"explosionRadiusScale": 1.0,
+				"deathSoundRadiusScale": 0.5
+			},
+			"elite": true
+		},
+		"mothership": {
+			"spaceshipReference": "mothership",
+			"stats": {
+				"collisionRadius": 6.0,
+				"hp": 6000.0,
+				"hpRegen": 50.0,
+				"shield": 3000.0,
+				"shieldRegen": 100.0,
+				"damage": 500.0,
+				"maxSpeed": 20.0,
+				"turnSpeed": 1.0,
+				"mass": 50000.0,
+				"score": 0,
+				"killedScore": 2500
+			},
+			"effects": {
+				"explosionRadiusScale": 1.0,
+				"deathSoundRadiusScale": 0.5
+			},
+			"elite": true
+		}
 	}
 }
