@@ -83,11 +83,11 @@ void GameConfig::initConstants() {
 	settings.controlSensitivity = Clamp(
 		getFloat("settings.controlSensitivity", 1.0f), 0.01f, 1.0f
 	);
-	loadout.w1 = getString("loadout.w1", "bullet.machineGun");
-	loadout.w2 = getString("loadout.w2", "bullet.machineGun");
-	loadout.w3 = getString("loadout.w3", "lazer.basic");
-	loadout.w4 = getString("loadout.w4", "lazer.basic");
-	loadout.special = getString("loadout.special", "missile.basic");
+	loadout.turretWeapons = getStringArray("loadout.turretWeapons", {});
+	loadout.specialWeapon = getString(
+		"loadout.specialWeapon",
+		"missile.basic"
+	);
 
 	debug.showTarget = getBool("debug.showTarget", false);
 }
@@ -156,6 +156,23 @@ std::string GameConfig::getString(
 	if (node == nullptr || !node->is_string())
 		return defaultVal;
 	return node->get<std::string>();
+}
+
+std::vector<std::string> GameConfig::getStringArray(
+	const std::string& path,
+	const std::vector<std::string>& defaultVal
+) const {
+	const nlohmann::json* node = navigatePath(path);
+	if (node == nullptr || !node->is_array())
+		return defaultVal;
+	std::vector<std::string> result;
+	result.reserve(node->size());
+	for (const auto& value : *node) {
+		if (!value.is_string())
+			return defaultVal;
+		result.push_back(value.get<std::string>());
+	}
+	return result;
 }
 
 Vector3 GameConfig::getVector3(
@@ -240,6 +257,20 @@ void GameConfig::setFloat(const std::string& path, float value) {
 
 void GameConfig::setString(const std::string& path, const std::string& value) {
 	setJsonValue(path, value);
+	if (path == "loadout.specialWeapon")
+		loadout.specialWeapon = value;
+}
+
+void GameConfig::setStringArray(
+	const std::string& path,
+	const std::vector<std::string>& value
+) {
+	nlohmann::json array = nlohmann::json::array();
+	for (const std::string& entry : value)
+		array.push_back(entry);
+	setJsonValue(path, std::move(array));
+	if (path == "loadout.turretWeapons")
+		loadout.turretWeapons = value;
 }
 
 void GameConfig::setBool(const std::string& path, bool value) {

@@ -32,11 +32,19 @@ public:
 		const std::string& path,
 		const std::string& defaultVal
 	) const;
+	virtual std::vector<std::string> getStringArray(
+		const std::string& path,
+		const std::vector<std::string>& defaultVal
+	) const;
 	virtual Vector3 getVector3(const std::string& path, Vector3 defaultVal) const;
 
 	void setFloat(const std::string& path, float value);
 	void setBool(const std::string& path, bool value);
 	void setString(const std::string& path, const std::string& value);
+	void setStringArray(
+		const std::string& path,
+		const std::vector<std::string>& value
+	);
 
 	void saveRoot(const std::string& rootName);
 	void saveChanged();
@@ -71,11 +79,8 @@ public:
 	} settings;
 
 	struct PlayerLoadout {
-		std::string w1;
-		std::string w2;
-		std::string w3;
-		std::string w4;
-		std::string special;
+		std::vector<std::string> turretWeapons;
+		std::string specialWeapon;
 	} loadout;
 
 	struct Debug {
@@ -123,6 +128,12 @@ public:
 	) const override {
 		return parentCfg->getString(rootPath + "." + path, defaultVal);
 	}
+	std::vector<std::string> getStringArray(
+		const std::string& path,
+		const std::vector<std::string>& defaultVal
+	) const override {
+		return parentCfg->getStringArray(rootPath + "." + path, defaultVal);
+	}
 	Vector3 getVector3(const std::string& path, Vector3 defaultVal) const override {
 		return parentCfg->getVector3(rootPath + "." + path, defaultVal);
 	}
@@ -137,6 +148,10 @@ private:
 	void setFloat(const std::string&, float) = delete;
 	void setBool(const std::string&, bool) = delete;
 	void setString(const std::string&, const std::string&) = delete;
+	void setStringArray(
+		const std::string&,
+		const std::vector<std::string>&
+	) = delete;
 	void saveRoot(const std::string&) = delete;
 	void saveChanged() = delete;
 	void saveAll() = delete;

@@ -3,50 +3,37 @@
 #include "components/unit_camera.hpp"
 #include "utils.hpp"
 
-#include <array>
+#include <stdexcept>
 #include <string>
 
 namespace {
 
-bool knownWeapon(const GameContext& context, const std::string& id) {
-	return !id.empty()
-		&& context.weaponRegistry.getAllWeaponsMap().find(id)
-			!= context.weaponRegistry.getAllWeaponsMap().end();
-}
-
-std::string randomStandardWeapon(const GameContext& context) {
-	return context.weaponRegistry.getRandomStandardWeaponId(
-		GetRandomValue(0, 100000)
-	);
-}
-
-std::string randomSpecialWeapon(const GameContext& context) {
-	return context.weaponRegistry.getRandomSpecialWeaponId(
-		GetRandomValue(0, 100000)
-	);
+std::string selectedPlayerUnitId(const GameContext& context) {
+	const std::string id = context.config.getString("loadout.shipId", "");
+	if (id.empty())
+		throw std::invalid_argument("PLAYER: loadout.shipId is required");
+	if (!context.config.units().contains(id))
+		throw std::invalid_argument(
+			"PLAYER: loadout.shipId references an unknown unit: " + id
+		);
+	return id;
 }
 
 unit::Loadout makePlayerLoadout(
 	GameContext& context,
 	std::size_t mountCount
 ) {
-	const std::array<std::string, 4> configured{
-		context.config.loadout.w1,
-		context.config.loadout.w2,
-		context.config.loadout.w3,
-		context.config.loadout.w4
-	};
 	unit::Loadout loadout;
-	loadout.turretWeapons.resize(mountCount);
+	loadout.turretWeapons.resize(mountCount, "bullet.basic");
 	for (std::size_t index = 0; index < mountCount; ++index) {
-		const std::string& configuredId = configured[index % configured.size()];
-		loadout.turretWeapons[index] = knownWeapon(context, configuredId)
-			? configuredId
-			: randomStandardWeapon(context);
+		if (index < context.config.loadout.turretWeapons.size()
+			&& !context.config.loadout.turretWeapons[index].empty())
+			loadout.turretWeapons[index] =
+				context.config.loadout.turretWeapons[index];
 	}
-	loadout.specialWeapon = knownWeapon(context, context.config.loadout.special)
-		? context.config.loadout.special
-		: randomSpecialWeapon(context);
+	loadout.specialWeapon = context.config.loadout.specialWeapon.empty()
+		? "missile.basic"
+		: context.config.loadout.specialWeapon;
 	return loadout;
 }
 
@@ -70,7 +57,8 @@ entt::entity spawnPlayer(GameContext& context) {
 }
 
 entt::entity spawnPlayer(GameContext& context, Vector3 pos) {
-	const auto& playerDefinition = context.config.units().get("player");
+	const std::string unitId = selectedPlayerUnitId(context);
+	const auto& playerDefinition = context.config.units().get(unitId);
 	const std::size_t mountCount = context.config.spaceship().get(
 		playerDefinition.spaceshipReference
 	).mounts.size();
@@ -82,7 +70,9 @@ entt::entity spawnPlayer(GameContext& context, Vector3 pos) {
 	params.rotation = vector3ToRotation(Vector3{0, 0, 1});
 	params.loadout = makePlayerLoadout(context, mountCount);
 	const unit::SpawnedUnit spawned =
-		unit::spawnConfiguredUnit(context, "player", params);
+		unit::spawnConfiguredUnit(context, unitId, params);
+	if (context.registry.all_of<tag::EliteUnit>(spawned.entity))
+		context.registry.remove<tag::EliteUnit>(spawned.entity);
 	context.registry.emplace<SpawnsTrailParticle>(
 		spawned.entity,
 		SpawnsTrailParticle{0.3f, 0.1f}

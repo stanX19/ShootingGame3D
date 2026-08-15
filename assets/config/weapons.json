@@ -115,13 +115,13 @@
 				"extendFireDuration": 1.5,
 				"extendFireRequest": 2,
 				"hp": 1,
-				"isSpecial": true,
+				"isSpecial": false,
 				"name": "Lazer Deletor",
 				"radius": 0.5,
 				"spreadMultiplier": 0
 			},
 			"machineGun": {
-				"ammo": 80,
+				"ammo": 120,
 				"ammoRegen": 6,
 				"bulletCount": 1,
 				"cooldown": 0.05,
