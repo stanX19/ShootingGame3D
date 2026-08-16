@@ -32,8 +32,8 @@ namespace
 		if (startRadius < 0.0f || finalRadius <= startRadius || lifespan <= 0.0f)
 			return;
 
-		t_model_id explosionModel = context.modelManager.createSphere(64, 64);
-		const int fragmentCount = std::max(1, static_cast<int>(5.0f * finalRadius));
+		t_model_id explosionModel = context.modelManager.createSphere(10, 10);
+		const int fragmentCount = std::clamp(static_cast<int>(2.0f * finalRadius), 4, 32);
 		const float startRatio = startRadius / finalRadius;
 
 		for (int i = 0; i < fragmentCount; i++)

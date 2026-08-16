@@ -22,7 +22,7 @@ void ecs_systems::spawnTrailParticles(GameContext &context, [[maybe_unused]] flo
 			context.registry.emplace<Velocity>(particle, Velocity{vel.value * 0.5f});
 			context.registry.emplace<RenderBody>(
 				particle,
-				context.modelManager.createSphere(),
+				context.modelManager.createSphere(6, 6),
 				ColorAlpha(trail.color, 0.5f),
 				trail.radius
 			);

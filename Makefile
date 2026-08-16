@@ -36,6 +36,7 @@ SCRIPT_DIR	= scripts
 GEN_MODEL_LIB	= $(OBJDIR)/scripts/libgen_model.a
 GEN_COLLISION_LIB	= $(OBJDIR)/scripts/libgen_collision.a
 SCRIPT_IFLAGS	= -Iscripts
+TEST_FLAGS	?= -r compact
 INTEGRATION_BIN_TARGET := $(if $(strip $(INTEGRATION_TEST_SRCS)),$(INTEGRATION_TEST_BIN),)
 TEST_OBJDIRS	:= $(sort $(dir $(CATCH_OBJ) $(UNIT_TEST_OBJS) $(INTEGRATION_TEST_OBJS) $(SMOKE_TEST_OBJS) $(MANUAL_TEST_BINS) $(TEST_ARCHIVE)))
 
@@ -97,7 +98,7 @@ test: test-unit test-integration test-smoke
 
 test-unit: $(UNIT_TEST_BIN)
 	@echo "Running $<..."
-	@./$<
+	@./$< $(TEST_FLAGS)
 
 gen_model:
 	$(MAKE) -C $(SCRIPT_DIR) gen_model
@@ -114,12 +115,12 @@ test-integration:
 	else \
 		$(MAKE) --no-print-directory $(INTEGRATION_TEST_BIN); \
 		echo "Running $(INTEGRATION_TEST_BIN)..."; \
-		./$(INTEGRATION_TEST_BIN); \
+		./$(INTEGRATION_TEST_BIN) $(TEST_FLAGS); \
 	fi
 
 test-smoke: $(SMOKE_TEST_BIN)
 	@echo "Running $<..."
-	@./$<
+	@./$< $(TEST_FLAGS)
 
 test-manual-bin: $(MANUAL_TEST_BINS)
 
@@ -169,10 +170,10 @@ $(UNIT_TEST_BIN): $(UNIT_TEST_OBJS) $(CATCH_OBJ) $(GEN_MODEL_LIB) $(GEN_COLLISIO
 	$(CC) $(CFLAGS) $(UNIT_TEST_OBJS) $(CATCH_OBJ) $(GEN_MODEL_LIB) $(GEN_COLLISION_LIB) -o $@
 
 $(GEN_MODEL_LIB):
-	$(MAKE) -C $(SCRIPT_DIR) gen_model_lib
+	@$(MAKE) --no-print-directory -C $(SCRIPT_DIR) gen_model_lib
 
 $(GEN_COLLISION_LIB):
-	$(MAKE) -C $(SCRIPT_DIR) gen_collision_lib
+	@$(MAKE) --no-print-directory -C $(SCRIPT_DIR) gen_collision_lib
 
 $(INTEGRATION_TEST_BIN): $(INTEGRATION_TEST_OBJS) $(CATCH_OBJ) $(TEST_ARCHIVE) | $(TESTBINDIR)
 	$(CC) $(CFLAGS) $(INTEGRATION_TEST_OBJS) $(CATCH_OBJ) $(TEST_ARCHIVE) $(IFLAGS) $(LFLAGS) -o $@

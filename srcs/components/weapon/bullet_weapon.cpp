@@ -50,7 +50,7 @@ namespace
 		std::string path = context.config.getString("weapons.bullet.modelPath", "");
 		if (!path.empty())
 			return context.modelManager.loadModel(path);
-		return context.modelManager.createSphere();
+		return context.modelManager.createSphere(8, 8);
 	}
 }
 

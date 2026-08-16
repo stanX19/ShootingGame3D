@@ -8,6 +8,7 @@
 
 
 class Renderer {
+	friend class BenchmarkRenderer;
 public:
 	Renderer(Camera3D& camera, GameContext &context);
 	~Renderer();

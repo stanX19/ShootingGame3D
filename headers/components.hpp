@@ -304,7 +304,7 @@ struct RadiusExpand {
 };
 
 namespace effect {
-	inline constexpr float DEFAULT_EXPLOSION_DURATION = 5.0f;
+	inline constexpr float DEFAULT_EXPLOSION_DURATION = 10.0f;
 	inline constexpr float DEFAULT_EXPLOSION_DAMAGE = 50.0f;
 	inline const Color EXPLOSION_COLOR = ORANGE;
 
@@ -316,13 +316,24 @@ namespace effect {
 		float damage = DEFAULT_EXPLOSION_DAMAGE;
 		Color color = EXPLOSION_COLOR;
 
+		// legacy compatiblity layer
 		static ExplodeOnDeath createFromRadDmg(float parentRad, float parentDmg) // Legacy helper: parent means the original entity.
 		{
 			return ExplodeOnDeath{
 				parentRad * 10.0f,
 				parentRad * 0.7f,
-				parentRad * 5.0f, // Preserve the legacy expansion rate.
+				DEFAULT_EXPLOSION_DURATION,
 				parentDmg,
+				EXPLOSION_COLOR
+			};
+		}
+
+		static ExplodeOnDeath createFromStartEndRad(float startRad, float endRad, float damage) {
+			return ExplodeOnDeath{
+				endRad,
+				startRad,
+				DEFAULT_EXPLOSION_DURATION,
+				damage,
 				EXPLOSION_COLOR
 			};
 		}

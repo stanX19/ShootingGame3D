@@ -151,8 +151,9 @@ SpawnedUnit spawnConfiguredUnit(
 	context.registry.emplace<KilledScore>(entity, stats.killedScore);
 	context.registry.emplace<effect::ExplodeOnDeath>(
 		entity,
-		effect::ExplodeOnDeath::createFromRadDmg(
-			stats.collisionRadius * effects.explosionRadiusScale,
+		effect::ExplodeOnDeath::createFromStartEndRad(
+			stats.collisionRadius * 0.7f,
+			stats.collisionRadius * 10.0f * effects.explosionRadiusScale,
 			stats.damage
 		)
 	);

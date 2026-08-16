@@ -113,7 +113,7 @@
 				"killedScore": 25000
 			},
 			"effects": {
-				"explosionRadiusScale": 4.0,
+				"explosionRadiusScale": 2.0,
 				"deathSoundRadiusScale": 0.5
 			},
 			"elite": true
@@ -134,7 +134,7 @@
 				"killedScore": 2500
 			},
 			"effects": {
-				"explosionRadiusScale": 6.0,
+				"explosionRadiusScale": 2.0,
 				"deathSoundRadiusScale": 0.5
 			},
 			"elite": true
