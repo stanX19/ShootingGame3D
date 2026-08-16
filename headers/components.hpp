@@ -5,6 +5,9 @@
 #include "model_manager.hpp"
 #include "collision_body_manager.hpp"
 
+#include <cstddef>
+#include <cstdint>
+
 // Components
 struct Position
 {
@@ -332,7 +335,11 @@ namespace effect {
 	};
 }
 
-struct SpawnsTrailParticle {
+struct SpawnsTrailParticles {
+	static constexpr std::size_t maxSpawnLocations = 8;
+
+	Vector3 spawnLocations[maxSpawnLocations]{};
+	std::uint8_t spawnCount = 0;
 	float radius = 0.5f;
 	float lifespan = 1.0f;
 	Color color = SKYBLUE;

@@ -73,10 +73,6 @@ entt::entity spawnPlayer(GameContext& context, Vector3 pos) {
 		unit::spawnConfiguredUnit(context, unitId, params);
 	if (context.registry.all_of<tag::EliteUnit>(spawned.entity))
 		context.registry.remove<tag::EliteUnit>(spawned.entity);
-	context.registry.emplace<SpawnsTrailParticle>(
-		spawned.entity,
-		SpawnsTrailParticle{0.3f, 0.1f}
-	);
 	addPlayerControlTags(context, spawned.entity);
 	context.currentPlayer = spawned.entity;
 	return spawned.entity;

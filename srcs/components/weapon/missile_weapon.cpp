@@ -88,7 +88,16 @@ namespace
 		context.templateReg.emplace<Damage>(missile, Damage{bodyDamage});
 		context.templateReg.emplace<RenderBody>(missile, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(missile, missileBound * -1, missileBound);
-		context.templateReg.emplace<SpawnsTrailParticle>(missile, SpawnsTrailParticle{rad * 0.5f, 0.5f});
+		context.templateReg.emplace<SpawnsTrailParticles>(
+			missile,
+			SpawnsTrailParticles{
+				{{Vector3{0.0f, 0.0f, 0.0f}}},
+				1,
+				rad * 0.5f,
+				0.5f,
+				SKYBLUE
+			}
+		);
 		context.templateReg.emplace<Rotation>(missile);
 		context.templateReg.emplace<tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);
@@ -385,7 +394,16 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	context.templateReg.emplace<tag::Targetable>(bulletTemplate);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{baseLifespan * lifespanMultiplier});
-	context.templateReg.emplace_or_replace<SpawnsTrailParticle>(bulletTemplate, SpawnsTrailParticle{radius, 0.5f, ORANGE});
+	context.templateReg.emplace_or_replace<SpawnsTrailParticles>(
+		bulletTemplate,
+		SpawnsTrailParticles{
+			{{Vector3{0.0f, 0.0f, 0.0f}}},
+			1,
+			radius,
+			0.5f,
+			ORANGE
+		}
+	);
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(spreadAngle);

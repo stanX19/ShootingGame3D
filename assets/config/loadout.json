@@ -2,9 +2,9 @@
     "shipId": "fighter",
     "specialWeapon": "missile.basic",
     "turretWeapons": [
-        "bullet.machineGun",
-        "bullet.machineGun",
-        "bullet.machineGun",
-        "bullet.machineGun"
+        "bullet.basic",
+        "bullet.basic",
+        "bullet.basic",
+        "bullet.basic"
     ]
 }

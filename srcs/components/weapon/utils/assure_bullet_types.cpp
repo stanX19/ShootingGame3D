@@ -23,6 +23,7 @@ void weapon::utils::assureBulletTypes(entt::registry &registry) {
 		DisappearBound,
 		sound::HitSound,
 		sound::ShootSound,
-		sound::DeathSound
+		sound::DeathSound,
+		SpawnsTrailParticles
 	>(registry);
 }

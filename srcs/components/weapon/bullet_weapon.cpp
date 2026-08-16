@@ -220,7 +220,16 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, con
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 	context.templateReg.emplace<Rotation>(bulletTemplate);
 	context.templateReg.emplace<RotationVelocity>(bulletTemplate, QuaternionFromAxisAngle(Vector3UnitY, PI));
-	context.templateReg.emplace<SpawnsTrailParticle>(bulletTemplate, SpawnsTrailParticle{radius / 2.0f, 1.0f, GRAY});
+	context.templateReg.emplace<SpawnsTrailParticles>(
+		bulletTemplate,
+		SpawnsTrailParticles{
+			{{Vector3{0.0f, 0.0f, 0.0f}}},
+			1,
+			radius / 2.0f,
+			1.0f,
+			GRAY
+		}
+	);
 	context.templateReg.erase<ModelStrech>(bulletTemplate);
 
 	Weapon weapon{bulletTemplate};
