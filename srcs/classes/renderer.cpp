@@ -67,6 +67,24 @@ void Renderer::setupShaderUniforms()
 	SetShaderValue(lightedShader, lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
 }
 
+void Renderer::updateFrustum()
+{
+	Matrix viewMat = rlGetMatrixModelview();
+	Matrix projMat = rlGetMatrixProjection();
+	Matrix viewProjMat = MatrixMultiply(viewMat, projMat);
+	currentFrustum = Frustum::fromViewProjection(viewProjMat);
+}
+
+bool Renderer::isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech)
+{
+	strech = getStrech(entity);
+	float baseRadius = context.modelManager.getModelRadius(body.modelID);
+	float maxScale = std::max({body.scale.x, body.scale.y, body.scale.z, 0.01f});
+	float translationLen = Vector3Length(body.translation);
+	float effectiveRadius = baseRadius * maxScale + translationLen + (strech.strech > 1.0f ? strech.strech * maxScale : 0.0f);
+	return currentFrustum.isSphereInside(pos.value, effectiveRadius);
+}
+
 void Renderer::Render(float dt)
 {
 	currentDt = dt;
@@ -76,6 +94,7 @@ void Renderer::Render(float dt)
 	drawEntitiesWithSkyboxShader();
 
 	BeginMode3D(camera);
+	updateFrustum();
 	// DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
 
 	handleLightSource();
@@ -177,11 +196,15 @@ void Renderer::drawEntitiesWithoutShader()
 	{
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
+		StrechDat strech;
+		if (!isEntityVisible(entity, pos, body, strech))
+			continue;
+
 		Model &model = context.modelManager.getModel(body.modelID);
 		for (int i = 0; i < model.materialCount; i++) {
 			model.materials[i].shader = defaultShader;
 		}
-		drawEntityModel(pos, body, getStrech(entity));
+		drawEntityModel(pos, body, strech);
 	}
 }
 
@@ -194,6 +217,10 @@ void Renderer::drawEntitiesWithShader()
 	{
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
+		StrechDat strech;
+		if (!isEntityVisible(entity, pos, body, strech))
+			continue;
+
 		Model &model = context.modelManager.getModel(body.modelID);
 		bool hasNormalMap = false;
 		for (int i = 0; i < model.materialCount; i++) {
@@ -204,7 +231,7 @@ void Renderer::drawEntitiesWithShader()
 		const int normalMapAvailable = hasNormalMap ? 1 : 0;
 		SetShaderValue(lightedShader, normalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
 		// SetShaderValueTexture(shader, GetShaderLocation(shader, "texture0"), model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture);
-		drawEntityModel(pos, body, getStrech(entity));
+		drawEntityModel(pos, body, strech);
 	}
 
 	// EndShaderMode();
@@ -249,10 +276,13 @@ void Renderer::drawEnergyShield()
 	{
 		if (shield.activeTimer <= 0.0f || shield.hp < 10)
 			continue;
+		float scale = std::max(body.scale.x, std::max(body.scale.y, body.scale.z)) * 4;
+		if (!currentFrustum.isSphereInside(pos.value, scale))
+			continue;
+
 		context.modelManager.getModel(body.modelID).materials[0].shader = defaultShader;
 
 		Color color = ColorAlpha(SKYBLUE, (0.1 + 0.5 * shield.hp / shield.maxHp) * (shield.activeTimer / shield.activeDuration));
-		float scale = std::max(body.scale.x, std::max(body.scale.y, body.scale.z)) * 4;
 		DrawModel(context.modelManager.getModel(model), pos.value, scale, color);
 	}
 }

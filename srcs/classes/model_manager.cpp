@@ -37,6 +37,26 @@ namespace {
 			prepareTexture(material.maps[MATERIAL_MAP_NORMAL].texture);
 		}
 	}
+
+	float computeModelBoundingRadius(const Model &model)
+	{
+		BoundingBox box = GetModelBoundingBox(model);
+		float maxDistSq = 0.0f;
+		for (int x : {0, 1}) {
+			for (int y : {0, 1}) {
+				for (int z : {0, 1}) {
+					Vector3 pt = {
+						x ? box.max.x : box.min.x,
+						y ? box.max.y : box.min.y,
+						z ? box.max.z : box.min.z
+					};
+					float distSq = pt.x * pt.x + pt.y * pt.y + pt.z * pt.z;
+					if (distSq > maxDistSq) maxDistSq = distSq;
+				}
+			}
+		}
+		return std::max(0.01f, std::sqrt(maxDistSq));
+	}
 }
 
 t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &transform)
@@ -67,6 +87,7 @@ t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &tr
 	model.transform = transform;
 
 	models.push_back(model);
+	modelRadii.push_back(computeModelBoundingRadius(model));
 	modelPaths.emplace_back(filePath);
 	t_model_id id = models.size() - 1;
 	loadedFromFile[key] = id;
@@ -179,6 +200,7 @@ void ModelManager::unloadAll()
 		UnloadModel(model);
 	}
 	models.clear();
+	modelRadii.clear();
 	modelPaths.clear();
 	proceduralCache.clear();
 	loadedFromFile.clear();
@@ -187,6 +209,13 @@ void ModelManager::unloadAll()
 bool ModelManager::isValid(t_model_id id) const
 {
 	return id < models.size();
+}
+
+float ModelManager::getModelRadius(t_model_id id) const
+{
+	if (id < modelRadii.size())
+		return modelRadii[id];
+	return 1.0f;
 }
 
 template <typename... Args>
@@ -212,6 +241,7 @@ t_model_id ModelManager::createAndAddModel(const std::string &keyBase, Func mode
 	Model model = modelGenerator(); // Call the generator function
 	t_model_id id = models.size();
 	models.push_back(model);
+	modelRadii.push_back(computeModelBoundingRadius(model));
 	modelPaths.emplace_back(std::nullopt);
 	proceduralCache[key] = id;
 	return id;

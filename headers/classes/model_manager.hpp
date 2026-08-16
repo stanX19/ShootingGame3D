@@ -32,10 +32,12 @@ public:
 	std::optional<std::string> getModelPath(t_model_id id) const;
 
 	void unloadAll();
+	float getModelRadius(t_model_id id) const;
 
 	bool isValid(t_model_id id) const;
 private:
 	std::vector<Model> models;
+	std::vector<float> modelRadii;
 	std::vector<std::optional<std::string>> modelPaths;
 	std::map<std::pair<std::string, Matrix>, t_model_id> loadedFromFile; // filepath -> id
 	std::map<std::string, t_model_id> proceduralCache;

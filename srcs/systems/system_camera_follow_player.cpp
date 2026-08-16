@@ -79,7 +79,7 @@ void ecs_systems::cameraFollowPlayer(GameContext &context, float dt) {
 		if (colBodyPtr) {
 			scale = colBodyPtr->radius;
 		}
-		std::cout << "Camera scale: " << scale << std::endl;
+		// std::cout << "Camera scale: " << scale << std::endl;
 	}
 
 	Vector3 desiredPosition = Vector3RotateByQuaternion(pov.positionOffset, rot.value) * scale + pos.value;

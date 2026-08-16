@@ -223,17 +223,13 @@ int main() {
 
 		// State transitions
 		if (state == BenchmarkState::WARMUP) {
-			if (GetTime() >= 60.0) {
-				std::cout << ">>> BENCHMARK WARMUP REACHED 60s (FPS: " << smoothedFps << "). Exiting automatically without lag spike. <<<" << std::endl;
-				break;
-			}
-			if ((smoothedFps < 30.0f && currentFrame > 120) || IsKeyPressed(KEY_B) || IsKeyPressed(KEY_SPACE) || GetTime() > 40.0) {
+			if ((smoothedFps < 30.0f && currentFrame > 180) || GetTime() >= 35.0 || IsKeyPressed(KEY_B) || IsKeyPressed(KEY_SPACE)) {
 				state = BenchmarkState::BENCHMARKING;
 				benchmarkTimer = 0.0;
 				resetMetrics(metrics);
 				samples.clear();
 				std::cout << "\n=================================================================================" << std::endl;
-				std::cout << ">>> BENCHMARK TRIGGERED (FPS: " << smoothedFps << ")! Profiling for 10 seconds... <<<" << std::endl;
+				std::cout << ">>> BENCHMARK TRIGGERED (FPS: " << smoothedFps << ", Time: " << GetTime() << "s)! Profiling for 10 seconds... <<<" << std::endl;
 				std::cout << "=================================================================================\n" << std::endl;
 			}
 		} else if (state == BenchmarkState::BENCHMARKING) {

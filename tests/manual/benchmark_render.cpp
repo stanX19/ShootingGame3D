@@ -16,6 +16,7 @@ namespace {
 		PROBE_SKYBOX_PASS,
 		PROBE_BEGIN_MODE_3D,
 		PROBE_LIGHT_SOURCE,
+		PROBE_CULLING_OVERHEAD,
 		PROBE_UNSHADED_ENTITIES,
 		PROBE_SHADED_ENTITIES,
 		PROBE_BOUNDARY_WARNING,
@@ -35,6 +36,17 @@ namespace {
 		uint32_t sampleCount = 0;
 	};
 
+	struct CullingStats {
+		size_t shadedTested = 0;
+		size_t shadedCulled = 0;
+		size_t shadedDrawn = 0;
+		size_t unshadedTested = 0;
+		size_t unshadedCulled = 0;
+		size_t unshadedDrawn = 0;
+	};
+
+	static CullingStats globalCullStats;
+
 	struct RenderFrameSample {
 		size_t frameIndex = 0;
 		double frameTimeMs = 0.0;
@@ -43,6 +55,8 @@ namespace {
 		size_t shadedBodies = 0;
 		size_t bulletCount = 0;
 		size_t particleCount = 0;
+		size_t totalCulled = 0;
+		size_t totalDrawn = 0;
 	};
 
 	enum class BenchmarkState {
@@ -73,10 +87,11 @@ namespace {
 	void initProbeNames(RenderMetric (&metrics)[PROBE_COUNT]) {
 		metrics[PROBE_CLEAR_BACKGROUND].name = "ClearBackground";
 		metrics[PROBE_SKYBOX_PASS].name = "drawEntitiesWithSkyboxShader";
-		metrics[PROBE_BEGIN_MODE_3D].name = "BeginMode3D";
+		metrics[PROBE_BEGIN_MODE_3D].name = "BeginMode3D + updateFrustum";
 		metrics[PROBE_LIGHT_SOURCE].name = "handleLightSource";
-		metrics[PROBE_UNSHADED_ENTITIES].name = "drawEntitiesWithoutShader (Particles/Bullets/Exp)";
-		metrics[PROBE_SHADED_ENTITIES].name = "drawEntitiesWithShader (Ships/Asteroids)";
+		metrics[PROBE_CULLING_OVERHEAD].name = "CPU Frustum Sphere Tests (isEntityVisible)";
+		metrics[PROBE_UNSHADED_ENTITIES].name = "drawEntitiesWithoutShader (DrawModelEx calls)";
+		metrics[PROBE_SHADED_ENTITIES].name = "drawEntitiesWithShader (DrawModelEx calls)";
 		metrics[PROBE_BOUNDARY_WARNING].name = "drawBoundaryWarning";
 		metrics[PROBE_ENERGY_SHIELD].name = "drawEnergyShield";
 		metrics[PROBE_DEBUG_DRAW].name = "drawDebug";
@@ -92,13 +107,16 @@ namespace {
 			metrics[i].maxNanos = 0;
 			metrics[i].sampleCount = 0;
 		}
+		globalCullStats = CullingStats{};
 	}
 }
 
 class BenchmarkRenderer {
 public:
-	static void renderInstrumented(Renderer &renderer, BattlefieldHUDRenderer &hudRenderer, float dt, RenderMetric (&metrics)[PROBE_COUNT], bool profiling) {
+	static void renderInstrumented(Renderer &renderer, BattlefieldHUDRenderer &hudRenderer, float dt, RenderMetric (&metrics)[PROBE_COUNT], bool profiling, size_t &frameCulled, size_t &frameDrawn) {
 		renderer.currentDt = dt;
+		frameCulled = 0;
+		frameDrawn = 0;
 
 		const auto renderStart = std::chrono::high_resolution_clock::now();
 
@@ -112,19 +130,108 @@ public:
 
 		runRenderProbe<PROBE_BEGIN_MODE_3D>(metrics, profiling, [&]() {
 			BeginMode3D(renderer.camera);
+			renderer.updateFrustum();
 		});
 
 		runRenderProbe<PROBE_LIGHT_SOURCE>(metrics, profiling, [&]() {
 			renderer.handleLightSource();
 		});
 
-		runRenderProbe<PROBE_UNSHADED_ENTITIES>(metrics, profiling, [&]() {
-			renderer.drawEntitiesWithoutShader();
-		});
+		// Custom unshaded pass with separate culling vs draw timing
+		uint64_t unshadedCullNanos = 0;
+		uint64_t unshadedDrawNanos = 0;
+		{
+			auto view = renderer.context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded, tag::SkyBox>);
+			for (auto entity : view) {
+				const Position &pos = view.get<Position>(entity);
+				const RenderBody &body = view.get<RenderBody>(entity);
+				Renderer::StrechDat strech;
 
-		runRenderProbe<PROBE_SHADED_ENTITIES>(metrics, profiling, [&]() {
-			renderer.drawEntitiesWithShader();
-		});
+				const auto t0 = std::chrono::high_resolution_clock::now();
+				bool visible = renderer.isEntityVisible(entity, pos, body, strech);
+				const auto t1 = std::chrono::high_resolution_clock::now();
+				unshadedCullNanos += std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+
+				if (profiling) globalCullStats.unshadedTested++;
+				if (!visible) {
+					if (profiling) globalCullStats.unshadedCulled++;
+					frameCulled++;
+					continue;
+				}
+				if (profiling) globalCullStats.unshadedDrawn++;
+				frameDrawn++;
+
+				const auto t2 = std::chrono::high_resolution_clock::now();
+				Model &model = renderer.context.modelManager.getModel(body.modelID);
+				for (int i = 0; i < model.materialCount; i++) {
+					model.materials[i].shader = renderer.defaultShader;
+				}
+				renderer.drawEntityModel(pos, body, strech);
+				const auto t3 = std::chrono::high_resolution_clock::now();
+				unshadedDrawNanos += std::chrono::duration_cast<std::chrono::nanoseconds>(t3 - t2).count();
+			}
+		}
+
+		// Custom shaded pass with separate culling vs draw timing
+		uint64_t shadedCullNanos = 0;
+		uint64_t shadedDrawNanos = 0;
+		{
+			auto view = renderer.context.registry.view<Position, RenderBody, tag::Shaded>();
+			for (auto entity : view) {
+				const Position &pos = view.get<Position>(entity);
+				const RenderBody &body = view.get<RenderBody>(entity);
+				Renderer::StrechDat strech;
+
+				const auto t0 = std::chrono::high_resolution_clock::now();
+				bool visible = renderer.isEntityVisible(entity, pos, body, strech);
+				const auto t1 = std::chrono::high_resolution_clock::now();
+				shadedCullNanos += std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+
+				if (profiling) globalCullStats.shadedTested++;
+				if (!visible) {
+					if (profiling) globalCullStats.shadedCulled++;
+					frameCulled++;
+					continue;
+				}
+				if (profiling) globalCullStats.shadedDrawn++;
+				frameDrawn++;
+
+				const auto t2 = std::chrono::high_resolution_clock::now();
+				Model &model = renderer.context.modelManager.getModel(body.modelID);
+				bool hasNormalMap = false;
+				for (int i = 0; i < model.materialCount; i++) {
+					model.materials[i].shader = renderer.lightedShader;
+					if (model.materials[i].maps[MATERIAL_MAP_NORMAL].texture.id != 0) {
+						hasNormalMap = true;
+					}
+				}
+				SetShaderValue(renderer.lightedShader, renderer.normalMapAvailableLoc, &hasNormalMap, SHADER_UNIFORM_INT);
+				renderer.drawEntityModel(pos, body, strech);
+				const auto t3 = std::chrono::high_resolution_clock::now();
+				shadedDrawNanos += std::chrono::duration_cast<std::chrono::nanoseconds>(t3 - t2).count();
+			}
+		}
+
+		if (profiling) {
+			const uint64_t totalCullNanos = unshadedCullNanos + shadedCullNanos;
+			RenderMetric &mCull = metrics[PROBE_CULLING_OVERHEAD];
+			mCull.totalNanos += totalCullNanos;
+			if (totalCullNanos < mCull.minNanos) mCull.minNanos = totalCullNanos;
+			if (totalCullNanos > mCull.maxNanos) mCull.maxNanos = totalCullNanos;
+			mCull.sampleCount++;
+
+			RenderMetric &mUnshaded = metrics[PROBE_UNSHADED_ENTITIES];
+			mUnshaded.totalNanos += unshadedDrawNanos;
+			if (unshadedDrawNanos < mUnshaded.minNanos) mUnshaded.minNanos = unshadedDrawNanos;
+			if (unshadedDrawNanos > mUnshaded.maxNanos) mUnshaded.maxNanos = unshadedDrawNanos;
+			mUnshaded.sampleCount++;
+
+			RenderMetric &mShaded = metrics[PROBE_SHADED_ENTITIES];
+			mShaded.totalNanos += shadedDrawNanos;
+			if (shadedDrawNanos < mShaded.minNanos) mShaded.minNanos = shadedDrawNanos;
+			if (shadedDrawNanos > mShaded.maxNanos) mShaded.maxNanos = shadedDrawNanos;
+			mShaded.sampleCount++;
+		}
 
 		runRenderProbe<PROBE_BOUNDARY_WARNING>(metrics, profiling, [&]() {
 			renderer.drawBoundaryWarning();
@@ -221,17 +328,13 @@ int main() {
 		};
 
 		if (state == BenchmarkState::WARMUP) {
-			if (GetTime() >= 60.0) {
-				std::cout << ">>> BENCHMARK WARMUP REACHED 60s (FPS: " << smoothedFps << "). Exiting automatically without lag spike. <<<" << std::endl;
-				break;
-			}
-			if ((smoothedFps < 30.0f && currentFrame > 120) || IsKeyPressed(KEY_B) || IsKeyPressed(KEY_SPACE) || GetTime() > 40.0) {
+			if ((smoothedFps < 30.0f && currentFrame > 180) || GetTime() >= 35.0 || IsKeyPressed(KEY_B) || IsKeyPressed(KEY_SPACE)) {
 				state = BenchmarkState::BENCHMARKING;
 				benchmarkTimer = 0.0;
 				resetProbes(metrics);
 				samples.clear();
 				std::cout << "\n=================================================================================" << std::endl;
-				std::cout << ">>> RENDER SUB-PASS BENCHMARK TRIGGERED (FPS: " << smoothedFps << ")! Profiling for 10s... <<<" << std::endl;
+				std::cout << ">>> RENDER SUB-PASS BENCHMARK TRIGGERED (FPS: " << smoothedFps << ", Time: " << GetTime() << "s)! Profiling for 10s... <<<" << std::endl;
 				std::cout << "=================================================================================\n" << std::endl;
 			}
 		} else if (state == BenchmarkState::BENCHMARKING) {
@@ -272,7 +375,9 @@ int main() {
 
 		// --- Render with Direct Sub-Pass Probing ---
 		BeginDrawing();
-		BenchmarkRenderer::renderInstrumented(renderer, hudRenderer, dt, metrics, isProfiling);
+		size_t frameCulled = 0;
+		size_t frameDrawn = 0;
+		BenchmarkRenderer::renderInstrumented(renderer, hudRenderer, dt, metrics, isProfiling, frameCulled, frameDrawn);
 
 		if (isProfiling) {
 			RenderFrameSample s;
@@ -283,6 +388,8 @@ int main() {
 			s.unshadedBodies = s.totalRenderBodies > s.shadedBodies ? (s.totalRenderBodies - s.shadedBodies) : 0;
 			s.bulletCount = context.registry.storage<tag::Bullet>().size();
 			s.particleCount = context.registry.view<RenderBody, Lifespan>().size_hint();
+			s.totalCulled = frameCulled;
+			s.totalDrawn = frameDrawn;
 			samples.push_back(s);
 		}
 
@@ -308,10 +415,10 @@ int main() {
 			DrawRectangle(10, 10, 420, 115, ColorAlpha(BLACK, 0.85f));
 			DrawText(TextFormat("RENDER PROFILING: %.1fs / %.0fs", benchmarkTimer, BENCHMARK_DURATION), 20, 20, 18, RED);
 			DrawText(TextFormat("FPS: %.1f | Frame: %.2f ms", smoothedFps, dt * 1000.0f), 20, 45, 16, WHITE);
-			DrawText(TextFormat("RenderBodies: %zu (Unshaded: %zu, Shaded: %zu)",
+			DrawText(TextFormat("RenderBodies: %zu (Culled: %zu, Drawn: %zu)",
 				context.registry.storage<RenderBody>().size(),
-				context.registry.storage<RenderBody>().size() - context.registry.view<RenderBody, tag::Shaded>().size_hint(),
-				context.registry.view<RenderBody, tag::Shaded>().size_hint()), 20, 68, 14, SKYBLUE);
+				frameCulled,
+				frameDrawn), 20, 68, 14, SKYBLUE);
 			DrawText(TextFormat("Bullets: %zu | Particles/Lifespans: %zu",
 				context.registry.storage<tag::Bullet>().size(),
 				context.registry.view<RenderBody, Lifespan>().size_hint()), 20, 90, 13, LIGHTGRAY);
@@ -362,26 +469,64 @@ int main() {
 						  << std::setw(9) << std::setprecision(1) << pct << "%" << std::endl;
 			}
 
+			std::cout << "\n--- FRUSTUM CULLING EFFECTIVENESS & METRICS ---" << std::endl;
+			const size_t totalTested = globalCullStats.shadedTested + globalCullStats.unshadedTested;
+			const size_t totalCulled = globalCullStats.shadedCulled + globalCullStats.unshadedCulled;
+			const size_t totalDrawn = globalCullStats.shadedDrawn + globalCullStats.unshadedDrawn;
+			const double cullPct = totalTested > 0 ? (static_cast<double>(totalCulled) / totalTested * 100.0) : 0.0;
+			const double shadedCullPct = globalCullStats.shadedTested > 0 ? (static_cast<double>(globalCullStats.shadedCulled) / globalCullStats.shadedTested * 100.0) : 0.0;
+			const double unshadedCullPct = globalCullStats.unshadedTested > 0 ? (static_cast<double>(globalCullStats.unshadedCulled) / globalCullStats.unshadedTested * 100.0) : 0.0;
+
+			std::cout << "Shaded Entities (Ships/Asteroids): "
+					  << "Tested = " << globalCullStats.shadedTested << " | "
+					  << "Culled (Dropped) = " << globalCullStats.shadedCulled << " (" << std::fixed << std::setprecision(1) << shadedCullPct << "%) | "
+					  << "Drawn = " << globalCullStats.shadedDrawn << std::endl;
+
+			std::cout << "Unshaded Entities (Particles/FX):  "
+					  << "Tested = " << globalCullStats.unshadedTested << " | "
+					  << "Culled (Dropped) = " << globalCullStats.unshadedCulled << " (" << std::fixed << std::setprecision(1) << unshadedCullPct << "%) | "
+					  << "Drawn = " << globalCullStats.unshadedDrawn << std::endl;
+
+			std::cout << "TOTAL ACROSS ALL PASSES:           "
+					  << "Tested = " << totalTested << " | "
+					  << "Culled (Skipped GPU Draw Calls) = " << totalCulled << " (" << std::fixed << std::setprecision(1) << cullPct << "%) | "
+					  << "Drawn = " << totalDrawn << std::endl;
+
+			const double cullOverheadTotalMs = static_cast<double>(metrics[PROBE_CULLING_OVERHEAD].totalNanos) / 1.0e6;
+			const double cullOverheadAvgUs = (cullOverheadTotalMs / samples.size()) * 1000.0;
+			std::cout << "Total Culling CPU Overhead:        "
+					  << std::fixed << std::setprecision(2) << cullOverheadTotalMs << " ms across " << samples.size() << " frames ("
+					  << std::fixed << std::setprecision(1) << cullOverheadAvgUs << " us/frame = "
+					  << std::setprecision(3) << (cullOverheadTotalMs / samples.size()) << " ms/frame)" << std::endl;
+
 			std::cout << "\n--- POPULATION METRICS DURING BENCHMARK ---" << std::endl;
 			size_t avgRen = 0, maxRen = 0;
 			size_t avgUnsh = 0, maxUnsh = 0;
 			size_t avgShad = 0, maxShad = 0;
 			size_t avgBull = 0, maxBull = 0;
 			size_t avgPart = 0, maxPart = 0;
+			size_t avgCulled = 0, maxCulled = 0;
+			size_t avgDrawn = 0, maxDrawn = 0;
 			for (const auto &s : samples) {
 				avgRen += s.totalRenderBodies; maxRen = std::max(maxRen, s.totalRenderBodies);
 				avgUnsh += s.unshadedBodies; maxUnsh = std::max(maxUnsh, s.unshadedBodies);
 				avgShad += s.shadedBodies; maxShad = std::max(maxShad, s.shadedBodies);
 				avgBull += s.bulletCount; maxBull = std::max(maxBull, s.bulletCount);
 				avgPart += s.particleCount; maxPart = std::max(maxPart, s.particleCount);
+				avgCulled += s.totalCulled; maxCulled = std::max(maxCulled, s.totalCulled);
+				avgDrawn += s.totalDrawn; maxDrawn = std::max(maxDrawn, s.totalDrawn);
 			}
 			avgRen /= samples.size();
 			avgUnsh /= samples.size();
 			avgShad /= samples.size();
 			avgBull /= samples.size();
 			avgPart /= samples.size();
+			avgCulled /= samples.size();
+			avgDrawn /= samples.size();
 
 			std::cout << "Total RenderBodies:    Avg = " << std::setw(5) << avgRen << " | Max = " << maxRen << std::endl;
+			std::cout << "Culled Entities (Avg): Avg = " << std::setw(5) << avgCulled << " | Max = " << maxCulled << " (Zero GPU draw calls)" << std::endl;
+			std::cout << "Drawn Entities (Avg):  Avg = " << std::setw(5) << avgDrawn << " | Max = " << maxDrawn << " (Dispatched to GPU)" << std::endl;
 			std::cout << "Unshaded Entities:     Avg = " << std::setw(5) << avgUnsh << " | Max = " << maxUnsh << " (Particles, Bullets, Explosions)" << std::endl;
 			std::cout << "Shaded Entities:       Avg = " << std::setw(5) << avgShad << " | Max = " << maxShad << " (Ships, Asteroids)" << std::endl;
 			std::cout << "Bullets:               Avg = " << std::setw(5) << avgBull << " | Max = " << maxBull << std::endl;

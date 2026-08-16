@@ -5,6 +5,7 @@
 #include "components.hpp"
 #include "utils.hpp"
 #include "game_context.hpp"
+#include "frustum.hpp"
 
 
 class Renderer {
@@ -29,6 +30,7 @@ private:
 	int lightColorLoc;
 	int ambientStrengthLoc;
 	int normalMapAvailableLoc;
+	Frustum currentFrustum;
 
 	struct StrechDat {
 		float strech;
@@ -38,7 +40,9 @@ private:
 	void loadDefaultShader();
 	void loadShaderWithFallback();
 	void setupShaderUniforms();
+	void updateFrustum();
 	StrechDat getStrech(entt::entity entity);
+	bool isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech);
 	void drawEntityModel(const Position &pos, const RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
 	void drawTrails();
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);

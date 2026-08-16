@@ -91,24 +91,13 @@ TEST_CASE("GameConfig rejects a unit with an unknown spaceship reference", "[int
 TEST_CASE("Spaceship factory scales the unit-radius model by collision radius", "[integration][spaceship]") {
 	GameConfig config;
 	config.init(kConfigRoots);
-	const auto& authored = config.spaceship().get("player");
-
-	CHECK(spaceship::factory::detail::visualScaleForAuthoredModel(
-		1.0f,
-		authored.modelRadius
-	) == Catch::Approx(1.0f));
-	CHECK(spaceship::factory::detail::visualScaleForAuthoredModel(
-		0.5f,
-		authored.modelRadius
-	) == Catch::Approx(0.5f));
-	CHECK(spaceship::factory::detail::visualScaleForAuthoredModel(
-		1.5f,
-		authored.modelRadius
-	) == Catch::Approx(1.5f));
-	CHECK(spaceship::factory::detail::visualScaleForAuthoredModel(
-		100.123f,
-		authored.modelRadius
-	) == Catch::Approx(100.123f));
+	ModelManager modelManager;
+	const auto mounts1 = spaceship::factory::getModelAndMounts(config, modelManager, "player", 1.0f);
+	CHECK(mounts1.bodyScale == Catch::Approx(1.0f));
+	const auto mounts05 = spaceship::factory::getModelAndMounts(config, modelManager, "player", 0.5f);
+	CHECK(mounts05.bodyScale == Catch::Approx(0.5f));
+	const auto mounts15 = spaceship::factory::getModelAndMounts(config, modelManager, "player", 1.5f);
+	CHECK(mounts15.bodyScale == Catch::Approx(1.5f));
 }
 
 TEST_CASE("GameConfig rejects an unknown spaceship ID", "[integration][spaceship]") {
