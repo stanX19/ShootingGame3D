@@ -4,6 +4,8 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <unordered_set>
+#include "rlgl.h"
 #include "model_manager.hpp"
 #include "utils.hpp"
 
@@ -195,9 +197,36 @@ std::optional<std::string> ModelManager::getModelPath(t_model_id id) const
 
 void ModelManager::unloadAll()
 {
+	constexpr int kMaxMaterialMaps = 12;
+	const bool windowReady = IsWindowReady();
+	std::unordered_set<unsigned int> unloadedTextureIds;
+
 	for (auto &model : models)
 	{
-		UnloadModel(model);
+		if (model.materials != nullptr)
+		{
+			for (int i = 0; i < model.materialCount; ++i)
+			{
+				Material &material = model.materials[i];
+				if (material.maps != nullptr && windowReady)
+				{
+					for (int j = 0; j < kMaxMaterialMaps; ++j)
+					{
+						Texture2D &texture = material.maps[j].texture;
+						if (texture.id > 0 && texture.id != rlGetTextureIdDefault())
+						{
+							if (unloadedTextureIds.insert(texture.id).second)
+								UnloadTexture(texture);
+							texture.id = 0;
+						}
+					}
+				}
+				material.shader = {0, nullptr};
+			}
+		}
+
+		if (model.meshCount > 0 && model.meshes != nullptr)
+			UnloadModel(model);
 	}
 	models.clear();
 	modelRadii.clear();

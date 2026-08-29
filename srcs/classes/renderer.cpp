@@ -14,10 +14,22 @@ Renderer::Renderer(Camera3D &cam, GameContext &context)
 
 Renderer::~Renderer()
 {
-	if (lightedShader.id != 0)
+	if (lightedShader.id > 0 && lightedShader.id != rlGetShaderIdDefault())
 	{
-		// UnloadShader(shader);  // this seg faults idk why
-		lightedShader = {0, NULL};
+		UnloadShader(lightedShader);
+		lightedShader = {0, nullptr};
+	}
+
+	if (skyboxShader.id > 0 && skyboxShader.id != rlGetShaderIdDefault())
+	{
+		UnloadShader(skyboxShader);
+		skyboxShader = {0, nullptr};
+	}
+
+	if (defaultShader.id > 0 && defaultShader.id != rlGetShaderIdDefault())
+	{
+		UnloadShader(defaultShader);
+		defaultShader = {0, nullptr};
 	}
 }
 
@@ -29,12 +41,10 @@ void Renderer::loadDefaultShader()
 void Renderer::loadShaderWithFallback()
 {
 	lightedShader = LoadShader("shaders/sunlight.vs", "shaders/sunlight.fs");
-
 	if (lightedShader.id == 0)
 	{
 		TraceLog(LOG_WARNING, "Custom shader failed to load. Using default shader.");
 		lightedShader = LoadShader(NULL, NULL);
-		return ;
 	}
 
 	skyboxShader = LoadShader("shaders/skybox.vs", "shaders/skybox.fs");
@@ -42,12 +52,7 @@ void Renderer::loadShaderWithFallback()
 	{
 		TraceLog(LOG_WARNING, "Custom shader failed to load. Using default shader.");
 		skyboxShader = LoadShader(NULL, NULL);
-		return ;
 	}
-
-	Mesh sphereMesh = GenMeshSphere(1.0f, 64, 64);
-	sphereModel = LoadModelFromMesh(sphereMesh);
-	sphereModel.materials[0].shader = lightedShader;
 
 	// create a unit cone mesh (height = 1, base radius = 1) for trails
 	t_model_id trailModelID = context.modelManager.loadModel("assets/Models/Trail/trail.glb");

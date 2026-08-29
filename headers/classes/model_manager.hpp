@@ -13,6 +13,8 @@ class ModelManager {
 public:
 	ModelManager();
 	~ModelManager();
+	ModelManager(const ModelManager &) = delete;
+	ModelManager &operator=(const ModelManager &) = delete;
 
 	t_model_id loadModel(const std::string& filePath);
 	t_model_id loadModel(const std::string &filePath, float scale);

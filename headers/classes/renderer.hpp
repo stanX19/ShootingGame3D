@@ -13,23 +13,24 @@ class Renderer {
 public:
 	Renderer(Camera3D& camera, GameContext &context);
 	~Renderer();
+	Renderer(const Renderer &) = delete;
+	Renderer &operator=(const Renderer &) = delete;
 
 	void Render(float dt);
 
 private:
 	Camera3D& camera;
 	GameContext &context;
-	float currentDt;
-	Shader lightedShader;
-	Shader skyboxShader;
-	Shader defaultShader;
+	float currentDt = 0.0f;
+	Shader lightedShader{};
+	Shader skyboxShader{};
+	Shader defaultShader{};
 	
-	Model sphereModel;
-	Model trailModel;
-	int lightPosLoc;
-	int lightColorLoc;
-	int ambientStrengthLoc;
-	int normalMapAvailableLoc;
+	Model trailModel{};
+	int lightPosLoc = 0;
+	int lightColorLoc = 0;
+	int ambientStrengthLoc = 0;
+	int normalMapAvailableLoc = 0;
 	Frustum currentFrustum;
 
 	struct StrechDat {

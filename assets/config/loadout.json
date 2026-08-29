@@ -1,8 +1,10 @@
 {
-    "shipId": "fastElite",
+    "shipId": "fighter",
     "specialWeapon": "missile.flares",
     "turretWeapons": [
-        "bullet.machineGun",
-        "bullet.machineGun"
+        "bullet.burstSniper",
+        "bullet.burstSniper",
+        "bullet.burstSniper",
+        "bullet.burstSniper"
     ]
 }

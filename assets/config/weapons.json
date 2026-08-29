@@ -1,6 +1,6 @@
 {
 	"bullet": {
-		"baseDamage": 25,
+		"baseDamage": 50,
 		"baseSpeed": 1000,
 		"effectiveRangeMultiplier": 2,
 		"weapons": {
