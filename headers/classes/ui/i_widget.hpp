@@ -7,10 +7,14 @@ class IWidget {
 public:
     virtual ~IWidget() = default;
 
-    bool tick_and_draw() {
+    bool tickAndDraw() {
         const bool changed = update();
         draw();
         return changed;
+    }
+
+    bool tick_and_draw() {
+        return tickAndDraw();
     }
 
     virtual bool update() = 0;

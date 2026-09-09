@@ -82,45 +82,45 @@ namespace
 } // namespace
 
 GameHangar::GameHangar(GameContext &context)
-  : context(context),
-	renderer(context.mainCamera, context),
-	previewPlayer(entt::null),
-	specialButton("Special Weapon", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
-	shipButton("SELECT SHIP", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
-	backButton("BACK TO MENU", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, GRAY, 20)
+  : m_context(context),
+	m_renderer(context.mainCamera, context),
+	m_previewPlayer(entt::null),
+	m_specialButton("Special Weapon", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	m_shipButton("SELECT SHIP", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+	m_backButton("BACK TO MENU", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, GRAY, 20)
 {
-	standardWeapons = context.weaponRegistry.getStandardWeaponIds();
-	specialWeapons = context.weaponRegistry.getSpecialWeaponIds();
-	shipIds = context.config.units().ids();
-	if (shipIds.empty())
+	m_standardWeapons = context.weaponRegistry.getStandardWeaponIds();
+	m_specialWeapons = context.weaponRegistry.getSpecialWeaponIds();
+	m_shipIds = context.config.units().ids();
+	if (m_shipIds.empty())
 		throw std::runtime_error("HANGAR: no unit definitions are available");
 
-	selectedShipId = context.config.getString("loadout.shipId", "");
-	if (selectedShipId.empty())
+	m_selectedShipId = context.config.getString("loadout.shipId", "");
+	if (m_selectedShipId.empty())
 		throw std::invalid_argument("HANGAR: loadout.shipId is required");
 
-	const auto selected = std::find(shipIds.begin(), shipIds.end(), selectedShipId);
-	if (selected == shipIds.end())
-		throw std::invalid_argument("HANGAR: loadout.shipId references an unknown unit: " + selectedShipId);
+	const auto selected = std::find(m_shipIds.begin(), m_shipIds.end(), m_selectedShipId);
+	if (selected == m_shipIds.end())
+		throw std::invalid_argument("HANGAR: loadout.shipId references an unknown unit: " + m_selectedShipId);
 
-	selectedShipIndex = static_cast<std::size_t>(std::distance(shipIds.begin(), selected));
-	turretList.setRowUpdate(
+	m_selectedShipIndex = static_cast<std::size_t>(std::distance(m_shipIds.begin(), selected));
+	m_turretList.setRowUpdate(
 		[this](std::size_t index, Rectangle bounds) {
-			if (index >= turretButtons.size())
+			if (index >= m_turretButtons.size())
 				return false;
 			prepareTurretButton(index, bounds);
-			if (!turretButtons[index].update())
+			if (!m_turretButtons[index].update())
 				return false;
 			cycleTurretWeapon(index);
 			return true;
 		}
 	);
-	turretList.setRowDraw(
+	m_turretList.setRowDraw(
 		[this](std::size_t index, Rectangle bounds) {
-			if (index >= turretButtons.size())
+			if (index >= m_turretButtons.size())
 				return;
 			prepareTurretButton(index, bounds);
-			turretButtons[index].draw();
+			m_turretButtons[index].draw();
 		}
 	);
 }
@@ -134,12 +134,12 @@ EngineState GameHangar::run()
 {
 	spawnPreviewShip();
 
-	float arenaSize = context.config.ARENA_SIZE;
-	context.mainCamera.position = Vector3{arenaSize, arenaSize, arenaSize};
-	context.mainCamera.target = Vector3{0.0f, 0.0f, 0.0f};
-	context.mainCamera.up = Vector3{0.0f, 1.0f, 0.0f};
-	context.mainCamera.fovy = 30.0f;
-	context.mainCamera.projection = CAMERA_PERSPECTIVE;
+	float arenaSize = m_context.config.ARENA_SIZE;
+	m_context.mainCamera.position = Vector3{arenaSize, arenaSize, arenaSize};
+	m_context.mainCamera.target = Vector3{0.0f, 0.0f, 0.0f};
+	m_context.mainCamera.up = Vector3{0.0f, 1.0f, 0.0f};
+	m_context.mainCamera.fovy = 30.0f;
+	m_context.mainCamera.projection = CAMERA_PERSPECTIVE;
 
 	EngineState nextState = EngineState::HANGAR;
 
@@ -148,15 +148,15 @@ EngineState GameHangar::run()
 		float dt = GetFrameTime();
 
 		float time = (float)GetTime() * 0.025f;
-		const auto &selectedDefinition = context.config.units().get(selectedShipId);
+		const auto &selectedDefinition = m_context.config.units().get(m_selectedShipId);
 		float dist = 30.0f * selectedDefinition.stats.collisionRadius;
-		context.mainCamera.position.x = dist * cosf(time);
-		context.mainCamera.position.z = dist * sinf(time);
-		context.mainCamera.position.y = 10.0f;
+		m_context.mainCamera.position.x = dist * cosf(time);
+		m_context.mainCamera.position.z = dist * sinf(time);
+		m_context.mainCamera.position.y = 10.0f;
 
 		BeginDrawing();
 		ClearBackground(BLACK);
-		renderer.Render(dt);
+		m_renderer.render(dt);
 		drawUI(nextState);
 		EndDrawing();
 
@@ -168,10 +168,10 @@ EngineState GameHangar::run()
 	// Save settings when leaving Hangar
 	if (nextState != EngineState::HANGAR)
 	{
-		context.config.setStringArray("loadout.turretWeapons", context.config.loadout.turretWeapons);
-		context.config.setString("loadout.specialWeapon", context.config.loadout.specialWeapon);
-		context.config.setString("loadout.shipId", selectedShipId);
-		context.config.saveChanged();
+		m_context.config.setStringArray("loadout.turretWeapons", m_context.config.loadout.turretWeapons);
+		m_context.config.setString("loadout.specialWeapon", m_context.config.loadout.specialWeapon);
+		m_context.config.setString("loadout.shipId", m_selectedShipId);
+		m_context.config.saveChanged();
 	}
 
 	return nextState;
@@ -182,29 +182,29 @@ void GameHangar::cycleWeapon(const std::string &path, std::string &currentWeapon
 	const std::string newWeapon = nextWeaponId(currentWeapon, options);
 	if (newWeapon.empty())
 		return;
-	context.config.setString(path, newWeapon);
+	m_context.config.setString(path, newWeapon);
 	spawnPreviewShip();
 }
 
 void GameHangar::cycleTurretWeapon(std::size_t index)
 {
-	if (index >= context.config.loadout.turretWeapons.size())
+	if (index >= m_context.config.loadout.turretWeapons.size())
 		return;
 	const std::string newWeapon = nextWeaponId(
-		context.config.loadout.turretWeapons[index],
-		standardWeapons);
+		m_context.config.loadout.turretWeapons[index],
+		m_standardWeapons);
 	if (newWeapon.empty())
 		return;
-	std::vector<std::string> updated = context.config.loadout.turretWeapons;
+	std::vector<std::string> updated = m_context.config.loadout.turretWeapons;
 	updated[index] = newWeapon;
-	context.config.setStringArray("loadout.turretWeapons", updated);
+	m_context.config.setStringArray("loadout.turretWeapons", updated);
 	spawnPreviewShip();
 }
 
 std::size_t GameHangar::selectedMountCount() const
 {
-	const auto &definition = context.config.units().get(selectedShipId);
-	return context.config.spaceship().get(
+	const auto &definition = m_context.config.units().get(m_selectedShipId);
+	return m_context.config.spaceship().get(
 													 definition.spaceshipReference)
 		.mounts.size();
 }
@@ -213,50 +213,50 @@ void GameHangar::prepareTurretButton(
 	std::size_t index,
 	Rectangle bounds)
 {
-	if (index >= turretButtons.size()
-		|| index >= context.config.loadout.turretWeapons.size())
+	if (index >= m_turretButtons.size()
+		|| index >= m_context.config.loadout.turretWeapons.size())
 		return;
 	const std::string &currentId =
-		context.config.loadout.turretWeapons[index];
+		m_context.config.loadout.turretWeapons[index];
 	std::string name = "None";
-	const auto &weapons = context.weaponRegistry.getAllWeaponsMap();
+	const auto &weapons = m_context.weaponRegistry.getAllWeaponsMap();
 	const auto weapon = weapons.find(currentId);
 	if (weapon != weapons.end())
 		name = weapon->second.name;
-	turretButtons[index].setBounds(bounds);
-	turretButtons[index].setText(
+	m_turretButtons[index].setBounds(bounds);
+	m_turretButtons[index].setText(
 		"Weapon " + std::to_string(index + 1) + ": " + name);
 }
 
 void GameHangar::resetShipLoadout()
 {
 	const std::size_t mountCount = selectedMountCount();
-	context.config.setStringArray(
+	m_context.config.setStringArray(
 		"loadout.turretWeapons",
 		std::vector<std::string>(mountCount, "bullet.basic"));
-	context.config.setString("loadout.specialWeapon", "missile.basic");
-	turretButtons.resize(mountCount);
-	turretList.resetScroll();
+	m_context.config.setString("loadout.specialWeapon", "missile.basic");
+	m_turretButtons.resize(mountCount);
+	m_turretList.resetScroll();
 }
 
 void GameHangar::cycleShip()
 {
-	if (shipIds.empty())
+	if (m_shipIds.empty())
 		return;
-	selectedShipIndex = (selectedShipIndex + 1) % shipIds.size();
-	selectedShipId = shipIds[selectedShipIndex];
-	context.config.setString("loadout.shipId", selectedShipId);
+	m_selectedShipIndex = (m_selectedShipIndex + 1) % m_shipIds.size();
+	m_selectedShipId = m_shipIds[m_selectedShipIndex];
+	m_context.config.setString("loadout.shipId", m_selectedShipId);
 	resetShipLoadout();
 	spawnPreviewShip();
 }
 
 void GameHangar::drawShipPanel()
 {
-	if (shipIds.empty())
+	if (m_shipIds.empty())
 		return;
 
-	const auto &definition = context.config.units().get(selectedShipId);
-	const auto &spaceship = context.config.spaceship().get(definition.spaceshipReference);
+	const auto &definition = m_context.config.units().get(m_selectedShipId);
+	const auto &spaceship = m_context.config.spaceship().get(definition.spaceshipReference);
 	const int screenWidth = GetScreenWidth();
 	const float panelX = std::max(20.0f, static_cast<float>(screenWidth) - shipPanelWidth - 40.0f);
 
@@ -273,14 +273,14 @@ void GameHangar::drawShipPanel()
 		static_cast<int>(shipPanelHeight + 40.0f),
 		ColorAlpha(SKYBLUE, 0.7f));
 
-	shipButton.setBounds(Rectangle{
+	m_shipButton.setBounds(Rectangle{
 		panelX,
 		shipPanelY,
 		shipPanelWidth,
 		55.0f
 	});
-	shipButton.setText("SHIP: " + displayNameForUnitId(selectedShipId));
-	if (shipButton.tick_and_draw())
+	m_shipButton.setText("SHIP: " + displayNameForUnitId(m_selectedShipId));
+	if (m_shipButton.tickAndDraw())
 	{
 		cycleShip();
 		return;
@@ -297,7 +297,7 @@ void GameHangar::drawShipStats(
 	const config::UnitConfig::Definition &definition,
 	std::size_t mountCount,
 	float panelX,
-	float statsY)
+	float statsY) const
 {
 	const auto statBars = buildShipStatBars(
 		definition,
@@ -326,7 +326,7 @@ void GameHangar::drawUI(EngineState &nextState)
 		std::string name = "None";
 		if (!currentId.empty())
 		{
-			const auto &map = context.weaponRegistry.getAllWeaponsMap();
+			const auto &map = m_context.weaponRegistry.getAllWeaponsMap();
 			if (map.find(currentId) != map.end())
 			{
 				name = map.at(currentId).name;
@@ -336,7 +336,7 @@ void GameHangar::drawUI(EngineState &nextState)
 		widget.setBounds(bounds);
 		widget.setText(fullText);
 
-		if (widget.tick_and_draw())
+		if (widget.tickAndDraw())
 			onClick();
 	};
 
@@ -344,15 +344,15 @@ void GameHangar::drawUI(EngineState &nextState)
 	const float leftPaneWidth = 400.0f;
 	const float leftPaneTop = 100.0f;
 	drawWeaponButton(
-		specialButton,
+		m_specialButton,
 		"Special Weapon",
-		context.config.loadout.specialWeapon,
+		m_context.config.loadout.specialWeapon,
 		[&]
 		{
 			cycleWeapon(
 				"loadout.specialWeapon",
-				context.config.loadout.specialWeapon,
-				specialWeapons);
+				m_context.config.loadout.specialWeapon,
+				m_specialWeapons);
 		},
 		{leftPaneX, leftPaneTop, leftPaneWidth, 50});
 
@@ -363,15 +363,15 @@ void GameHangar::drawUI(EngineState &nextState)
 		std::max(120.0f, static_cast<float>(screenHeight) - leftPaneTop - 190.0f)
 	};
 	const std::size_t mountCount = selectedMountCount();
-	turretButtons.resize(mountCount);
-	turretList.setBounds(weaponViewport);
-	turretList.setItemCount(mountCount);
-	turretList.setRowHeight(60.0f);
-	turretList.tick_and_draw();
+	m_turretButtons.resize(mountCount);
+	m_turretList.setBounds(weaponViewport);
+	m_turretList.setItemCount(mountCount);
+	m_turretList.setRowHeight(60.0f);
+	m_turretList.tickAndDraw();
 
 	Rectangle btnBack = {(float)screenWidth / 2 - 100, (float)screenHeight - 80, 200, 50};
-	backButton.setBounds(btnBack);
-	if (backButton.tick_and_draw())
+	m_backButton.setBounds(btnBack);
+	if (m_backButton.tickAndDraw())
 	{
 		nextState = EngineState::MENU;
 	}
@@ -392,27 +392,27 @@ void GameHangar::inputControls([[maybe_unused]] float dt, EngineState &nextState
 void GameHangar::spawnPreviewShip()
 {
 	destroyPreviewShip();
-	previewPlayer = spawnPlayer(context, Vector3{0, 0, 0});
-	context.currentPlayer = entt::null;
+	m_previewPlayer = spawnPlayer(m_context, Vector3{0, 0, 0});
+	m_context.currentPlayer = entt::null;
 }
 
 void GameHangar::destroyPreviewShip()
 {
-	if (previewPlayer == entt::null)
+	if (m_previewPlayer == entt::null)
 		return;
 
 	std::vector<entt::entity> linkedTurrets;
-	for (auto [entity, parent] : context.registry.view<WeaponParent>().each())
+	for (auto [entity, parent] : m_context.registry.view<WeaponParent>().each())
 	{
-		if (parent.parent == previewPlayer)
+		if (parent.parent == m_previewPlayer)
 			linkedTurrets.push_back(entity);
 	}
 	for (entt::entity turret : linkedTurrets)
 	{
-		if (context.registry.valid(turret))
-			context.registry.destroy(turret);
+		if (m_context.registry.valid(turret))
+			m_context.registry.destroy(turret);
 	}
-	if (context.registry.valid(previewPlayer))
-		context.registry.destroy(previewPlayer);
-	previewPlayer = entt::null;
+	if (m_context.registry.valid(m_previewPlayer))
+		m_context.registry.destroy(m_previewPlayer);
+	m_previewPlayer = entt::null;
 }

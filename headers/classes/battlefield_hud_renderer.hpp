@@ -16,7 +16,8 @@ class BattlefieldHUDRenderer {
 public:
     BattlefieldHUDRenderer(Camera3D &camera, GameContext &context);
 
-    void RenderAll(float dt);
+    void renderAll(float dt);
+    void RenderAll(float dt) { renderAll(dt); }
 
 	void setDt(float dt);
     void drawHUD();
@@ -33,13 +34,29 @@ public:
     void drawCollisionWarning();
     void drawMissileWarning();
 
-private:
-    Camera3D &camera;
-    GameContext &context;
-    float currentDt;
+    Vector2 getUIFrameCenter() const;
+    float getUIFrameRadius() const;
+    Vector2 GetUIFrameCenter() const { return getUIFrameCenter(); }
+    float GetUIFrameRadius() const { return getUIFrameRadius(); }
 
-    Vector2 GetUIFrameCenter() const;
-    float GetUIFrameRadius() const;
+private:
+    Camera3D &m_camera;
+    GameContext &m_context;
+    float m_currentDt = 0.0f;
+
+    // Encapsulated HUD state
+    int m_score = 0;
+    float m_animationAngle = 0.0f;
+    entt::entity m_prevTargetedEntity = entt::null;
+    float m_blinkTimer = 0.0f;
+    float m_reloadAngleOffset = 0.0f;
+    float m_speedAnimationTime = 0.0f;
+    float m_collisionAlertCooldown = 0.0f;
+    bool m_collisionCanPlayAlert = false;
+    float m_collisionBlinkTimer = 0.0f;
+    float m_missileAlertCooldown = 0.0f;
+    bool m_missileCanPlayAlert = false;
+    float m_missileBlinkTimer = 0.0f;
 };
 
 #endif

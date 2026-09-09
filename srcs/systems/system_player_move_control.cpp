@@ -243,19 +243,17 @@ void systems::PlayerMoveControl::update(GameContext &context, float dt)
 		newRotation = rotateAroundAxis(newRotation, fowardVector, turnSpeedDt);
 	
 	// TODO: change to engine thrust component
-	static float boostCooldown = 0;
-	static float boostDuration = 0;
 	float accel = 40.0f;
 	if ((IsKeyDown(KEY_LEFT_SHIFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-	&& boostCooldown <= 0) {
-		boostDuration = 0.5f;
-		boostCooldown = 6.0f;
+	&& m_boostCooldown <= 0) {
+		m_boostDuration = 0.5f;
+		m_boostCooldown = 6.0f;
 		context.soundManager.playImmediate(context.config, "sounds.hyperBoost");
 	}
-	if (boostCooldown > 0)
-		boostCooldown -= dt;
-	if (boostDuration > 0) {
-		boostDuration -= dt;
+	if (m_boostCooldown > 0)
+		m_boostCooldown -= dt;
+	if (m_boostDuration > 0) {
+		m_boostDuration -= dt;
 		accel *= 15.0f;
 	}
 
@@ -263,7 +261,7 @@ void systems::PlayerMoveControl::update(GameContext &context, float dt)
 	if ((
 		(IsKeyDown(KEY_W) || IsMouseButtonDown(MOUSE_BUTTON_EXTRA)
 			|| IsMouseButtonDown(MOUSE_BUTTON_RIGHT)))// && speed < maxSpeed.value)
-		|| boostDuration > 0)
+		|| m_boostDuration > 0)
 	{
 		speedChange += accel * dt;
 	}

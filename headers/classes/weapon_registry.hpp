@@ -28,7 +28,7 @@ public:
 
     void init(const GameConfig& globalCfg);
 
-    const std::map<std::string, WeaponData>& getAllWeaponsMap() const { return allWeapons; }
+    const std::map<std::string, WeaponData>& getAllWeaponsMap() const { return m_allWeapons; }
     
     // Helpers to get specific lists (e.g. for menus or specific spawners)
     std::vector<std::string> getWeaponIdsByType(const std::string& type) const;
@@ -44,8 +44,8 @@ public:
     void emplaceWeaponById(GameContext& context, entt::entity entity, const std::string& id) const;
 
 private:
-    std::map<std::string, WeaponEmplaceFunc> predefinedFunctions;
-    std::map<std::string, WeaponData> allWeapons;
+    std::map<std::string, WeaponEmplaceFunc> m_predefinedFunctions;
+    std::map<std::string, WeaponData> m_allWeapons;
 
     void registerPredefinedFunctions();
     void parseWeaponsOfType(const GameConfig& globalCfg, const std::string& category);

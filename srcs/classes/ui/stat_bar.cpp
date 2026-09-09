@@ -16,16 +16,6 @@ namespace
 namespace ui
 {
 
-	float StatBar::getClampedValue() const {
-		if (maximum <= 0.0f)
-			return 0.0f;
-		return Clamp(value, 0.0f, maximum);
-	}
-
-	float StatBar::getNormalizedValue() const {
-		return getClampedValue() / maximum;
-	}
-
 	void StatBar::draw(Rectangle bounds) const
 	{
 		if (bounds.width <= 0.0f || bounds.height <= 0.0f)

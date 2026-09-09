@@ -62,9 +62,9 @@ private:
 	t_collision_mesh_id addCollisionModel(CollisionMeshData mesh, const Matrix &staticTransform);
 	void buildBvh(CollisionModel &model);
 
-	std::vector<CollisionModel> models;
-	std::map<std::pair<std::string, Matrix>, t_collision_mesh_id> loadedFromFile;
-	std::map<std::pair<t_model_id, Matrix>, t_collision_mesh_id> loadedFromModel;
+	std::vector<CollisionModel> m_models;
+	std::map<std::pair<std::string, Matrix>, t_collision_mesh_id> m_loadedFromFile;
+	std::map<std::pair<t_model_id, Matrix>, t_collision_mesh_id> m_loadedFromModel;
 };
 
 #endif

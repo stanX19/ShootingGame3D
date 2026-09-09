@@ -15,11 +15,11 @@ public:
     EngineState run();
 
 private:
-    GameContext &context;
-    Renderer renderer;
-    ui::TextButtonWidget startButton;
-    ui::TextButtonWidget hangarButton;
-    ui::TextButtonWidget settingsButton;
+    GameContext &m_context;
+    Renderer m_renderer;
+    ui::TextButtonWidget m_startButton;
+    ui::TextButtonWidget m_hangarButton;
+    ui::TextButtonWidget m_settingsButton;
 
     void drawMenuUI(EngineState &nextState);
 	void inputControls([[maybe_unused]] float dt, EngineState &nextState);

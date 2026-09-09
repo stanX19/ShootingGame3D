@@ -10,7 +10,7 @@
 
 static void aiTurnControl(GameContext &context, [[maybe_unused]] float dt)
 {
-	auto view = context.registry.view<Position, Rotation, Velocity, TurnSpeed, MoveTarget, tag::AIMoveControl>();
+	auto view = context.registry.view<const Position, const Rotation, const Velocity, const TurnSpeed, const MoveTarget, tag::AIMoveControl>();
 
 	for (auto [entity, position, rotation, velocity, turnSpeed, target] : view.each())
 	{
@@ -21,19 +21,19 @@ static void aiTurnControl(GameContext &context, [[maybe_unused]] float dt)
 		if (context.registry.valid(target.entity) && context.registry.all_of<Velocity>(target.entity))
 			targetVel = context.registry.get<Velocity>(target.entity).value;
 
-		float speed = Vector3Length(velocity.value);
-		float calc_speed = speed;
+		const float speed = Vector3Length(velocity.value);
+		const float calcSpeed = speed;
 		
-		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, calc_speed);
-		float distance = Vector3Distance(position.value, targetPos);
-		float relSpeed = Vector3Length(targetVel - velocity.value);
+		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, calcSpeed);
+		const float distance = Vector3Distance(position.value, targetPos);
+		const float relSpeed = Vector3Length(targetVel - velocity.value);
 
-		const float avoidance_time = 1.0f;
-		if (!context.registry.all_of<tag::Suicidal>(entity) && distance / relSpeed < avoidance_time) {
+		constexpr float AVOIDANCE_TIME = 1.0f;
+		if (!context.registry.all_of<tag::Suicidal>(entity) && distance / relSpeed < AVOIDANCE_TIME) {
 			targetDir = Vector3Normalize(Vector3Normalize(position.value - targetPos) + getUpVector(rotation) * 0.9f);
 		}
 
-		Quaternion targetRotation = vector3ToRotation(targetDir);
+		const Quaternion targetRotation = vector3ToRotation(targetDir);
 		TargetRotation &tRot = context.registry.get_or_emplace<TargetRotation>(entity);
 		tRot.value = targetRotation;
 	}
@@ -41,16 +41,16 @@ static void aiTurnControl(GameContext &context, [[maybe_unused]] float dt)
 
 static void aiSpeedControl(GameContext &context, float dt)
 {
-	auto view = context.registry.view<Rotation, Velocity, MaxSpeed, MoveTarget, tag::AIMoveControl>();
+	auto view = context.registry.view<const Rotation, const Velocity, const MaxSpeed, const MoveTarget, tag::AIMoveControl>();
 
 	for (auto [entity, rotation, velocity, maxSpeed, target] : view.each())
 	{
-		Quaternion targetRotation = rotation.value;
-		Vector3 vel = velocity.value;
-		float speed = Vector3Length(vel);
+		const Quaternion targetRotation = rotation.value;
+		const Vector3 vel = velocity.value;
+		const float speed = Vector3Length(vel);
 
-		float targetSpeed = maxSpeed.value * (0.5f + 0.5f * (180.0f - angleDifference(targetRotation, rotation.value)) / 180.0f);
-		float newSpeed = Clamp(speed + Clamp(targetSpeed - speed, -20.0f * dt, 20.0f * dt), 0.0f, maxSpeed.value);
+		const float targetSpeed = maxSpeed.value * (0.5f + 0.5f * (180.0f - angleDifference(targetRotation, rotation.value)) / 180.0f);
+		const float newSpeed = Clamp(speed + Clamp(targetSpeed - speed, -20.0f * dt, 20.0f * dt), 0.0f, maxSpeed.value);
 
 		TargetVelocity &tVel = context.registry.get_or_emplace<TargetVelocity>(entity);
 		tVel.value = getForwardVector(rotation) * newSpeed;

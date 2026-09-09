@@ -30,15 +30,15 @@ private:
     float getKnobX(const Rectangle &trackBounds) const;
     float getSnappedValueFromMouseX(const Rectangle &trackBounds, float mouseX) const;
 
-    std::string label;
-    float *value = nullptr;
-    float minValue = 0.01f;
-    float maxValue = 1.0f;
-    float step = 0.01f;
-    Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
-    Color color = ORANGE;
+    std::string m_label;
+    float *m_value = nullptr;
+    float m_minValue = 0.01f;
+    float m_maxValue = 1.0f;
+    float m_step = 0.01f;
+    Rectangle m_bounds = {0.0f, 0.0f, 0.0f, 0.0f};
+    Color m_color = ORANGE;
 
-    bool isDragging = false;
+    bool m_isDragging = false;
 };
 
 } // namespace ui

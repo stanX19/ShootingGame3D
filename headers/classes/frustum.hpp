@@ -17,7 +17,7 @@ public:
 	bool isPointInside(const Vector3 &point) const;
 
 private:
-	Plane planes[6]; // Left, Right, Bottom, Top, Near, Far
+	Plane m_planes[6]; // Left, Right, Bottom, Top, Near, Far
 };
 
 #endif // FRUSTUM_HPP

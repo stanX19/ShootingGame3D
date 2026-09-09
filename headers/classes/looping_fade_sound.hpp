@@ -15,12 +15,12 @@ public:
 	// Call every frame with whether sound should be playing
 	void update(bool shouldPlay, float dt, float masterVolume = 1.0f);
 
-	bool isLoaded() const { return loaded; }
-	bool isPlaying() const { return playing; }
+	bool isLoaded() const { return m_loaded; }
+	bool isPlaying() const { return m_playing; }
 
-	void setFadeInDuration(float duration) { fadeInDuration = duration; }
-	void setFadeOutDuration(float duration) { fadeOutDuration = duration; }
-	void setMaxVolume(float volume) { maxVolume = volume; }
+	void setFadeInDuration(float duration) { m_fadeInDuration = duration; }
+	void setFadeOutDuration(float duration) { m_fadeOutDuration = duration; }
+	void setMaxVolume(float volume) { m_maxVolume = volume; }
 
 private:
 	enum class FadeState {
@@ -29,18 +29,18 @@ private:
 		FadingOut
 	};
 
-	std::string soundPath;
-	Sound sound;
-	bool loaded = false;
-	bool playing = false;
+	std::string m_soundPath;
+	Sound m_sound;
+	bool m_loaded = false;
+	bool m_playing = false;
 
-	FadeState fadeState = FadeState::Idle;
-	float currentVolume = 0.0f;
-	float maxVolume = 0.5f;
-	float fadeInDuration = 0.3f;
-	float fadeOutDuration = 1.0f;
-	float restartThreshold;  // seconds after stop before restarting from beginning
-	float timeSinceFadeOut = 0.0f;
+	FadeState m_fadeState = FadeState::Idle;
+	float m_currentVolume = 0.0f;
+	float m_maxVolume = 0.5f;
+	float m_fadeInDuration = 0.3f;
+	float m_fadeOutDuration = 1.0f;
+	float m_restartThreshold;  // seconds after stop before restarting from beginning
+	float m_timeSinceFadeOut = 0.0f;
 
 	void startPlaying();
 	void stopPlaying();

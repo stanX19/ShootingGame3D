@@ -25,19 +25,19 @@ public:
 	void draw() override;
 
 private:
-	static constexpr float padding = 5.0f;
-	static constexpr float scrollbarWidth = 12.0f;
+	static constexpr float PADDING = 5.0f;
+	static constexpr float SCROLLBAR_WIDTH = 12.0f;
 
 	float maxScroll() const;
 	Rectangle rowBounds(std::size_t index) const;
 	bool rowVisible(Rectangle row) const;
 
-	Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
-	std::size_t itemCount = 0;
-	float rowHeight = 60.0f;
-	float scroll = 0.0f;
-	RowUpdate updateRow;
-	RowDraw drawRow;
+	Rectangle m_bounds = {0.0f, 0.0f, 0.0f, 0.0f};
+	std::size_t m_itemCount = 0;
+	float m_rowHeight = 60.0f;
+	float m_scroll = 0.0f;
+	RowUpdate m_updateRow;
+	RowDraw m_drawRow;
 };
 
 } // namespace ui

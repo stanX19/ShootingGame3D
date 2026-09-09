@@ -10,21 +10,21 @@ void systems::WeaponUpdateCanFire::update(GameContext &context, [[maybe_unused]]
 	}
 
 	// Remove CanFire if cooldown not ready
-	for (auto [entity, cooldown] : context.registry.view<WeaponCooldown, tag::weapon::IsWeapon>().each()) {
+	for (auto [entity, cooldown] : context.registry.view<const WeaponCooldown, tag::weapon::IsWeapon>().each()) {
 		if (cooldown.timeSinceLastShot < cooldown.shootCooldown) {
 			context.registry.remove<tag::weapon::CanFire>(entity);
 		}
 	}
 
 	// Remove CanFire if out of ammo
-	for (auto [entity, ammo] : context.registry.view<Ammo, tag::weapon::IsWeapon>(entt::exclude<ChargedWeapon>).each()) {
+	for (auto [entity, ammo] : context.registry.view<const Ammo, tag::weapon::IsWeapon>(entt::exclude<ChargedWeapon>).each()) {
 		if (ammo.value < 1.0f) {
 			context.registry.remove<tag::weapon::CanFire>(entity);
 		}
 	}
 
-	for (auto [entity, ammo, charge] : context.registry.view<Ammo, ChargedWeapon, tag::weapon::IsWeapon>().each()) {
-		float ammoNeeded = charge.chargeAmmo * (1 - charge.currentCharge / charge.totalChargeNeeded);
+	for (auto [entity, ammo, charge] : context.registry.view<const Ammo, const ChargedWeapon, tag::weapon::IsWeapon>().each()) {
+		const float ammoNeeded = charge.chargeAmmo * (1.0f - charge.currentCharge / charge.totalChargeNeeded);
 		if (ammo.value < ammoNeeded - 1e-6f) {
 			context.registry.remove<tag::weapon::CanFire>(entity);
 		}

@@ -64,8 +64,8 @@ namespace {
 t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &transform)
 {
 	auto key = std::make_pair(filePath, transform);
-	auto it = loadedFromFile.find(key);
-	if (it != loadedFromFile.end())
+	auto it = m_loadedFromFile.find(key);
+	if (it != m_loadedFromFile.end())
 	{
 		return it->second;
 	}
@@ -88,11 +88,11 @@ t_model_id ModelManager::loadModel(const std::string &filePath, const Matrix &tr
 	// apply transformation
 	model.transform = transform;
 
-	models.push_back(model);
-	modelRadii.push_back(computeModelBoundingRadius(model));
-	modelPaths.emplace_back(filePath);
-	t_model_id id = models.size() - 1;
-	loadedFromFile[key] = id;
+	m_models.push_back(model);
+	m_modelRadii.push_back(computeModelBoundingRadius(model));
+	m_modelPaths.emplace_back(filePath);
+	t_model_id id = m_models.size() - 1;
+	m_loadedFromFile[key] = id;
 	return id;
 }
 
@@ -237,7 +237,7 @@ Model &ModelManager::getModel(t_model_id id)
 	{
 		throw std::out_of_range("Invalid model ID");
 	}
-	return models[id];
+	return m_models[id];
 }
 
 const Model &ModelManager::getModel(t_model_id id) const
@@ -246,14 +246,14 @@ const Model &ModelManager::getModel(t_model_id id) const
 	{
 		throw std::out_of_range("Invalid model ID");
 	}
-	return models[id];
+	return m_models[id];
 }
 
 std::optional<std::string> ModelManager::getModelPath(t_model_id id) const
 {
 	if (!isValid(id))
 		throw std::out_of_range("Invalid model ID");
-	return modelPaths[id];
+	return m_modelPaths[id];
 }
 
 void ModelManager::unloadAll()
@@ -262,7 +262,7 @@ void ModelManager::unloadAll()
 	const bool windowReady = IsWindowReady();
 	std::unordered_set<unsigned int> unloadedTextureIds;
 
-	for (auto &model : models)
+	for (auto &model : m_models)
 	{
 		if (model.materials != nullptr)
 		{
@@ -289,22 +289,22 @@ void ModelManager::unloadAll()
 		if (model.meshCount > 0 && model.meshes != nullptr)
 			UnloadModel(model);
 	}
-	models.clear();
-	modelRadii.clear();
-	modelPaths.clear();
-	proceduralCache.clear();
-	loadedFromFile.clear();
+	m_models.clear();
+	m_modelRadii.clear();
+	m_modelPaths.clear();
+	m_proceduralCache.clear();
+	m_loadedFromFile.clear();
 }
 
 bool ModelManager::isValid(t_model_id id) const
 {
-	return id < models.size();
+	return id < m_models.size();
 }
 
 float ModelManager::getModelRadius(t_model_id id) const
 {
-	if (id < modelRadii.size())
-		return modelRadii[id];
+	if (id < m_modelRadii.size())
+		return m_modelRadii[id];
 	return 1.0f;
 }
 
@@ -322,17 +322,17 @@ t_model_id ModelManager::createAndAddModel(const std::string &keyBase, Func mode
 {
 	std::string key = generateCacheKey(keyBase, args...);
 
-	auto it = proceduralCache.find(key);
-	if (it != proceduralCache.end())
+	auto it = m_proceduralCache.find(key);
+	if (it != m_proceduralCache.end())
 	{
 		return it->second;
 	}
 
 	Model model = modelGenerator(); // Call the generator function
-	t_model_id id = models.size();
-	models.push_back(model);
-	modelRadii.push_back(computeModelBoundingRadius(model));
-	modelPaths.emplace_back(std::nullopt);
-	proceduralCache[key] = id;
+	t_model_id id = m_models.size();
+	m_models.push_back(model);
+	m_modelRadii.push_back(computeModelBoundingRadius(model));
+	m_modelPaths.emplace_back(std::nullopt);
+	m_proceduralCache[key] = id;
 	return id;
 }

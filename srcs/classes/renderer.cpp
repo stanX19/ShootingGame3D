@@ -5,7 +5,7 @@
 #include <algorithm>
 
 Renderer::Renderer(Camera3D &cam, GameContext &context)
-	: camera(cam), context(context)
+	: m_camera(cam), m_context(context)
 {
 	loadDefaultShader();
 	loadShaderWithFallback();
@@ -14,62 +14,62 @@ Renderer::Renderer(Camera3D &cam, GameContext &context)
 
 Renderer::~Renderer()
 {
-	if (lightedShader.id > 0 && lightedShader.id != rlGetShaderIdDefault())
+	if (m_lightedShader.id > 0 && m_lightedShader.id != rlGetShaderIdDefault())
 	{
-		UnloadShader(lightedShader);
-		lightedShader = {0, nullptr};
+		UnloadShader(m_lightedShader);
+		m_lightedShader = {0, nullptr};
 	}
 
-	if (skyboxShader.id > 0 && skyboxShader.id != rlGetShaderIdDefault())
+	if (m_skyboxShader.id > 0 && m_skyboxShader.id != rlGetShaderIdDefault())
 	{
-		UnloadShader(skyboxShader);
-		skyboxShader = {0, nullptr};
+		UnloadShader(m_skyboxShader);
+		m_skyboxShader = {0, nullptr};
 	}
 
-	if (defaultShader.id > 0 && defaultShader.id != rlGetShaderIdDefault())
+	if (m_defaultShader.id > 0 && m_defaultShader.id != rlGetShaderIdDefault())
 	{
-		UnloadShader(defaultShader);
-		defaultShader = {0, nullptr};
+		UnloadShader(m_defaultShader);
+		m_defaultShader = {0, nullptr};
 	}
 }
 
 void Renderer::loadDefaultShader()
 {
-	defaultShader = LoadShader(NULL, NULL);
+	m_defaultShader = LoadShader(NULL, NULL);
 }
 
 void Renderer::loadShaderWithFallback()
 {
-	lightedShader = LoadShader("shaders/sunlight.vs", "shaders/sunlight.fs");
-	if (lightedShader.id == 0)
+	m_lightedShader = LoadShader("shaders/sunlight.vs", "shaders/sunlight.fs");
+	if (m_lightedShader.id == 0)
 	{
 		TraceLog(LOG_WARNING, "Custom shader failed to load. Using default shader.");
-		lightedShader = LoadShader(NULL, NULL);
+		m_lightedShader = LoadShader(NULL, NULL);
 	}
 
-	skyboxShader = LoadShader("shaders/skybox.vs", "shaders/skybox.fs");
-	if (skyboxShader.id == 0)
+	m_skyboxShader = LoadShader("shaders/skybox.vs", "shaders/skybox.fs");
+	if (m_skyboxShader.id == 0)
 	{
 		TraceLog(LOG_WARNING, "Custom shader failed to load. Using default shader.");
-		skyboxShader = LoadShader(NULL, NULL);
+		m_skyboxShader = LoadShader(NULL, NULL);
 	}
 
 	// create a unit cone mesh (height = 1, base radius = 1) for trails
-	t_model_id trailModelID = context.modelManager.loadModel("assets/Models/Trail/trail.glb");
-	trailModel = context.modelManager.getModel(trailModelID);
+	const t_model_id trailModelID = m_context.modelManager.loadModel("assets/Models/Trail/trail.glb");
+	m_trailModel = m_context.modelManager.getModel(trailModelID);
 }
 
 void Renderer::setupShaderUniforms()
 {
-	lightPosLoc = GetShaderLocation(lightedShader, "lightPosition");
-	lightColorLoc = GetShaderLocation(lightedShader, "lightColor");
-	normalMapAvailableLoc = GetShaderLocation(lightedShader, "normalMapAvailable");
+	m_lightPosLoc = GetShaderLocation(m_lightedShader, "lightPosition");
+	m_lightColorLoc = GetShaderLocation(m_lightedShader, "lightColor");
+	m_normalMapAvailableLoc = GetShaderLocation(m_lightedShader, "normalMapAvailable");
 
 	Vector3 lightPos = { 100000, 100000, 100000 };
-	SetShaderValue(lightedShader, lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
+	SetShaderValue(m_lightedShader, m_lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
 
 	Vector3 lightColor = { 1.0f, 1.0f, 1.0f };
-	SetShaderValue(lightedShader, lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
+	SetShaderValue(m_lightedShader, m_lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
 }
 
 void Renderer::updateFrustum()
@@ -77,28 +77,28 @@ void Renderer::updateFrustum()
 	Matrix viewMat = rlGetMatrixModelview();
 	Matrix projMat = rlGetMatrixProjection();
 	Matrix viewProjMat = MatrixMultiply(viewMat, projMat);
-	currentFrustum = Frustum::fromViewProjection(viewProjMat);
+	m_currentFrustum = Frustum::fromViewProjection(viewProjMat);
 }
 
-bool Renderer::isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech)
+bool Renderer::isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech) const
 {
 	strech = getStrech(entity);
-	float baseRadius = context.modelManager.getModelRadius(body.modelID);
-	float maxScale = std::max({body.scale.x, body.scale.y, body.scale.z, 0.01f});
-	float translationLen = Vector3Length(body.translation);
-	float effectiveRadius = baseRadius * maxScale + translationLen + (strech.strech > 1.0f ? strech.strech * maxScale : 0.0f);
-	return currentFrustum.isSphereInside(pos.value, effectiveRadius);
+	const float baseRadius = m_context.modelManager.getModelRadius(body.modelID);
+	const float maxScale = std::max({body.scale.x, body.scale.y, body.scale.z, 0.01f});
+	const float translationLen = Vector3Length(body.translation);
+	const float effectiveRadius = baseRadius * maxScale + translationLen + (strech.strech > 1.0f ? strech.strech * maxScale : 0.0f);
+	return m_currentFrustum.isSphereInside(pos.value, effectiveRadius);
 }
 
-void Renderer::Render(float dt)
+void Renderer::render(float dt)
 {
-	currentDt = dt;
+	m_currentDt = dt;
 	// std::cout << "start draw\n" << std::endl;
 	ClearBackground(BLACK);
 
 	drawEntitiesWithSkyboxShader();
 
-	BeginMode3D(camera);
+	BeginMode3D(m_camera);
 	updateFrustum();
 	// DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
 
@@ -116,7 +116,7 @@ void Renderer::Render(float dt)
 
 void Renderer::drawTrails()
 {
-	auto trailView = context.registry.view<Position, PrevPosition, Trail>();
+	auto trailView = m_context.registry.view<Position, PrevPosition, Trail>();
 	for (auto entity : trailView)
 	{
 		const Position &p = trailView.get<Position>(entity);
@@ -128,19 +128,19 @@ void Renderer::drawTrails()
 
 void Renderer::drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color)
 {
-	Vector3 dir = head - tail;
-	float len = Vector3Length(dir);
-	Vector3 mid = tail + dir * len;
+	const Vector3 dir = head - tail;
+	const float len = Vector3Length(dir);
+	const Vector3 mid = tail + dir * len;
 
 	Vector3 axisOut;
 	float angleOut;
 	QuaternionToAxisAngle(vector3ToRotation(dir), &axisOut, &angleOut);
-	DrawModelEx(trailModel, mid, axisOut, angleOut * RAD2DEG, (Vector3){rad, rad, len}, color);
+	DrawModelEx(m_trailModel, mid, axisOut, angleOut * RAD2DEG, (Vector3){rad, rad, len}, color);
 }
 
 void Renderer::handleLightSource()
 {
-	auto view = context.registry.view<Position, RenderBody, tag::LightSource>();
+	auto view = m_context.registry.view<Position, RenderBody, tag::LightSource>();
 
 	for (auto entity : view)
 	{
@@ -148,26 +148,15 @@ void Renderer::handleLightSource()
 		const RenderBody &body = view.get<RenderBody>(entity);
 
 		Vector3 color = {body.color.r / 255.0f, body.color.g / 255.0f, body.color.b / 255.0f};
-		SetShaderValue(lightedShader, lightPosLoc, &pos.value, SHADER_UNIFORM_VEC3);
-		SetShaderValue(lightedShader, lightColorLoc, &color, SHADER_UNIFORM_VEC3);
+		SetShaderValue(m_lightedShader, m_lightPosLoc, &pos.value, SHADER_UNIFORM_VEC3);
+		SetShaderValue(m_lightedShader, m_lightColorLoc, &color, SHADER_UNIFORM_VEC3);
 		break ;
 	}
 }
 
-
-// if (context.registry.all_of<Rotation>(entity))
-// {
-// 	auto &rot = context.registry.get<Rotation>(entity);
-// 	Vector3 forward = getForwardVector(rot);
-// 	Vector3 end = pos.value + forward * (body.radius * 100);
-// 	DrawLine3D(pos.value, end, WHITE);
-// 	end = pos.value + getUpVector(rot) * (body.radius * 10);
-// 	DrawLine3D(pos.value, end, GREEN);
-// }
-
-Renderer::StrechDat Renderer::getStrech(entt::entity entity) {
+Renderer::StrechDat Renderer::getStrech(entt::entity entity) const {
 	StrechDat result = {1.0f, {0, 0, 0}};
-	auto [pos, prevPos, strechComp] = context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
+	auto [pos, prevPos, strechComp] = m_context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
 	if (!pos || !prevPos || !strechComp)
 		return result;
 	result.dir = Vector3Normalize(pos->value - prevPos->value);
@@ -177,25 +166,21 @@ Renderer::StrechDat Renderer::getStrech(entt::entity entity) {
 
 void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, StrechDat strech)
 {
-	Model &model = context.modelManager.getModel(body.modelID);
+	Model &model = m_context.modelManager.getModel(body.modelID);
 
 	Vector3 axis;
 	float angle;
 	QuaternionToAxisAngle(body.rotation, &axis, &angle);
 
-	// std::cout << "Entity rotation axis: (" << axis.x << ", " << axis.y << ", " << axis.z
-	//   << "), angle: " << RAD2DEG * angle << " deg" << std::endl;
-	float shrink = 1; //std::max(0.01f, 1.0f / std::sqrt(strech));
-	Vector3 renderScale = body.scale * Vector3{shrink, shrink, strech.strech};
-	Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation) + strech.dir * (-renderScale.z);
+	const float shrink = 1.0f;
+	const Vector3 renderScale = body.scale * Vector3{shrink, shrink, strech.strech};
+	const Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation) + strech.dir * (-renderScale.z);
 	DrawModelEx(model, position, axis, angle * RAD2DEG, renderScale, body.color);
 }
 
-
-
 void Renderer::drawEntitiesWithoutShader()
 {
-	auto view = context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded, tag::SkyBox>);
+	auto view = m_context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded, tag::SkyBox>);
 
 	for (auto entity : view)
 	{
@@ -205,9 +190,9 @@ void Renderer::drawEntitiesWithoutShader()
 		if (!isEntityVisible(entity, pos, body, strech))
 			continue;
 
-		Model &model = context.modelManager.getModel(body.modelID);
+		Model &model = m_context.modelManager.getModel(body.modelID);
 		for (int i = 0; i < model.materialCount; i++) {
-			model.materials[i].shader = defaultShader;
+			model.materials[i].shader = m_defaultShader;
 		}
 		drawEntityModel(pos, body, strech);
 	}
@@ -215,9 +200,7 @@ void Renderer::drawEntitiesWithoutShader()
 
 void Renderer::drawEntitiesWithShader()
 {
-	// BeginShaderMode(lightedShader);
-
-	auto view = context.registry.view<Position, RenderBody, tag::Shaded>();
+	auto view = m_context.registry.view<Position, RenderBody, tag::Shaded>();
 	for (auto entity : view)
 	{
 		const Position &pos = view.get<Position>(entity);
@@ -226,106 +209,100 @@ void Renderer::drawEntitiesWithShader()
 		if (!isEntityVisible(entity, pos, body, strech))
 			continue;
 
-		Model &model = context.modelManager.getModel(body.modelID);
+		Model &model = m_context.modelManager.getModel(body.modelID);
 		bool hasNormalMap = false;
 		for (int i = 0; i < model.materialCount; i++) {
-			model.materials[i].shader = lightedShader;
+			model.materials[i].shader = m_lightedShader;
 			if (model.materials[i].maps != nullptr && model.materials[i].maps[MATERIAL_MAP_NORMAL].texture.id > 0)
 				hasNormalMap = true;
 		}
 		const int normalMapAvailable = hasNormalMap ? 1 : 0;
-		SetShaderValue(lightedShader, normalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
-		// SetShaderValueTexture(shader, GetShaderLocation(shader, "texture0"), model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture);
+		SetShaderValue(m_lightedShader, m_normalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
 		drawEntityModel(pos, body, strech);
 	}
-
-	// EndShaderMode();
 }
 
 void Renderer::drawEntitiesWithSkyboxShader()
 {
-	// BeginShaderMode(skyboxShader);
-	Camera3D centerCam = camera;
+	Camera3D centerCam = m_camera;
 	centerCam.position = {0, 0, 0};
-	centerCam.target = Vector3Normalize(camera.target - camera.position) * 0.01f;
+	centerCam.target = Vector3Normalize(m_camera.target - m_camera.position) * 0.01f;
 
 	BeginMode3D(centerCam);
 	rlDisableDepthMask();
 	rlDisableBackfaceCulling();
 
-	auto view = context.registry.view<Position, RenderBody, tag::SkyBox>();
+	auto view = m_context.registry.view<Position, RenderBody, tag::SkyBox>();
 	for (auto entity : view)
 	{
 		const Position &pos = view.get<Position>(entity);
 		const RenderBody &body = view.get<RenderBody>(entity);
-		Model &model = context.modelManager.getModel(body.modelID);
+		Model &model = m_context.modelManager.getModel(body.modelID);
 		for (int i = 0; i < model.materialCount; i++) {
-			model.materials[i].shader = skyboxShader;
+			model.materials[i].shader = m_skyboxShader;
 		}
-		// std::cout << "drawing " << model.materials[0].maps[MATERIAL_MAP_ALBEDO].texture.height << std::endl;
 		drawEntityModel(pos, body);
 	}
 
 	rlEnableBackfaceCulling();
 	rlEnableDepthMask();
 	EndMode3D();
-	// EndShaderMode();
 }
 
 void Renderer::drawEnergyShield()
 {
-	auto view = context.registry.view<Position, RenderBody, EnergyShield>();
-	t_model_id model = context.modelManager.loadModel("assets/Models/shield/spherical_hex_force_field.glb", 0.01f);
+	auto view = m_context.registry.view<Position, RenderBody, EnergyShield>();
+	const t_model_id model = m_context.modelManager.loadModel("assets/Models/shield/spherical_hex_force_field.glb", 0.01f);
 
 	for (auto [entity, pos, body, shield] : view.each())
 	{
 		if (shield.activeTimer <= 0.0f || shield.hp < 10)
 			continue;
-		float scale = std::max(body.scale.x, std::max(body.scale.y, body.scale.z)) * 4;
-		if (!currentFrustum.isSphereInside(pos.value, scale))
+		const float scale = std::max(body.scale.x, std::max(body.scale.y, body.scale.z)) * 4;
+		if (!m_currentFrustum.isSphereInside(pos.value, scale))
 			continue;
 
-		context.modelManager.getModel(body.modelID).materials[0].shader = defaultShader;
+		m_context.modelManager.getModel(body.modelID).materials[0].shader = m_defaultShader;
 
-		Color color = ColorAlpha(SKYBLUE, (0.1 + 0.5 * shield.hp / shield.maxHp) * (shield.activeTimer / shield.activeDuration));
-		DrawModel(context.modelManager.getModel(model), pos.value, scale, color);
+		const Color color = ColorAlpha(SKYBLUE, (0.1 + 0.5 * shield.hp / shield.maxHp) * (shield.activeTimer / shield.activeDuration));
+		DrawModel(m_context.modelManager.getModel(model), pos.value, scale, color);
 	}
 }
 
 void Renderer::drawBoundaryWarning()
 {
-	if (!context.registry.valid(context.currentPlayer))
+	if (!m_context.registry.valid(m_context.currentPlayer))
 		return;
 	
-	auto posPtr = context.registry.try_get<Position>(context.currentPlayer);
+	const auto posPtr = m_context.registry.try_get<Position>(m_context.currentPlayer);
 	if (!posPtr)
 		return;
 	
-	Vector3 playerPos = posPtr->value;
+	const Vector3 playerPos = posPtr->value;
 	
-	const float softBoundaryStart = context.config.ARENA_SIZE * 0.5f;
-	const float hardBoundary = context.config.ARENA_SIZE;
+	const float softBoundaryStart = m_context.config.ARENA_SIZE * 0.5f;
+	const float hardBoundary = m_context.config.ARENA_SIZE;
 	const float warningZone = hardBoundary - softBoundaryStart;
 	
-	Vector3 axes[3] = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}};
-	float positions[3] = {playerPos.x, playerPos.y, playerPos.z};
+	const Vector3 axes[3] = {{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}};
+	const float positions[3] = {playerPos.x, playerPos.y, playerPos.z};
 	
 	for (int axis = 0; axis < 3; axis++) {
-		float currentPos = positions[axis];
-		float absCurrentPos = std::abs(currentPos);
+		const float currentPos = positions[axis];
+		const float absCurrentPos = std::abs(currentPos);
 		
 		if (absCurrentPos < softBoundaryStart)
 			continue;
 
-		float excess = absCurrentPos - softBoundaryStart;
-		float intensity = std::min(1.0f, excess / warningZone);
+		const float excess = absCurrentPos - softBoundaryStart;
+		const float intensity = std::min(1.0f, excess / warningZone);
 		
 		if (intensity <= 0.0f)
 			continue;
 		
-		Vector3 toBoundaryUnit = axes[axis] * (currentPos > 0 ? 1.0f : -1.0f);
+		const Vector3 toBoundaryUnit = axes[axis] * (currentPos > 0 ? 1.0f : -1.0f);
 		
-		Vector3 planeCenter = playerPos * (Vector3Ones - toBoundaryUnit * toBoundaryUnit) + toBoundaryUnit * hardBoundary;
+		const Vector3 planeCenter = playerPos * (Vector3Ones - toBoundaryUnit * toBoundaryUnit) + toBoundaryUnit * hardBoundary;
 		Vector3 right, up;
 		
 		// Generate perpendicular vectors for the grid plane
@@ -341,19 +318,19 @@ void Renderer::drawBoundaryWarning()
 		const float gridTileSize = 20.0f;
 		const int linesPerSide = (int)(gridSize / gridTileSize) + 1;
 		const float halfGrid = gridSize * 0.5f;
-		const Vector3 boundVec = {context.config.ARENA_SIZE, context.config.ARENA_SIZE, context.config.ARENA_SIZE};
+		const Vector3 boundVec = {m_context.config.ARENA_SIZE, m_context.config.ARENA_SIZE, m_context.config.ARENA_SIZE};
 
 		// Calculate grid offset and snap to grid tile size
-		Vector3 playerProjection = playerPos * (Vector3Ones - toBoundaryUnit * toBoundaryUnit);
-		float rightOffset = fmodf(Vector3DotProduct(playerProjection, right), gridTileSize);
-		float upOffset = fmodf(Vector3DotProduct(playerProjection, up), gridTileSize);
+		const Vector3 playerProjection = playerPos * (Vector3Ones - toBoundaryUnit * toBoundaryUnit);
+		const float rightOffset = fmodf(Vector3DotProduct(playerProjection, right), gridTileSize);
+		const float upOffset = fmodf(Vector3DotProduct(playerProjection, up), gridTileSize);
 		
-		float alpha = intensity * 0.3f;
-		Color warningColor = ColorAlpha(WHITE, alpha);
+		const float alpha = intensity * 0.3f;
+		const Color warningColor = ColorAlpha(WHITE, alpha);
 		
 		// Draw horizontal grid lines
 		for (int i = 0; i < linesPerSide; i++) {
-			float linePos = (i * gridTileSize) - halfGrid - upOffset;
+			const float linePos = (i * gridTileSize) - halfGrid - upOffset;
 			
 			Vector3 lineStart = planeCenter + right * (-halfGrid - rightOffset) + up * linePos;
 			Vector3 lineEnd = planeCenter + right * (halfGrid - rightOffset) + up * linePos;
@@ -365,7 +342,7 @@ void Renderer::drawBoundaryWarning()
 		
 		// Draw vertical grid lines
 		for (int i = 0; i < linesPerSide; i++) {
-			float linePos = (i * gridTileSize) - halfGrid - rightOffset;
+			const float linePos = (i * gridTileSize) - halfGrid - rightOffset;
 			
 			Vector3 lineStart = planeCenter + right * linePos + up * (-halfGrid - upOffset);
 			Vector3 lineEnd = planeCenter + right * linePos + up * (halfGrid - upOffset);
@@ -379,16 +356,16 @@ void Renderer::drawBoundaryWarning()
 
 void Renderer::drawDebug()
 {
-	if (!context.config.debug.showTarget)
+	if (!m_context.config.debug.showTarget)
 		return;
 
-	auto view = context.registry.view<Position, TargetRotation>();
+	auto view = m_context.registry.view<Position, TargetRotation>();
 	for (auto [entity, pos, tRot] : view.each())
 	{
-		Vector3 start = pos.value;
-		Vector3 forward = getForwardVector(tRot.value);
+		const Vector3 start = pos.value;
+		const Vector3 forward = getForwardVector(tRot.value);
 
-		Vector3 end = start + forward * 15.0f;
+		const Vector3 end = start + forward * 15.0f;
 
 		DrawCylinderEx(start, end, 0.2f, 0.2f, 8, RED);
 		DrawCylinderEx(end, end + forward * 3.0f, 0.6f, 0.0f, 8, RED);

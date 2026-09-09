@@ -13,11 +13,11 @@ namespace
 		return baseColor;
 	}
 
-	const float DEFAULT_MASS = 0.0f;
+	constexpr float DEFAULT_MASS = 0.0f;
 
 	t_model_id getBulletModel(GameContext &context)
 	{
-		std::string path = context.config.getString("weapons.lazer.modelPath", "");
+		const std::string path = context.config.getString("weapons.lazer.modelPath", "");
 		if (!path.empty())
 			return context.modelManager.loadModel(path);
 		return context.modelManager.createCylinder();
@@ -34,11 +34,11 @@ namespace
 	entt::entity createBulletTemplate(GameContext &context, float rad, Color color)
 	{
 		const auto &cfg = context.config;
-		float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
-		Vector3 lazerBound = {arenaSize * 2, arenaSize * 2, arenaSize * 2};
+		const float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
+		const Vector3 lazerBound = {arenaSize * 2, arenaSize * 2, arenaSize * 2};
 
 		entt::entity bullet = context.templateReg.create();
-		t_model_id model = getBulletModel(context);
+		const t_model_id model = getBulletModel(context);
 		context.templateReg.emplace<tag::Bullet>(bullet);
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
 		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
@@ -53,9 +53,9 @@ namespace
 
 	float getBaseSpread(const GameConfig &cfg)
 	{
-		float combatDist = cfg.getFloat("game.combatDist", 1000.0f);
-		float rangeMultiplier = cfg.getFloat("weapons.lazer.effectiveRangeMultiplier", 1.0f);
-		float effectiveRange = combatDist * rangeMultiplier;
+		const float combatDist = cfg.getFloat("game.combatDist", 1000.0f);
+		const float rangeMultiplier = cfg.getFloat("weapons.lazer.effectiveRangeMultiplier", 1.0f);
+		const float effectiveRange = combatDist * rangeMultiplier;
 		return std::atan2(1.0f, effectiveRange);
 	}
 }

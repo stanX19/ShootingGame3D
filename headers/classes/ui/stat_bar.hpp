@@ -12,8 +12,20 @@ struct StatBar {
 	std::string name;
 	float value = 0.0f;
 	float maximum = 1.0f;
-	float getClampedValue() const;
-	float getNormalizedValue() const;
+
+	float getClampedValue() const {
+		if (maximum <= 0.0f)
+			return 0.0f;
+		return Clamp(value, 0.0f, maximum);
+	}
+
+	float getNormalizedValue() const {
+		return getClampedValue() / maximum;
+	}
+
+	float clampedValue() const { return getClampedValue(); }
+	float normalizedValue() const { return getNormalizedValue(); }
+
 	void draw(Rectangle bounds) const;
 };
 

@@ -20,13 +20,13 @@ public:
     void draw() override;
 
 private:
-    std::string text;
-    Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
-    Color color = WHITE;
-    int fontSize = 20;
+    std::string m_text;
+    Rectangle m_bounds = {0.0f, 0.0f, 0.0f, 0.0f};
+    Color m_color = WHITE;
+    int m_fontSize = 20;
 
-    bool hovered = false;
-    bool down = false;
+    bool m_hovered = false;
+    bool m_down = false;
 };
 
 } // namespace ui

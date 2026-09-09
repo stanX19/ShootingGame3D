@@ -2,97 +2,97 @@
 #include <algorithm>
 
 LoopingFadeSound::LoopingFadeSound(const std::string& path, float restartThreshold)
-	: soundPath(path), restartThreshold(restartThreshold) {}
+	: m_soundPath(path), m_restartThreshold(restartThreshold) {}
 
 LoopingFadeSound::~LoopingFadeSound() {
 	shutdown();
 }
 
 void LoopingFadeSound::init(float masterVolume) {
-	if (loaded || soundPath.empty())
+	if (m_loaded || m_soundPath.empty())
 		return;
 
-	sound = LoadSound(soundPath.c_str());
-	loaded = IsSoundValid(sound);
-	if (loaded) {
-		SetSoundVolume(sound, 0.0f);
+	m_sound = LoadSound(m_soundPath.c_str());
+	m_loaded = IsSoundValid(m_sound);
+	if (m_loaded) {
+		SetSoundVolume(m_sound, 0.0f);
 	}
 	(void)masterVolume;
 }
 
 void LoopingFadeSound::shutdown() {
-	if (!loaded)
+	if (!m_loaded)
 		return;
 
-	StopSound(sound);
-	UnloadSound(sound);
-	loaded = false;
-	playing = false;
-	fadeState = FadeState::Idle;
-	currentVolume = 0.0f;
+	StopSound(m_sound);
+	UnloadSound(m_sound);
+	m_loaded = false;
+	m_playing = false;
+	m_fadeState = FadeState::Idle;
+	m_currentVolume = 0.0f;
 }
 
 void LoopingFadeSound::startPlaying() {
-	if (!loaded || playing)
+	if (!m_loaded || m_playing)
 		return;
 
-	PlaySound(sound);
-	playing = true;
+	PlaySound(m_sound);
+	m_playing = true;
 }
 
 void LoopingFadeSound::stopPlaying() {
-	if (!loaded || !playing)
+	if (!m_loaded || !m_playing)
 		return;
 
-	StopSound(sound);
-	playing = false;
+	StopSound(m_sound);
+	m_playing = false;
 }
 
 void LoopingFadeSound::update(bool shouldPlay, float dt, float masterVolume) {
-	if (!loaded)
+	if (!m_loaded)
 		return;
 
 	// Handle state transitions
-	if (shouldPlay && fadeState != FadeState::FadingIn) {
+	if (shouldPlay && m_fadeState != FadeState::FadingIn) {
 		// Check if we should restart from beginning
-		if (fadeState == FadeState::FadingOut && timeSinceFadeOut >= restartThreshold) {
+		if (m_fadeState == FadeState::FadingOut && m_timeSinceFadeOut >= m_restartThreshold) {
 			stopPlaying();
-			currentVolume = 0.0f;
+			m_currentVolume = 0.0f;
 		}
-		fadeState = FadeState::FadingIn;
-		timeSinceFadeOut = 0.0f;
-	} else if (!shouldPlay && fadeState == FadeState::FadingIn) {
-		fadeState = FadeState::FadingOut;
-		timeSinceFadeOut = 0.0f;
+		m_fadeState = FadeState::FadingIn;
+		m_timeSinceFadeOut = 0.0f;
+	} else if (!shouldPlay && m_fadeState == FadeState::FadingIn) {
+		m_fadeState = FadeState::FadingOut;
+		m_timeSinceFadeOut = 0.0f;
 	}
 
 	// Track time since fade out started
-	if (fadeState == FadeState::FadingOut) {
-		timeSinceFadeOut += dt;
+	if (m_fadeState == FadeState::FadingOut) {
+		m_timeSinceFadeOut += dt;
 	}
 
 	// Update volume based on state
-	switch (fadeState) {
+	switch (m_fadeState) {
 		case FadeState::FadingIn: {
-			if (!playing)
+			if (!m_playing)
 				startPlaying();
 
-			float fadeSpeed = maxVolume / fadeInDuration;
-			currentVolume = std::min(currentVolume + fadeSpeed * dt, maxVolume);
+			float fadeSpeed = m_maxVolume / m_fadeInDuration;
+			m_currentVolume = std::min(m_currentVolume + fadeSpeed * dt, m_maxVolume);
 
-			if (currentVolume >= maxVolume) {
-				currentVolume = maxVolume;
+			if (m_currentVolume >= m_maxVolume) {
+				m_currentVolume = m_maxVolume;
 			}
 			break;
 		}
 		case FadeState::FadingOut: {
-			float fadeSpeed = maxVolume / fadeOutDuration;
-			currentVolume = std::max(currentVolume - fadeSpeed * dt, 0.0f);
+			float fadeSpeed = m_maxVolume / m_fadeOutDuration;
+			m_currentVolume = std::max(m_currentVolume - fadeSpeed * dt, 0.0f);
 
-			if (currentVolume <= 0.0f) {
-				currentVolume = 0.0f;
+			if (m_currentVolume <= 0.0f) {
+				m_currentVolume = 0.0f;
 				stopPlaying();
-				fadeState = FadeState::Idle;
+				m_fadeState = FadeState::Idle;
 			}
 			break;
 		}
@@ -101,12 +101,12 @@ void LoopingFadeSound::update(bool shouldPlay, float dt, float masterVolume) {
 	}
 
 	// Loop sound if it finished but should still be playing
-	if (playing && !IsSoundPlaying(sound) && fadeState == FadeState::FadingIn) {
-		PlaySound(sound);
+	if (m_playing && !IsSoundPlaying(m_sound) && m_fadeState == FadeState::FadingIn) {
+		PlaySound(m_sound);
 	}
 
 	// Apply volume
-	if (playing) {
-		SetSoundVolume(sound, currentVolume * masterVolume);
+	if (m_playing) {
+		SetSoundVolume(m_sound, m_currentVolume * masterVolume);
 	}
 }

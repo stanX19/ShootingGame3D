@@ -17,9 +17,9 @@ public:
     EngineState run();
 
 private:
-    GameContext &context;
-    Renderer renderer;
-    BattlefieldHUDRenderer hudRenderer;
+    GameContext &m_context;
+    Renderer m_renderer;
+    BattlefieldHUDRenderer m_hudRenderer;
 
     // Systems
     systems::PlayerMoveControl m_systemPlayerMoveControl;

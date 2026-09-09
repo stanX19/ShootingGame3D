@@ -9,11 +9,11 @@
 #include <vector>
 
 void systems::HpCleanup::update(GameContext &context, [[maybe_unused]] float dt) {
-	auto view = context.registry.view<HP>();
+	auto view = context.registry.view<const HP>();
 	std::vector<entt::entity> toDestroy;
 
 	for (auto entity : view) {
-		HP& hp = view.get<HP>(entity);
+		const HP& hp = view.get<const HP>(entity);
 		if (hp.value <= 0.001f) {
 			toDestroy.push_back(entity);
 		}

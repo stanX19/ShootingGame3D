@@ -185,12 +185,12 @@ void SpaceshipConfig::init(
 			iterator.key(),
 			parseDefinition(iterator.key(), iterator.value(), defaults, sourcePath)
 		);
-	definitions = std::move(parsed);
+	m_definitions = std::move(parsed);
 }
 
 const SpaceshipConfig::Definition& SpaceshipConfig::get(std::string_view id) const {
-	const auto iterator = definitions.find(std::string(id));
-	if (iterator == definitions.end())
+	const auto iterator = m_definitions.find(std::string(id));
+	if (iterator == m_definitions.end())
 		throw std::out_of_range("SPACESHIP: unknown ship ID: " + std::string(id));
 	return iterator->second;
 }

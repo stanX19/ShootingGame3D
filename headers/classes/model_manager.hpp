@@ -40,11 +40,11 @@ public:
 
 	bool isValid(t_model_id id) const;
 private:
-	std::vector<Model> models;
-	std::vector<float> modelRadii;
-	std::vector<std::optional<std::string>> modelPaths;
-	std::map<std::pair<std::string, Matrix>, t_model_id> loadedFromFile; // filepath -> id
-	std::map<std::string, t_model_id> proceduralCache;
+	std::vector<Model> m_models;
+	std::vector<float> m_modelRadii;
+	std::vector<std::optional<std::string>> m_modelPaths;
+	std::map<std::pair<std::string, Matrix>, t_model_id> m_loadedFromFile; // filepath -> id
+	std::map<std::string, t_model_id> m_proceduralCache;
 
 	template <typename... Args>
 	std::string generateCacheKey(const std::string &keyBase, Args&&... args) const;

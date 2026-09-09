@@ -6,17 +6,17 @@
 
 void systems::CleanOutOfBound::update(GameContext &context, [[maybe_unused]] float dt)
 {
-	auto view = context.registry.view<DisappearBound, Position>();
+	auto view = context.registry.view<const DisappearBound, const Position>();
 	std::vector<entt::entity> toDestroy;
 
 	for (auto entity : view)
 	{
-		DisappearBound &bound = view.get<DisappearBound>(entity);
-		Vector3 &pos = view.get<Position>(entity).value;
-		Vector3 &start = bound.start;
-		Vector3 &end = bound.end;
+		const DisappearBound &bound = view.get<const DisappearBound>(entity);
+		const Vector3 &pos = view.get<const Position>(entity).value;
+		const Vector3 &start = bound.start;
+		const Vector3 &end = bound.end;
 
-		bool outOfBounds =
+		const bool outOfBounds =
 			(pos.x < start.x || pos.x > end.x) ||
 			(pos.y < start.y || pos.y > end.y) ||
 			(pos.z < start.z || pos.z > end.z);

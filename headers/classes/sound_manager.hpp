@@ -84,9 +84,9 @@ public:
 	bool isEnabled() const;
 
 private:
-	int maxSoundsPerIdPerFrame = 3;
-	int soundAliasesCount = 4;  // simultaneous plays per sound
-	float explosionMaxDistance = -1.0f;  // -1 means no limit
+	int m_maxSoundsPerIdPerFrame = 3;
+	int m_soundAliasesCount = 4;  // simultaneous plays per sound
+	float m_explosionMaxDistance = -1.0f;  // -1 means no limit
 
 	struct SoundData {
 		Sound baseSound;
@@ -95,36 +95,36 @@ private:
 		bool loaded = false;
 	};
 
-	std::map<sound::Id, SoundData> sounds;
-	std::map<std::string, sound::Id> pathCache;  // path -> id cache
-	std::vector<PlaySoundRequest> pendingRequests;
-	std::map<sound::Id, int> playsThisFrame;
+	std::map<sound::Id, SoundData> m_sounds;
+	std::map<std::string, sound::Id> m_pathCache;  // path -> id cache
+	std::vector<PlaySoundRequest> m_pendingRequests;
+	std::map<sound::Id, int> m_playsThisFrame;
 
 	// Category pools - populated from config
-	std::vector<sound::Id> bulletShootIds;
-	std::vector<sound::Id> lazerShootIds;
-	std::vector<sound::Id> bulletHitIds;
-	std::vector<sound::Id> lazerHitIds;
-	std::vector<sound::Id> explosionIds;
-	std::vector<sound::Id> missileShootIds;
-	sound::Id backgroundMusicId = sound::NONE;
-	sound::Id alertSoundId = sound::NONE;
-	sound::Id thrustSoundId = sound::NONE;
+	std::vector<sound::Id> m_bulletShootIds;
+	std::vector<sound::Id> m_lazerShootIds;
+	std::vector<sound::Id> m_bulletHitIds;
+	std::vector<sound::Id> m_lazerHitIds;
+	std::vector<sound::Id> m_explosionIds;
+	std::vector<sound::Id> m_missileShootIds;
+	sound::Id m_backgroundMusicId = sound::NONE;
+	sound::Id m_alertSoundId = sound::NONE;
+	sound::Id m_thrustSoundId = sound::NONE;
 
 	// Per-category pitch modifiers (virtual ID -> pitch)
-	std::map<sound::Id, float> categoryPitches;
+	std::map<sound::Id, float> m_categoryPitches;
 
-	Sound backgroundMusicSound;
-	bool musicLoaded = false;
+	Sound m_backgroundMusicSound;
+	bool m_musicLoaded = false;
 
-	std::unique_ptr<LoopingFadeSound> thrustSound;
+	std::unique_ptr<LoopingFadeSound> m_thrustSound;
 
-	float masterVolume = 0.5f;
-	bool enabled = true;
-	bool initialized = false;
+	float m_masterVolume = 0.5f;
+	bool m_enabled = true;
+	bool m_initialized = false;
 	
-	int nextSoundId = 1;  // Start at 1, 0 is NONE, negatives are virtual
-	std::mt19937 rng{std::random_device{}()};
+	int m_nextSoundId = 1;  // Start at 1, 0 is NONE, negatives are virtual
+	std::mt19937 m_rng{std::random_device{}()};
 
 	void unloadSound(sound::Id id);
 	Sound& getNextAlias(sound::Id id);

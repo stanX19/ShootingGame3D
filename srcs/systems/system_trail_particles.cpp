@@ -7,7 +7,7 @@
 #include "components/lifetime.hpp"
 
 void systems::SpawnTrailParticles::update(GameContext &context, [[maybe_unused]] float dt) {
-	for (auto [entity, trail, pos, vel] : context.registry.view<SpawnsTrailParticles, Position, Velocity>().each()) {
+	for (auto [entity, trail, pos, vel] : context.registry.view<const SpawnsTrailParticles, const Position, const Velocity>().each()) {
 		if (Vector3Length(vel.value) < 10.0f)
 			continue;
 

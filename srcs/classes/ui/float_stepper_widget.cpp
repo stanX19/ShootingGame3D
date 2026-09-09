@@ -11,55 +11,55 @@ FloatStepperWidget::FloatStepperWidget(
     Rectangle bounds,
     Color color
 )
-    : label(label), value(&valueRef), step(step), minValue(minValue), maxValue(maxValue), bounds(bounds), color(color),
-      minusButton("-", bounds, color, 20), plusButton("+", bounds, color, 20) {
+    : m_label(label), m_value(&valueRef), m_step(step), m_minValue(minValue), m_maxValue(maxValue), m_bounds(bounds), m_color(color),
+      m_minusButton("-", bounds, color, 20), m_plusButton("+", bounds, color, 20) {
     syncChildBounds();
 }
 
 void FloatStepperWidget::setBounds(Rectangle newBounds) {
-    bounds = newBounds;
+    m_bounds = newBounds;
     syncChildBounds();
 }
 
 void FloatStepperWidget::syncChildBounds() {
-    const float right = bounds.x + bounds.width;
-    const float buttonWidth = bounds.width / 8.0f;
-    const float valueSpaceWidth = bounds.width / 4.0f;
+    const float right = m_bounds.x + m_bounds.width;
+    const float buttonWidth = m_bounds.width / 8.0f;
+    const float valueSpaceWidth = m_bounds.width / 4.0f;
     const float padding = 5.0f;
 
     const Rectangle minusBounds = {
         right - buttonWidth - padding - valueSpaceWidth - buttonWidth,
-        bounds.y + padding,
+        m_bounds.y + padding,
         buttonWidth,
-        bounds.height - padding * 2.0f
+        m_bounds.height - padding * 2.0f
     };
     const Rectangle plusBounds = {
         right - buttonWidth - padding,
-        bounds.y + padding,
+        m_bounds.y + padding,
         buttonWidth,
-        bounds.height - padding * 2.0f
+        m_bounds.height - padding * 2.0f
     };
 
-    minusButton.setBounds(minusBounds);
-    minusButton.setColor(color);
-    plusButton.setBounds(plusBounds);
-    plusButton.setColor(color);
+    m_minusButton.setBounds(minusBounds);
+    m_minusButton.setColor(m_color);
+    m_plusButton.setBounds(plusBounds);
+    m_plusButton.setColor(m_color);
 }
 
 bool FloatStepperWidget::update() {
-    if (!value) {
+    if (!m_value) {
         return false;
     }
 
     bool changed = false;
 
-    if (minusButton.update()) {
-        *value = Clamp(*value - step, minValue, maxValue);
+    if (m_minusButton.update()) {
+        *m_value = Clamp(*m_value - m_step, m_minValue, m_maxValue);
         changed = true;
     }
 
-    if (plusButton.update()) {
-        *value = Clamp(*value + step, minValue, maxValue);
+    if (m_plusButton.update()) {
+        *m_value = Clamp(*m_value + m_step, m_minValue, m_maxValue);
         changed = true;
     }
 
@@ -67,29 +67,29 @@ bool FloatStepperWidget::update() {
 }
 
 void FloatStepperWidget::draw() {
-    if (!value) {
+    if (!m_value) {
         return;
     }
 
-    DrawRectangleLinesEx(bounds, 2, ColorAlpha(color, 0.5f));
-    DrawText(label.c_str(), bounds.x + 10, bounds.y + bounds.height / 2 - 10, 20, color);
+    DrawRectangleLinesEx(m_bounds, 2, ColorAlpha(m_color, 0.5f));
+    DrawText(m_label.c_str(), m_bounds.x + 10, m_bounds.y + m_bounds.height / 2 - 10, 20, m_color);
 
-    minusButton.draw();
-    plusButton.draw();
+    m_minusButton.draw();
+    m_plusButton.draw();
 
     char valueText[32];
-    snprintf(valueText, sizeof(valueText), "%.1f", *value);
+    snprintf(valueText, sizeof(valueText), "%.1f", *m_value);
 
-    const float right = bounds.x + bounds.width;
-    const float buttonWidth = bounds.width / 8.0f;
-    const float valueSpaceWidth = bounds.width / 4.0f;
+    const float right = m_bounds.x + m_bounds.width;
+    const float buttonWidth = m_bounds.width / 8.0f;
+    const float valueSpaceWidth = m_bounds.width / 4.0f;
     const float padding = 5.0f;
     const int textWidth = MeasureText(valueText, 20);
 
     DrawText(
         valueText,
         right - buttonWidth - padding - valueSpaceWidth / 2.0f - textWidth / 2.0f,
-        bounds.y + bounds.height / 2.0f - 10.0f,
+        m_bounds.y + m_bounds.height / 2.0f - 10.0f,
         20,
         WHITE
     );

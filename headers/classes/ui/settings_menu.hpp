@@ -15,11 +15,11 @@ public:
     EngineState run();
 
 private:
-    GameContext &context;
-    ui::TextButtonWidget hpToggleWidget;
-    ui::FloatSliderWidget volumeWidget;
-    ui::FloatSliderWidget sensitivityWidget;
-    ui::TextButtonWidget backWidget;
+    GameContext &m_context;
+    ui::TextButtonWidget m_hpToggleWidget;
+    ui::FloatSliderWidget m_volumeWidget;
+    ui::FloatSliderWidget m_sensitivityWidget;
+    ui::TextButtonWidget m_backWidget;
 
     void drawSettingsUI(EngineState &nextState);
     void inputControls(float dt, EngineState &nextState);

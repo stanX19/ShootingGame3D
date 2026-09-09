@@ -23,7 +23,7 @@ public:
 	void init(const std::vector<RootSource>& sources);
 	void init(std::initializer_list<RootSource> sources);
 	void initConstants();
-	bool isLoaded() const { return loaded; }
+	bool isLoaded() const { return m_loaded; }
 
 	virtual float getFloat(const std::string& path, float defaultVal) const;
 	virtual int getInt(const std::string& path, int defaultVal) const;
@@ -50,16 +50,16 @@ public:
 	void saveChanged();
 	void saveAll();
 
-	const nlohmann::json& getJson() const { return config; }
+	const nlohmann::json& getJson() const { return m_config; }
 	nlohmann::json getSection(const std::string& path) const;
 	class SubGameConfig getSubConfig(const std::string& path) const;
 
 	const config::SpaceshipConfig& spaceship() const noexcept {
-		return spaceshipConfig;
+		return m_spaceshipConfig;
 	}
 
 	const config::UnitConfig& units() const noexcept {
-		return unitConfig;
+		return m_unitConfig;
 	}
 
 	float ARENA_SIZE = 2000.0f;
@@ -93,11 +93,11 @@ private:
 		bool dirty = false;
 	};
 
-	nlohmann::json config;
-	std::map<std::string, RootJsonFile> roots;
-	config::SpaceshipConfig spaceshipConfig;
-	config::UnitConfig unitConfig;
-	bool loaded = false;
+	nlohmann::json m_config;
+	std::map<std::string, RootJsonFile> m_roots;
+	config::SpaceshipConfig m_spaceshipConfig;
+	config::UnitConfig m_unitConfig;
+	bool m_loaded = false;
 
 	const nlohmann::json* navigatePath(const std::string& path) const;
 	nlohmann::json* navigatePath(
@@ -111,37 +111,37 @@ private:
 class SubGameConfig : public GameConfig {
 public:
 	SubGameConfig(const GameConfig* parent, const std::string& root)
-		: parentCfg(parent), rootPath(root) {}
+		: m_parentCfg(parent), m_rootPath(root) {}
 
 	float getFloat(const std::string& path, float defaultVal) const override {
-		return parentCfg->getFloat(rootPath + "." + path, defaultVal);
+		return m_parentCfg->getFloat(m_rootPath + "." + path, defaultVal);
 	}
 	int getInt(const std::string& path, int defaultVal) const override {
-		return parentCfg->getInt(rootPath + "." + path, defaultVal);
+		return m_parentCfg->getInt(m_rootPath + "." + path, defaultVal);
 	}
 	bool getBool(const std::string& path, bool defaultVal) const override {
-		return parentCfg->getBool(rootPath + "." + path, defaultVal);
+		return m_parentCfg->getBool(m_rootPath + "." + path, defaultVal);
 	}
 	std::string getString(
 		const std::string& path,
 		const std::string& defaultVal
 	) const override {
-		return parentCfg->getString(rootPath + "." + path, defaultVal);
+		return m_parentCfg->getString(m_rootPath + "." + path, defaultVal);
 	}
 	std::vector<std::string> getStringArray(
 		const std::string& path,
 		const std::vector<std::string>& defaultVal
 	) const override {
-		return parentCfg->getStringArray(rootPath + "." + path, defaultVal);
+		return m_parentCfg->getStringArray(m_rootPath + "." + path, defaultVal);
 	}
 	Vector3 getVector3(const std::string& path, Vector3 defaultVal) const override {
-		return parentCfg->getVector3(rootPath + "." + path, defaultVal);
+		return m_parentCfg->getVector3(m_rootPath + "." + path, defaultVal);
 	}
 	nlohmann::json getSection(const std::string& path) const {
-		return parentCfg->getSection(rootPath + "." + path);
+		return m_parentCfg->getSection(m_rootPath + "." + path);
 	}
 	SubGameConfig getSubConfig(const std::string& path) const {
-		return parentCfg->getSubConfig(rootPath + "." + path);
+		return m_parentCfg->getSubConfig(m_rootPath + "." + path);
 	}
 
 private:
@@ -159,8 +159,8 @@ private:
 	void init(std::initializer_list<RootSource>) = delete;
 	void initConstants() = delete;
 
-	const GameConfig* parentCfg;
-	std::string rootPath;
+	const GameConfig* m_parentCfg;
+	std::string m_rootPath;
 };
 
 inline SubGameConfig GameConfig::getSubConfig(const std::string& path) const {

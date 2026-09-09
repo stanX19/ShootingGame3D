@@ -19,9 +19,9 @@ public:
     EngineState run();
 
 private:
-    GameContext &context;
-    Renderer renderer;
-    entt::entity previewPlayer;
+    GameContext &m_context;
+    Renderer m_renderer;
+    entt::entity m_previewPlayer;
 
     void drawUI(EngineState &nextState);
     void inputControls(float dt, EngineState &nextState);
@@ -38,19 +38,19 @@ private:
         std::size_t mountCount,
         float panelX,
         float statsY
-    );
+    ) const;
 
-    std::vector<std::string> standardWeapons;
-    std::vector<std::string> specialWeapons;
-    std::vector<ui::TextButtonWidget> turretButtons;
-    ui::ScrollableListWidget turretList;
-    std::vector<std::string> shipIds;
-    std::size_t selectedShipIndex = 0;
-    std::string selectedShipId;
+    std::vector<std::string> m_standardWeapons;
+    std::vector<std::string> m_specialWeapons;
+    std::vector<ui::TextButtonWidget> m_turretButtons;
+    ui::ScrollableListWidget m_turretList;
+    std::vector<std::string> m_shipIds;
+    std::size_t m_selectedShipIndex = 0;
+    std::string m_selectedShipId;
 
-    ui::TextButtonWidget specialButton;
-    ui::TextButtonWidget shipButton;
-    ui::TextButtonWidget backButton;
+    ui::TextButtonWidget m_specialButton;
+    ui::TextButtonWidget m_shipButton;
+    ui::TextButtonWidget m_backButton;
 
     void cycleWeapon(const std::string& path, std::string &currentWeapon, const std::vector<std::string> &options);
 };

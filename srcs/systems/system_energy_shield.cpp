@@ -4,7 +4,7 @@
 
 namespace {
 	void shieldRegen(GameContext &context, float dt) {
-		auto view = context.registry.view<EnergyShield, EnergyShieldRegen>();
+		auto view = context.registry.view<EnergyShield, const EnergyShieldRegen>();
 
 		for (auto [entity, shield, regen] : view.each()) {
 			if (shield.activeTimer > -regen.regenCd)

@@ -4,64 +4,55 @@
 #include "components/weapon.hpp"
 #include "components/physics.hpp"
 
-namespace
+void systems::SoundSfx::lowHpWarningSfx(GameContext &context, float dt)
 {
-	float prevSpeed = 0.0f;
-	float prevHp = 0.0f;
-	float lowHpWarningDuration = 0.0f; // remaining duration to keep warning
-	float lowHpWarningCooldown = 0.0f; // cooldown between beeps
-	entt::entity lastLockOnTarget = entt::null;
+	const HP *hpPtr = context.registry.try_get<HP>(context.currentPlayer);
+	if (!hpPtr)
+		return;
 
-	void lowHpWarningSfx(GameContext &context, float dt)
-	{
-		HP *hpPtr = context.registry.try_get<HP>(context.currentPlayer);
-		if (!hpPtr)
-			return;
+	const float lowHpThreshold = context.config.getFloat("sounds.lowHpWarningThreshold", 0.3f);
+	const bool isLowHp = hpPtr->value < hpPtr->maxValue * lowHpThreshold;
+	const bool tookDamage = hpPtr->value < m_prevHp;
+	m_prevHp = hpPtr->value;
 
-		float lowHpThreshold = context.config.getFloat("sounds.lowHpWarningThreshold", 0.3f);
-		bool isLowHp = hpPtr->value < hpPtr->maxValue * lowHpThreshold;
-		bool tookDamage = hpPtr->value < prevHp;
-		prevHp = hpPtr->value;
+	if (isLowHp && tookDamage)
+		m_lowHpWarningDuration = context.config.getFloat("sounds.lowHpWarningDuration", 10.0f);
+	if (!isLowHp)
+		m_lowHpWarningDuration = 0.0f;
+	if (m_lowHpWarningDuration <= 0.0f)
+		return;
 
-		if (isLowHp && tookDamage)
-			lowHpWarningDuration = context.config.getFloat("sounds.lowHpWarningDuration", 10.0f);
-		if (!isLowHp)
-			lowHpWarningDuration = 0.0f;
-		if (lowHpWarningDuration <= 0.0f)
-			return;
+	m_lowHpWarningDuration -= dt;
+	m_lowHpWarningCooldown -= dt;
+	if (m_lowHpWarningCooldown > 0.0f)
+		return;
+	m_lowHpWarningCooldown = context.config.getFloat("sounds.lowHpWarningInterval", 1.0f);
+	
+	float volume = context.config.getFloat("sounds.warningVolume", 1.0f);
+	const float fadeDuration = context.config.getFloat("sounds.lowHpWarningFadeDuration", 5.0f);
+	if (m_lowHpWarningDuration <= fadeDuration)
+		volume *= m_lowHpWarningDuration / fadeDuration;
+	context.soundManager.playImmediate(context.config, "sounds.warning", volume);
+}
 
-		lowHpWarningDuration -= dt;
-		lowHpWarningCooldown -= dt;
-		if (lowHpWarningCooldown > 0.0f)
-			return;
-		lowHpWarningCooldown = context.config.getFloat("sounds.lowHpWarningInterval", 1.0f);
-		
-		float volume = context.config.getFloat("sounds.warningVolume", 1.0f);
-		float fadeDuration = context.config.getFloat("sounds.lowHpWarningFadeDuration", 5.0f);
-		if (lowHpWarningDuration <= fadeDuration)
-			volume *= lowHpWarningDuration / fadeDuration;
-		context.soundManager.playImmediate(context.config, "sounds.warning", volume);
+void systems::SoundSfx::lockOnSfx(GameContext &context)
+{
+	const AimTarget *aimTargetPtr = context.registry.try_get<AimTarget>(context.currentPlayer);
+	const entt::entity targetedEntity = aimTargetPtr ? aimTargetPtr->entity : entt::null;
+	if (targetedEntity != entt::null && targetedEntity != m_lastLockOnTarget) {
+		const float volume = context.config.getFloat("sounds.lockOnVolume", 1.0f);
+		context.soundManager.playImmediate(context.config, "sounds.lockOn", volume);
 	}
-
-	void lockOnSfx(GameContext &context)
-	{
-		AimTarget *aimTargetPtr = context.registry.try_get<AimTarget>(context.currentPlayer);
-		entt::entity targetedEntity = aimTargetPtr ? aimTargetPtr->entity : entt::null;
-		if (targetedEntity != entt::null && targetedEntity != lastLockOnTarget) {
-			float volume = context.config.getFloat("sounds.lockOnVolume", 1.0f);
-			context.soundManager.playImmediate(context.config, "sounds.lockOn", volume);
-		}
-		lastLockOnTarget = targetedEntity;
-	}
+	m_lastLockOnTarget = targetedEntity;
 }
 
 void systems::SoundSfx::update(GameContext &context, float dt)
 {
 	// --- Player thrust sound ---
-	Velocity *velPtr = context.registry.try_get<Velocity>(context.currentPlayer);
-	float currentSpeed = velPtr ? Vector3Length(velPtr->value) : 0.0f;
-	context.soundManager.updateThrustSound((currentSpeed - prevSpeed) / dt > 10.0f, dt);
-	prevSpeed = currentSpeed;
+	const Velocity *velPtr = context.registry.try_get<Velocity>(context.currentPlayer);
+	const float currentSpeed = velPtr ? Vector3Length(velPtr->value) : 0.0f;
+	context.soundManager.updateThrustSound((currentSpeed - m_prevSpeed) / dt > 10.0f, dt);
+	m_prevSpeed = currentSpeed;
 
 	// --- Low HP warning sound ---
 	lowHpWarningSfx(context, dt);

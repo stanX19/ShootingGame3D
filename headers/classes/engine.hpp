@@ -22,8 +22,8 @@ public:
     void run();
 
 private:
-    GameContext context;
-    EngineState state = EngineState::MENU;
+    GameContext m_context;
+    EngineState m_state = EngineState::MENU;
 
     void init();
     void shutdown();

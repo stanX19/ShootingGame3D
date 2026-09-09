@@ -3,11 +3,11 @@
 #include "components/combat.hpp"
 
 void systems::HpRegen::update(GameContext &context, float dt) {
-	auto view = context.registry.view<HP, HPRegen>();
+	auto view = context.registry.view<HP, const HPRegen>();
 
 	for (auto entity : view) {
 		HP& hp = view.get<HP>(entity);
-		HPRegen& regen = view.get<HPRegen>(entity);
+		const HPRegen& regen = view.get<const HPRegen>(entity);
 		
 		hp.value = Clamp(hp.value + regen.value * dt, 0, hp.maxValue);
 	}

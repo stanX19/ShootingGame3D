@@ -204,15 +204,15 @@ t_collision_mesh_id CollisionBodyManager::loadCollisionModel(
 
 	const std::pair<t_model_id, Matrix> key{modelID, model.transform};
 	const std::map<std::pair<t_model_id, Matrix>, t_collision_mesh_id>::const_iterator iterator =
-		loadedFromModel.find(key);
-	if (iterator != loadedFromModel.end())
+		m_loadedFromModel.find(key);
+	if (iterator != m_loadedFromModel.end())
 		return iterator->second;
 
 	const t_collision_mesh_id id = addCollisionModel(
 		copyCollisionMesh(model),
 		model.transform
 	);
-	loadedFromModel[key] = id;
+	m_loadedFromModel[key] = id;
 	return id;
 }
 
@@ -232,15 +232,15 @@ t_collision_mesh_id CollisionBodyManager::loadCollisionModel(
 	const std::filesystem::path canonicalPath = std::filesystem::weakly_canonical(path);
 	const std::pair<std::string, Matrix> key{canonicalPath.string(), staticTransform};
 	const std::map<std::pair<std::string, Matrix>, t_collision_mesh_id>::const_iterator iterator =
-		loadedFromFile.find(key);
-	if (iterator != loadedFromFile.end())
+		m_loadedFromFile.find(key);
+	if (iterator != m_loadedFromFile.end())
 		return iterator->second;
 
 	const t_collision_mesh_id id = addCollisionModel(
 		loadCollisionMesh(canonicalPath),
 		staticTransform
 	);
-	loadedFromFile[key] = id;
+	m_loadedFromFile[key] = id;
 	return id;
 }
 
@@ -256,8 +256,8 @@ t_collision_mesh_id CollisionBodyManager::addCollisionModel(
 	model.staticTransform = staticTransform;
 	buildBvh(model);
 
-	const t_collision_mesh_id id = models.size();
-	models.push_back(std::move(model));
+	const t_collision_mesh_id id = m_models.size();
+	m_models.push_back(std::move(model));
 	return id;
 }
 
@@ -272,7 +272,7 @@ const CollisionModel &CollisionBodyManager::getCollisionModel(t_collision_mesh_i
 {
 	if (!isValid(id))
 		throw std::out_of_range("Invalid collision mesh ID");
-	return models[id];
+	return m_models[id];
 }
 
 float CollisionBodyManager::getCollisionRadius(
@@ -317,12 +317,12 @@ float CollisionBodyManager::getCollisionRadius(
 
 bool CollisionBodyManager::isValid(t_collision_mesh_id id) const
 {
-	return id < models.size();
+	return id < m_models.size();
 }
 
 void CollisionBodyManager::unloadAll()
 {
-	models.clear();
-	loadedFromFile.clear();
-	loadedFromModel.clear();
+	m_models.clear();
+	m_loadedFromFile.clear();
+	m_loadedFromModel.clear();
 }

@@ -20,22 +20,23 @@ public:
 	Renderer(const Renderer &) = delete;
 	Renderer &operator=(const Renderer &) = delete;
 
-	void Render(float dt);
+	void render(float dt);
+	void Render(float dt) { render(dt); }
 
 private:
-	Camera3D& camera;
-	GameContext &context;
-	float currentDt = 0.0f;
-	Shader lightedShader{};
-	Shader skyboxShader{};
-	Shader defaultShader{};
+	Camera3D& m_camera;
+	GameContext &m_context;
+	float m_currentDt = 0.0f;
+	Shader m_lightedShader{};
+	Shader m_skyboxShader{};
+	Shader m_defaultShader{};
 	
-	Model trailModel{};
-	int lightPosLoc = 0;
-	int lightColorLoc = 0;
-	int ambientStrengthLoc = 0;
-	int normalMapAvailableLoc = 0;
-	Frustum currentFrustum;
+	Model m_trailModel{};
+	int m_lightPosLoc = 0;
+	int m_lightColorLoc = 0;
+	int m_ambientStrengthLoc = 0;
+	int m_normalMapAvailableLoc = 0;
+	Frustum m_currentFrustum;
 
 	struct StrechDat {
 		float strech;
@@ -46,8 +47,8 @@ private:
 	void loadShaderWithFallback();
 	void setupShaderUniforms();
 	void updateFrustum();
-	StrechDat getStrech(entt::entity entity);
-	bool isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech);
+	StrechDat getStrech(entt::entity entity) const;
+	bool isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech) const;
 	void drawEntityModel(const Position &pos, const RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
 	void drawTrails();
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);

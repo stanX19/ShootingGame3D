@@ -11,7 +11,7 @@ void GameConfig::init(std::initializer_list<RootSource> sources) {
 }
 
 void GameConfig::init(const std::vector<RootSource>& sources) {
-	if (loaded)
+	if (m_loaded)
 		return;
 	if (sources.empty())
 		throw std::invalid_argument("CONFIG: at least one root source is required");
@@ -61,11 +61,11 @@ void GameConfig::init(const std::vector<RootSource>& sources) {
 		);
 	}
 
-	config = std::move(candidate);
-	roots = std::move(candidateFiles);
-	spaceshipConfig = std::move(candidateSpaceship);
-	unitConfig = std::move(candidateUnits);
-	loaded = true;
+	m_config = std::move(candidate);
+	m_roots = std::move(candidateFiles);
+	m_spaceshipConfig = std::move(candidateSpaceship);
+	m_unitConfig = std::move(candidateUnits);
+	m_loaded = true;
 	initConstants();
 }
 
@@ -93,10 +93,10 @@ void GameConfig::initConstants() {
 }
 
 const nlohmann::json* GameConfig::navigatePath(const std::string& path) const {
-	if (!loaded)
+	if (!m_loaded)
 		return nullptr;
 
-	const nlohmann::json* current = &config;
+	const nlohmann::json* current = &m_config;
 	std::istringstream stream(path);
 	std::string token;
 	while (std::getline(stream, token, '.')) {
@@ -201,11 +201,11 @@ void GameConfig::setJsonValue(const std::string& path, nlohmann::json value) {
 			"CONFIG: setters require a root-qualified path: " + path
 		);
 	const std::string rootName = path.substr(0, separator);
-	auto root = roots.find(rootName);
-	if (root == roots.end())
+	auto root = m_roots.find(rootName);
+	if (root == m_roots.end())
 		throw std::invalid_argument("CONFIG: unknown root: " + rootName);
 
-	nlohmann::json updatedRoot = config.at(rootName);
+	nlohmann::json updatedRoot = m_config.at(rootName);
 	nlohmann::json* node = navigatePath(
 		updatedRoot,
 		path.substr(separator + 1)
@@ -216,14 +216,14 @@ void GameConfig::setJsonValue(const std::string& path, nlohmann::json value) {
 		return;
 	*node = std::move(value);
 
-	config::SpaceshipConfig updatedSpaceship = spaceshipConfig;
-	config::UnitConfig updatedUnits = unitConfig;
+	config::SpaceshipConfig updatedSpaceship = m_spaceshipConfig;
+	config::UnitConfig updatedUnits = m_unitConfig;
 	if (rootName == "spaceship") {
 		updatedSpaceship.init(updatedRoot, root->second.sourcePath);
-		const auto unitsRoot = config.find("units");
-		if (unitsRoot != config.end()) {
-			const auto unitsFile = roots.find("units");
-			if (unitsFile == roots.end())
+		const auto unitsRoot = m_config.find("units");
+		if (unitsRoot != m_config.end()) {
+			const auto unitsFile = m_roots.find("units");
+			if (unitsFile == m_roots.end())
 				throw std::logic_error("CONFIG: units root has no source file");
 			updatedUnits.init(
 				*unitsRoot,
@@ -233,20 +233,20 @@ void GameConfig::setJsonValue(const std::string& path, nlohmann::json value) {
 		}
 	}
 	if (rootName == "units") {
-		const auto spaceshipRoot = config.find("spaceship");
-		if (spaceshipRoot == config.end())
+		const auto spaceshipRoot = m_config.find("spaceship");
+		if (spaceshipRoot == m_config.end())
 			throw std::invalid_argument(
 				"CONFIG: units root requires a spaceship root"
 			);
 		updatedUnits.init(
 			updatedRoot,
 			root->second.sourcePath,
-			spaceshipConfig
+			m_spaceshipConfig
 		);
 	}
-	config[rootName] = std::move(updatedRoot);
-	spaceshipConfig = std::move(updatedSpaceship);
-	unitConfig = std::move(updatedUnits);
+	m_config[rootName] = std::move(updatedRoot);
+	m_spaceshipConfig = std::move(updatedSpaceship);
+	m_unitConfig = std::move(updatedUnits);
 	root->second.dirty = true;
 	initConstants();
 }
@@ -286,7 +286,7 @@ void GameConfig::saveRootJsonFile(
 		throw std::runtime_error(
 			"CONFIG: failed to open root for saving " + rootName + ": " + file.sourcePath
 		);
-	output << config.at(rootName).dump(4) << '\n';
+	output << m_config.at(rootName).dump(4) << '\n';
 	if (!output)
 		throw std::runtime_error(
 			"CONFIG: failed while saving root " + rootName + ": " + file.sourcePath
@@ -301,20 +301,20 @@ void GameConfig::saveRootJsonFile(
 }
 
 void GameConfig::saveRoot(const std::string& rootName) {
-	auto iterator = roots.find(rootName);
-	if (iterator == roots.end())
+	auto iterator = m_roots.find(rootName);
+	if (iterator == m_roots.end())
 		throw std::invalid_argument("CONFIG: unknown root: " + rootName);
 	saveRootJsonFile(rootName, iterator->second);
 }
 
 void GameConfig::saveChanged() {
-	for (auto& [rootName, file] : roots) {
+	for (auto& [rootName, file] : m_roots) {
 		if (file.dirty)
 			saveRootJsonFile(rootName, file);
 	}
 }
 
 void GameConfig::saveAll() {
-	for (auto& [rootName, file] : roots)
+	for (auto& [rootName, file] : m_roots)
 		saveRootJsonFile(rootName, file);
 }

@@ -29,16 +29,16 @@ public:
 private:
     void syncChildBounds();
 
-    std::string label;
-    float *value = nullptr;
-    float step = 0.1f;
-    float minValue = 0.0f;
-    float maxValue = 1.0f;
-    Rectangle bounds = {0.0f, 0.0f, 0.0f, 0.0f};
-    Color color = SKYBLUE;
+    std::string m_label;
+    float *m_value = nullptr;
+    float m_step = 0.1f;
+    float m_minValue = 0.0f;
+    float m_maxValue = 1.0f;
+    Rectangle m_bounds = {0.0f, 0.0f, 0.0f, 0.0f};
+    Color m_color = SKYBLUE;
 
-    TextButtonWidget minusButton;
-    TextButtonWidget plusButton;
+    TextButtonWidget m_minusButton;
+    TextButtonWidget m_plusButton;
 };
 
 } // namespace ui

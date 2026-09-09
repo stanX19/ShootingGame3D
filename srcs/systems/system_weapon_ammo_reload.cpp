@@ -4,7 +4,7 @@
 #include "utils/math_utils.hpp"
 
 void systems::AmmoReload::update(GameContext &context, float dt) {
-	for (auto [entity, ammo, regen] : context.registry.view<Ammo, AmmoRegen>().each()) {
+	for (auto [entity, ammo, regen] : context.registry.view<Ammo, const AmmoRegen>().each()) {
 		ammo.value = Clamp(ammo.value + regen.value * dt, 0, ammo.maxValue);
 	}
 

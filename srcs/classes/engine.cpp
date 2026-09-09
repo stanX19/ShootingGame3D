@@ -14,7 +14,7 @@ void Engine::init() {
 	SetTargetFPS(60);
 	SetExitKey(KEY_NULL);
 
-	context.config.init({
+	m_context.config.init({
 		{"audio", "assets/config/audio.json"},
 		{"debug", "assets/config/debug.json"},
 		{"game", "assets/config/game.json"},
@@ -26,42 +26,42 @@ void Engine::init() {
 		{"weapons", "assets/config/weapons.json"},
 		{"spaceship", "assets/config/spaceships.json"}
 	});
-	context.weaponRegistry.init(context.config);
-	context.soundManager.init(context.config);
+	m_context.weaponRegistry.init(m_context.config);
+	m_context.soundManager.init(m_context.config);
 }
 
 void Engine::shutdown() {
-	context.soundManager.shutdown();
-	context.modelManager.unloadAll();
+	m_context.soundManager.shutdown();
+	m_context.modelManager.unloadAll();
 	CloseWindow();
 }
 
 void Engine::run() {
-	GameMenu menu(context);
-	Game game(context);
-	GameHangar hangar(context);
-	SettingsMenu settings(context);
+	GameMenu menu(m_context);
+	Game game(m_context);
+	GameHangar hangar(m_context);
+	SettingsMenu settings(m_context);
 
-	while (state != EngineState::EXIT) {
+	while (m_state != EngineState::EXIT) {
 		if (WindowShouldClose()) {
-			state = EngineState::EXIT;
+			m_state = EngineState::EXIT;
 			break;
 		}
 
-		switch (state) {
+		switch (m_state) {
 			case EngineState::MENU:
-				state = menu.run();
-				if (state == EngineState::GAME)
+				m_state = menu.run();
+				if (m_state == EngineState::GAME)
 					game.reset();
 				break;
 			case EngineState::GAME:
-				state = game.run();
+				m_state = game.run();
 				break;
 			case EngineState::HANGAR:
-				state = hangar.run();
+				m_state = hangar.run();
 				break;
 			case EngineState::SETTINGS:
-				state = settings.run();
+				m_state = settings.run();
 				break;
 			case EngineState::EXIT:
 				break;

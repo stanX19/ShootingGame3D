@@ -1,6 +1,5 @@
-#pragma once
-
-#pragma message("WARNING: components_deprecated.hpp is deprecated. Include specific components from headers/components/ instead.")
+#ifndef ALL_COMPONENTS_HPP
+#define ALL_COMPONENTS_HPP
 
 #include "components/physics.hpp"
 #include "components/movement.hpp"
@@ -16,3 +15,5 @@
 #include "components/factions.hpp"
 #include "components/sound.hpp"
 #include "components/unit_camera.hpp"
+
+#endif // ALL_COMPONENTS_HPP

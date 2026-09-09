@@ -62,7 +62,7 @@ private:
 	);
 	static void validateDefinition(const Definition& definition, std::string_view sourcePath);
 
-	std::map<std::string, Definition> definitions;
+	std::map<std::string, Definition> m_definitions;
 };
 
 } // namespace config

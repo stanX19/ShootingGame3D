@@ -200,24 +200,24 @@ void UnitConfig::init(
 			iterator.key(),
 			parseDefinition(iterator.key(), iterator.value(), sourcePath, spaceships)
 		);
-	definitions = std::move(parsed);
+	m_definitions = std::move(parsed);
 }
 
 bool UnitConfig::contains(std::string_view id) const {
-	return definitions.find(std::string(id)) != definitions.end();
+	return m_definitions.find(std::string(id)) != m_definitions.end();
 }
 
 const UnitConfig::Definition& UnitConfig::get(std::string_view id) const {
-	const auto iterator = definitions.find(std::string(id));
-	if (iterator == definitions.end())
+	const auto iterator = m_definitions.find(std::string(id));
+	if (iterator == m_definitions.end())
 		throw std::out_of_range("UNIT: unknown unit ID: " + std::string(id));
 	return iterator->second;
 }
 
 std::vector<std::string> UnitConfig::ids() const {
 	std::vector<std::string> result;
-	result.reserve(definitions.size());
-	for (const auto& entry : definitions)
+	result.reserve(m_definitions.size());
+	for (const auto& entry : m_definitions)
 		result.push_back(entry.first);
 	return result;
 }

@@ -8,11 +8,11 @@
 #include <cstdio>
 
 BattlefieldHUDRenderer::BattlefieldHUDRenderer(Camera3D &camera, GameContext &context)
-    : camera(camera), context(context), currentDt(0.0f)
+    : m_camera(camera), m_context(context), m_currentDt(0.0f)
 {
 }
 
-void BattlefieldHUDRenderer::RenderAll(float dt)
+void BattlefieldHUDRenderer::renderAll(float dt)
 {
     setDt(dt);
     drawHUD();
@@ -21,7 +21,7 @@ void BattlefieldHUDRenderer::RenderAll(float dt)
 
 void BattlefieldHUDRenderer::setDt(float dt)
 {
-    currentDt = dt;
+    m_currentDt = dt;
 }
 
 void BattlefieldHUDRenderer::drawHUD()
@@ -29,7 +29,7 @@ void BattlefieldHUDRenderer::drawHUD()
     drawHealthBars();
     drawTargetable();
 
-    if (!context.registry.valid(context.currentPlayer))
+    if (!m_context.registry.valid(m_context.currentPlayer))
         return;
 
     drawAimCircle();
@@ -45,15 +45,13 @@ void BattlefieldHUDRenderer::drawHUD()
 
 void BattlefieldHUDRenderer::drawTexts()
 {
-    static int score = 0;
-
     DrawFPS(10, 10);
 
-    if (context.registry.valid(context.currentPlayer))
+    if (m_context.registry.valid(m_context.currentPlayer))
     {
         Color textColor = SKYBLUE;
         int totalEntities = 0;
-        auto hittableView = context.registry.view<CollisionBody, Position, HP>();
+        auto hittableView = m_context.registry.view<CollisionBody, Position, HP>();
         for (auto entity : hittableView)
         {
             if (hittableView.get<HP>(entity).value > 0)
@@ -68,15 +66,15 @@ void BattlefieldHUDRenderer::drawTexts()
 			DrawText("Fire: Space or Left click", 10, 90, 20, textColor);
 		}
 
-		auto playerFacPtr = context.registry.try_get<faction::Faction>(context.currentPlayer);
+		auto playerFacPtr = m_context.registry.try_get<faction::Faction>(m_context.currentPlayer);
 
 		if (playerFacPtr) {
-			int allyKill = std::accumulate(context.factions.begin(), context.factions.end(), 0, [&](int acc, const std::pair<const faction::FacVal, FactionData> &pair) {
+			int allyKill = std::accumulate(m_context.factions.begin(), m_context.factions.end(), 0, [&](int acc, const std::pair<const faction::FacVal, FactionData> &pair) {
 				if (pair.first != playerFacPtr->value)
 					return acc + pair.second.deaths;
 				return acc;
 			});
-			int enemyKill = context.factions[playerFacPtr->value].deaths;
+			int enemyKill = m_context.factions[playerFacPtr->value].deaths;
 			char buf[40];
 			float screenCenterX = GetScreenWidth() / 2.0f;
 			int spacing = 20;
@@ -99,7 +97,7 @@ void BattlefieldHUDRenderer::drawTexts()
         DrawText(msg, GetScreenWidth() / 2 - w / 2, GetScreenHeight() / 2 + 50, 40, RED);
 
         char buf[40];
-        sprintf(buf, "Final Score: %i", score);
+        sprintf(buf, "Final Score: %i", m_score);
         w = MeasureText(buf, 50);
         DrawText(buf, GetScreenWidth() / 2 - w / 2, GetScreenHeight() / 2, 50, ORANGE);
     }
@@ -107,21 +105,21 @@ void BattlefieldHUDRenderer::drawTexts()
 
 void BattlefieldHUDRenderer::drawHealthBars()
 {
-	if (!context.config.settings.showHPBar)
+	if (!m_context.config.settings.showHPBar)
 		return;
 
-    auto view = context.registry.view<Position, CollisionBody, HP, tag::Targetable>();
+    auto view = m_context.registry.view<Position, CollisionBody, HP, tag::Targetable>();
     for (auto entity : view)
     {
         auto &pos = view.get<Position>(entity);
         auto &hp = view.get<HP>(entity);
-        EnergyShield *shieldPtr = context.registry.try_get<EnergyShield>(entity);
+        EnergyShield *shieldPtr = m_context.registry.try_get<EnergyShield>(entity);
 
         if (hp.value == hp.maxValue && (!shieldPtr || shieldPtr->hp == shieldPtr->maxHp))
             continue;
-        if (!draw_utils::isInFrontOfCamera(pos.value, camera))
+        if (!draw_utils::isInFrontOfCamera(pos.value, m_camera))
             continue;
-        Vector2 screen = GetWorldToScreen(pos.value, camera);
+        Vector2 screen = GetWorldToScreen(pos.value, m_camera);
 
         screen.y -= 20;
 
@@ -148,39 +146,36 @@ void BattlefieldHUDRenderer::drawHealthBars()
 
 void BattlefieldHUDRenderer::drawTargetable()
 {
-    auto [aimTargetPtr, playerPosPtr, playerFacPtr] = context.registry.try_get<AimTarget, Position, faction::Faction>(context.currentPlayer);
+    auto [aimTargetPtr, playerPosPtr, playerFacPtr] = m_context.registry.try_get<AimTarget, Position, faction::Faction>(m_context.currentPlayer);
     entt::entity targetedEntity = aimTargetPtr ? aimTargetPtr->entity : entt::null;
-    Vector3 playerPos = playerPosPtr ? playerPosPtr->value : camera.target;
+    Vector3 playerPos = playerPosPtr ? playerPosPtr->value : m_camera.target;
     faction::FacVal playerFac = playerFacPtr ? playerFacPtr->value : 0;
 
-    Vector3 camForward = Vector3Normalize(camera.target - camera.position);
-    Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
+    Vector3 camForward = Vector3Normalize(m_camera.target - m_camera.position);
+    Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, m_camera.up));
     Vector3 camUp = Vector3CrossProduct(camRight, camForward);
 
     Vector2 screenCenter = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
-    float uiFrameRadius = GetUIFrameRadius();
+    float uiFrameRadius = getUIFrameRadius();
 
-    static float animationAngle = 0.0f;
-    animationAngle = wrapAngleDegree(animationAngle + 1.0f);
+    m_animationAngle = wrapAngleDegree(m_animationAngle + 1.0f);
 
-    static entt::entity s_prevTargetedEntity = entt::null;
-    static float s_blinkTimer = 0.0f;
     const float blinkInterval = 0.1f;
 
-    s_blinkTimer -= currentDt;
-    if (targetedEntity != s_prevTargetedEntity) {
-        s_blinkTimer = blinkInterval * 3;
+    m_blinkTimer -= m_currentDt;
+    if (targetedEntity != m_prevTargetedEntity) {
+        m_blinkTimer = blinkInterval * 3;
     }
-    s_prevTargetedEntity = targetedEntity;
+    m_prevTargetedEntity = targetedEntity;
     std::vector<std::tuple<entt::entity, Vector3, float, faction::FacVal>> allPosArr;
     std::vector<std::tuple<entt::entity, Vector3, float, faction::FacVal>> posArr;
-    for (auto [entity, pos, faction] : context.registry.view<Position, tag::Targetable, faction::Faction>().each())
+    for (auto [entity, pos, faction] : m_context.registry.view<Position, tag::Targetable, faction::Faction>().each())
     {
-        if (entity == context.currentPlayer)
+        if (entity == m_context.currentPlayer)
             continue;
         float dist = Vector3Distance(pos.value, playerPos);
         faction::FacVal isAlly = faction.value & playerFac;
-        if (dist < context.config.COMBAT_DIST * 2.5f)
+        if (dist < m_context.config.COMBAT_DIST * 2.5f)
             posArr.push_back({entity, pos.value, dist, isAlly});
         else
             allPosArr.push_back({entity, pos.value, dist, isAlly});
@@ -206,7 +201,7 @@ void BattlefieldHUDRenderer::drawTargetable()
 
         Color color = isAlly ? SKYBLUE : RED;
 
-        Vector2 screenPos = GetWorldToScreen(pos, camera);
+        Vector2 screenPos = GetWorldToScreen(pos, m_camera);
 
         if (behind)
         {
@@ -242,12 +237,12 @@ void BattlefieldHUDRenderer::drawTargetable()
             float innerRad = 17 + 500.0f / distance;
             Color aimColor = MAROON;
 
-            if (s_blinkTimer >= 0 && fmod(s_blinkTimer / blinkInterval, 2.0f) >= 1.0f) {
+            if (m_blinkTimer >= 0 && fmod(m_blinkTimer / blinkInterval, 2.0f) >= 1.0f) {
                 aimColor = ColorAlpha(aimColor, 0.3f);
             }
 
-            DrawRingLines(screenPos, innerRad, innerRad + 2, 90 + animationAngle, 180 + animationAngle, 12, aimColor);
-            DrawRingLines(screenPos, innerRad, innerRad + 2, 270 + animationAngle, 360 + animationAngle, 12, aimColor);
+            DrawRingLines(screenPos, innerRad, innerRad + 2, 90 + m_animationAngle, 180 + m_animationAngle, 12, aimColor);
+            DrawRingLines(screenPos, innerRad, innerRad + 2, 270 + m_animationAngle, 360 + m_animationAngle, 12, aimColor);
             DrawLine(screenPos.x + innerRad + 2, screenPos.y, screenPos.x + innerRad + 7, screenPos.y, aimColor);
             DrawLine(screenPos.x - innerRad - 2, screenPos.y, screenPos.x - innerRad - 7, screenPos.y, aimColor);
             DrawLine(screenPos.x, screenPos.y + innerRad + 2, screenPos.x, screenPos.y + innerRad + 7, aimColor);
@@ -267,20 +262,20 @@ void BattlefieldHUDRenderer::drawTargetable()
 
 void BattlefieldHUDRenderer::drawSpeedBar()
 {
-    if (!context.registry.all_of<Velocity, MaxSpeed, Rotation>(context.currentPlayer))
+    if (!m_context.registry.all_of<Velocity, MaxSpeed, Rotation>(m_context.currentPlayer))
         return;
 
-    entt::entity entity = context.currentPlayer;
-    const auto& velocity = context.registry.get<Velocity>(entity);
-    const auto& maxSpeed = context.registry.get<MaxSpeed>(entity);
-    const auto& rotation = context.registry.get<Rotation>(entity);
+    entt::entity entity = m_context.currentPlayer;
+    const auto& velocity = m_context.registry.get<Velocity>(entity);
+    const auto& maxSpeed = m_context.registry.get<MaxSpeed>(entity);
+    const auto& rotation = m_context.registry.get<Rotation>(entity);
 
     float currentSpeed = Vector3DotProduct(velocity.value, getForwardVector(rotation));
     float speedRatio = currentSpeed / (maxSpeed.value * 2);
     speedRatio = std::min(1.0, speedRatio > 0.5 ? 0.8 + 0.2 * ((speedRatio - 0.5) / 0.5) : speedRatio / 0.5 * 0.8);
 
-    Vector2 center = GetUIFrameCenter();
-    float frameRadius = GetUIFrameRadius();
+    Vector2 center = getUIFrameCenter();
+    float frameRadius = getUIFrameRadius();
 
     float speedBarRadius = frameRadius + 13;
     float speedBarThickness = 8;
@@ -332,7 +327,7 @@ void BattlefieldHUDRenderer::drawSpeedBar()
 
 void BattlefieldHUDRenderer::drawThrustBar()
 {
-    if (!context.registry.all_of<Velocity>(context.currentPlayer))
+    if (!m_context.registry.all_of<Velocity>(m_context.currentPlayer))
         return;
 
     float thrustRatio = 0.7f;
@@ -356,30 +351,30 @@ void BattlefieldHUDRenderer::drawThrustBar()
 
 void BattlefieldHUDRenderer::drawAimCircle()
 {
-    if (!context.registry.valid(context.currentPlayer))
+    if (!m_context.registry.valid(m_context.currentPlayer))
         return;
 
     std::vector<Vector2> aimLocs;
 
     auto addWeaponAim = [&](entt::entity entity, Vector3 pos, Vector3 aim) {
-        float dist = context.config.COMBAT_DIST;
-        auto targetPtr = context.registry.try_get<AimTarget>(entity);
+        float dist = m_context.config.COMBAT_DIST;
+        auto targetPtr = m_context.registry.try_get<AimTarget>(entity);
         if (targetPtr) {
-            auto targetPosPtr = context.registry.try_get<Position>(targetPtr->entity);
+            auto targetPosPtr = m_context.registry.try_get<Position>(targetPtr->entity);
             if (targetPosPtr)
                 dist = Vector3Distance(pos, targetPosPtr->value);
         }
         Vector3 position = pos + aim * dist;
-        aimLocs.push_back(GetWorldToScreen(position, camera));
+        aimLocs.push_back(GetWorldToScreen(position, m_camera));
     };
 
-    if (context.registry.all_of<Position, AimDirection>(context.currentPlayer)) {
-        auto [pos, aim] = context.registry.get<Position, AimDirection>(context.currentPlayer);
-        addWeaponAim(context.currentPlayer, pos.value, aim.value);
+    if (m_context.registry.all_of<Position, AimDirection>(m_context.currentPlayer)) {
+        auto [pos, aim] = m_context.registry.get<Position, AimDirection>(m_context.currentPlayer);
+        addWeaponAim(m_context.currentPlayer, pos.value, aim.value);
     }
 
-    for (auto [weaponEntity, weaponParent, pos, aim] : context.registry.view<WeaponParent, Position, AimDirection>().each()) {
-        if (weaponParent.parent != context.currentPlayer) {
+    for (auto [weaponEntity, weaponParent, pos, aim] : m_context.registry.view<WeaponParent, Position, AimDirection>().each()) {
+        if (weaponParent.parent != m_context.currentPlayer) {
             continue;
         }
         addWeaponAim(weaponEntity, pos.value, aim.value);
@@ -396,36 +391,36 @@ void BattlefieldHUDRenderer::drawAimCircle()
 
 void BattlefieldHUDRenderer::drawAmmoCircle()
 {
-    if (!context.registry.valid(context.currentPlayer))
+    if (!m_context.registry.valid(m_context.currentPlayer))
         return;
 
     const int ammoTextSize = 20;
 
     std::vector<std::tuple<float, float, int>> weaponAmmo;
 
-    if (auto ammoPtr = context.registry.try_get<Ammo>(context.currentPlayer)) {
-        auto reloadPtr = context.registry.try_get<AmmoReload>(context.currentPlayer);
+    if (auto ammoPtr = m_context.registry.try_get<Ammo>(m_context.currentPlayer)) {
+        auto reloadPtr = m_context.registry.try_get<AmmoReload>(m_context.currentPlayer);
         if (reloadPtr && reloadPtr->timer < reloadPtr->cd)
             weaponAmmo.push_back({reloadPtr->timer, reloadPtr->cd, true});
         else
             weaponAmmo.push_back({ammoPtr->value, ammoPtr->maxValue, false});
-    } else if (auto cooldownPtr = context.registry.try_get<WeaponCooldown>(context.currentPlayer)) {
+    } else if (auto cooldownPtr = m_context.registry.try_get<WeaponCooldown>(m_context.currentPlayer)) {
         weaponAmmo.push_back({std::min(1.0f, cooldownPtr->timeSinceLastShot / cooldownPtr->shootCooldown), 1.0, false});
     }
 
-    for (auto [weaponEntity, weaponParent, ammo] : context.registry.view<WeaponParent, Ammo>().each()) {
-        if (weaponParent.parent != context.currentPlayer) {
+    for (auto [weaponEntity, weaponParent, ammo] : m_context.registry.view<WeaponParent, Ammo>().each()) {
+        if (weaponParent.parent != m_context.currentPlayer) {
             continue;
         }
-        auto reloadPtr = context.registry.try_get<AmmoReload>(weaponEntity);
+        auto reloadPtr = m_context.registry.try_get<AmmoReload>(weaponEntity);
         if (reloadPtr && reloadPtr->timer < reloadPtr->cd)
             weaponAmmo.push_back({reloadPtr->timer, reloadPtr->cd, true});
         else
             weaponAmmo.push_back({ammo.value, ammo.maxValue, false});
     }
 
-    for (auto [weaponEntity, weaponParent, cooldown] : context.registry.view<WeaponParent, WeaponCooldown>(entt::exclude<Ammo>).each()) {
-        if (weaponParent.parent == context.currentPlayer) {
+    for (auto [weaponEntity, weaponParent, cooldown] : m_context.registry.view<WeaponParent, WeaponCooldown>(entt::exclude<Ammo>).each()) {
+        if (weaponParent.parent == m_context.currentPlayer) {
             weaponAmmo.push_back({std::min(1.0f, cooldown.timeSinceLastShot / cooldown.shootCooldown), 1.0, false});
         }
     }
@@ -437,8 +432,8 @@ void BattlefieldHUDRenderer::drawAmmoCircle()
         weaponAmmo.resize(8);
     }
 
-    Vector2 frameCenter = GetUIFrameCenter();
-    float frameRadius = GetUIFrameRadius();
+    Vector2 frameCenter = getUIFrameCenter();
+    float frameRadius = getUIFrameRadius();
     float circleRadius = ammoTextSize * 0.75f;
 
     std::vector<Vector2> positions;
@@ -479,10 +474,9 @@ void BattlefieldHUDRenderer::drawAmmoCircle()
         positions.push_back(pos);
     }
 
-    static float reloadAngleOffset = 0;
-    reloadAngleOffset += 300.0f * currentDt;
-    if (reloadAngleOffset >= 360.0f)
-        reloadAngleOffset = 0;
+    m_reloadAngleOffset += 300.0f * m_currentDt;
+    if (m_reloadAngleOffset >= 360.0f)
+        m_reloadAngleOffset = 0;
 
     for (size_t i = 0; i < weaponAmmo.size() && i < positions.size(); i++) {
         Vector2 circleCenter = positions[i];
@@ -501,8 +495,8 @@ void BattlefieldHUDRenderer::drawAmmoCircle()
                 DrawRingLines(circleCenter, circleRadius - 2, circleRadius + 2, startAngle, endAngle, 32, ammoColor);
             else {
                 const int segments = 4;
-                for (int i = 0; i < segments; i++) {
-                    float angle = i * 360.0f / segments + reloadAngleOffset;
+                for (int seg = 0; seg < segments; seg++) {
+                    float angle = seg * 360.0f / segments + m_reloadAngleOffset;
                     DrawRingLines(circleCenter, circleRadius, circleRadius, angle, angle + 360.0f / segments / 2, 2, BLUE);
                 }
             }
@@ -537,8 +531,8 @@ void BattlefieldHUDRenderer::drawCrosshair()
 
 void BattlefieldHUDRenderer::drawMainUIFrame()
 {
-    Vector2 center = GetUIFrameCenter();
-    float radius = GetUIFrameRadius();
+    Vector2 center = getUIFrameCenter();
+    float radius = getUIFrameRadius();
     float startAngle = 45.0f - 90.0f;
     float endAngle = 315.0f - 90.0f;
 
@@ -568,8 +562,7 @@ void BattlefieldHUDRenderer::drawCursorArrow()
     if (distance > 0) {
         Vector2 normalizedDir = Vector2Normalize(direction);
 
-        static float animationTime = 0.0f;
-        animationTime += currentDt * 1.0f;
+        m_speedAnimationTime += m_currentDt * 1.0f;
 
         float arrowSpacing = 40.0f;
         float arrowSpeed = 200.0f;
@@ -577,7 +570,7 @@ void BattlefieldHUDRenderer::drawCursorArrow()
 
         for (int i = 0; i < numArrows; i++) {
             float baseOffset = i * arrowSpacing;
-            float animOffset = fmod(animationTime * arrowSpeed, arrowSpacing);
+            float animOffset = fmod(m_speedAnimationTime * arrowSpeed, arrowSpacing);
             float totalOffset = baseOffset + animOffset;
 
             if (totalOffset >= distance) continue;
@@ -628,27 +621,25 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     std::vector<std::pair<Vector3, float>> warnings;
 
     // Play alert sound with cooldown
-    static float alertSoundCooldown = 0.0f;
-    static bool canPlayAlertSound;
-    alertSoundCooldown -= currentDt;
-    canPlayAlertSound = alertSoundCooldown <= 0.0f;
-    if (alertSoundCooldown <= 0.0f) {
-        alertSoundCooldown = 1.0f;
+    m_collisionAlertCooldown -= m_currentDt;
+    m_collisionCanPlayAlert = m_collisionAlertCooldown <= 0.0f;
+    if (m_collisionAlertCooldown <= 0.0f) {
+        m_collisionAlertCooldown = 1.0f;
     }
 
-    auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
+    auto [posA, velA, bodyA] = m_context.registry.try_get<Position, Velocity, CollisionBody>(m_context.currentPlayer);
 
     if (!posA || !velA || !bodyA)
         return;
 
-    for (auto [other, posB, bodyB, dmgB] : context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
-        if (context.currentPlayer == other)
+    for (auto [other, posB, bodyB, dmgB] : m_context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
+        if (m_context.currentPlayer == other)
             continue;
-        Velocity velB = context.registry.all_of<Velocity>(other) ? context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
+        Velocity velB = m_context.registry.all_of<Velocity>(other) ? m_context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
         if (willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime)) {
             warnings.push_back({posB.value, Vector3Distance(posA->value, posB.value) - bodyA->radius - bodyB.radius});
-            if (canPlayAlertSound)
-                context.soundManager.queueSound(context.config, "sounds.collisionAlert", posB.value, 0.5f);
+            if (m_collisionCanPlayAlert)
+                m_context.soundManager.queueSound(m_context.config, "sounds.collisionAlert", posB.value, 0.5f);
         }
     }
 
@@ -659,9 +650,8 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     int msgWidth = MeasureText(alertMsg, 24);
     Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
 
-    static float blinkTimer = 0.0f;
-    blinkTimer += currentDt * 6.0f;
-    float alpha = 0.7f + 0.3f * sinf(blinkTimer);
+    m_collisionBlinkTimer += m_currentDt * 6.0f;
+    float alpha = 0.7f + 0.3f * sinf(m_collisionBlinkTimer);
 
     DrawRectangle(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha * 0.3f));
     DrawRectangleLines(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha));
@@ -669,24 +659,24 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     DrawText(alertMsg, alertPos.x, alertPos.y, 24, ColorAlpha(RED, alpha));
 
     Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-    float uiFrameRadius = GetUIFrameRadius();
+    float uiFrameRadius = getUIFrameRadius();
 
     for (const auto& [warningPos, distance]: warnings) {
-        Vector2 screenPos = GetWorldToScreen(warningPos, camera);
+        Vector2 screenPos = GetWorldToScreen(warningPos, m_camera);
         bool isOnScreen = (screenPos.x >= 0 && screenPos.x <= GetScreenWidth() &&
                            screenPos.y >= 0 && screenPos.y <= GetScreenHeight() &&
-                           draw_utils::isInFrontOfCamera(warningPos, camera));
+                           draw_utils::isInFrontOfCamera(warningPos, m_camera));
 
         if (isOnScreen) {
-            float pulseRadius = 20.0f + 10.0f * sinf(blinkTimer * 2.0f);
+            float pulseRadius = 20.0f + 10.0f * sinf(m_collisionBlinkTimer * 2.0f);
             DrawCircleLines(screenPos.x, screenPos.y, pulseRadius, ColorAlpha(RED, alpha));
             DrawCircleLines(screenPos.x, screenPos.y, pulseRadius + 2, ColorAlpha(YELLOW, alpha * 0.7f));
 
             DrawText("!", screenPos.x - 4, screenPos.y - 10, 20, ColorAlpha(RED, alpha));
         } else {
-            Vector3 toWarning = warningPos - camera.position;
-            Vector3 camForward = Vector3Normalize(camera.target - camera.position);
-            Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
+            Vector3 toWarning = warningPos - m_camera.position;
+            Vector3 camForward = Vector3Normalize(m_camera.target - m_camera.position);
+            Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, m_camera.up));
             Vector3 camUp = Vector3CrossProduct(camRight, camForward) * -1;
 
             Vector3 local;
@@ -740,73 +730,56 @@ void BattlefieldHUDRenderer::drawMissileWarning()
     std::vector<std::pair<Vector3, float>> warnings;
 
     // Play alert sound with cooldown
-    static float alertSoundCooldown = 0.0f;
-    static bool canPlayAlertSound;
-    alertSoundCooldown -= currentDt;
-    canPlayAlertSound = alertSoundCooldown <= 0.0f;
-    if (alertSoundCooldown <= 0.0f) {
-        alertSoundCooldown = 1.0f;
+    m_missileAlertCooldown -= m_currentDt;
+    m_missileCanPlayAlert = m_missileAlertCooldown <= 0.0f;
+    if (m_missileAlertCooldown <= 0.0f) {
+        m_missileAlertCooldown = 1.0f;
     }
 
-    auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
+    auto [posA, velA, bodyA] = m_context.registry.try_get<Position, Velocity, CollisionBody>(m_context.currentPlayer);
 
     if (!posA || !velA || !bodyA)
         return;
 
-    for (auto [other, posB, bodyB, dmgB, velB, target] : context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
-        if (context.currentPlayer == other || target.entity != context.currentPlayer)
+    for (auto [other, posB, bodyB, dmgB, velB, target] : m_context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
+        if (m_context.currentPlayer == other || target.entity != m_context.currentPlayer)
             continue;
         float distance = Vector3Distance(posA->value, posB.value);
 		if (warningTime * Vector3Length(velB.value - velA->value) < distance)
 			continue;
-        // bool willCollideFlag = willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime * 2);
 		bool willCollideFlag = Vector3DotProduct(posA->value - posB.value, velB.value - velA->value) > 0;
         if (willCollideFlag) {
             warnings.push_back({posB.value, distance - bodyA->radius - bodyB.radius});
-            if (canPlayAlertSound)
-                context.soundManager.queueSound(context.config, "sounds.missileAlert", posB.value, 0.5f);
+            if (m_missileCanPlayAlert)
+                m_context.soundManager.queueSound(m_context.config, "sounds.missileAlert", posB.value, 0.5f);
         }
     }
 
     if (warnings.empty())
         return;
 
-    // const char* alertMsg = "MISSILE ALERT";
-    // int msgWidth = MeasureText(alertMsg, 24);
-    // Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
-
-    static float blinkTimer = 0.0f;
-    blinkTimer += currentDt * 6.0f;
-    float alpha = 0.7f + 0.3f * sinf(blinkTimer);
-
-    // DrawRectangle(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha * 0.3f));
-    // DrawRectangleLines(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha));
-
-    // DrawText(alertMsg, alertPos.x, alertPos.y, 24, ColorAlpha(RED, alpha));
+    m_missileBlinkTimer += m_currentDt * 6.0f;
+    float alpha = 0.7f + 0.3f * sinf(m_missileBlinkTimer);
 
     Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-    float uiFrameRadius = GetUIFrameRadius();
+    float uiFrameRadius = getUIFrameRadius();
 
     for (const auto& [warningPos, distance]: warnings) {
-        Vector2 screenPos = GetWorldToScreen(warningPos, camera);
+        Vector2 screenPos = GetWorldToScreen(warningPos, m_camera);
         bool isOnScreen = (screenPos.x >= 0 && screenPos.x <= GetScreenWidth() &&
                            screenPos.y >= 0 && screenPos.y <= GetScreenHeight() &&
-                           draw_utils::isInFrontOfCamera(warningPos, camera));
+                           draw_utils::isInFrontOfCamera(warningPos, m_camera));
 
         if (isOnScreen) {
 			Color aimColor = ColorAlpha(color, alpha);
-			// float radius = 30.0f + 10.0f * sinf(blinkTimer * 2.0f);
-            // drawEquiTriangle(screenPos, radius, blinkTimer * 10.0f, aimColor);
-            // drawEquiTriangle(screenPos, radius + 2, blinkTimer * 10.0f, aimColor);
-            // drawEquiTriangleCorners(screenPos, 20, -90, aimColor, 8);
             drawEquiTriangle(screenPos, 15, -90, ColorAlpha(color, alpha * 0.5f));
             drawEquiTriangle(screenPos, 15 + 4, -90, aimColor);
 
             DrawText("!", screenPos.x - 1, screenPos.y - 10, 20, ColorAlpha(color, alpha));
         } else {
-            Vector3 toWarning = warningPos - camera.position;
-            Vector3 camForward = Vector3Normalize(camera.target - camera.position);
-            Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, camera.up));
+            Vector3 toWarning = warningPos - m_camera.position;
+            Vector3 camForward = Vector3Normalize(m_camera.target - m_camera.position);
+            Vector3 camRight = Vector3Normalize(Vector3CrossProduct(camForward, m_camera.up));
             Vector3 camUp = Vector3CrossProduct(camRight, camForward) * -1;
 
             Vector3 local;
@@ -827,12 +800,12 @@ void BattlefieldHUDRenderer::drawMissileWarning()
     }
 }
 
-Vector2 BattlefieldHUDRenderer::GetUIFrameCenter() const
+Vector2 BattlefieldHUDRenderer::getUIFrameCenter() const
 {
     return {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
 }
 
-float BattlefieldHUDRenderer::GetUIFrameRadius() const
+float BattlefieldHUDRenderer::getUIFrameRadius() const
 {
     return fminf(GetScreenWidth(), GetScreenHeight()) * 0.25f;
 }

@@ -18,7 +18,7 @@ namespace {
 	) {
 		entt::entity chargeEffectEntity = context.registry.create();
 
-		float chargeRadius = 0.5f * (1 - chargeRatio); // linear scale for now
+		const float chargeRadius = 0.5f * (1.0f - chargeRatio); // linear scale for now
 
 		context.registry.emplace<RenderBody>(chargeEffectEntity, RenderBody{
 			context.modelManager.createSphere(),
@@ -37,11 +37,11 @@ namespace {
 
 void systems::WeaponUpdateCharged::update(GameContext &context, [[maybe_unused]] float dt)
 {
-	auto view = context.registry.view<Weapon, Position, ChargedWeapon>();
+	auto view = context.registry.view<const Weapon, const Position, ChargedWeapon>();
 
 	for (auto [entity, weapon, position, chargedWeapon] : view.each())
 	{
-		bool isCharging = chargedWeapon.currentCharge && chargedWeapon.currentCharge < chargedWeapon.totalChargeNeeded;
+		const bool isCharging = chargedWeapon.currentCharge && chargedWeapon.currentCharge < chargedWeapon.totalChargeNeeded;
 		if (isCharging && chargedWeapon.chargeEffectEntity == entt::null) {
 			chargedWeapon.chargeEffectEntity = createChargeEffectEntity(
 				context,

@@ -9,15 +9,13 @@
 #include <iostream>
 
 namespace {
-	camera::UnitCamera defaultCamera;
-
 	camera::CameraPOV getAimModePOV(GameContext &context, entt::entity entity, camera::CameraPOV defaultPOV) {
 		if (!context.registry.valid(entity) && !context.registry.all_of<Position, Rotation>(entity))
 			return defaultPOV;
 		// closest entity in front of the player
-		Vector3 playerPos = context.registry.get<Position>(entity).value;
-		Quaternion playerRot = context.registry.get<Rotation>(entity).value;
-		Vector3 playerForward = getForwardVector(playerRot);
+		const Vector3 playerPos = context.registry.get<Position>(entity).value;
+		const Quaternion playerRot = context.registry.get<Rotation>(entity).value;
+		const Vector3 playerForward = getForwardVector(playerRot);
 		
 		float closestDist = context.config.ARENA_SIZE * 2;
 		float closestAngle = std::cos(1.0f * DEG2RAD);  // minimum 1.0 degrees
@@ -25,16 +23,16 @@ namespace {
 		for (auto otherEntity : context.registry.view<Position, tag::Targetable>()) {
 			if (otherEntity == entity)
 				continue;
-			Position& otherPosComp = context.registry.get<Position>(otherEntity);
-			Vector3 toOther = Vector3Subtract(otherPosComp.value, playerPos);
+			const Position& otherPosComp = context.registry.get<Position>(otherEntity);
+			const Vector3 toOther = Vector3Subtract(otherPosComp.value, playerPos);
 
-			Vector3 toOtherDir = Vector3Normalize(toOther);
-			float dot = Vector3DotProduct(playerForward, toOtherDir);
+			const Vector3 toOtherDir = Vector3Normalize(toOther);
+			const float dot = Vector3DotProduct(playerForward, toOtherDir);
 			if (dot < closestAngle)
 				continue;
 			closestAngle = dot;
 
-			float toOtherDist = Vector3Length(toOther);
+			const float toOtherDist = Vector3Length(toOther);
 			closestDist = toOtherDist;
 			closestEntity = otherEntity;
 		}
@@ -55,11 +53,11 @@ void systems::CameraFollowPlayer::update(GameContext &context, float dt) {
 	auto [posPtr, rotPtr, colBodyPtr] = context.registry.try_get<Position, Rotation, CollisionBody>(context.currentPlayer);
 	if (!posPtr || !rotPtr)
 		return;
-	camera::UnitCamera *unitCamera = &defaultCamera;
+	camera::UnitCamera *unitCamera = &m_defaultCamera;
 	if (auto cameraComp = context.registry.try_get<camera::UnitCamera>(context.currentPlayer))
 		unitCamera = cameraComp;
-	Position& pos = *posPtr;
-	Rotation& rot = *rotPtr;
+	const Position& pos = *posPtr;
+	const Rotation& rot = *rotPtr;
 	Camera3D& camera = context.mainCamera;
 	
 	float scroll = GetMouseWheelMove();

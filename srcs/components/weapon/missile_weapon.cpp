@@ -9,7 +9,7 @@ namespace
 {
 	const Color BASE_COLOR = GRAY;
 	const Color NUKE_EXPLOSION_COLOR = {0, 255, 255, 255};
-	const float DEFAULT_MASS = 5.0f;
+	constexpr float DEFAULT_MASS = 5.0f;
 
 	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = BASE_COLOR)
 	{
@@ -77,13 +77,13 @@ namespace
 	entt::entity createMissileTemplate(GameContext &context, float rad, Color color, float mass)
 	{
 		const auto &cfg = context.config;
-		float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
-		float lifespan = cfg.getFloat("weapons.missile.lifespan", 20.0f);
-		float bodyDamage = cfg.getFloat("weapons.missile.bodyDamage", 2.5f);
-		Vector3 missileBound = {arenaSize * 2, arenaSize * 2, arenaSize * 2};
+		const float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
+		const float lifespan = cfg.getFloat("weapons.missile.lifespan", 20.0f);
+		const float bodyDamage = cfg.getFloat("weapons.missile.bodyDamage", 2.5f);
+		const Vector3 missileBound = {arenaSize * 2, arenaSize * 2, arenaSize * 2};
 
 		entt::entity missile = context.templateReg.create();
-		t_model_id model = context.modelManager.loadModel("assets/Models/missile/missile.glb");
+		const t_model_id model = context.modelManager.loadModel("assets/Models/missile/missile.glb");
 		context.templateReg.emplace<tag::VelocitySyncModelRot>(missile);
 		context.templateReg.emplace<CollisionBody>(missile, CollisionBody{rad});
 		context.templateReg.emplace<Damage>(missile, Damage{bodyDamage});
@@ -113,9 +113,9 @@ namespace
 
 	float getBaseSpread(const GameConfig &cfg)
 	{
-		float combatDist = cfg.getFloat("game.combatDist", 1000.0f);
-		float rangeMultiplier = cfg.getFloat("weapons.missile.effectiveRangeMultiplier", 5.0f);
-		float effectiveRange = combatDist * rangeMultiplier;
+		const float combatDist = cfg.getFloat("game.combatDist", 1000.0f);
+		const float rangeMultiplier = cfg.getFloat("weapons.missile.effectiveRangeMultiplier", 5.0f);
+		const float effectiveRange = combatDist * rangeMultiplier;
 		return std::atan2(1.0f, effectiveRange);
 	}
 }

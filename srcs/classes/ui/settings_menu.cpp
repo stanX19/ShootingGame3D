@@ -1,9 +1,9 @@
 #include "settings_menu.hpp"
 
 SettingsMenu::SettingsMenu(GameContext &context)
-    : context(context),
-      hpToggleWidget("HP BAR: ON", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
-      volumeWidget(
+    : m_context(context),
+      m_hpToggleWidget("HP BAR: ON", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+      m_volumeWidget(
           "VOLUME",
           context.config.settings.masterVolume,
           0.0f,
@@ -12,7 +12,7 @@ SettingsMenu::SettingsMenu(GameContext &context)
           Rectangle{0.0f, 0.0f, 0.0f, 0.0f},
           SKYBLUE
       ),
-      sensitivityWidget(
+      m_sensitivityWidget(
           "SENSITIVITY",
           context.config.settings.controlSensitivity,
           0.01f,
@@ -21,7 +21,7 @@ SettingsMenu::SettingsMenu(GameContext &context)
           Rectangle{0.0f, 0.0f, 0.0f, 0.0f},
           SKYBLUE
       ),
-      backWidget("BACK", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, GRAY, 20)
+      m_backWidget("BACK", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, GRAY, 20)
 {
 }
 
@@ -46,7 +46,7 @@ EngineState SettingsMenu::run()
     }
     
     // Save on exit from settings
-    context.config.saveChanged();
+    m_context.config.saveChanged();
     
     return nextState;
 }
@@ -67,10 +67,10 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
     float buttonHeight = 40;
 
     const Rectangle hpBounds = {(float)screenWidth / 2 - buttonWidth / 2, (float)startY, buttonWidth, buttonHeight};
-    hpToggleWidget.setBounds(hpBounds);
-    hpToggleWidget.setText(context.config.settings.showHPBar ? "HP BAR: ON" : "HP BAR: OFF");
-    if (hpToggleWidget.tick_and_draw()) {
-        context.config.setBool("settings.showHPBar", !context.config.settings.showHPBar);
+    m_hpToggleWidget.setBounds(hpBounds);
+    m_hpToggleWidget.setText(m_context.config.settings.showHPBar ? "HP BAR: ON" : "HP BAR: OFF");
+    if (m_hpToggleWidget.tickAndDraw()) {
+        m_context.config.setBool("settings.showHPBar", !m_context.config.settings.showHPBar);
     }
 
     const Rectangle volumeBounds = {
@@ -79,10 +79,10 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
         buttonWidth,
         buttonHeight
     };
-    volumeWidget.setBounds(volumeBounds);
-    if (volumeWidget.tick_and_draw()) {
-        context.soundManager.setMasterVolume(context.config.settings.masterVolume);
-        context.config.setFloat("audio.masterVolume", context.config.settings.masterVolume);
+    m_volumeWidget.setBounds(volumeBounds);
+    if (m_volumeWidget.tickAndDraw()) {
+        m_context.soundManager.setMasterVolume(m_context.config.settings.masterVolume);
+        m_context.config.setFloat("audio.masterVolume", m_context.config.settings.masterVolume);
     }
 
     const Rectangle sensitivityBounds = {
@@ -91,9 +91,9 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
         buttonWidth,
         buttonHeight
     };
-    sensitivityWidget.setBounds(sensitivityBounds);
-    if (sensitivityWidget.tick_and_draw()) {
-        context.config.setFloat("settings.controlSensitivity", context.config.settings.controlSensitivity);
+    m_sensitivityWidget.setBounds(sensitivityBounds);
+    if (m_sensitivityWidget.tickAndDraw()) {
+        m_context.config.setFloat("settings.controlSensitivity", m_context.config.settings.controlSensitivity);
     }
 
     const Rectangle backBounds = {
@@ -102,8 +102,8 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
         buttonWidth,
         buttonHeight
     };
-    backWidget.setBounds(backBounds);
-    if (backWidget.tick_and_draw()) {
+    m_backWidget.setBounds(backBounds);
+    if (m_backWidget.tickAndDraw()) {
         nextState = EngineState::MENU;
     }
 }
