@@ -347,31 +347,31 @@ int main() {
 		const bool isProfiling = (state == BenchmarkState::BENCHMARKING);
 
 		// --- Run Simulation Systems ---
-		ecs_systems::playerRespawn(context, dt);
-		ecs_systems::aiFindTarget(context, dt);
-		ecs_systems::aiMoveControl(context, dt);
-		ecs_systems::aiShootControl(context, dt);
-		ecs_systems::processMoveRequest(context, dt);
-		ecs_systems::ammoReload(context, dt);
-		ecs_systems::bulletTargetAim(context, dt);
-		ecs_systems::weaponParentControlAim(context, dt);
-		ecs_systems::weaponParentControlShoot(context, dt);
-		ecs_systems::playerShootControl(context, dt);
-		ecs_systems::weaponUpdateCooldown(context, dt);
-		ecs_systems::weaponUpdateCanFire(context, dt);
-		ecs_systems::weaponUpdateCharged(context, dt);
-		ecs_systems::weaponShoot(context, dt);
-		ecs_systems::weaponUpdateFireStatus(context, dt);
-		ecs_systems::entityMovement(context, dt);
-		ecs_systems::entityAnchor(context, dt);
-		ecs_systems::entityTransformation(context, dt);
-		ecs_systems::detectEntityCollision(context, dt);
+		systems::PlayerRespawn{}.update(context, dt);
+		systems::AiFindTarget{}.update(context, dt);
+		systems::AiMoveControl{}.update(context, dt);
+		systems::AiShootControl{}.update(context, dt);
+		systems::ProcessMoveRequest{}.update(context, dt);
+		systems::AmmoReload{}.update(context, dt);
+		systems::BulletTargetAim{}.update(context, dt);
+		systems::WeaponParentControlAim{}.update(context, dt);
+		systems::WeaponParentControlShoot{}.update(context, dt);
+		systems::PlayerShootControl{}.update(context, dt);
+		systems::WeaponUpdateCooldown{}.update(context, dt);
+		systems::WeaponUpdateCanFire{}.update(context, dt);
+		systems::WeaponUpdateCharged{}.update(context, dt);
+		systems::WeaponShoot{}.update(context, dt);
+		systems::WeaponUpdateFireStatus{}.update(context, dt);
+		systems::EntityMovement{}.update(context, dt);
+		systems::EntityAnchor{}.update(context, dt);
+		systems::EntityTransformation{}.update(context, dt);
+		systems::DetectEntityCollision{}.update(context, dt);
 		context.dispatcher.update();
 		context.soundManager.update(context.mainCamera);
-		ecs_systems::soundSfx(context, dt);
-		ecs_systems::energyShield(context, dt);
-		ecs_systems::syncModelRotation(context, dt);
-		ecs_systems::cameraFollowPlayer(context, dt);
+		systems::SoundSfx{}.update(context, dt);
+		systems::EnergyShield{}.update(context, dt);
+		systems::SyncModelRotation{}.update(context, dt);
+		systems::CameraFollowPlayer{}.update(context, dt);
 
 		// --- Render with Direct Sub-Pass Probing ---
 		BeginDrawing();
@@ -394,16 +394,16 @@ int main() {
 		}
 
 		// Simulation Cleanup Systems
-		ecs_systems::blueUnitRespawn(context, dt);
-		ecs_systems::redUnitRespawn(context, dt);
-		ecs_systems::asteroidRespawn(context, dt);
-		ecs_systems::entityAnchorRelease(context, dt);
-		ecs_systems::entityLifetime(context, dt);
-		ecs_systems::cleanOutOfBound(context, dt);
-		ecs_systems::delayedDamage(context, dt);
-		ecs_systems::hpCleanup(context, dt);
-		ecs_systems::hpRegen(context, dt);
-		ecs_systems::spawnTrailParticles(context, dt);
+		systems::BlueUnitRespawn{}.update(context, dt);
+		systems::RedUnitRespawn{}.update(context, dt);
+		systems::AsteroidRespawn{}.update(context, dt);
+		systems::EntityAnchorRelease{}.update(context, dt);
+		systems::EntityLifetime{}.update(context, dt);
+		systems::CleanOutOfBound{}.update(context, dt);
+		systems::DelayedDamage{}.update(context, dt);
+		systems::HpCleanup{}.update(context, dt);
+		systems::HpRegen{}.update(context, dt);
+		systems::SpawnTrailParticles{}.update(context, dt);
 
 		// Realtime UI Overlay
 		if (state == BenchmarkState::WARMUP) {

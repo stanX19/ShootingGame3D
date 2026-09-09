@@ -1,8 +1,12 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/movement.hpp"
+#include "components/render.hpp"
+#include "utils/vector_rotation_utils.hpp"
 #include <cmath>
 
-void ecs_systems::processMoveRequest(GameContext &context, float dt) {
+void systems::ProcessMoveRequest::update(GameContext &context, float dt) {
     for (auto [entity, vel, tVel] : context.registry.view<Velocity, TargetVelocity>().each()) {
         vel.value = Vector3Lerp(vel.value, tVel.value, Clamp(tVel.lerpSpeed * dt, 0.0f, 1.0f));
     }
@@ -26,3 +30,4 @@ void ecs_systems::processMoveRequest(GameContext &context, float dt) {
 		vel.value = getForwardVector(rot.value) * Vector3Length(vel.value);
     }
 }
+

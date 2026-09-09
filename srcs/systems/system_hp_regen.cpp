@@ -1,6 +1,8 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/combat.hpp"
 
-void ecs_systems::hpRegen(GameContext &context, float dt) {
+void systems::HpRegen::update(GameContext &context, float dt) {
 	auto view = context.registry.view<HP, HPRegen>();
 
 	for (auto entity : view) {
@@ -10,3 +12,4 @@ void ecs_systems::hpRegen(GameContext &context, float dt) {
 		hp.value = Clamp(hp.value + regen.value * dt, 0, hp.maxValue);
 	}
 }
+

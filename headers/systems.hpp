@@ -1,49 +1,47 @@
-#ifndef SYSTEMS_HPP
-#define SYSTEMS_HPP
-#include "components.hpp"
-#include "game_context.hpp"
+#pragma once
+
+#include "systems/base_system.hpp"
+#include "components/weapon.hpp"
+
+struct GameContext;
 
 // utils
 bool aimTargetExists(GameContext &context, AimTarget &target);
 
-// Game systems
-namespace ecs_systems
+namespace systems
 {
-	void cameraFollowPlayer(GameContext &context, float dt);
-	void playerMoveControl(GameContext &context, float dt);
-	void playerShootControl(GameContext &context, float dt);
-	void playerRespawn(GameContext &context, float dt);
-	void aiMoveControl(GameContext &context, float dt);
-	void aiShootControl(GameContext &context, float dt);
-	void aiFindTarget(GameContext &context, float dt);
-	void blueUnitRespawn(GameContext &context, float dt);
-	void redUnitRespawn(GameContext &context, float dt);
-	void processMoveRequest(GameContext &context, float dt);
-	void entityMovement(GameContext &context, float dt);
-	void applyImpulse(GameContext &context, float dt);
-	void entityTransformation(GameContext &context, float dt);
-	void detectEntityCollision(GameContext &context, float dt);
-	void entityAnchor(GameContext &context, float dt);
-	void entityAnchorRelease(GameContext &context, float dt);
-	void entityLifetime(GameContext &context, float dt);
-	void delayedDamage(GameContext &context, float dt);
-	void hpCleanup(GameContext &context, float dt);
-	void hpRegen(GameContext &context, float dt);
-	void energyShield(GameContext &context, float dt);
-	void ammoReload(GameContext &context, float dt);
-	void bulletTargetAim(GameContext &context, float dt);
-	void weaponShoot(GameContext &context, float dt);
-	void weaponParentControlAim(GameContext &context, float dt);
-	void weaponParentControlShoot(GameContext &context, float dt);
-	void weaponUpdateCanFire(GameContext &context, float dt);
-	void weaponUpdateFireStatus(GameContext &context, float dt);
-	void weaponUpdateCooldown(GameContext &context, float dt);
-	void weaponUpdateCharged(GameContext &context, float dt);
-	void asteroidRespawn(GameContext &context, float dt);
-	void cleanOutOfBound(GameContext &context, float dt);
-	void syncModelRotation(GameContext &context, float dt);
-	void spawnTrailParticles(GameContext &context, float dt);
-	void soundSfx(GameContext &context, float dt);
-}
-
-#endif // SYSTEMS_HPP
+	class CameraFollowPlayer : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class PlayerMoveControl : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class PlayerShootControl : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class PlayerRespawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class AiMoveControl : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class AiShootControl : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class AiFindTarget : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class BlueUnitRespawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class RedUnitRespawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class ProcessMoveRequest : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class EntityMovement : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class EntityTransformation : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class DetectEntityCollision : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class EntityAnchor : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class EntityAnchorRelease : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class EntityLifetime : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class DelayedDamage : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class HpCleanup : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class HpRegen : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class EnergyShield : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class AmmoReload : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class BulletTargetAim : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class WeaponShoot : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class WeaponParentControlAim : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class WeaponParentControlShoot : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class WeaponUpdateCanFire : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class WeaponUpdateFireStatus : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class WeaponUpdateCooldown : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class WeaponUpdateCharged : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class AsteroidRespawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class CleanOutOfBound : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class SyncModelRotation : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class SpawnTrailParticles : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class SoundSfx : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+} // namespace systems

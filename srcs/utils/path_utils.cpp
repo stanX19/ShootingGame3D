@@ -6,7 +6,7 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
-#include "utils.hpp"
+#include "path_utils.hpp"
 
 std::string getParentDir(const std::string &path) {
 	return std::filesystem::path(path).parent_path();

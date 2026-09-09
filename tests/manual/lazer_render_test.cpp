@@ -60,11 +60,11 @@ static void resetGame(GameContext &context) {
 	context.registry.emplace<tag::weapon::FireRequest>(gun);
 	// spawnBody(context, {-3, 0, 0}, {50000, 0, 0}, 0.1f, 0.01f);
 	event::utils::hookAllListeners(context);
-	ecs_systems::weaponUpdateCanFire(context, dt);
-	ecs_systems::weaponShoot(context, dt);
-	ecs_systems::syncModelRotation(context, dt);
-	ecs_systems::entityMovement(context, dt);
-	ecs_systems::detectEntityCollision(context, dt);
+	systems::WeaponUpdateCanFire{}.update(context, dt);
+	systems::WeaponShoot{}.update(context, dt);
+	systems::SyncModelRotation{}.update(context, dt);
+	systems::EntityMovement{}.update(context, dt);
+	systems::DetectEntityCollision{}.update(context, dt);
 	context.dispatcher.update();
 	
 	printEntityStats(context);

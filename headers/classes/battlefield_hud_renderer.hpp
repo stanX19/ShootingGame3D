@@ -2,7 +2,12 @@
 #define BATTLEFIELD_HUD_RENDERER_HPP
 
 #include "includes.hpp"
-#include "components.hpp"
+#include "components/physics.hpp"
+#include "components/movement.hpp"
+#include "components/combat.hpp"
+#include "components/collision.hpp"
+#include "components/weapon.hpp"
+#include "components/unit.hpp"
 #include "components/factions.hpp"
 #include "utils.hpp"
 #include "game_context.hpp"

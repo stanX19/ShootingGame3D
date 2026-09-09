@@ -1,6 +1,8 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/weapon.hpp"
 
-void ecs_systems::weaponUpdateFireStatus(GameContext &context, [[maybe_unused]] float dt)
+void systems::WeaponUpdateFireStatus::update(GameContext &context, [[maybe_unused]] float dt)
 {
 	// deal with cooldown
 	for (auto [entity, justFired, cooldown] : context.registry.view<JustFired, WeaponCooldown>().each()) {

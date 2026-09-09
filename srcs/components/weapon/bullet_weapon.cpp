@@ -2,6 +2,7 @@
 #include "utils.hpp"
 #include "factions.hpp"
 #include "components/sound.hpp"
+#include "components/unit.hpp"
 #include "game_config.hpp"
 #include <string>
 

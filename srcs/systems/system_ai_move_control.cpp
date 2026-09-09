@@ -1,5 +1,12 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/movement.hpp"
+#include "components/unit.hpp"
+#include "utils/math_utils.hpp"
+#include "utils/vector_rotation_utils.hpp"
+#include "utils/algorithm_utils.hpp"
+#include <cmath>
 
 static void aiTurnControl(GameContext &context, [[maybe_unused]] float dt)
 {
@@ -17,15 +24,6 @@ static void aiTurnControl(GameContext &context, [[maybe_unused]] float dt)
 		float speed = Vector3Length(velocity.value);
 		float calc_speed = speed;
 		
-		// if (context.registry.all_of<ScalarAcceleration>(entity)) {
-		// 	float acceleration = context.registry.get<ScalarAcceleration>(entity).value;
-		// 	float distance = Vector3Distance(position.value, targetPos);
-		// 	float traverlTime = speed + sqrtf(speed * speed + 2 * acceleration * distance) / acceleration;
-		// 	calc_speed += acceleration * traverlTime / 2.0f;
-		// }
-
-		// Vector3 toTargetEntt = targetPos - position.value;  // use normal aiming by default
-
 		Vector3 targetDir = calculateLeadDirection(position.value, targetPos, targetVel, calc_speed);
 		float distance = Vector3Distance(position.value, targetPos);
 		float relSpeed = Vector3Length(targetVel - velocity.value);
@@ -59,7 +57,7 @@ static void aiSpeedControl(GameContext &context, float dt)
 	}
 }
 
-void ecs_systems::aiMoveControl(GameContext &context, float dt)
+void systems::AiMoveControl::update(GameContext &context, float dt)
 {
 	aiTurnControl(context, dt);
 	aiSpeedControl(context, dt);

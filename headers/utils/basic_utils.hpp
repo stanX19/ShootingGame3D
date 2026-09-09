@@ -1,7 +1,8 @@
 #ifndef BASIC_UTILS_HPP
 #define BASIC_UTILS_HPP
 #include "includes.hpp"
-#include "components.hpp"
+#include <vector>
+#include <type_traits>
 
 template <typename T, typename... Ts>
 std::vector<T> merge_vectors(const std::vector<T>& first, const std::vector<Ts>&... rest) {

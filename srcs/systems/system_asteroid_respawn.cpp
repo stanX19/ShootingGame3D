@@ -1,11 +1,15 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/unit.hpp"
+#include "utils/math_utils.hpp"
+#include "utils/vector_rotation_utils.hpp"
 #include "game_utils.hpp"
 #include "entities.hpp"
 
 #define ASTEROID_COUNT 10
 
-void ecs_systems::asteroidRespawn(GameContext &context, [[maybe_unused]] float dt)
+void systems::AsteroidRespawn::update(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto asteroidView = context.registry.view<tag::Asteroid>();
 	int asteroidsToSpawn = ASTEROID_COUNT - (int)asteroidView.size();

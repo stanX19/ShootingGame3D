@@ -1,6 +1,7 @@
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "components/sound.hpp"
+#include "components/effect.hpp"
 #include "game_config.hpp"
 #include <algorithm>
 

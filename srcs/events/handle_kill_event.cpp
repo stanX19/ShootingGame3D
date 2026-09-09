@@ -1,6 +1,11 @@
 #include "events.hpp"
-#include "components.hpp"
+#include "components/score.hpp"
+#include "components/unit.hpp"
 #include "components/sound.hpp"
+#include "components/physics.hpp"
+#include "components/collision.hpp"
+#include "components/weapon.hpp"
+#include "components/factions.hpp"
 #include <iostream>
 
 namespace {

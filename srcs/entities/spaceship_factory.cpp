@@ -4,7 +4,14 @@
 #include <stdexcept>
 
 #include "components/factions.hpp"
-#include "components.hpp"
+#include "components/physics.hpp"
+#include "components/movement.hpp"
+#include "components/combat.hpp"
+#include "components/collision.hpp"
+#include "components/render.hpp"
+#include "components/effect.hpp"
+#include "components/unit.hpp"
+#include "components/score.hpp"
 #include "utils.hpp"
 #include <iostream>
 

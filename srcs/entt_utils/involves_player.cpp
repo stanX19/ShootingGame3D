@@ -1,5 +1,5 @@
 #include "entt_utils.hpp"
-#include "components.hpp"
+#include "components/anchor.hpp"
 
 bool entt_utils::involvesPlayer(GameContext &context, entt::entity entity) {
 	entt::registry &registry = context.registry;

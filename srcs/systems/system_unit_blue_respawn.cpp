@@ -1,8 +1,12 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
 #include "game_utils.hpp"
 #include "entities.hpp"
+#include "components/physics.hpp"
+#include "components/render.hpp"
+#include "components/unit.hpp"
 #include "components/factions.hpp"
+#include "utils/color_utils.hpp"
 
 namespace {
 	struct BlueTag {};
@@ -31,7 +35,7 @@ static Vector3 generateSpawnPos(GameContext const &context, Vector3 const &playe
 	);
 }
 
-void ecs_systems::blueUnitRespawn(GameContext &context, [[maybe_unused]] float dt)
+void systems::BlueUnitRespawn::update(GameContext &context, [[maybe_unused]] float dt)
 {
 	Vector3 playerPos = {0, 0, 0};
 	if (context.registry.valid(context.currentPlayer)) {

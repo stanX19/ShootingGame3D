@@ -1,8 +1,13 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/weapon.hpp"
+#include "utils/math_utils.hpp"
+#include "utils/vector_rotation_utils.hpp"
+#include "utils/algorithm_utils.hpp"
 #include <iostream>
 
-void ecs_systems::bulletTargetAim(GameContext &context, [[maybe_unused]] float dt)
+void systems::BulletTargetAim::update(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto view = context.registry.view<Position, AimDirection, AimTarget, Weapon>();
 

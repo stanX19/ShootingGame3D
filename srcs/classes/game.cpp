@@ -37,52 +37,52 @@ EngineState Game::run() {
         context.soundManager.updateMusic();
 
         // --- Update systems ---
-        ecs_systems::playerMoveControl(context, dt);
-        ecs_systems::playerRespawn(context, dt);
-        ecs_systems::aiFindTarget(context, dt);
-        ecs_systems::aiMoveControl(context, dt);
-        ecs_systems::aiShootControl(context, dt);
-        ecs_systems::processMoveRequest(context, dt);
+        m_systemPlayerMoveControl.update(context, dt);
+        m_systemPlayerRespawn.update(context, dt);
+        m_systemAiFindTarget.update(context, dt);
+        m_systemAiMoveControl.update(context, dt);
+        m_systemAiShootControl.update(context, dt);
+        m_systemProcessMoveRequest.update(context, dt);
 
-        ecs_systems::ammoReload(context, dt);
-        ecs_systems::bulletTargetAim(context, dt);
-        ecs_systems::weaponParentControlAim(context, dt);
-        ecs_systems::weaponParentControlShoot(context, dt);
-        ecs_systems::playerShootControl(context, dt);  // override parent control shoot
-        ecs_systems::weaponUpdateCooldown(context, dt);
-        ecs_systems::weaponUpdateCanFire(context, dt);
-        ecs_systems::weaponUpdateCharged(context, dt);
-        ecs_systems::weaponShoot(context, dt);
-        ecs_systems::weaponUpdateFireStatus(context, dt);
+        m_systemAmmoReload.update(context, dt);
+        m_systemBulletTargetAim.update(context, dt);
+        m_systemWeaponParentControlAim.update(context, dt);
+        m_systemWeaponParentControlShoot.update(context, dt);
+        m_systemPlayerShootControl.update(context, dt);  // override parent control shoot
+        m_systemWeaponUpdateCooldown.update(context, dt);
+        m_systemWeaponUpdateCanFire.update(context, dt);
+        m_systemWeaponUpdateCharged.update(context, dt);
+        m_systemWeaponShoot.update(context, dt);
+        m_systemWeaponUpdateFireStatus.update(context, dt);
 
-        ecs_systems::entityMovement(context, dt);
-        ecs_systems::entityAnchor(context, dt);
-        ecs_systems::entityTransformation(context, dt);
+        m_systemEntityMovement.update(context, dt);
+        m_systemEntityAnchor.update(context, dt);
+        m_systemEntityTransformation.update(context, dt);
         
-        ecs_systems::detectEntityCollision(context, dt);
+        m_systemDetectEntityCollision.update(context, dt);
         context.dispatcher.update();
         context.soundManager.update(context.mainCamera);
-        ecs_systems::soundSfx(context, dt);
+        m_systemSoundSfx.update(context, dt);
 
-        ecs_systems::energyShield(context, dt);
+        m_systemEnergyShield.update(context, dt);
         
-        ecs_systems::syncModelRotation(context, dt);
-        ecs_systems::cameraFollowPlayer(context, dt);
+        m_systemSyncModelRotation.update(context, dt);
+        m_systemCameraFollowPlayer.update(context, dt);
         BeginDrawing();
         renderer.Render(dt);
         hudRenderer.RenderAll(dt);
         EndDrawing();
 
-        ecs_systems::blueUnitRespawn(context, dt);
-        ecs_systems::redUnitRespawn(context, dt);
-        ecs_systems::asteroidRespawn(context, dt);
-        ecs_systems::entityAnchorRelease(context, dt);
-        ecs_systems::entityLifetime(context, dt);
-        ecs_systems::cleanOutOfBound(context, dt);
-        ecs_systems::delayedDamage(context, dt);
-        ecs_systems::hpCleanup(context, dt);
-        ecs_systems::hpRegen(context, dt);
-        ecs_systems::spawnTrailParticles(context, dt);
+        m_systemBlueUnitRespawn.update(context, dt);
+        m_systemRedUnitRespawn.update(context, dt);
+        m_systemAsteroidRespawn.update(context, dt);
+        m_systemEntityAnchorRelease.update(context, dt);
+        m_systemEntityLifetime.update(context, dt);
+        m_systemCleanOutOfBound.update(context, dt);
+        m_systemDelayedDamage.update(context, dt);
+        m_systemHpCleanup.update(context, dt);
+        m_systemHpRegen.update(context, dt);
+        m_systemSpawnTrailParticles.update(context, dt);
 
         inputControls(dt, nextState);
     }

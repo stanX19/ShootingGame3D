@@ -1,6 +1,7 @@
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "components/sound.hpp"
+#include "components/unit.hpp"
 #include "game_config.hpp"
 
 namespace

@@ -1,6 +1,10 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/lifetime.hpp"
+#include "components/physics.hpp"
+#include <vector>
 
-void ecs_systems::cleanOutOfBound(GameContext &context, [[maybe_unused]] float dt)
+void systems::CleanOutOfBound::update(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto view = context.registry.view<DisappearBound, Position>();
 	std::vector<entt::entity> toDestroy;
@@ -31,3 +35,4 @@ void ecs_systems::cleanOutOfBound(GameContext &context, [[maybe_unused]] float d
 		}
 	}
 }
+

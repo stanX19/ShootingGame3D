@@ -1,7 +1,9 @@
 #include "systems.hpp"
-#include <iostream>
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/anchor.hpp"
 
-void ecs_systems::entityAnchor(GameContext& context, float dt) {
+void systems::EntityAnchor::update(GameContext& context, float dt) {
 	auto parentView = context.registry.view<Position, Rotation>();
 
 	for (auto [entity, anchor, pos] : context.registry.view<PositionAnchor, Position>().each()) {
@@ -26,3 +28,4 @@ void ecs_systems::entityAnchor(GameContext& context, float dt) {
 		}
 	}
 }
+

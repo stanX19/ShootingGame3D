@@ -195,6 +195,40 @@ int main() {
 	Renderer renderer(context.mainCamera, context);
 	BattlefieldHUDRenderer hudRenderer(context.mainCamera, context);
 
+	systems::PlayerRespawn sysPlayerRespawn;
+	systems::AiFindTarget sysAiFindTarget;
+	systems::AiMoveControl sysAiMoveControl;
+	systems::AiShootControl sysAiShootControl;
+	systems::ProcessMoveRequest sysProcessMoveRequest;
+	systems::AmmoReload sysAmmoReload;
+	systems::BulletTargetAim sysBulletTargetAim;
+	systems::WeaponParentControlAim sysWeaponParentControlAim;
+	systems::WeaponParentControlShoot sysWeaponParentControlShoot;
+	systems::PlayerShootControl sysPlayerShootControl;
+	systems::WeaponUpdateCooldown sysWeaponUpdateCooldown;
+	systems::WeaponUpdateCanFire sysWeaponUpdateCanFire;
+	systems::WeaponUpdateCharged sysWeaponUpdateCharged;
+	systems::WeaponShoot sysWeaponShoot;
+	systems::WeaponUpdateFireStatus sysWeaponUpdateFireStatus;
+	systems::EntityMovement sysEntityMovement;
+	systems::EntityAnchor sysEntityAnchor;
+	systems::EntityTransformation sysEntityTransformation;
+	systems::DetectEntityCollision sysDetectEntityCollision;
+	systems::SoundSfx sysSoundSfx;
+	systems::EnergyShield sysEnergyShield;
+	systems::SyncModelRotation sysSyncModelRotation;
+	systems::CameraFollowPlayer sysCameraFollowPlayer;
+	systems::BlueUnitRespawn sysBlueUnitRespawn;
+	systems::RedUnitRespawn sysRedUnitRespawn;
+	systems::AsteroidRespawn sysAsteroidRespawn;
+	systems::EntityAnchorRelease sysEntityAnchorRelease;
+	systems::EntityLifetime sysEntityLifetime;
+	systems::CleanOutOfBound sysCleanOutOfBound;
+	systems::DelayedDamage sysDelayedDamage;
+	systems::HpCleanup sysHpCleanup;
+	systems::HpRegen sysHpRegen;
+	systems::SpawnTrailParticles sysSpawnTrailParticles;
+
 	SystemMetric metrics[SYS_COUNT];
 	initMetricNames(metrics);
 
@@ -242,50 +276,50 @@ int main() {
 		const bool isProfiling = (state == BenchmarkState::BENCHMARKING);
 
 		// --- Frame Simulation Probes (O(1) inlined enum index, zero allocation) ---
-		runProfiled<SYS_PLAYER_RESPAWN>(metrics, isProfiling, [&]() { ecs_systems::playerRespawn(context, dt); });
-		runProfiled<SYS_AI_FIND_TARGET>(metrics, isProfiling, [&]() { ecs_systems::aiFindTarget(context, dt); });
-		runProfiled<SYS_AI_MOVE_CONTROL>(metrics, isProfiling, [&]() { ecs_systems::aiMoveControl(context, dt); });
-		runProfiled<SYS_AI_SHOOT_CONTROL>(metrics, isProfiling, [&]() { ecs_systems::aiShootControl(context, dt); });
-		runProfiled<SYS_PROCESS_MOVE_REQUEST>(metrics, isProfiling, [&]() { ecs_systems::processMoveRequest(context, dt); });
+		runProfiled<SYS_PLAYER_RESPAWN>(metrics, isProfiling, [&]() { sysPlayerRespawn.update(context, dt); });
+		runProfiled<SYS_AI_FIND_TARGET>(metrics, isProfiling, [&]() { sysAiFindTarget.update(context, dt); });
+		runProfiled<SYS_AI_MOVE_CONTROL>(metrics, isProfiling, [&]() { sysAiMoveControl.update(context, dt); });
+		runProfiled<SYS_AI_SHOOT_CONTROL>(metrics, isProfiling, [&]() { sysAiShootControl.update(context, dt); });
+		runProfiled<SYS_PROCESS_MOVE_REQUEST>(metrics, isProfiling, [&]() { sysProcessMoveRequest.update(context, dt); });
 
-		runProfiled<SYS_AMMO_RELOAD>(metrics, isProfiling, [&]() { ecs_systems::ammoReload(context, dt); });
-		runProfiled<SYS_BULLET_TARGET_AIM>(metrics, isProfiling, [&]() { ecs_systems::bulletTargetAim(context, dt); });
-		runProfiled<SYS_WEAPON_PARENT_CONTROL_AIM>(metrics, isProfiling, [&]() { ecs_systems::weaponParentControlAim(context, dt); });
-		runProfiled<SYS_WEAPON_PARENT_CONTROL_SHOOT>(metrics, isProfiling, [&]() { ecs_systems::weaponParentControlShoot(context, dt); });
-		runProfiled<SYS_PLAYER_SHOOT_CONTROL>(metrics, isProfiling, [&]() { ecs_systems::playerShootControl(context, dt); });
-		runProfiled<SYS_WEAPON_UPDATE_COOLDOWN>(metrics, isProfiling, [&]() { ecs_systems::weaponUpdateCooldown(context, dt); });
-		runProfiled<SYS_WEAPON_UPDATE_CAN_FIRE>(metrics, isProfiling, [&]() { ecs_systems::weaponUpdateCanFire(context, dt); });
-		runProfiled<SYS_WEAPON_UPDATE_CHARGED>(metrics, isProfiling, [&]() { ecs_systems::weaponUpdateCharged(context, dt); });
-		runProfiled<SYS_WEAPON_SHOOT>(metrics, isProfiling, [&]() { ecs_systems::weaponShoot(context, dt); });
-		runProfiled<SYS_WEAPON_UPDATE_FIRE_STATUS>(metrics, isProfiling, [&]() { ecs_systems::weaponUpdateFireStatus(context, dt); });
+		runProfiled<SYS_AMMO_RELOAD>(metrics, isProfiling, [&]() { sysAmmoReload.update(context, dt); });
+		runProfiled<SYS_BULLET_TARGET_AIM>(metrics, isProfiling, [&]() { sysBulletTargetAim.update(context, dt); });
+		runProfiled<SYS_WEAPON_PARENT_CONTROL_AIM>(metrics, isProfiling, [&]() { sysWeaponParentControlAim.update(context, dt); });
+		runProfiled<SYS_WEAPON_PARENT_CONTROL_SHOOT>(metrics, isProfiling, [&]() { sysWeaponParentControlShoot.update(context, dt); });
+		runProfiled<SYS_PLAYER_SHOOT_CONTROL>(metrics, isProfiling, [&]() { sysPlayerShootControl.update(context, dt); });
+		runProfiled<SYS_WEAPON_UPDATE_COOLDOWN>(metrics, isProfiling, [&]() { sysWeaponUpdateCooldown.update(context, dt); });
+		runProfiled<SYS_WEAPON_UPDATE_CAN_FIRE>(metrics, isProfiling, [&]() { sysWeaponUpdateCanFire.update(context, dt); });
+		runProfiled<SYS_WEAPON_UPDATE_CHARGED>(metrics, isProfiling, [&]() { sysWeaponUpdateCharged.update(context, dt); });
+		runProfiled<SYS_WEAPON_SHOOT>(metrics, isProfiling, [&]() { sysWeaponShoot.update(context, dt); });
+		runProfiled<SYS_WEAPON_UPDATE_FIRE_STATUS>(metrics, isProfiling, [&]() { sysWeaponUpdateFireStatus.update(context, dt); });
 
-		runProfiled<SYS_ENTITY_MOVEMENT>(metrics, isProfiling, [&]() { ecs_systems::entityMovement(context, dt); });
-		runProfiled<SYS_ENTITY_ANCHOR>(metrics, isProfiling, [&]() { ecs_systems::entityAnchor(context, dt); });
-		runProfiled<SYS_ENTITY_TRANSFORMATION>(metrics, isProfiling, [&]() { ecs_systems::entityTransformation(context, dt); });
+		runProfiled<SYS_ENTITY_MOVEMENT>(metrics, isProfiling, [&]() { sysEntityMovement.update(context, dt); });
+		runProfiled<SYS_ENTITY_ANCHOR>(metrics, isProfiling, [&]() { sysEntityAnchor.update(context, dt); });
+		runProfiled<SYS_ENTITY_TRANSFORMATION>(metrics, isProfiling, [&]() { sysEntityTransformation.update(context, dt); });
 
-		runProfiled<SYS_DETECT_COLLISION>(metrics, isProfiling, [&]() { ecs_systems::detectEntityCollision(context, dt); });
+		runProfiled<SYS_DETECT_COLLISION>(metrics, isProfiling, [&]() { sysDetectEntityCollision.update(context, dt); });
 		runProfiled<SYS_DISPATCHER_UPDATE>(metrics, isProfiling, [&]() { context.dispatcher.update(); });
 		runProfiled<SYS_SOUND_UPDATE>(metrics, isProfiling, [&]() { context.soundManager.update(context.mainCamera); });
-		runProfiled<SYS_SOUND_SFX>(metrics, isProfiling, [&]() { ecs_systems::soundSfx(context, dt); });
+		runProfiled<SYS_SOUND_SFX>(metrics, isProfiling, [&]() { sysSoundSfx.update(context, dt); });
 
-		runProfiled<SYS_ENERGY_SHIELD>(metrics, isProfiling, [&]() { ecs_systems::energyShield(context, dt); });
-		runProfiled<SYS_SYNC_MODEL_ROTATION>(metrics, isProfiling, [&]() { ecs_systems::syncModelRotation(context, dt); });
-		runProfiled<SYS_CAMERA_FOLLOW_PLAYER>(metrics, isProfiling, [&]() { ecs_systems::cameraFollowPlayer(context, dt); });
+		runProfiled<SYS_ENERGY_SHIELD>(metrics, isProfiling, [&]() { sysEnergyShield.update(context, dt); });
+		runProfiled<SYS_SYNC_MODEL_ROTATION>(metrics, isProfiling, [&]() { sysSyncModelRotation.update(context, dt); });
+		runProfiled<SYS_CAMERA_FOLLOW_PLAYER>(metrics, isProfiling, [&]() { sysCameraFollowPlayer.update(context, dt); });
 
 		BeginDrawing();
 		runProfiled<SYS_RENDERER_RENDER>(metrics, isProfiling, [&]() { renderer.Render(dt); });
 		runProfiled<SYS_HUD_RENDERER_RENDER>(metrics, isProfiling, [&]() { hudRenderer.RenderAll(dt); });
 
-		runProfiled<SYS_BLUE_UNIT_RESPAWN>(metrics, isProfiling, [&]() { ecs_systems::blueUnitRespawn(context, dt); });
-		runProfiled<SYS_RED_UNIT_RESPAWN>(metrics, isProfiling, [&]() { ecs_systems::redUnitRespawn(context, dt); });
-		runProfiled<SYS_ASTEROID_RESPAWN>(metrics, isProfiling, [&]() { ecs_systems::asteroidRespawn(context, dt); });
-		runProfiled<SYS_ENTITY_ANCHOR_RELEASE>(metrics, isProfiling, [&]() { ecs_systems::entityAnchorRelease(context, dt); });
-		runProfiled<SYS_ENTITY_LIFETIME>(metrics, isProfiling, [&]() { ecs_systems::entityLifetime(context, dt); });
-		runProfiled<SYS_CLEAN_OUT_OF_BOUND>(metrics, isProfiling, [&]() { ecs_systems::cleanOutOfBound(context, dt); });
-		runProfiled<SYS_DELAYED_DAMAGE>(metrics, isProfiling, [&]() { ecs_systems::delayedDamage(context, dt); });
-		runProfiled<SYS_HP_CLEANUP>(metrics, isProfiling, [&]() { ecs_systems::hpCleanup(context, dt); });
-		runProfiled<SYS_HP_REGEN>(metrics, isProfiling, [&]() { ecs_systems::hpRegen(context, dt); });
-		runProfiled<SYS_SPAWN_TRAIL_PARTICLES>(metrics, isProfiling, [&]() { ecs_systems::spawnTrailParticles(context, dt); });
+		runProfiled<SYS_BLUE_UNIT_RESPAWN>(metrics, isProfiling, [&]() { sysBlueUnitRespawn.update(context, dt); });
+		runProfiled<SYS_RED_UNIT_RESPAWN>(metrics, isProfiling, [&]() { sysRedUnitRespawn.update(context, dt); });
+		runProfiled<SYS_ASTEROID_RESPAWN>(metrics, isProfiling, [&]() { sysAsteroidRespawn.update(context, dt); });
+		runProfiled<SYS_ENTITY_ANCHOR_RELEASE>(metrics, isProfiling, [&]() { sysEntityAnchorRelease.update(context, dt); });
+		runProfiled<SYS_ENTITY_LIFETIME>(metrics, isProfiling, [&]() { sysEntityLifetime.update(context, dt); });
+		runProfiled<SYS_CLEAN_OUT_OF_BOUND>(metrics, isProfiling, [&]() { sysCleanOutOfBound.update(context, dt); });
+		runProfiled<SYS_DELAYED_DAMAGE>(metrics, isProfiling, [&]() { sysDelayedDamage.update(context, dt); });
+		runProfiled<SYS_HP_CLEANUP>(metrics, isProfiling, [&]() { sysHpCleanup.update(context, dt); });
+		runProfiled<SYS_HP_REGEN>(metrics, isProfiling, [&]() { sysHpRegen.update(context, dt); });
+		runProfiled<SYS_SPAWN_TRAIL_PARTICLES>(metrics, isProfiling, [&]() { sysSpawnTrailParticles.update(context, dt); });
 
 		// Entity metric capture during profiling
 		if (isProfiling) {

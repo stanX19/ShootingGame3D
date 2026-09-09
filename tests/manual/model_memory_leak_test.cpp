@@ -1,7 +1,8 @@
 #include "includes.hpp"
 #include "game_context.hpp"
 #include "renderer.hpp"
-#include "components.hpp"
+#include "components/physics.hpp"
+#include "components/render.hpp"
 #include <iostream>
 #include <cstdlib>
 #include <string>

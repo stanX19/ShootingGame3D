@@ -1,5 +1,10 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/weapon.hpp"
+#include "components/render.hpp"
+#include "components/lifetime.hpp"
+#include "components/anchor.hpp"
 #include <iostream>
 
 namespace {
@@ -30,7 +35,7 @@ namespace {
 	}
 }
 
-void ecs_systems::weaponUpdateCharged(GameContext &context, [[maybe_unused]] float dt)
+void systems::WeaponUpdateCharged::update(GameContext &context, [[maybe_unused]] float dt)
 {
 	auto view = context.registry.view<Weapon, Position, ChargedWeapon>();
 

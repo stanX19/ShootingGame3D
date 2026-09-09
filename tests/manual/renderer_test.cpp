@@ -1,7 +1,8 @@
 #include "includes.hpp"
 #include "game_context.hpp"
 #include "renderer.hpp"
-#include "components.hpp"
+#include "components/physics.hpp"
+#include "components/render.hpp"
 #include "utils.hpp" // For random functions if you want to spawn multiple models
 
 int main()

@@ -1,9 +1,14 @@
 #include "systems.hpp"
+#include "game_context.hpp"
 #include "entities.hpp"
+#include "components/physics.hpp"
+#include "components/unit.hpp"
+#include "components/weapon.hpp"
 #include "components/factions.hpp"
 #include "components/unit_camera.hpp"
+#include "utils/math_utils.hpp"
 
-void ecs_systems::playerRespawn(GameContext &context, [[maybe_unused]] float dt) {
+void systems::PlayerRespawn::update(GameContext &context, [[maybe_unused]] float dt) {
 	if (context.registry.valid(context.currentPlayer))
 		return;
 	entt::entity closest = entt::null;

@@ -66,8 +66,8 @@ int main() {
 	while (!WindowShouldClose()) {
 		float dt = GetFrameTime();
 
-		ecs_systems::entityMovement(context, dt);
-		ecs_systems::detectEntityCollision(context, dt);
+		systems::EntityMovement{}.update(context, dt);
+		systems::DetectEntityCollision{}.update(context, dt);
 		context.dispatcher.update();
 
 		BeginDrawing();

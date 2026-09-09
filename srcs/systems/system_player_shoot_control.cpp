@@ -1,4 +1,8 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/weapon.hpp"
+#include <array>
+#include <vector>
 
 namespace {
 	void setFireRequestStatus(entt::registry &registry, entt::entity entity, bool isFiring) {
@@ -13,7 +17,7 @@ namespace {
     };
 }
 
-void ecs_systems::playerShootControl(GameContext &context, [[maybe_unused]] float dt) {
+void systems::PlayerShootControl::update(GameContext &context, [[maybe_unused]] float dt) {
 	auto playerView = context.registry.view<tag::weapon::PlayerControlledFire>();
 	auto weaponView = context.registry.view<WeaponParent, tag::weapon::IsWeapon>();
 

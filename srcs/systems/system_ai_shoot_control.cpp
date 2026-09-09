@@ -1,8 +1,12 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/weapon.hpp"
 #include "components/factions.hpp"
+#include "utils/math_utils.hpp"
+#include <cmath>
 
-void ecs_systems::aiShootControl(GameContext &context, [[maybe_unused]] float dt) {
+void systems::AiShootControl::update(GameContext &context, [[maybe_unused]] float dt) {
 	auto view = context.registry.view<Position, AimDirection, AimTarget,
 										tag::weapon::IsWeapon, tag::weapon::AIControlledFire>();
 	for (auto [entity, position, aimDirection, aimTarget] : view.each())

@@ -1,7 +1,12 @@
 #include "systems.hpp"
+#include "game_context.hpp"
 #include "entities.hpp"
+#include "components/effect.hpp"
+#include "components/physics.hpp"
+#include "components/render.hpp"
+#include "components/lifetime.hpp"
 
-void ecs_systems::spawnTrailParticles(GameContext &context, [[maybe_unused]] float dt) {
+void systems::SpawnTrailParticles::update(GameContext &context, [[maybe_unused]] float dt) {
 	for (auto [entity, trail, pos, vel] : context.registry.view<SpawnsTrailParticles, Position, Velocity>().each()) {
 		if (Vector3Length(vel.value) < 10.0f)
 			continue;
@@ -34,3 +39,4 @@ void ecs_systems::spawnTrailParticles(GameContext &context, [[maybe_unused]] flo
 		}
 	}
 }
+

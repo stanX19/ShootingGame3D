@@ -1,7 +1,14 @@
 #include "systems.hpp"
+#include "game_context.hpp"
 #include "entities.hpp"
+#include "components/combat.hpp"
+#include "components/physics.hpp"
+#include "components/render.hpp"
+#include "components/score.hpp"
+#include "components/effect.hpp"
+#include <vector>
 
-void ecs_systems::hpCleanup(GameContext &context, [[maybe_unused]] float dt) {
+void systems::HpCleanup::update(GameContext &context, [[maybe_unused]] float dt) {
 	auto view = context.registry.view<HP>();
 	std::vector<entt::entity> toDestroy;
 
@@ -45,3 +52,4 @@ void ecs_systems::hpCleanup(GameContext &context, [[maybe_unused]] float dt) {
 		context.registry.destroy(entity);
 	}
 }
+

@@ -1,7 +1,12 @@
 #include "events.hpp"
-#include "components.hpp"
-#include "entities.hpp"
+#include "components/physics.hpp"
+#include "components/combat.hpp"
+#include "components/render.hpp"
+#include "components/effect.hpp"
 #include "components/sound.hpp"
+#include "components/score.hpp"
+#include "components/unit.hpp"
+#include "entities.hpp"
 #include "entt_utils.hpp"
 
 namespace {

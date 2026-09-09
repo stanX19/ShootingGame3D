@@ -1,7 +1,7 @@
 #ifndef SHOOT_3D_HPP
 #define SHOOT_3D_HPP
 #include "includes.hpp"
-#include "components.hpp"
+#include "components_deprecated.hpp"
 #include "model_manager.hpp"
 #include "game_context.hpp"
 #include "utils.hpp"

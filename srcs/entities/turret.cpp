@@ -1,6 +1,14 @@
 #include "entities/turret.hpp"
 #include "components/factions.hpp"
-#include "components.hpp"
+#include "components/physics.hpp"
+#include "components/anchor.hpp"
+#include "components/combat.hpp"
+#include "components/collision.hpp"
+#include "components/render.hpp"
+#include "components/weapon.hpp"
+#include "components/unit.hpp"
+#include "components/score.hpp"
+#include "components/effect.hpp"
 
 #include <stdexcept>
 

@@ -1,7 +1,11 @@
-#include "utils.hpp"
+#include "math_utils.hpp"
 #include <cmath>
 #include <iostream>
 
+Vector3 vector3Abs(const Vector3 &vec)
+{
+	return Vector3{std::abs(vec.x), std::abs(vec.y), std::abs(vec.z)};
+}
 
 float wrapAngle(float angle)
 {

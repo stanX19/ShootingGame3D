@@ -1,15 +1,18 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
 #include "events.hpp"
 #include "collision_algorithm.hpp"
+#include "components/physics.hpp"
+#include "components/collision.hpp"
+#include "components/render.hpp"
+#include "components/unit.hpp"
+#include "utils/algorithm_utils.hpp"
 
 #include <algorithm>
 #include <vector>
 #include <iostream>
 
 namespace {
-	// Helper function goes here
-	// getCollisionRadius goes to CollisionBodyManager
 	struct EntityData {
 		entt::entity id;
 		Vector3 pos;
@@ -69,7 +72,7 @@ namespace {
 	}
 }
 
-void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
+void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 	std::vector<EntityData> entities;
 
 	for (auto [entity, position, body] : context.registry.view<Position, CollisionBody>().each()) {
@@ -125,7 +128,6 @@ void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 			if (!willCollide(interval, 1.0f))
 				continue;
 
-			// all the below code throw into the processMeshCollision, this code here should stay clean and next step is just itepereing and creating collision event
 			const MeshCollisionResult meshCollision = processMeshCollision(context, A, B, *interval);
 			if (meshCollision.usesMeshNarrowPhase && !meshCollision.hit)
 				continue;
@@ -143,3 +145,4 @@ void ecs_systems::detectEntityCollision(GameContext& context, float dt) {
 		}
 	}
 }
+

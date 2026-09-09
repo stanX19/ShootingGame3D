@@ -1,4 +1,8 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/render.hpp"
+#include "components/collision.hpp"
+#include <algorithm>
 
 namespace {
 	void transformRadius(GameContext &context, float dt) {
@@ -12,6 +16,6 @@ namespace {
 	}
 }
 
-void ecs_systems::entityTransformation(GameContext &context, float dt) {
+void systems::EntityTransformation::update(GameContext &context, float dt) {
 	transformRadius(context, dt);
 }

@@ -1,6 +1,10 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/movement.hpp"
 #include "components/unit_camera.hpp"
+#include "utils/input_utils.hpp"
+#include "utils/vector_rotation_utils.hpp"
 #include <iostream>
 #include <cmath>
 
@@ -117,7 +121,6 @@ namespace {
 	}
 }
 
-// void ecs_systems::playerMoveControl(GameContext &context, float dt, const Camera3D &camera)
 // {
 // 	if (!context.registry.all_of<Position, Rotation, Velocity, MaxSpeed, TurnSpeed>(context.currentPlayer))
 // 		return ;
@@ -194,7 +197,7 @@ namespace {
 // }
 
 
-void ecs_systems::playerMoveControl(GameContext &context, float dt)
+void systems::PlayerMoveControl::update(GameContext &context, float dt)
 {
 	if (!context.registry.all_of<Position, Rotation, Velocity, MaxSpeed, TurnSpeed>(context.currentPlayer))
 		return ;

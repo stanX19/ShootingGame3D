@@ -1,5 +1,5 @@
 #include "catch2/catch_amalgamated.hpp"
-#include "components.hpp"
+#include "components/effect.hpp"
 
 TEST_CASE("trail emitters keep counted local spawn locations", "[unit][trail]") {
 	SpawnsTrailParticles trail{};

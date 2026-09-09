@@ -1,9 +1,15 @@
 #include "systems.hpp"
+#include "game_context.hpp"
 #include "entities.hpp"
-#include "utils.hpp"
 #include "entt_utils.hpp"
+#include "components/physics.hpp"
+#include "components/weapon.hpp"
+#include "components/score.hpp"
 #include "components/factions.hpp"
 #include "components/sound.hpp"
+#include "components/collision.hpp"
+#include "utils/math_utils.hpp"
+#include "utils/vector_rotation_utils.hpp"
 #include "events.hpp"
 #include <random>
 
@@ -122,7 +128,7 @@ namespace
 	}
 }
 
-void ecs_systems::weaponShoot(GameContext &context, [[maybe_unused]] float dt)
+void systems::WeaponShoot::update(GameContext &context, [[maybe_unused]] float dt)
 {
 	FireRequestPreprocessing(context, dt);
 	assignIsFiringStatus(context, dt);

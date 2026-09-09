@@ -1,4 +1,8 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/combat.hpp"
+#include "components/weapon.hpp"
+#include "components/physics.hpp"
 
 namespace
 {
@@ -51,7 +55,7 @@ namespace
 	}
 }
 
-void ecs_systems::soundSfx(GameContext &context, float dt)
+void systems::SoundSfx::update(GameContext &context, float dt)
 {
 	// --- Player thrust sound ---
 	Velocity *velPtr = context.registry.try_get<Velocity>(context.currentPlayer);
@@ -65,3 +69,4 @@ void ecs_systems::soundSfx(GameContext &context, float dt)
 	// --- Lock-on sound ---
 	lockOnSfx(context);
 }
+

@@ -1,7 +1,12 @@
 #include "systems.hpp"
-#include "utils.hpp"
-#include "iostream"
+#include "game_context.hpp"
+#include "components/physics.hpp"
+#include "components/collision.hpp"
+#include "components/unit.hpp"
 #include "components/unit_camera.hpp"
+#include "utils/vector_rotation_utils.hpp"
+#include <cmath>
+#include <iostream>
 
 namespace {
 	camera::UnitCamera defaultCamera;
@@ -43,8 +48,7 @@ namespace {
 	}
 }
 
-void ecs_systems::cameraFollowPlayer(GameContext &context, float dt) {
-	
+void systems::CameraFollowPlayer::update(GameContext &context, float dt) {
 	if (!context.registry.valid(context.currentPlayer))
 		return;
 
@@ -79,7 +83,6 @@ void ecs_systems::cameraFollowPlayer(GameContext &context, float dt) {
 		if (colBodyPtr) {
 			scale = colBodyPtr->radius;
 		}
-		// std::cout << "Camera scale: " << scale << std::endl;
 	}
 
 	Vector3 desiredPosition = Vector3RotateByQuaternion(pov.positionOffset, rot.value) * scale + pos.value;
@@ -95,9 +98,5 @@ void ecs_systems::cameraFollowPlayer(GameContext &context, float dt) {
 	
 	camera.fovy = pov.fovy;
 	camera.projection = CAMERA_PERSPECTIVE;
-	// std::cout << "Camera Pos: (" << camera.position.x << ", " 
-	// 							   << camera.position.y << ", " 
-	// 							   << camera.position.z << ") | Target: (" << camera.target.x << ", " 
-	// 							   << camera.target.y << ", " 
-	// 							   << camera.target.z << ") | FOV: " << camera.fovy << std::endl;
 }
+

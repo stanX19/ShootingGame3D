@@ -1,7 +1,15 @@
 #ifndef WEAPONS_HPP
 #define WEAPONS_HPP
 #include "includes.hpp"
-#include "components.hpp"
+#include "components/weapon.hpp"
+#include "components/render.hpp"
+#include "components/combat.hpp"
+#include "components/effect.hpp"
+#include "components/unit.hpp"
+#include "components/collision.hpp"
+#include "components/lifetime.hpp"
+#include "components/sound.hpp"
+#include "components/movement.hpp"
 #include "game_context.hpp"
 #include <vector>
 #include <string>

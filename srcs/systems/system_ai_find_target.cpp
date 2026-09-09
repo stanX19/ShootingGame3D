@@ -1,6 +1,13 @@
 #include "systems.hpp"
-#include "utils.hpp"
+#include "game_context.hpp"
 #include "components/factions.hpp"
+#include "components/physics.hpp"
+#include "components/movement.hpp"
+#include "components/weapon.hpp"
+#include "components/unit.hpp"
+#include "utils/vector_rotation_utils.hpp"
+#include <map>
+#include <vector>
 
 namespace {
 	using TargetsVector = std::vector<std::tuple<entt::entity, Vector3>>;
@@ -17,6 +24,7 @@ namespace {
 
 		return ret;
 	}
+
 
 	// angle: cone angle
 	// minDist: search distance limit
@@ -63,7 +71,7 @@ namespace {
 
 }
 
-void ecs_systems::aiFindTarget(GameContext &context, [[maybe_unused]] float dt){
+void systems::AiFindTarget::update(GameContext &context, [[maybe_unused]] float dt){
 	auto targetsView = context.registry.view<faction::Faction, Position, tag::Targetable>();
 	std::map<faction::FacVal, TargetsVector> cache;
 

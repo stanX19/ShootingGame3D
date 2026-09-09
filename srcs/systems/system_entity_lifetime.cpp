@@ -1,6 +1,9 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/lifetime.hpp"
+#include <vector>
 
-void ecs_systems::entityLifetime(GameContext &context, float dt) {
+void systems::EntityLifetime::update(GameContext &context, float dt) {
 	auto view = context.registry.view<Lifespan>();
 	std::vector<entt::entity> toDestroy;
 

@@ -1,4 +1,6 @@
 #include "systems.hpp"
+#include "game_context.hpp"
+#include "components/combat.hpp"
 
 namespace {
 	void shieldRegen(GameContext &context, float dt) {
@@ -22,7 +24,8 @@ namespace {
 	}
 }
 
-void ecs_systems::energyShield(GameContext &context, float dt) {
+void systems::EnergyShield::update(GameContext &context, float dt) {
 	shieldActiveTimer(context, dt);
 	shieldRegen(context, dt);
 }
+

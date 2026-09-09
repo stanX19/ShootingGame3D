@@ -2,7 +2,11 @@
 #define RENDERER_HPP
 
 #include "includes.hpp"
-#include "components.hpp"
+#include "components/physics.hpp"
+#include "components/render.hpp"
+#include "components/effect.hpp"
+#include "components/combat.hpp"
+#include "components/movement.hpp"
 #include "utils.hpp"
 #include "game_context.hpp"
 #include "frustum.hpp"
