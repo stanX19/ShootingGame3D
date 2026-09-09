@@ -170,6 +170,67 @@ t_model_id ModelManager::createPlane(float width, float length, int resX, int re
 		return LoadModelFromMesh(mesh); }, width, length, resX, resZ);
 }
 
+t_model_id ModelManager::createTriangle(const Vector3 &p1, const Vector3 &p2, const Vector3 &p3)
+{
+	return createAndAddModel("triangle", [=]()
+	{
+		Mesh mesh{};
+		mesh.triangleCount = 2;
+		mesh.vertexCount = 6;
+		mesh.vertices = static_cast<float *>(MemAlloc(6 * 3 * sizeof(float)));
+		mesh.normals = static_cast<float *>(MemAlloc(6 * 3 * sizeof(float)));
+		mesh.texcoords = static_cast<float *>(MemAlloc(6 * 2 * sizeof(float)));
+
+		Vector3 edge1 = p2 - p1;
+		Vector3 edge2 = p3 - p1;
+		Vector3 normal = Vector3CrossProduct(edge1, edge2);
+		float len = Vector3Length(normal);
+		if (len > 0.00001f)
+			normal = normal / len;
+		else
+			normal = Vector3{0.0f, 0.0f, 1.0f};
+
+		// Front face (p1, p2, p3)
+		mesh.vertices[0] = p1.x; mesh.vertices[1] = p1.y; mesh.vertices[2] = p1.z;
+		mesh.vertices[3] = p2.x; mesh.vertices[4] = p2.y; mesh.vertices[5] = p2.z;
+		mesh.vertices[6] = p3.x; mesh.vertices[7] = p3.y; mesh.vertices[8] = p3.z;
+
+		mesh.normals[0] = normal.x; mesh.normals[1] = normal.y; mesh.normals[2] = normal.z;
+		mesh.normals[3] = normal.x; mesh.normals[4] = normal.y; mesh.normals[5] = normal.z;
+		mesh.normals[6] = normal.x; mesh.normals[7] = normal.y; mesh.normals[8] = normal.z;
+
+		mesh.texcoords[0] = 0.0f; mesh.texcoords[1] = 0.0f;
+		mesh.texcoords[2] = 1.0f; mesh.texcoords[3] = 0.0f;
+		mesh.texcoords[4] = 0.5f; mesh.texcoords[5] = 1.0f;
+
+		// Back face (p1, p3, p2)
+		mesh.vertices[9] = p1.x;  mesh.vertices[10] = p1.y; mesh.vertices[11] = p1.z;
+		mesh.vertices[12] = p3.x; mesh.vertices[13] = p3.y; mesh.vertices[14] = p3.z;
+		mesh.vertices[15] = p2.x; mesh.vertices[16] = p2.y; mesh.vertices[17] = p2.z;
+
+		mesh.normals[9] = -normal.x;  mesh.normals[10] = -normal.y; mesh.normals[11] = -normal.z;
+		mesh.normals[12] = -normal.x; mesh.normals[13] = -normal.y; mesh.normals[14] = -normal.z;
+		mesh.normals[15] = -normal.x; mesh.normals[16] = -normal.y; mesh.normals[17] = -normal.z;
+
+		mesh.texcoords[6] = 0.0f; mesh.texcoords[7] = 0.0f;
+		mesh.texcoords[8] = 0.5f; mesh.texcoords[9] = 1.0f;
+		mesh.texcoords[10] = 1.0f; mesh.texcoords[11] = 0.0f;
+
+		if (IsWindowReady())
+			UploadMesh(&mesh, false);
+		return LoadModelFromMesh(mesh);
+	}, p1, p2, p3);
+}
+
+t_model_id ModelManager::createTriangle(float rad, float angle1, float angle2, float angle3)
+{
+	float r = std::max(0.001f, rad);
+	Vector3 p1 = { r * cosf(angle1), r * sinf(angle1), 0.0f };
+	Vector3 p2 = { r * cosf(angle2), r * sinf(angle2), 0.0f };
+	Vector3 p3 = { r * cosf(angle3), r * sinf(angle3), 0.0f };
+	return createTriangle(p1, p2, p3);
+}
+
 Model &ModelManager::getModel(t_model_id id)
 {
 	if (!isValid(id))

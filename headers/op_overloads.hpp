@@ -2,6 +2,11 @@
 #define OP_OVERLOADS_HPP
 
 #include "includes.hpp"
+#include <ostream>
+
+inline std::ostream& operator<<(std::ostream& os, const Vector3& v) {
+	return os << v.x << "_" << v.y << "_" << v.z;
+}
 
 inline bool operator<(const Matrix& lhs, const Matrix& rhs) {
 	const float* a = reinterpret_cast<const float*>(&lhs);

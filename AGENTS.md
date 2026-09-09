@@ -49,6 +49,25 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 
 ## C++ and ECS Rules
 
+> Architecture and code style are **developer automation tooling**: they exist to eliminate friction, automate discovery, enable effortless refactoring, and reduce cognitive load.
+
+### Four Pillars of Automation
+- **Automated Symbol Discovery:** Domain namespaces (`ecs_systems::`, `utils::<domain>::`, `entity::`) turn IDE/Clangd autocomplete into instant discovery tools.
+- **Automated Global Propagation:** Centralize gameplay constants, arena dimensions, and tuning in `GameConfig.hpp` / `SubGameConfig.hpp` so changes propagate without manual hunt-and-replace; zero magic numbers.
+- **Automated Behavior Locality:** 1 feature or domain = 1 `.hpp` + 1 `.cpp` (behavior locality; no god files). Pinpoint and tune logic in isolation with zero collateral damage.
+- **Automated Build Tooling:** Makefile autonomously builds missing dependencies (`$(RAYLIB_LIB)`) and tracks pure prerequisites (`$(RAYLIB_LIB)` -> `$(PCH)` -> `$(OBJDIR)/%.o` -> `$(NAME)`) with zero redundant work.
+
+### Code Style & Implementation
+- **Naming Conventions:** Types in `PascalCase`; functions, methods, parameters, and locals in `camelCase`; member variables in `m_camelCase` (or `camelCase` for plain data structs); constants in `UPPER_SNAKE`. File names in `snake_case` matching the feature/domain (`system_camera_follow_player.cpp`, `unit_camera.hpp`).
+- **Header / Source Hygiene:** Declarations in `.hpp`, definitions in `.cpp`. Prefer `#pragma once` on line 1 of headers. Use forward declarations where pointers/references suffice (light headers compile fast and avoid rebuild cascades).
+- **Namespace Formatting:** In `.hpp`, tab-indent declarations inside `namespace` blocks. In `.cpp`, do NOT wrap files in `namespace { }` blocks; explicitly qualify symbol definitions at the definition site (e.g. `void ecs_systems::foo(...)`).
+- **Component Cleanliness:** Component structs contain pure ECS data. Nest component-specific helper/POV structs inside the parent component struct.
+
+### C++ Foundations
+- **`const`-Correctness:** Default to `const` on variables, parameters, and return types. Always add `const` until you cannot (documents intent and catches accidental writes at compile time). Mark all non-mutating member functions (especially accessors) `const`.
+- **Parameter Passing:** Pass small, trivially-copyable types (`int`, `float`, `Vector3`) by value. Pass all other read-only parameters by `const T&` (avoids copies, accepts temporaries/literals).
+
+### Control Flow & Simulation
 - Use guard clauses and early returns instead of nested `if/else` blocks.
 - Check failure conditions first and return early.
 - Be careful with early returns inside frame and simulation loops: required timer, particle, camera, audio, cleanup, or state updates must still run.
