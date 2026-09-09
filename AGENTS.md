@@ -1,4 +1,15 @@
-# Project Instructions
+# Project
+
+## Introduction
+This is a space shooting game. Design philosophy is realistic physics and sci-fi combat. The fun comes from space simulation, dogfights and tactical gameplay.
+
+## Ambition
+
+Currently it is single player PVE, but the ambition is to make this an online PVP game. Therefore when designing systems and writing code always write it in a way that is easy to expand into PVP.
+- bad: Adding isEnemy or isPlayer component because its easy to do
+- good: Use generic faction system, keep it flexible and easy to expand into PVP.
+
+# Instructions
 
 ## Read First
 
@@ -62,6 +73,7 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - **Header / Source Hygiene:** Declarations in `.hpp`, definitions in `.cpp`. Prefer `#pragma once` on line 1 of headers. Use forward declarations where pointers/references suffice (light headers compile fast and avoid rebuild cascades).
 - **Namespace Formatting:** In `.hpp`, tab-indent declarations inside `namespace` blocks. In `.cpp`, do NOT wrap files in `namespace { }` blocks; explicitly qualify symbol definitions at the definition site (e.g. `void ecs_systems::foo(...)`).
 - **Component Cleanliness:** Component structs contain pure ECS data. Nest component-specific helper/POV structs inside the parent component struct.
+- **Function Cleaness** Anything more than 2 indentation from the parent function should be factored out into its subfunction. NEVER create hell of nested indent! A function should never be more than 50 lines.
 
 ### C++ Foundations
 - **`const`-Correctness:** Default to `const` on variables, parameters, and return types. Always add `const` until you cannot (documents intent and catches accidental writes at compile time). Mark all non-mutating member functions (especially accessors) `const`.

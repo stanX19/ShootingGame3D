@@ -14,6 +14,7 @@ const std::vector<GameConfig::RootSource> kConfigRoots{
 	{"audio", "assets/config/audio.json"},
 	{"debug", "assets/config/debug.json"},
 	{"game", "assets/config/game.json"},
+	{"hud", "assets/config/hud.json"},
 	{"loadout", "assets/config/loadout.json"},
 	{"physics", "assets/config/physics.json"},
 	{"settings", "assets/config/settings.json"},

@@ -34,6 +34,7 @@ EngineState Game::run() {
 
     while (!WindowShouldClose() && nextState == EngineState::GAME) {
         float dt = GetFrameTime();
+        m_context.gameTime += dt;
         m_context.soundManager.updateMusic();
 
         // --- Update systems ---
@@ -68,6 +69,8 @@ EngineState Game::run() {
         
         m_systemSyncModelRotation.update(m_context, dt);
         m_systemCameraFollowPlayer.update(m_context, dt);
+        m_context.hudManager.setObservedEntity(m_context.currentPlayer);
+        m_context.hudManager.update(dt, m_context);
         BeginDrawing();
         m_renderer.render(dt);
         m_hudRenderer.renderAll(dt);

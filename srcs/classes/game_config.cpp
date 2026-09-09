@@ -74,11 +74,18 @@ void GameConfig::initConstants() {
 	COMBAT_DIST = getInt("game.combatDist", 1000);
 	UNIT_COUNT = getInt("game.unitCount", 4);
 
+	hud.damageNumbers.fontSize = getFloat("hud.damageNumbers.fontSize", 20.0f);
+	hud.damageNumbers.opacity = getFloat("hud.damageNumbers.opacity", 0.75f);
+	hud.damageNumbers.resetCooldown = getFloat("hud.damageNumbers.resetCooldown", 0.45f);
+
 	physics.collisionElasticity = getFloat("physics.collisionElasticity", 0.5f);
 	physics.maxAngularKick = getFloat("physics.maxAngularKick", 0.5f);
 	physics.roughness = getFloat("physics.roughness", 2.5f);
 
 	settings.showHPBar = getBool("settings.showHPBar", true);
+	settings.showDamageNumbers = getBool("settings.showDamageNumbers", true);
+	settings.showToasts = getBool("settings.showToasts", true);
+	settings.showKillLogs = getBool("settings.showKillLogs", true);
 	settings.masterVolume = getFloat("audio.masterVolume", 0.5f);
 	settings.controlSensitivity = Clamp(
 		getFloat("settings.controlSensitivity", 1.0f), 0.01f, 1.0f

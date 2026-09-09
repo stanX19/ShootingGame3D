@@ -1,4 +1,6 @@
 #include "events.hpp"
+#include "entt_utils.hpp"
+#include "components/combat.hpp"
 #include "components/score.hpp"
 #include "components/unit.hpp"
 #include "components/sound.hpp"
@@ -39,21 +41,18 @@ namespace {
 		auto victimFacPtr = evt.context->registry.try_get<faction::Faction>(evt.victim.id);
 		auto victimScorePtr = evt.context->registry.try_get<KilledScore>(evt.victim.id);
 
-		std::cout << "Entity killed\n";
 		if (killerFacPtr) {
 			auto &killerData = factions[killerFacPtr->value];
 			killerData.kills += 1;
 			killerData.score += victimScorePtr ? victimScorePtr->value : 0;
-		} else 
-			std::cout << "Killer has no faction\n";
+		}
 		if (victimFacPtr) {
 			auto &victimData = factions[victimFacPtr->value];
 			victimData.deaths += 1;
-		} else 
-			std::cout << "Victim has no faction\n";
+		}
 	}
 
-	void handleScoreTrasfer(const KillEvent& evt) {
+	void handleScoreTransfer(const KillEvent& evt) {
 		auto victimScorePtr = evt.context->registry.try_get<KilledScore>(evt.victim.id);
 		if (victimScorePtr)
 			addScore(*evt.context, evt.killer.id, victimScorePtr->value);
@@ -87,11 +86,100 @@ namespace {
 		fixVictimPosition(evt);
 		updateVictimVelocity(evt);
 	}
+
+	entt::entity resolveEffectiveKiller(const KillEvent& evt) {
+		const entt::entity directKiller = evt.killer.id;
+		const entt::entity rootKiller = entt_utils::getRootScoreParent(evt.context->registry, directKiller);
+
+		const bool isInvalidKiller = (rootKiller == entt::null || !evt.context->registry.valid(rootKiller));
+		const bool isSuicide = (rootKiller == evt.victim.id);
+		const bool isAsteroid = (directKiller != entt::null &&
+		                         evt.context->registry.valid(directKiller) &&
+		                         evt.context->registry.any_of<tag::Asteroid>(directKiller));
+		if (!isInvalidKiller && !isSuicide && !isAsteroid)
+			return rootKiller;
+
+		const auto *contributors = evt.context->registry.try_get<DamageContributors>(evt.victim.id);
+		if (!contributors)
+			return rootKiller;
+
+		const entt::entity fallback = contributors->getLastDamageDealer(evt.context->gameTime, 10.0f, evt.victim.id);
+		if (fallback != entt::null && evt.context->registry.valid(fallback))
+			return fallback;
+
+		return rootKiller;
+	}
+
+	bool tryHandlePlayerDeathToast(const KillEvent& evt, entt::entity effectiveKiller) {
+		if (evt.victim.id != evt.context->currentPlayer)
+			return false;
+
+		const Name *killerName = evt.context->registry.try_get<Name>(effectiveKiller);
+		const std::string message = (killerName && effectiveKiller != entt::null)
+			? ("Killed by " + killerName->val)
+			: "You have been killed";
+		evt.context->hudManager.addToastLeftLog(message, RED);
+		return true;
+	}
+
+	bool isEligibleForAssist(const DamageContributors::DamageContributorEntry &entry, float maxHp, float totalDamage, float gameTime) {
+		if ((gameTime - entry.lastHitGameTime) > 10.0f)
+			return false;
+		if (totalDamage <= 0.0f || entry.damage < 0.30f * totalDamage)
+			return false;
+		if (maxHp > 0.0f && entry.damage < 0.30f * maxHp)
+			return false;
+		return true;
+	}
+
+	void tryHandleKillAssistToast(const KillEvent& evt, entt::entity effectiveKiller, const std::string &victimName) {
+		const auto *contributors = evt.context->registry.try_get<DamageContributors>(evt.victim.id);
+		if (!contributors)
+			return;
+
+		const HP *hpPtr = evt.context->registry.try_get<HP>(evt.victim.id);
+		const float maxHp = hpPtr ? hpPtr->maxValue : 0.0f;
+		const float totalDamage = contributors->getTotalDamage();
+
+		for (size_t i = 0; i < contributors->count; ++i) {
+			const auto &entry = contributors->entries[i];
+			if (entry.attacker != evt.context->currentPlayer || entry.attacker == effectiveKiller)
+				continue;
+			if (!isEligibleForAssist(entry, maxHp, totalDamage, evt.context->gameTime))
+				continue;
+
+			evt.context->hudManager.addToastLeftLog("Kill assist " + victimName, SKYBLUE);
+			return;
+		}
+	}
+
+	void handleKillToast(const KillEvent& evt) {
+		if (!evt.context)
+			return;
+
+		const entt::entity effectiveKiller = resolveEffectiveKiller(evt);
+		if (tryHandlePlayerDeathToast(evt, effectiveKiller))
+			return;
+
+		if (!evt.context->registry.all_of<tag::Spaceship>(evt.victim.id))
+			return;
+
+		const Name *victimNamePtr = evt.context->registry.try_get<Name>(evt.victim.id);
+		const std::string victimName = victimNamePtr ? victimNamePtr->val : "Enemy";
+
+		if (effectiveKiller == evt.context->currentPlayer) {
+			evt.context->hudManager.addToastLeftLog("Killed " + victimName, GREEN);
+			return;
+		}
+
+		tryHandleKillAssistToast(evt, effectiveKiller, victimName);
+	}
 }
 
 void event::Listener::handleKillEvent(const KillEvent& evt) {
 	tryEmitDeathSound(evt);
 	handleFactionDataUpdate(evt);
-	handleScoreTrasfer(evt);
+	handleScoreTransfer(evt);
 	handleVictimPhysics(evt);
+	handleKillToast(evt);
 }

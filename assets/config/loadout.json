@@ -1,10 +1,10 @@
 {
     "shipId": "fighter",
-    "specialWeapon": "missile.flares",
+    "specialWeapon": "missile.basic",
     "turretWeapons": [
-        "bullet.burstSniper",
-        "bullet.burstSniper",
-        "bullet.burstSniper",
-        "bullet.burstSniper"
+        "lazer.deletor",
+        "lazer.deletor",
+        "lazer.deletor",
+        "lazer.deletor"
     ]
 }

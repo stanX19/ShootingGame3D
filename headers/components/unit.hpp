@@ -1,5 +1,11 @@
 #pragma once
 
+#include <string>
+
+struct Name {
+	std::string val;
+};
+
 namespace tag {
 	struct Asteroid {};
 	struct Missile {};

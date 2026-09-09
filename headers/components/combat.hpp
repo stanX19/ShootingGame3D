@@ -1,5 +1,8 @@
 #pragma once
 
+#include "includes.hpp"
+#include <array>
+
 struct HP
 {
 	float value;
@@ -39,3 +42,78 @@ struct DelayedDamage
 	float timeRemaining;
 	float damage;
 };
+
+struct DamageContributors {
+	struct DamageContributorEntry {
+		entt::entity attacker = entt::null;
+		float damage = 0.0f;
+		float lastHitGameTime = 0.0f;
+	};
+
+	static constexpr size_t MAX_ENTRIES = 3;
+	std::array<DamageContributorEntry, MAX_ENTRIES> entries{};
+	size_t count = 0;
+
+	float getTotalDamage() const {
+		float total = 0.0f;
+		for (size_t i = 0; i < count; ++i)
+			total += entries[i].damage;
+		return total;
+	}
+
+	void recordDamage(entt::entity attacker, float amount, float currentGameTime) {
+		if (attacker == entt::null || amount <= 0.0f)
+			return;
+		if (tryUpdateExisting(attacker, amount, currentGameTime))
+			return;
+		if (tryAppendNew(attacker, amount, currentGameTime))
+			return;
+		evictLRU(attacker, amount, currentGameTime);
+	}
+
+	entt::entity getLastDamageDealer(float currentGameTime, float maxAge = 10.0f, entt::entity exclude = entt::null) const {
+		entt::entity best = entt::null;
+		float bestTime = -1.0f;
+		for (size_t i = 0; i < count; ++i) {
+			const auto &entry = entries[i];
+			if (entry.attacker == entt::null || entry.attacker == exclude)
+				continue;
+			if ((currentGameTime - entry.lastHitGameTime) > maxAge)
+				continue;
+			if (entry.lastHitGameTime <= bestTime)
+				continue;
+			bestTime = entry.lastHitGameTime;
+			best = entry.attacker;
+		}
+		return best;
+	}
+
+private:
+	bool tryUpdateExisting(entt::entity attacker, float amount, float currentGameTime) {
+		for (size_t i = 0; i < count; ++i) {
+			if (entries[i].attacker != attacker)
+				continue;
+			entries[i].damage += amount;
+			entries[i].lastHitGameTime = currentGameTime;
+			return true;
+		}
+		return false;
+	}
+
+	bool tryAppendNew(entt::entity attacker, float amount, float currentGameTime) {
+		if (count >= MAX_ENTRIES)
+			return false;
+		entries[count++] = {attacker, amount, currentGameTime};
+		return true;
+	}
+
+	void evictLRU(entt::entity attacker, float amount, float currentGameTime) {
+		size_t lruIdx = 0;
+		for (size_t i = 1; i < count; ++i) {
+			if (entries[i].lastHitGameTime < entries[lruIdx].lastHitGameTime)
+				lruIdx = i;
+		}
+		entries[lruIdx] = {attacker, amount, currentGameTime};
+	}
+};
+

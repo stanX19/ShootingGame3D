@@ -15,8 +15,10 @@ void systems::SoundSfx::lowHpWarningSfx(GameContext &context, float dt)
 	const bool tookDamage = hpPtr->value < m_prevHp;
 	m_prevHp = hpPtr->value;
 
-	if (isLowHp && tookDamage)
+	if (isLowHp && tookDamage) {
 		m_lowHpWarningDuration = context.config.getFloat("sounds.lowHpWarningDuration", 10.0f);
+		context.hudManager.addToastTopNotif("LOW HP", ToastPriority::CRITICAL, RED);
+	}
 	if (!isLowHp)
 		m_lowHpWarningDuration = 0.0f;
 	if (m_lowHpWarningDuration <= 0.0f)

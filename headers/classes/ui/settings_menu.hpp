@@ -17,6 +17,9 @@ public:
 private:
     GameContext &m_context;
     ui::TextButtonWidget m_hpToggleWidget;
+    ui::TextButtonWidget m_damageNumbersToggleWidget;
+    ui::TextButtonWidget m_toastsToggleWidget;
+    ui::TextButtonWidget m_killLogsToggleWidget;
     ui::FloatSliderWidget m_volumeWidget;
     ui::FloatSliderWidget m_sensitivityWidget;
     ui::TextButtonWidget m_backWidget;

@@ -17,6 +17,8 @@ void BattlefieldHUDRenderer::renderAll(float dt)
     setDt(dt);
     drawHUD();
     drawTexts();
+    drawDamageNumbers(m_camera);
+    drawToasts();
 }
 
 void BattlefieldHUDRenderer::setDt(float dt)
@@ -616,42 +618,15 @@ void BattlefieldHUDRenderer::drawCursorArrow()
 
 void BattlefieldHUDRenderer::drawCollisionWarning()
 {
-    const static float warningTime = 5.0f;
-    [[maybe_unused]] const static float warningDist = 10.0f;
-    std::vector<std::pair<Vector3, float>> warnings;
-
-    // Play alert sound with cooldown
-    m_collisionAlertCooldown -= m_currentDt;
-    m_collisionCanPlayAlert = m_collisionAlertCooldown <= 0.0f;
-    if (m_collisionAlertCooldown <= 0.0f) {
-        m_collisionAlertCooldown = 1.0f;
-    }
-
-    auto [posA, velA, bodyA] = m_context.registry.try_get<Position, Velocity, CollisionBody>(m_context.currentPlayer);
-
-    if (!posA || !velA || !bodyA)
+    if (!m_context.hudManager.hasCollisionWarnings())
         return;
 
-    for (auto [other, posB, bodyB, dmgB] : m_context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
-        if (m_context.currentPlayer == other)
-            continue;
-        Velocity velB = m_context.registry.all_of<Velocity>(other) ? m_context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
-        if (willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime)) {
-            warnings.push_back({posB.value, Vector3Distance(posA->value, posB.value) - bodyA->radius - bodyB.radius});
-            if (m_collisionCanPlayAlert)
-                m_context.soundManager.queueSound(m_context.config, "sounds.collisionAlert", posB.value, 0.5f);
-        }
-    }
-
-    if (warnings.empty())
-        return;
+    const auto &warnings = m_context.hudManager.getCollisionWarnings();
+    float alpha = m_context.hudManager.getCollisionAlertAlpha();
 
     const char* alertMsg = "PROXIMITY ALERT";
     int msgWidth = MeasureText(alertMsg, 24);
     Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
-
-    m_collisionBlinkTimer += m_currentDt * 6.0f;
-    float alpha = 0.7f + 0.3f * sinf(m_collisionBlinkTimer);
 
     DrawRectangle(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha * 0.3f));
     DrawRectangleLines(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha));
@@ -668,7 +643,7 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
                            draw_utils::isInFrontOfCamera(warningPos, m_camera));
 
         if (isOnScreen) {
-            float pulseRadius = 20.0f + 10.0f * sinf(m_collisionBlinkTimer * 2.0f);
+            float pulseRadius = 20.0f + 10.0f * (alpha - 0.7f) * 3.33f;
             DrawCircleLines(screenPos.x, screenPos.y, pulseRadius, ColorAlpha(RED, alpha));
             DrawCircleLines(screenPos.x, screenPos.y, pulseRadius + 2, ColorAlpha(YELLOW, alpha * 0.7f));
 
@@ -685,7 +660,6 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
             local.z = Vector3DotProduct(toWarning, camForward);
 
             Vector2 directionToWarning = {local.x, local.y};
-
             directionToWarning = Vector2Normalize(directionToWarning);
 
             char distText[32];
@@ -724,42 +698,12 @@ namespace {
 
 void BattlefieldHUDRenderer::drawMissileWarning()
 {
-    [[maybe_unused]] const static float warningTime = 5.0f;
-    [[maybe_unused]] const static float warningDist = 10.0f;
+    if (!m_context.hudManager.hasMissileWarnings())
+        return;
+
+    const auto &warnings = m_context.hudManager.getMissileWarnings();
+    float alpha = m_context.hudManager.getMissileAlertAlpha();
 	Color color = ColorLerp(ORANGE, MAROON, 0.5f);
-    std::vector<std::pair<Vector3, float>> warnings;
-
-    // Play alert sound with cooldown
-    m_missileAlertCooldown -= m_currentDt;
-    m_missileCanPlayAlert = m_missileAlertCooldown <= 0.0f;
-    if (m_missileAlertCooldown <= 0.0f) {
-        m_missileAlertCooldown = 1.0f;
-    }
-
-    auto [posA, velA, bodyA] = m_context.registry.try_get<Position, Velocity, CollisionBody>(m_context.currentPlayer);
-
-    if (!posA || !velA || !bodyA)
-        return;
-
-    for (auto [other, posB, bodyB, dmgB, velB, target] : m_context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
-        if (m_context.currentPlayer == other || target.entity != m_context.currentPlayer)
-            continue;
-        float distance = Vector3Distance(posA->value, posB.value);
-		if (warningTime * Vector3Length(velB.value - velA->value) < distance)
-			continue;
-		bool willCollideFlag = Vector3DotProduct(posA->value - posB.value, velB.value - velA->value) > 0;
-        if (willCollideFlag) {
-            warnings.push_back({posB.value, distance - bodyA->radius - bodyB.radius});
-            if (m_missileCanPlayAlert)
-                m_context.soundManager.queueSound(m_context.config, "sounds.missileAlert", posB.value, 0.5f);
-        }
-    }
-
-    if (warnings.empty())
-        return;
-
-    m_missileBlinkTimer += m_currentDt * 6.0f;
-    float alpha = 0.7f + 0.3f * sinf(m_missileBlinkTimer);
 
     Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
     float uiFrameRadius = getUIFrameRadius();
@@ -788,14 +732,76 @@ void BattlefieldHUDRenderer::drawMissileWarning()
             local.z = Vector3DotProduct(toWarning, camForward);
 
             Vector2 directionToWarning = {local.x, local.y};
-
             directionToWarning = Vector2Normalize(directionToWarning);
 
             char distText[32];
             snprintf(distText, sizeof(distText), "%.0fm", distance);
             int textWidth = MeasureText(distText, 20);
             Vector2 textPos = screenCenter + directionToWarning * (uiFrameRadius + 50);
-            DrawText(distText, textPos.x - textWidth/2, textPos.y - 8, 20, ColorAlpha(color, alpha));
+            DrawText(distText, textPos.x - textWidth / 2, textPos.y - 8, 20, ColorAlpha(color, alpha));
+        }
+    }
+}
+
+void BattlefieldHUDRenderer::drawDamageNumbers(const Camera3D &camera)
+{
+    if (!m_context.config.settings.showDamageNumbers)
+        return;
+
+    for (const auto &d : m_context.hudManager.getActiveDamageNumbers()) {
+        if (!draw_utils::isInFrontOfCamera(d.worldPos, camera))
+            continue;
+
+        Vector2 screen = GetWorldToScreen(d.worldPos, camera);
+        if (screen.x < -100 || screen.x > GetScreenWidth() + 100 ||
+            screen.y < -100 || screen.y > GetScreenHeight() + 100)
+            continue;
+
+        float progress = d.timer / d.maxDuration;
+        float alpha = (progress > 0.7f) ? (1.0f - (progress - 0.7f) / 0.3f) : 1.0f;
+        alpha *= m_context.config.hud.damageNumbers.opacity;
+        Color baseColor = hitTypeToColor(d.hitType);
+        Color drawColor = ColorAlpha(baseColor, alpha);
+
+        int dmgInt = static_cast<int>(std::round(d.totalDamage));
+        const char *txt = TextFormat("%d", dmgInt);
+        int sz = static_cast<int>(m_context.config.hud.damageNumbers.fontSize * d.scale);
+        int w = MeasureText(txt, sz);
+
+        DrawText(txt, static_cast<int>(screen.x) - w / 2, static_cast<int>(screen.y) - 24 - sz / 2, sz, drawColor);
+    }
+}
+
+void BattlefieldHUDRenderer::drawToasts()
+{
+    int leftLogIndex = 0;
+    float leftBaseY = static_cast<float>(GetScreenHeight()) - 180.0f;
+
+    for (const auto &t : m_context.hudManager.getActiveToasts()) {
+        float progress = t.timer / t.maxDuration;
+        float alpha = (progress > 0.8f) ? (1.0f - (progress - 0.8f) / 0.2f) : 1.0f;
+        Color col = ColorAlpha(t.color, alpha);
+
+        if (t.slot == ToastSlot::LEFT_LOG) {
+            if (!m_context.config.settings.showKillLogs)
+                continue;
+            float yPos = leftBaseY - (leftLogIndex * (t.fontSize + 8.0f));
+            DrawRectangle(15, static_cast<int>(yPos - 2), MeasureText(t.text.c_str(), t.fontSize) + 12, t.fontSize + 4, ColorAlpha(BLACK, 0.4f * alpha));
+            DrawText(t.text.c_str(), 20, static_cast<int>(yPos), t.fontSize, col);
+            leftLogIndex++;
+        } else if (t.slot == ToastSlot::TOP_NOTIF) {
+            if (!m_context.config.settings.showToasts)
+                continue;
+            int w = MeasureText(t.text.c_str(), t.fontSize);
+            float xPos = (GetScreenWidth() - w) * 0.5f;
+            float yPos = 80.0f;
+            DrawRectangle(static_cast<int>(xPos - 16), static_cast<int>(yPos - 4), w + 32, t.fontSize + 8, ColorAlpha(BLACK, 0.6f * alpha));
+            DrawRectangleLines(static_cast<int>(xPos - 16), static_cast<int>(yPos - 4), w + 32, t.fontSize + 8, ColorAlpha(t.color, 0.8f * alpha));
+            DrawText(t.text.c_str(), static_cast<int>(xPos), static_cast<int>(yPos), t.fontSize, col);
+        } else {
+            if (!m_context.config.settings.showToasts)
+                continue;
+            DrawText(t.text.c_str(), static_cast<int>(t.screenPos.x), static_cast<int>(t.screenPos.y), t.fontSize, col);
         }
     }
 }

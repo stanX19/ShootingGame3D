@@ -1,0 +1,7 @@
+{
+	"damageNumbers": {
+		"fontSize": 20.0,
+		"opacity": 0.85,
+		"resetCooldown": 1.5
+	}
+}

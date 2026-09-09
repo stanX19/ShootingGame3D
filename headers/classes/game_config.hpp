@@ -66,6 +66,14 @@ public:
 	int COMBAT_DIST = 1000;
 	int UNIT_COUNT = 4;
 
+	struct HUD {
+		struct DamageNumbersConfig {
+			float fontSize = 20.0f;
+			float opacity = 0.75f;
+			float resetCooldown = 0.45f;
+		} damageNumbers;
+	} hud;
+
 	struct Physics {
 		float collisionElasticity = 0.5f;
 		float maxAngularKick = 0.5f;
@@ -74,6 +82,9 @@ public:
 
 	struct Settings {
 		bool showHPBar = true;
+		bool showDamageNumbers = true;
+		bool showToasts = true;
+		bool showKillLogs = true;
 		float masterVolume = 0.5f;
 		float controlSensitivity = 1.0f;
 	} settings;

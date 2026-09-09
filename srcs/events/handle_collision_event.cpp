@@ -117,6 +117,34 @@ namespace {
 		}
 	}
 
+	void recordAttackerContribution(const event::CollisionEvent &evt, entt::entity victimId, entt::entity rootAttacker, float damage) {
+		if (victimId == entt::null || !evt.context->registry.valid(victimId))
+			return;
+		if (rootAttacker == entt::null || damage <= 0.0f)
+			return;
+		auto &contributors = evt.context->registry.get_or_emplace<DamageContributors>(victimId);
+		contributors.recordDamage(rootAttacker, damage, evt.context->gameTime);
+	}
+
+	void tryReportPlayerDamage(
+		const event::CollisionEvent &evt,
+		const event::CollisionParty &victim,
+		entt::entity rootAttacker,
+		float damage,
+		bool isKill
+	) {
+		if (rootAttacker != evt.context->currentPlayer)
+			return;
+		if (victim.id == entt::null || !evt.context->registry.valid(victim.id))
+			return;
+		// const bool isProjectile = evt.context->registry.any_of<tag::Bullet, tag::Missile>(victim.id);
+		if (!evt.context->registry.all_of<tag::Targetable>(victim.id))
+			return;
+
+		const HitType hitType = isKill ? HitType::KILL : HitType::NORMAL;
+		evt.context->hudManager.reportDamage(rootAttacker, victim.id, damage, victim.pos, hitType);
+	}
+
 	// assumes killer is eligible to deal damage to victim
 	void applyKillerDamageToVictim(
 		const event::CollisionEvent &evt,
@@ -128,9 +156,10 @@ namespace {
 		Damage *dmgPtr = registry.try_get<Damage>(killer.id);
 		auto [shieldPtr, hpPtr] = registry.try_get<EnergyShield, HP>(victim.id);
 
-		if (!dmgPtr || !hpPtr || hpPtr->value <= 0)
+		if (!dmgPtr || !hpPtr || hpPtr->value <= 0.0f)
 			return;
-			
+
+		const float prevHp = hpPtr->value;
 		float remainingDmg = dmgPtr->value;
 
 		// Use shield to block if it's an energy weapon
@@ -146,7 +175,12 @@ namespace {
 
 		hpPtr->value -= remainingDmg;
 
-		if (hpPtr->value < 0) {
+		const bool isKill = (prevHp > 0.0f && hpPtr->value <= 0.0f);
+		const entt::entity rootAttacker = entt_utils::getRootScoreParent(evt.context->registry, killer.id);
+		recordAttackerContribution(evt, victim.id, rootAttacker, remainingDmg);
+		tryReportPlayerDamage(evt, victim, rootAttacker, remainingDmg, isKill);
+
+		if (isKill) {
 			evt.context->dispatcher.enqueue<event::KillEvent>(event::KillEvent{
 				evt.context,
 				killer,
@@ -182,7 +216,9 @@ void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
 	applyCollisionPhysics(evt);
 
 	// Emit hit sounds only if collision involves player
-	if (!entt_utils::involvesPlayer(*evt.context, evt.a.id) && !entt_utils::involvesPlayer(*evt.context, evt.b.id))
+	const bool involvesPlayer = entt_utils::getRootScoreParent(evt.context->registry, evt.a.id) == evt.context->currentPlayer ||
+		entt_utils::getRootScoreParent(evt.context->registry, evt.b.id) == evt.context->currentPlayer;
+	if (!involvesPlayer)
 		return;
 	tryEmitHitSound(evt.context, evt.a);
 	tryEmitHitSound(evt.context, evt.b);

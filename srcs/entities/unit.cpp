@@ -2,8 +2,10 @@
 #include "entities/unit.hpp"
 #include "components/factions.hpp"
 #include "components/sound.hpp"
+#include "components/unit.hpp"
 #include "weapon_registry.hpp"
 
+#include <cctype>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -12,6 +14,7 @@
 #include <vector>
 
 namespace {
+
 
 bool isKnownWeapon(const GameContext& context, std::string_view id) {
 	return !id.empty()
@@ -164,6 +167,7 @@ SpawnedUnit spawnConfiguredUnit(
 	);
 	if (definition.elite)
 		context.registry.emplace<tag::EliteUnit>(entity);
+	context.registry.emplace<Name>(entity, std::string(unitId));
 
 	for (std::size_t index = 0;
 		index < params.loadout.turretWeapons.size()

@@ -33,6 +33,8 @@ public:
     void drawCursorArrow();
     void drawCollisionWarning();
     void drawMissileWarning();
+    void drawDamageNumbers(const Camera3D &camera);
+    void drawToasts();
 
     Vector2 getUIFrameCenter() const;
     float getUIFrameRadius() const;
@@ -51,12 +53,6 @@ private:
     float m_blinkTimer = 0.0f;
     float m_reloadAngleOffset = 0.0f;
     float m_speedAnimationTime = 0.0f;
-    float m_collisionAlertCooldown = 0.0f;
-    bool m_collisionCanPlayAlert = false;
-    float m_collisionBlinkTimer = 0.0f;
-    float m_missileAlertCooldown = 0.0f;
-    bool m_missileCanPlayAlert = false;
-    float m_missileBlinkTimer = 0.0f;
 };
 
 #endif

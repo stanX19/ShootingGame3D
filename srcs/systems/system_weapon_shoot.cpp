@@ -85,8 +85,8 @@ void systems::WeaponShoot::shootBullets(GameContext &context, [[maybe_unused]] f
 		const Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
 		const Vector3 shooterVel = velocityPtr ? velocityPtr->value : Vector3Zeros;
 
-		// Emit shoot sound if weapon has ShootSound component and involves player
-		if (entt_utils::involvesPlayer(context, entity)) {
+		// Emit shoot sound if weapon has ShootSound component and belongs to player
+		if (entt_utils::getRootScoreParent(context.registry, entity) == context.currentPlayer) {
 			if (auto *shootSound = context.registry.try_get<sound::ShootSound>(entity)) {
 				if (shootSound->id != sound::NONE) {
 					context.dispatcher.enqueue<event::SoundEvent>(event::SoundEvent{

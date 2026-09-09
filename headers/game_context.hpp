@@ -7,6 +7,7 @@
 #include "sound_manager.hpp"
 #include "factions.hpp"
 #include "classes/weapon_registry.hpp"
+#include "classes/hud_manager.hpp"
 #include <map>
 
 struct FactionData {
@@ -21,12 +22,14 @@ struct GameContext {
 	CollisionBodyManager collisionBodyManager;
 	SoundManager soundManager;
 	weapon::WeaponRegistry weaponRegistry;
+	HudManager hudManager;
 	entt::registry templateReg;
 	entt::registry registry;
 	entt::dispatcher dispatcher;
 	entt::entity currentPlayer = entt::null;
 	Camera3D mainCamera;
 	std::map<faction::FacVal, FactionData> factions;
+	float gameTime = 0.0f;
 };
 
 #endif  // GAME_CONTEXT_HPP

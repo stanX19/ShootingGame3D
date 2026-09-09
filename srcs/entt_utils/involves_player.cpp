@@ -1,15 +1,14 @@
 #include "entt_utils.hpp"
-#include "components/anchor.hpp"
+#include "components/score.hpp"
 
-bool entt_utils::involvesPlayer(GameContext &context, entt::entity entity) {
-	entt::registry &registry = context.registry;
-	while (registry.valid(entity)) {
-		if (entity == context.currentPlayer)
-			return true;
-		auto anchorPtr = registry.try_get<PositionAnchor>(entity);
-		if (!anchorPtr)
-			return false;
-		entity = anchorPtr->parent;
+namespace entt_utils {
+	entt::entity getRootScoreParent(const entt::registry &registry, entt::entity entity) {
+		while (registry.valid(entity)) {
+			const auto *scoreParent = registry.try_get<ScoreParent>(entity);
+			if (!scoreParent || !registry.valid(scoreParent->parent))
+				break;
+			entity = scoreParent->parent;
+		}
+		return entity;
 	}
-	return false;
 }
