@@ -103,7 +103,8 @@ namespace {
 		if (!contributors)
 			return rootKiller;
 
-		const entt::entity fallback = contributors->getLastDamageDealer(evt.context->gameTime, 10.0f, evt.victim.id);
+		const float maxAge = evt.context ? evt.context->config.killAttr.fallbackAttributionWindowSeconds : 10.0f;
+		const entt::entity fallback = contributors->getLastDamageDealer(evt.context->gameTime, maxAge, evt.victim.id);
 		if (fallback != entt::null && evt.context->registry.valid(fallback))
 			return fallback;
 
@@ -122,12 +123,18 @@ namespace {
 		return true;
 	}
 
-	bool isEligibleForAssist(const DamageContributors::DamageContributorEntry &entry, float maxHp, float totalDamage, float gameTime) {
-		if ((gameTime - entry.lastHitGameTime) > 10.0f)
+	bool isEligibleForAssist(
+		const DamageContributors::DamageContributorEntry &entry,
+		float maxHp,
+		float totalDamage,
+		float gameTime,
+		const GameConfig::KillAttr &config
+	) {
+		if ((gameTime - entry.lastHitGameTime) > config.assistWindowSeconds)
 			return false;
-		if (totalDamage <= 0.0f || entry.damage < 0.30f * totalDamage)
+		if (totalDamage <= 0.0f || entry.damage < config.assistThresholdPct * totalDamage)
 			return false;
-		if (maxHp > 0.0f && entry.damage < 0.30f * maxHp)
+		if (maxHp > 0.0f && entry.damage < config.assistThresholdPct * maxHp)
 			return false;
 		return true;
 	}
@@ -145,7 +152,7 @@ namespace {
 			const auto &entry = contributors->entries[i];
 			if (entry.attacker != evt.context->currentPlayer || entry.attacker == effectiveKiller)
 				continue;
-			if (!isEligibleForAssist(entry, maxHp, totalDamage, evt.context->gameTime))
+			if (!isEligibleForAssist(entry, maxHp, totalDamage, evt.context->gameTime, evt.context->config.killAttr))
 				continue;
 
 			evt.context->hudManager.addToastLeftLog("Kill assist " + victimName, SKYBLUE);

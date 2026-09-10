@@ -52,7 +52,11 @@ entt::entity HudManager::getObservedEntity() const {
 }
 
 void HudManager::reportDamage(entt::entity attacker, entt::entity target, float amount, Vector3 hitPos, HitType hitType) {
-	m_damageRequests.push_back({attacker, target, amount, hitPos, hitType});
+	reportDamage(attacker, target, amount, hitPos, Vector3Zeros, hitType);
+}
+
+void HudManager::reportDamage(entt::entity attacker, entt::entity target, float amount, Vector3 hitPos, Vector3 targetOffset, HitType hitType) {
+	m_damageRequests.push_back({attacker, target, amount, hitPos, targetOffset, hitType});
 }
 
 void HudManager::addToast(const ToastConfig &config) {
@@ -81,20 +85,75 @@ void HudManager::addToastTopNotif(const std::string &message, ToastPriority prio
 	m_toastRequests.push_back(config);
 }
 
+void HudManager::assignFirstFreeSlot(const std::string &text) {
+	for (auto &slot : m_warningSlots) {
+		if (slot.text.empty()) {
+			slot.text = text;
+			return;
+		}
+	}
+}
+
+void HudManager::rebuildWarningToasts(const std::vector<WarningAlert> &alerts) {
+	std::erase_if(m_toasts, [](const ActiveToast &t) {
+		return t.slot >= ToastSlot::WARNING_TOP;
+	});
+	for (const auto &slot : m_warningSlots) {
+		if (slot.text.empty())
+			continue;
+		for (const auto &alert : alerts) {
+			if (alert.text != slot.text)
+				continue;
+			ActiveToast newToast;
+			newToast.text = alert.text;
+			newToast.color = ColorAlpha(RED, alert.alpha);
+			newToast.timer = 0.0f;
+			newToast.maxDuration = 0.0f;
+			newToast.priority = ToastPriority::CRITICAL;
+			newToast.slot = slot.slot;
+			m_toasts.push_back(std::move(newToast));
+			break;
+		}
+	}
+}
+
+void HudManager::setWarningAlerts(const std::vector<WarningAlert> &alerts) {
+	for (auto &slot : m_warningSlots) {
+		if (slot.text.empty())
+			continue;
+		const bool active = std::any_of(alerts.begin(), alerts.end(), [&](const auto &a) {
+			return a.text == slot.text;
+		});
+		if (!active)
+			slot.text.clear();
+	}
+	for (const auto &alert : alerts) {
+		const bool assigned = std::any_of(std::begin(m_warningSlots), std::end(m_warningSlots), [&](const auto &s) {
+			return s.text == alert.text;
+		});
+		if (!assigned)
+			assignFirstFreeSlot(alert.text);
+	}
+	rebuildWarningToasts(alerts);
+}
+
+void HudManager::clearWarningToasts() {
+	std::erase_if(m_toasts, [](const ActiveToast &t) {
+		return t.slot >= ToastSlot::WARNING_TOP;
+	});
+	for (auto &slot : m_warningSlots) {
+		slot.text.clear();
+	}
+}
+
 void HudManager::reset() {
 	m_damageRequests.clear();
 	m_toastRequests.clear();
 	m_damageNumbers.clear();
 	m_toasts.clear();
 	m_observedEntity = entt::null;
-	m_collisionAlertCooldown = 0.0f;
-	m_collisionBlinkTimer = 0.0f;
-	m_collisionAlpha = 0.0f;
-	m_collisionWarnings.clear();
-	m_missileAlertCooldown = 0.0f;
-	m_missileBlinkTimer = 0.0f;
-	m_missileAlpha = 0.0f;
-	m_missileWarnings.clear();
+	clearWarnings();
+	clearWarningToasts();
 }
 
 size_t HudManager::getActiveDamageNumberCount() const {
@@ -121,7 +180,9 @@ void HudManager::processDamageRequests(GameContext &context) {
 			existing.timer = 0.0f;
 			existing.scale = std::min(existing.scale + 0.05f, 1.25f);
 			existing.worldPos = req.hitPos;
-			existing.offset = computeTargetOffset(context.registry, req.target, req.hitPos);
+			existing.offset = (Vector3LengthSqr(req.targetOffset) > 0.0f)
+				? req.targetOffset
+				: computeTargetOffset(context.registry, req.target, req.hitPos);
 
 			if (req.hitType == HitType::KILL) {
 				existing.hitType = HitType::KILL;
@@ -150,7 +211,9 @@ void HudManager::processDamageRequests(GameContext &context) {
 		ActiveDamageNumber newDmg;
 		newDmg.target = req.target;
 		newDmg.worldPos = req.hitPos;
-		newDmg.offset = computeTargetOffset(context.registry, req.target, req.hitPos);
+		newDmg.offset = (Vector3LengthSqr(req.targetOffset) > 0.0f)
+			? req.targetOffset
+			: computeTargetOffset(context.registry, req.target, req.hitPos);
 		newDmg.totalDamage = req.amount;
 		newDmg.timer = 0.0f;
 		newDmg.maxDuration = 1.0f;
@@ -201,80 +264,6 @@ void HudManager::processToastRequests() {
 	m_toastRequests.clear();
 }
 
-void HudManager::updateCollisionAlerts(float dt, GameContext &context) {
-	const static float warningTime = 5.0f;
-	const static float warningDist = 10.0f;
-	m_collisionWarnings.clear();
-
-	m_collisionAlertCooldown -= dt;
-	bool canPlayAlert = m_collisionAlertCooldown <= 0.0f;
-	if (m_collisionAlertCooldown <= 0.0f) {
-		m_collisionAlertCooldown = 1.0f;
-	}
-
-	if (!context.registry.valid(context.currentPlayer))
-		return;
-
-	auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
-	if (!posA || !velA || !bodyA)
-		return;
-
-	for (auto [other, posB, bodyB, dmgB] : context.registry.view<Position, CollisionBody, Damage, tag::Asteroid>(entt::exclude<tag::Bullet>).each()) {
-		if (context.currentPlayer == other)
-			continue;
-		Velocity velB = context.registry.all_of<Velocity>(other) ? context.registry.get<Velocity>(other) : Velocity{Vector3Zeros};
-		if (willCollide(posA->value, velA->value, posB.value, velB.value, bodyA->radius + bodyB.radius + warningDist, warningTime)) {
-			m_collisionWarnings.push_back({posB.value, Vector3Distance(posA->value, posB.value) - bodyA->radius - bodyB.radius});
-			if (canPlayAlert)
-				context.soundManager.queueSound(context.config, "sounds.collisionAlert", posB.value, 0.5f);
-		}
-	}
-
-	if (m_collisionWarnings.empty())
-		return;
-
-	m_collisionBlinkTimer += dt * 6.0f;
-	m_collisionAlpha = 0.7f + 0.3f * std::sin(m_collisionBlinkTimer);
-}
-
-void HudManager::updateMissileAlerts(float dt, GameContext &context) {
-	const static float warningTime = 5.0f;
-	m_missileWarnings.clear();
-
-	m_missileAlertCooldown -= dt;
-	bool canPlayAlert = m_missileAlertCooldown <= 0.0f;
-	if (m_missileAlertCooldown <= 0.0f) {
-		m_missileAlertCooldown = 1.0f;
-	}
-
-	if (!context.registry.valid(context.currentPlayer))
-		return;
-
-	auto [posA, velA, bodyA] = context.registry.try_get<Position, Velocity, CollisionBody>(context.currentPlayer);
-	if (!posA || !velA || !bodyA)
-		return;
-
-	for (auto [other, posB, bodyB, dmgB, velB, target] : context.registry.view<Position, CollisionBody, Damage, Velocity, MoveTarget, tag::Missile>().each()) {
-		if (context.currentPlayer == other || target.entity != context.currentPlayer)
-			continue;
-		float distance = Vector3Distance(posA->value, posB.value);
-		if (warningTime * Vector3Length(velB.value - velA->value) < distance)
-			continue;
-		bool willCollideFlag = Vector3DotProduct(posA->value - posB.value, velB.value - velA->value) > 0;
-		if (willCollideFlag) {
-			m_missileWarnings.push_back({posB.value, distance - bodyA->radius - bodyB.radius});
-			if (canPlayAlert)
-				context.soundManager.queueSound(context.config, "sounds.missileAlert", posB.value, 0.5f);
-		}
-	}
-
-	if (m_missileWarnings.empty())
-		return;
-
-	m_missileBlinkTimer += dt * 6.0f;
-	m_missileAlpha = 0.7f + 0.3f * std::sin(m_missileBlinkTimer);
-}
-
 void HudManager::updateActiveDamageNumbers(float dt, GameContext &context) {
 	for (auto it = m_damageNumbers.begin(); it != m_damageNumbers.end();) {
 		updateDamageNumberPosition(*it, dt, context.registry);
@@ -288,6 +277,10 @@ void HudManager::updateActiveDamageNumbers(float dt, GameContext &context) {
 
 void HudManager::updateActiveToasts(float dt) {
 	for (auto it = m_toasts.begin(); it != m_toasts.end();) {
+		if (it->maxDuration <= 0.0f) {
+			++it;
+			continue;
+		}
 		it->timer += dt;
 		if (it->timer >= it->maxDuration) {
 			it = m_toasts.erase(it);
@@ -300,8 +293,6 @@ void HudManager::updateActiveToasts(float dt) {
 void HudManager::update(float dt, GameContext &context) {
 	processDamageRequests(context);
 	processToastRequests();
-	updateCollisionAlerts(dt, context);
-	updateMissileAlerts(dt, context);
 	updateActiveDamageNumbers(dt, context);
 	updateActiveToasts(dt);
 }

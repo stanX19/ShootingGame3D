@@ -624,15 +624,6 @@ void BattlefieldHUDRenderer::drawCollisionWarning()
     const auto &warnings = m_context.hudManager.getCollisionWarnings();
     float alpha = m_context.hudManager.getCollisionAlertAlpha();
 
-    const char* alertMsg = "PROXIMITY ALERT";
-    int msgWidth = MeasureText(alertMsg, 24);
-    Vector2 alertPos = {GetScreenWidth() / 2.0f - msgWidth / 2.0f, 50.0f};
-
-    DrawRectangle(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha * 0.3f));
-    DrawRectangleLines(alertPos.x - 10, alertPos.y - 5, msgWidth + 20, 34, ColorAlpha(RED, alpha));
-
-    DrawText(alertMsg, alertPos.x, alertPos.y, 24, ColorAlpha(RED, alpha));
-
     Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
     float uiFrameRadius = getUIFrameRadius();
 
@@ -772,13 +763,29 @@ void BattlefieldHUDRenderer::drawDamageNumbers(const Camera3D &camera)
     }
 }
 
+void BattlefieldHUDRenderer::drawWarningToastItem(const HudManager::ActiveToast &t, Vector2 slotPos, float alpha)
+{
+    const auto &cfg = m_context.config.hud.warningToasts;
+    const int fontSize = cfg.fontSize;
+    const int msgWidth = MeasureText(t.text.c_str(), fontSize);
+    const float x = slotPos.x - msgWidth / 2.0f;
+    const float y = slotPos.y - 12.0f;
+
+    const float pulseAlpha = (t.color.a > 0) ? (t.color.a / 255.0f) * alpha : alpha;
+    const float halfPadX = cfg.boxPaddingX / 2.0f;
+
+    DrawRectangle(static_cast<int>(x - halfPadX), static_cast<int>(y - 5), msgWidth + cfg.boxPaddingX, cfg.boxHeight, ColorAlpha(RED, pulseAlpha * cfg.fillOpacity));
+    DrawRectangleLines(static_cast<int>(x - halfPadX), static_cast<int>(y - 5), msgWidth + cfg.boxPaddingX, cfg.boxHeight, ColorAlpha(RED, pulseAlpha));
+    DrawText(t.text.c_str(), static_cast<int>(x), static_cast<int>(y), fontSize, ColorAlpha(RED, pulseAlpha));
+}
+
 void BattlefieldHUDRenderer::drawToasts()
 {
     int leftLogIndex = 0;
     float leftBaseY = static_cast<float>(GetScreenHeight()) - 180.0f;
 
     for (const auto &t : m_context.hudManager.getActiveToasts()) {
-        float progress = t.timer / t.maxDuration;
+        float progress = (t.maxDuration > 0.0f) ? (t.timer / t.maxDuration) : 0.0f;
         float alpha = (progress > 0.8f) ? (1.0f - (progress - 0.8f) / 0.2f) : 1.0f;
         Color col = ColorAlpha(t.color, alpha);
 
@@ -798,6 +805,18 @@ void BattlefieldHUDRenderer::drawToasts()
             DrawRectangle(static_cast<int>(xPos - 16), static_cast<int>(yPos - 4), w + 32, t.fontSize + 8, ColorAlpha(BLACK, 0.6f * alpha));
             DrawRectangleLines(static_cast<int>(xPos - 16), static_cast<int>(yPos - 4), w + 32, t.fontSize + 8, ColorAlpha(t.color, 0.8f * alpha));
             DrawText(t.text.c_str(), static_cast<int>(xPos), static_cast<int>(yPos), t.fontSize, col);
+        } else if (t.slot >= ToastSlot::WARNING_TOP) {
+            if (!m_context.config.settings.showToasts)
+                continue;
+            const Vector2 center = getUIFrameCenter();
+            const float radius = getUIFrameRadius();
+            const float offsetY = m_context.config.hud.warningToasts.slotOffsetY;
+            Vector2 slotPos{center.x, center.y - radius - 35.0f};
+            if (t.slot == ToastSlot::WARNING_LEFT)
+                slotPos = {center.x - radius * 0.85f, center.y - radius - offsetY};
+            else if (t.slot == ToastSlot::WARNING_RIGHT)
+                slotPos = {center.x + radius * 0.85f, center.y - radius - offsetY};
+            drawWarningToastItem(t, slotPos, alpha);
         } else {
             if (!m_context.config.settings.showToasts)
                 continue;

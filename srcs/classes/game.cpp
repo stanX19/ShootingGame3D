@@ -69,6 +69,7 @@ EngineState Game::run() {
         
         m_systemSyncModelRotation.update(m_context, dt);
         m_systemCameraFollowPlayer.update(m_context, dt);
+        m_systemHudWarning.update(m_context, dt);
         m_context.hudManager.setObservedEntity(m_context.currentPlayer);
         m_context.hudManager.update(dt, m_context);
         BeginDrawing();

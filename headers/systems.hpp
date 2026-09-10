@@ -73,18 +73,35 @@ namespace systems
 	class SyncModelRotation : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class SpawnTrailParticles : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 
+	class HudWarning : public BaseSystem
+	{
+	public:
+		void update(GameContext &context, float dt) override;
+	private:
+		float m_prevHp = 0.0f;
+		float m_lowHpWarningDuration = 0.0f;
+		float m_lowHpWarningCooldown = 0.0f;
+		float m_lowHpBlinkTimer = 0.0f;
+
+		float m_collisionAlertCooldown = 0.0f;
+		float m_collisionBlinkTimer = 0.0f;
+
+		float m_missileAlertCooldown = 0.0f;
+		float m_missileBlinkTimer = 0.0f;
+
+		bool updateLowHpWarning(GameContext &context, float dt, entt::entity targetEntity);
+		bool updateCollisionWarning(GameContext &context, float dt, entt::entity targetEntity);
+		bool updateMissileWarning(GameContext &context, float dt, entt::entity targetEntity);
+	};
+
 	class SoundSfx : public BaseSystem
 	{
 	public:
 		void update(GameContext &context, float dt) override;
 	private:
 		float m_prevSpeed = 0.0f;
-		float m_prevHp = 0.0f;
-		float m_lowHpWarningDuration = 0.0f;
-		float m_lowHpWarningCooldown = 0.0f;
 		entt::entity m_lastLockOnTarget = entt::null;
 
-		void lowHpWarningSfx(GameContext &context, float dt);
 		void lockOnSfx(GameContext &context);
 	};
 } // namespace systems

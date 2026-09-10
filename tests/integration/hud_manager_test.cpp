@@ -5,6 +5,8 @@
 #include "components/score.hpp"
 #include "components/combat.hpp"
 #include "components/physics.hpp"
+#include "components/collision.hpp"
+#include "systems.hpp"
 #include "events.hpp"
 
 TEST_CASE("HudManager: Request queue drains on update", "[integration][hud]") {
@@ -624,5 +626,206 @@ TEST_CASE("HudManager: Destroyed target damage number continues floating from la
 	CHECK(hud.getActiveDamageNumbers()[0].worldPos.x == Catch::Approx(100.0f));
 	CHECK(hud.getActiveDamageNumbers()[0].worldPos.y > 0.0f);
 }
+
+TEST_CASE("HudWarning: Asteroid collision populates HudManager warning state and triggers sound", "[integration][hud]") {
+	GameContext context;
+	const entt::entity player = context.registry.create();
+	context.registry.emplace<Position>(player, Position{Vector3{0.0f, 0.0f, 0.0f}});
+	context.registry.emplace<Velocity>(player, Velocity{Vector3{0.0f, 0.0f, 0.0f}});
+	context.registry.emplace<CollisionBody>(player, CollisionBody{5.0f});
+	context.currentPlayer = player;
+	context.hudManager.setObservedEntity(player);
+
+	const entt::entity asteroid = context.registry.create();
+	context.registry.emplace<tag::Asteroid>(asteroid);
+	context.registry.emplace<Position>(asteroid, Position{Vector3{20.0f, 0.0f, 0.0f}});
+	context.registry.emplace<Velocity>(asteroid, Velocity{Vector3{-10.0f, 0.0f, 0.0f}});
+	context.registry.emplace<CollisionBody>(asteroid, CollisionBody{5.0f});
+	context.registry.emplace<Damage>(asteroid, Damage{10.0f});
+
+	systems::HudWarning warningSystem;
+	warningSystem.update(context, 0.016f);
+
+	CHECK(context.hudManager.hasCollisionWarnings());
+	REQUIRE(context.hudManager.getCollisionWarnings().size() == 1);
+	CHECK(context.hudManager.getCollisionAlertAlpha() > 0.0f);
+
+	// When Proximity Alert is the sole active warning, it occupies WARNING_TOP
+	bool foundProximityToast = false;
+	for (const auto &t : context.hudManager.getActiveToasts()) {
+		if (t.slot == ToastSlot::WARNING_TOP && t.text == "PROXIMITY ALERT")
+			foundProximityToast = true;
+	}
+	CHECK(foundProximityToast);
+}
+
+TEST_CASE("HudWarning: Low HP alone occupies WARNING_TOP slot", "[integration][hud]") {
+	GameContext context;
+	const entt::entity player = context.registry.create();
+	context.registry.emplace<Position>(player, Position{Vector3Zeros});
+	context.registry.emplace<Velocity>(player, Velocity{Vector3Zeros});
+	context.registry.emplace<CollisionBody>(player, CollisionBody{5.0f});
+	auto &hp = context.registry.emplace<HP>(player, 100.0f);
+	context.currentPlayer = player;
+	context.hudManager.setObservedEntity(player);
+
+	systems::HudWarning warningSystem;
+	// Initial update with full HP
+	warningSystem.update(context, 0.016f);
+	CHECK(context.hudManager.getActiveToastCount() == 0);
+
+	// HP drops below 30% (e.g. 20 HP)
+	hp.value = 20.0f;
+	warningSystem.update(context, 0.016f);
+
+	bool foundLowHpTop = false;
+	for (const auto &t : context.hudManager.getActiveToasts()) {
+		if (t.slot == ToastSlot::WARNING_TOP && t.text == "LOW HP")
+			foundLowHpTop = true;
+	}
+	CHECK(foundLowHpTop);
+
+	// Advance time past the 10s audio duration
+	for (int i = 0; i < 750; ++i) {
+		warningSystem.update(context, 0.016f);
+	}
+
+	bool stillActiveAfterAudio = false;
+	for (const auto &t : context.hudManager.getActiveToasts()) {
+		if (t.slot == ToastSlot::WARNING_TOP && t.text == "LOW HP")
+			stillActiveAfterAudio = true;
+	}
+	CHECK(stillActiveAfterAudio);
+}
+
+TEST_CASE("HudWarning: HudManager FCFS slot assignment retains slot positions without shifting", "[integration][hud]") {
+	GameContext context;
+	const entt::entity player = context.registry.create();
+	context.registry.emplace<Position>(player, Position{Vector3Zeros});
+	context.registry.emplace<Velocity>(player, Velocity{Vector3Zeros});
+	context.registry.emplace<CollisionBody>(player, CollisionBody{5.0f});
+	auto &hp = context.registry.emplace<HP>(player, 100.0f);
+	context.currentPlayer = player;
+	context.hudManager.setObservedEntity(player);
+
+	// Impending asteroid collision
+	const entt::entity asteroid = context.registry.create();
+	context.registry.emplace<tag::Asteroid>(asteroid);
+	auto &pos = context.registry.emplace<Position>(asteroid, Position{Vector3{20.0f, 0.0f, 0.0f}});
+	auto &vel = context.registry.emplace<Velocity>(asteroid, Velocity{Vector3{-10.0f, 0.0f, 0.0f}});
+	context.registry.emplace<CollisionBody>(asteroid, CollisionBody{5.0f});
+	context.registry.emplace<Damage>(asteroid, Damage{10.0f});
+
+	systems::HudWarning warningSystem;
+	// 1. Proximity alert triggers first -> HudManager places it at WARNING_TOP
+	warningSystem.update(context, 0.016f);
+
+	// 2. HP drops below 30% -> Low HP claims next available slot (WARNING_LEFT)
+	hp.value = 20.0f;
+	warningSystem.update(context, 0.016f);
+
+	bool proximityAtTop = false;
+	bool lowHpAtLeft = false;
+	for (const auto &t : context.hudManager.getActiveToasts()) {
+		if (t.slot == ToastSlot::WARNING_TOP && t.text == "PROXIMITY ALERT")
+			proximityAtTop = true;
+		if (t.slot == ToastSlot::WARNING_LEFT && t.text == "LOW HP")
+			lowHpAtLeft = true;
+	}
+	CHECK(proximityAtTop);
+	CHECK(lowHpAtLeft);
+
+	// 3. Asteroid collision resolves -> WARNING_TOP freed, LOW HP stays at WARNING_LEFT
+	pos.value = Vector3{200.0f, 0.0f, 0.0f};
+	vel.value = Vector3{50.0f, 0.0f, 0.0f};
+	warningSystem.update(context, 0.016f);
+
+	bool lowHpStillAtLeft = false;
+	bool topIsEmpty = true;
+	for (const auto &t : context.hudManager.getActiveToasts()) {
+		if (t.slot == ToastSlot::WARNING_TOP)
+			topIsEmpty = false;
+		if (t.slot == ToastSlot::WARNING_LEFT && t.text == "LOW HP")
+			lowHpStillAtLeft = true;
+	}
+	CHECK(topIsEmpty);
+	CHECK(lowHpStillAtLeft);
+}
+
+TEST_CASE("HudWarning: Low HP triggered first stays at WARNING_TOP when Proximity triggers", "[integration][hud]") {
+	GameContext context;
+	const entt::entity player = context.registry.create();
+	context.registry.emplace<Position>(player, Position{Vector3Zeros});
+	context.registry.emplace<Velocity>(player, Velocity{Vector3Zeros});
+	context.registry.emplace<CollisionBody>(player, CollisionBody{5.0f});
+	auto &hp = context.registry.emplace<HP>(player, 100.0f);
+	context.currentPlayer = player;
+	context.hudManager.setObservedEntity(player);
+
+	systems::HudWarning warningSystem;
+	warningSystem.update(context, 0.016f);
+
+	hp.value = 20.0f;
+	warningSystem.update(context, 0.016f);
+
+	bool lowHpAtTop = false;
+	for (const auto &t : context.hudManager.getActiveToasts()) {
+		if (t.slot == ToastSlot::WARNING_TOP && t.text == "LOW HP")
+			lowHpAtTop = true;
+	}
+	CHECK(lowHpAtTop);
+
+	// Threat 2: Asteroid approaches -> claims WARNING_LEFT
+	const entt::entity asteroid = context.registry.create();
+	context.registry.emplace<tag::Asteroid>(asteroid);
+	context.registry.emplace<Position>(asteroid, Position{Vector3{20.0f, 0.0f, 0.0f}});
+	context.registry.emplace<Velocity>(asteroid, Velocity{Vector3{-10.0f, 0.0f, 0.0f}});
+	context.registry.emplace<CollisionBody>(asteroid, CollisionBody{5.0f});
+	context.registry.emplace<Damage>(asteroid, Damage{10.0f});
+
+	warningSystem.update(context, 0.016f);
+
+	lowHpAtTop = false;
+	bool proximityAtLeft = false;
+	for (const auto &t : context.hudManager.getActiveToasts()) {
+		if (t.slot == ToastSlot::WARNING_TOP && t.text == "LOW HP")
+			lowHpAtTop = true;
+		if (t.slot == ToastSlot::WARNING_LEFT && t.text == "PROXIMITY ALERT")
+			proximityAtLeft = true;
+	}
+	CHECK(lowHpAtTop);
+	CHECK(proximityAtLeft);
+}
+
+TEST_CASE("HudWarning: Avoiding danger clears warning toast immediately", "[integration][hud]") {
+	GameContext context;
+	const entt::entity player = context.registry.create();
+	context.registry.emplace<Position>(player, Position{Vector3Zeros});
+	context.registry.emplace<Velocity>(player, Velocity{Vector3Zeros});
+	context.registry.emplace<CollisionBody>(player, CollisionBody{5.0f});
+	context.currentPlayer = player;
+	context.hudManager.setObservedEntity(player);
+
+	const entt::entity asteroid = context.registry.create();
+	context.registry.emplace<tag::Asteroid>(asteroid);
+	auto &pos = context.registry.emplace<Position>(asteroid, Position{Vector3{20.0f, 0.0f, 0.0f}});
+	auto &vel = context.registry.emplace<Velocity>(asteroid, Velocity{Vector3{-10.0f, 0.0f, 0.0f}});
+	context.registry.emplace<CollisionBody>(asteroid, CollisionBody{5.0f});
+	context.registry.emplace<Damage>(asteroid, Damage{10.0f});
+
+	systems::HudWarning warningSystem;
+	warningSystem.update(context, 0.016f);
+	CHECK(context.hudManager.hasCollisionWarnings());
+	CHECK(context.hudManager.getActiveToastCount() == 1);
+
+	// Asteroid moves far away and steers away
+	pos.value = Vector3{200.0f, 0.0f, 0.0f};
+	vel.value = Vector3{50.0f, 0.0f, 0.0f};
+	warningSystem.update(context, 0.016f);
+
+	CHECK(!context.hudManager.hasCollisionWarnings());
+	CHECK(context.hudManager.getActiveToastCount() == 0);
+}
+
 
 

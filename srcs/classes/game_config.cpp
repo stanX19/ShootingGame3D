@@ -74,6 +74,10 @@ void GameConfig::initConstants() {
 	COMBAT_DIST = getInt("game.combatDist", 1000);
 	UNIT_COUNT = getInt("game.unitCount", 4);
 
+	killAttr.assistThresholdPct = getFloat("game.killAttr.assistThresholdPct", 0.30f);
+	killAttr.assistWindowSeconds = getFloat("game.killAttr.assistWindowSeconds", 10.0f);
+	killAttr.fallbackAttributionWindowSeconds = getFloat("game.killAttr.fallbackAttributionWindowSeconds", 10.0f);
+
 	hud.damageNumbers.fontSize = getFloat("hud.damageNumbers.fontSize", 20.0f);
 	hud.damageNumbers.opacity = getFloat("hud.damageNumbers.opacity", 0.75f);
 	hud.damageNumbers.resetCooldown = getFloat("hud.damageNumbers.resetCooldown", 0.45f);

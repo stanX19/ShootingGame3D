@@ -1,5 +1,10 @@
 {
 	"arenaSize": 2500,
 	"combatDist": 1750,
-	"unitCount": 4
+	"unitCount": 4,
+	"killAttr": {
+		"assistThresholdPct": 0.30,
+		"assistWindowSeconds": 10.0,
+		"fallbackAttributionWindowSeconds": 10.0
+	}
 }

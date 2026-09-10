@@ -142,7 +142,12 @@ namespace {
 			return;
 
 		const HitType hitType = isKill ? HitType::KILL : HitType::NORMAL;
-		evt.context->hudManager.reportDamage(rootAttacker, victim.id, damage, victim.pos, hitType);
+		Vector3 targetOffset = Vector3Zeros;
+		if (evt.context->registry.all_of<Position>(victim.id)) {
+			const Vector3 targetPos = evt.context->registry.get<Position>(victim.id).value;
+			targetOffset = Vector3Subtract(victim.pos, targetPos);
+		}
+		evt.context->hudManager.reportDamage(rootAttacker, victim.id, damage, victim.pos, targetOffset, hitType);
 	}
 
 	// assumes killer is eligible to deal damage to victim

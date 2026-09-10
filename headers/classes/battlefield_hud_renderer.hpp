@@ -35,6 +35,7 @@ public:
     void drawMissileWarning();
     void drawDamageNumbers(const Camera3D &camera);
     void drawToasts();
+    void drawWarningToastItem(const HudManager::ActiveToast &t, Vector2 slotPos, float alpha);
 
     Vector2 getUIFrameCenter() const;
     float getUIFrameRadius() const;

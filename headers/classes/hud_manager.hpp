@@ -32,7 +32,10 @@ enum class ToastPriority {
 enum class ToastSlot {
 	FREEFORM = 0,
 	LEFT_LOG,
-	TOP_NOTIF
+	TOP_NOTIF,
+	WARNING_TOP,
+	WARNING_LEFT,
+	WARNING_RIGHT
 };
 
 struct ToastConfig {
@@ -50,6 +53,7 @@ struct DamageReport {
 	entt::entity target = entt::null;
 	float amount = 0.0f;
 	Vector3 hitPos{0.0f, 0.0f, 0.0f};
+	Vector3 targetOffset{0.0f, 0.0f, 0.0f};
 	HitType hitType = HitType::NORMAL;
 };
 
@@ -62,9 +66,16 @@ public:
 	entt::entity getObservedEntity() const;
 
 	void reportDamage(entt::entity attacker, entt::entity target, float amount, Vector3 hitPos, HitType hitType = HitType::NORMAL);
+	void reportDamage(entt::entity attacker, entt::entity target, float amount, Vector3 hitPos, Vector3 targetOffset, HitType hitType = HitType::NORMAL);
 	void addToast(const ToastConfig &config);
 	void addToastLeftLog(const std::string &message, Color color = WHITE);
 	void addToastTopNotif(const std::string &message, ToastPriority priority = ToastPriority::HIGH, Color color = YELLOW);
+	struct WarningAlert {
+		std::string text;
+		float alpha = 1.0f;
+	};
+	void setWarningAlerts(const std::vector<WarningAlert> &alerts);
+	void clearWarningToasts();
 
 	void update(float dt, GameContext &context);
 	void reset();
@@ -105,6 +116,24 @@ public:
 	float getMissileAlertAlpha() const { return m_missileAlpha; }
 	const std::vector<std::pair<Vector3, float>>& getMissileWarnings() const { return m_missileWarnings; }
 
+	void setCollisionWarnings(std::vector<std::pair<Vector3, float>> warnings, float alpha) {
+		m_collisionWarnings = std::move(warnings);
+		m_collisionAlpha = alpha;
+	}
+
+	void setMissileWarnings(std::vector<std::pair<Vector3, float>> warnings, float alpha) {
+		m_missileWarnings = std::move(warnings);
+		m_missileAlpha = alpha;
+	}
+
+	void clearWarnings() {
+		m_collisionWarnings.clear();
+		m_collisionAlpha = 0.0f;
+		m_missileWarnings.clear();
+		m_missileAlpha = 0.0f;
+		clearWarningToasts();
+	}
+
 private:
 	entt::entity m_observedEntity = entt::null;
 	std::vector<DamageReport> m_damageRequests;
@@ -112,20 +141,26 @@ private:
 	std::vector<ActiveDamageNumber> m_damageNumbers;
 	std::vector<ActiveToast> m_toasts;
 
-	float m_collisionAlertCooldown = 0.0f;
-	float m_collisionBlinkTimer = 0.0f;
+	struct WarningSlot {
+		std::string text;
+		ToastSlot slot = ToastSlot::FREEFORM;
+	};
+	WarningSlot m_warningSlots[3] = {
+		{"", ToastSlot::WARNING_TOP},
+		{"", ToastSlot::WARNING_LEFT},
+		{"", ToastSlot::WARNING_RIGHT}
+	};
+	void assignFirstFreeSlot(const std::string &text);
+	void rebuildWarningToasts(const std::vector<WarningAlert> &alerts);
+
 	float m_collisionAlpha = 0.0f;
 	std::vector<std::pair<Vector3, float>> m_collisionWarnings;
 
-	float m_missileAlertCooldown = 0.0f;
-	float m_missileBlinkTimer = 0.0f;
 	float m_missileAlpha = 0.0f;
 	std::vector<std::pair<Vector3, float>> m_missileWarnings;
 
 	void processDamageRequests(GameContext &context);
 	void processToastRequests();
-	void updateCollisionAlerts(float dt, GameContext &context);
-	void updateMissileAlerts(float dt, GameContext &context);
 	void updateActiveDamageNumbers(float dt, GameContext &context);
 	void updateActiveToasts(float dt);
 };

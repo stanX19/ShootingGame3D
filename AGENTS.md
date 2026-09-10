@@ -5,9 +5,15 @@ This is a space shooting game. Design philosophy is realistic physics and sci-fi
 
 ## Ambition
 
-Currently it is single player PVE, but the ambition is to make this an online PVP game. Therefore when designing systems and writing code always write it in a way that is easy to expand into PVP.
+### PVP Expansion
+Currently it is single player PVE, but the ambition is to make this an online PVP game. Therefore always design systems and write code in a way that is easy to expand into PVP.
 - bad: Adding isEnemy or isPlayer component because its easy to do
 - good: Use generic faction system, keep it flexible and easy to expand into PVP.
+
+### Multi-threading
+Now the mainloop runs in a single thread. But when the time comes, we will decouple rendering, physics, weapons, AI, and other processing into different threads. Always aim for maximum separation of concerns, modularity, and facade.
+- bad: A needs to know C, C needs to know A
+- good: A can run without C, C can run without A. data sharing happens within ECS, or shared facade B.
 
 # Instructions
 
@@ -76,7 +82,9 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - **Function Cleaness** Anything more than 2 indentation from the parent function should be factored out into its subfunction. NEVER create hell of nested indent! A function should never be more than 50 lines.
 
 ### C++ Foundations
-- **`const`-Correctness:** Default to `const` on variables, parameters, and return types. Always add `const` until you cannot (documents intent and catches accidental writes at compile time). Mark all non-mutating member functions (especially accessors) `const`.
+- **`const`-Correctness:** Default to `const` on variables, parameters, and return types. Always add `const` until you cannot (documents intent and catches accidental writes at compile time). Mark all non-mutating member functions (especially accessors) `const`. If unsure, add `const` first and correct it only when compiler complains.
+  * bad: `float vel = Vector3Length(velPtr->value)`
+  * good: `const float vel = Vector3Length(velPtr->value)`
 - **Parameter Passing:** Pass small, trivially-copyable types (`int`, `float`, `Vector3`) by value. Pass all other read-only parameters by `const T&` (avoids copies, accepts temporaries/literals).
 
 ### Control Flow & Simulation
@@ -95,6 +103,7 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - Follow Red-Green-Refactor for behavioral code.
 - Bug fixes start with a regression test. Risky legacy changes start with characterization tests.
 - Unit tests must be deterministic, bounded, and headless: no window, GPU, audio device, user input, network, or asset pack requirement.
+- **No Brittle Change-Detector Tests:** Do not write tests that assert exact literal values of configurable tuning parameters (e.g. `CHECK(config.val == 10.0f)`). Tests must verify **behavior** and systems logic, not configuration file contents. Tuning changes in JSON must never break tests unless the behavioral contract itself is broken.
 - Use `tests/unit/`, `tests/integration/`, `tests/smoke/`, and `tests/manual/` as the test taxonomy. Existing interactive visual programs are manual tests, not smoke tests.
 - `make test` and `make all_test` run deterministic automated tests only. Use `make test-manual TEST=<basename>` to launch one manual program; use `make test-manual-bin` only when you explicitly want to build all manual programs.
 - The integration category currently reports that no tests exist; do not treat that as integration coverage.

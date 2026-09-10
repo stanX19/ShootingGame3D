@@ -66,12 +66,26 @@ public:
 	int COMBAT_DIST = 1000;
 	int UNIT_COUNT = 4;
 
+	struct KillAttr {
+		float assistThresholdPct = 0.30f;
+		float assistWindowSeconds = 10.0f;
+		float fallbackAttributionWindowSeconds = 10.0f;
+	} killAttr;
+
 	struct HUD {
 		struct DamageNumbersConfig {
 			float fontSize = 20.0f;
 			float opacity = 0.75f;
 			float resetCooldown = 0.45f;
 		} damageNumbers;
+
+		struct WarningToastsConfig {
+			int fontSize = 24;
+			int boxPaddingX = 20;
+			int boxHeight = 34;
+			float fillOpacity = 0.3f;
+			float slotOffsetY = 10.0f;
+		} warningToasts;
 	} hud;
 
 	struct Physics {
