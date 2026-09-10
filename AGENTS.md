@@ -98,6 +98,14 @@ For ECS component domains, contracts, and tag conventions, read [docs/components
 - Keep systems explicit about their required component views and update order.
 - When unsure of usage and API, grep includes/entt/entt.hpp directly
 
+## Visual & UI Palette
+
+- **Canonical Color Palette:** All visual design, HUD elements, UI text, and feedback effects follow a 3-color palette: **Orange**, **Blue**, and **Red**.
+  - **Blue (`SKYBLUE` / `BLUE`):** Friendly entities, HUD ring/frame, player notifications/kills, player status, and shields.
+  - **Orange (`ORANGE`):** Accents, interactive highlights, warnings, critical hits, and explosions.
+  - **Red (`RED`):** Hostiles, damage indicators, danger alerts, and player death.
+- Avoid ad-hoc colors (e.g. green) in UI, HUD logs, and telemetry unless explicitly approved.
+
 ## Testing
 
 - Catch2 v3.15.0 is the repository's installed test framework.

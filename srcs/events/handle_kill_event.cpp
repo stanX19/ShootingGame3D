@@ -175,7 +175,7 @@ namespace {
 		const std::string victimName = victimNamePtr ? victimNamePtr->value : "Enemy";
 
 		if (effectiveKiller == evt.context->currentPlayer) {
-			evt.context->hudManager.addToastLeftLog("Killed " + victimName, GREEN);
+			evt.context->hudManager.addToastLeftLog("Killed " + victimName, SKYBLUE);
 			return;
 		}
 
