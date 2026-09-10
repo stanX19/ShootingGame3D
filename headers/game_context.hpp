@@ -5,7 +5,7 @@
 #include "model_manager.hpp"
 #include "collision_body_manager.hpp"
 #include "sound_manager.hpp"
-#include "factions.hpp"
+#include "components/faction.hpp"
 #include "classes/weapon_registry.hpp"
 #include "classes/hud_manager.hpp"
 #include <map>

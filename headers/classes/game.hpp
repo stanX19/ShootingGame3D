@@ -53,8 +53,7 @@ private:
     systems::CameraFollowPlayer m_systemCameraFollowPlayer;
     systems::HudWarning m_systemHudWarning;
 
-    systems::BlueUnitRespawn m_systemBlueUnitRespawn;
-    systems::RedUnitRespawn m_systemRedUnitRespawn;
+    systems::UnitSpawn m_systemUnitSpawn;
     systems::AsteroidRespawn m_systemAsteroidRespawn;
     systems::EntityAnchorRelease m_systemEntityAnchorRelease;
     systems::EntityLifetime m_systemEntityLifetime;

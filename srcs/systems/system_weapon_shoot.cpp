@@ -5,7 +5,7 @@
 #include "components/physics.hpp"
 #include "components/weapon.hpp"
 #include "components/score.hpp"
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include "components/sound.hpp"
 #include "components/collision.hpp"
 #include "utils/math_utils.hpp"

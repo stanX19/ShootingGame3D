@@ -3,8 +3,9 @@
 #include "components/combat.hpp"
 #include "components/physics.hpp"
 #include "components/collision.hpp"
-#include "components/movement.hpp"
-#include "components/unit.hpp"
+#include "components/spaceship.hpp"
+#include "components/identity.hpp"
+#include "components/weapon.hpp"
 #include "utils/algorithm_utils.hpp"
 #include "raymath.h"
 #include <algorithm>

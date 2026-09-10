@@ -8,11 +8,11 @@
 #include "components/lifetime.hpp"
 #include "components/score.hpp"
 #include "components/weapon.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include "components/effect.hpp"
 #include "components/render.hpp"
-#include "components/factions.hpp"
-#include "components/movement.hpp"
+#include "components/faction.hpp"
+#include "components/spaceship.hpp"
 #include "components/anchor.hpp"
 #include "game_context.hpp"
 #include "entities/spaceship_factory.hpp"
@@ -25,6 +25,7 @@
 #include <vector>
 
 entt::entity spawnUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
+entt::entity spawnFighterUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnFastEliteUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnEliteUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnTerminatorUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
@@ -44,7 +45,7 @@ void spawnDebris(
 void spawnDebris(
 	GameContext& context,
 	const Vector3& position,
-	const RenderBody* bodyPtr,
+	const render::RenderBody* bodyPtr,
 	float lifespan = 2.0f,
 	Vector3 velocity = {0, 0, 0}
 );

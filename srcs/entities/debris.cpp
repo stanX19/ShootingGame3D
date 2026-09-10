@@ -29,15 +29,15 @@ void spawnDebris(GameContext &context, const Vector3& position, float originalRa
 		// fast = small
 		float radius = originalRadius * (0.025f + 0.25f / speed);
 
-		context.registry.emplace<Position>(debris, position);
-		context.registry.emplace<RenderBody>(debris, RenderBody{debrisModel, originalColor, radius, Vector3{0.0f, 0.0f, 0.0f}, randomRotation()});
-		context.registry.emplace<Velocity>(debris, debrisVel);
-		context.registry.emplace<Lifespan>(debris, lifespan + GetRandomValue(0, 200) / 100.0f);
-		context.registry.emplace<tag::Shaded>(debris);
+		context.registry.emplace<physics::Position>(debris, position);
+		context.registry.emplace<render::RenderBody>(debris, render::RenderBody{debrisModel, originalColor, radius, Vector3{0.0f, 0.0f, 0.0f}, randomRotation()});
+		context.registry.emplace<physics::Velocity>(debris, debrisVel);
+		context.registry.emplace<lifetime::Lifespan>(debris, lifespan + GetRandomValue(0, 200) / 100.0f);
+		context.registry.emplace<render::tag::Shaded>(debris);
 	}
 }
 
-void spawnDebris(GameContext &context, const Vector3& position, const RenderBody *bodyPtr, float lifespan, Vector3 velocity) {
+void spawnDebris(GameContext &context, const Vector3& position, const render::RenderBody *bodyPtr, float lifespan, Vector3 velocity) {
 	if (!bodyPtr)
 		return;
 

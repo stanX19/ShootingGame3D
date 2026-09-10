@@ -45,8 +45,7 @@ namespace {
 		SYS_RENDERER_RENDER,
 		SYS_HUD_RENDERER_RENDER,
 
-		SYS_BLUE_UNIT_RESPAWN,
-		SYS_RED_UNIT_RESPAWN,
+		SYS_UNIT_SPAWN,
 		SYS_ASTEROID_RESPAWN,
 		SYS_ENTITY_ANCHOR_RELEASE,
 		SYS_ENTITY_LIFETIME,
@@ -137,8 +136,7 @@ namespace {
 		metrics[SYS_RENDERER_RENDER].name = "renderer.Render";
 		metrics[SYS_HUD_RENDERER_RENDER].name = "hudRenderer.RenderAll";
 
-		metrics[SYS_BLUE_UNIT_RESPAWN].name = "blueUnitRespawn";
-		metrics[SYS_RED_UNIT_RESPAWN].name = "redUnitRespawn";
+		metrics[SYS_UNIT_SPAWN].name = "unitSpawn";
 		metrics[SYS_ASTEROID_RESPAWN].name = "asteroidRespawn";
 		metrics[SYS_ENTITY_ANCHOR_RELEASE].name = "entityAnchorRelease";
 		metrics[SYS_ENTITY_LIFETIME].name = "entityLifetime";
@@ -218,8 +216,7 @@ int main() {
 	systems::EnergyShield sysEnergyShield;
 	systems::SyncModelRotation sysSyncModelRotation;
 	systems::CameraFollowPlayer sysCameraFollowPlayer;
-	systems::BlueUnitRespawn sysBlueUnitRespawn;
-	systems::RedUnitRespawn sysRedUnitRespawn;
+	systems::UnitSpawn sysUnitSpawn;
 	systems::AsteroidRespawn sysAsteroidRespawn;
 	systems::EntityAnchorRelease sysEntityAnchorRelease;
 	systems::EntityLifetime sysEntityLifetime;
@@ -310,8 +307,7 @@ int main() {
 		runProfiled<SYS_RENDERER_RENDER>(metrics, isProfiling, [&]() { renderer.Render(dt); });
 		runProfiled<SYS_HUD_RENDERER_RENDER>(metrics, isProfiling, [&]() { hudRenderer.RenderAll(dt); });
 
-		runProfiled<SYS_BLUE_UNIT_RESPAWN>(metrics, isProfiling, [&]() { sysBlueUnitRespawn.update(context, dt); });
-		runProfiled<SYS_RED_UNIT_RESPAWN>(metrics, isProfiling, [&]() { sysRedUnitRespawn.update(context, dt); });
+		runProfiled<SYS_UNIT_SPAWN>(metrics, isProfiling, [&]() { sysUnitSpawn.update(context, dt); });
 		runProfiled<SYS_ASTEROID_RESPAWN>(metrics, isProfiling, [&]() { sysAsteroidRespawn.update(context, dt); });
 		runProfiled<SYS_ENTITY_ANCHOR_RELEASE>(metrics, isProfiling, [&]() { sysEntityAnchorRelease.update(context, dt); });
 		runProfiled<SYS_ENTITY_LIFETIME>(metrics, isProfiling, [&]() { sysEntityLifetime.update(context, dt); });

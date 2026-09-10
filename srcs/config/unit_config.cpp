@@ -49,7 +49,7 @@ int integer(
 	return value.get<int>();
 }
 
-bool boolean(
+[[maybe_unused]] bool boolean(
 	const nlohmann::json& object,
 	const char* key,
 	std::string_view path
@@ -138,7 +138,6 @@ UnitConfig::Definition UnitConfig::parseDefinition(
 		required(value, "effects", path),
 		path + ".effects"
 	);
-	definition.elite = boolean(value, "elite", path);
 
 	try {
 		spaceships.get(definition.spaceshipReference);

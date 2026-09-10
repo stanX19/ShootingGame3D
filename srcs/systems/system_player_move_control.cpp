@@ -1,8 +1,8 @@
 #include "systems.hpp"
 #include "game_context.hpp"
 #include "components/physics.hpp"
-#include "components/movement.hpp"
-#include "components/unit_camera.hpp"
+#include "components/spaceship.hpp"
+#include "components/camera.hpp"
 #include "utils/input_utils.hpp"
 #include "utils/vector_rotation_utils.hpp"
 #include <iostream>

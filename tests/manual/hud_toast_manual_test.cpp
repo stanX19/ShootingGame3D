@@ -2,7 +2,7 @@
 #include "game_context.hpp"
 #include "classes/hud_manager.hpp"
 #include "classes/battlefield_hud_renderer.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include <iostream>
 
 int main() {

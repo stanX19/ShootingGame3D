@@ -5,11 +5,11 @@
 #include "components/render.hpp"
 #include "components/combat.hpp"
 #include "components/effect.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include "components/collision.hpp"
 #include "components/lifetime.hpp"
 #include "components/sound.hpp"
-#include "components/movement.hpp"
+#include "components/spaceship.hpp"
 #include "game_context.hpp"
 #include <vector>
 #include <string>

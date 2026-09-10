@@ -1,7 +1,10 @@
-#pragma once
+#ifndef COMPONENTS_RENDER_HPP
+#define COMPONENTS_RENDER_HPP
 
 #include "includes.hpp"
 #include "model_manager.hpp"
+
+namespace render {
 
 struct RenderBody
 {
@@ -43,11 +46,29 @@ struct RadiusExpand {
 };
 
 namespace tag {
-	struct LightSource {};
-	struct Shaded {};
-	struct SkyBox {};
-	struct RotationSyncModel {};
-	struct AimDirectionSyncModel {};
-	struct VelocitySyncModelRot {};
-	struct VelocitySyncRot {};
-}
+
+struct LightSource {};
+struct Shaded {};
+struct SkyBox {};
+struct RotationSyncModel {};
+struct AimDirectionSyncModel {};
+struct VelocitySyncModelRot {};
+
+} // namespace tag
+
+} // namespace render
+
+namespace tag {
+using ::render::tag::LightSource;
+using ::render::tag::Shaded;
+using ::render::tag::SkyBox;
+using ::render::tag::RotationSyncModel;
+using ::render::tag::AimDirectionSyncModel;
+using ::render::tag::VelocitySyncModelRot;
+} // namespace tag
+
+using ::render::RenderBody;
+using ::render::ModelStrech;
+using ::render::RadiusExpand;
+
+#endif // COMPONENTS_RENDER_HPP

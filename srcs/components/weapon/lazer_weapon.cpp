@@ -1,8 +1,18 @@
 #include "weapons.hpp"
 #include "utils.hpp"
 #include "components/sound.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include "game_config.hpp"
+
+using namespace render;
+using namespace combat;
+using namespace collision;
+using namespace lifetime;
+using namespace physics;
+using namespace spaceship;
+using namespace identity;
+using namespace weapon;
+namespace tag = ::tag;
 
 namespace
 {
@@ -25,7 +35,7 @@ namespace
 
 	void emplaceLazerWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_LAZER_SHOOT)
 	{
-		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+		context.registry.emplace_or_replace<weapon::tag::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
 		context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.4f);
@@ -39,10 +49,10 @@ namespace
 
 		entt::entity bullet = context.templateReg.create();
 		const t_model_id model = getBulletModel(context);
-		context.templateReg.emplace<tag::Bullet>(bullet);
-		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
-		context.templateReg.emplace<tag::bullet_type::Energy>(bullet);
-		context.templateReg.emplace<tag::bullet_type::Lazer>(bullet);
+		context.templateReg.emplace<weapon::tag::Bullet>(bullet);
+		context.templateReg.emplace<render::tag::VelocitySyncModelRot>(bullet);
+		context.templateReg.emplace<weapon::tag::Energy>(bullet);
+		context.templateReg.emplace<weapon::tag::Lazer>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f / (2 * rad));
 		context.templateReg.emplace<CollisionBody>(bullet, CollisionBody{rad});
 		context.templateReg.emplace<RenderBody>(bullet, RenderBody{model, color, rad});

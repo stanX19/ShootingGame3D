@@ -2,10 +2,11 @@
 #include "game_context.hpp"
 #include "entities.hpp"
 #include "components/physics.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
+#include "components/spaceship.hpp"
 #include "components/weapon.hpp"
-#include "components/factions.hpp"
-#include "components/unit_camera.hpp"
+#include "components/faction.hpp"
+#include "components/camera.hpp"
 #include "utils/math_utils.hpp"
 
 void systems::PlayerRespawn::update(GameContext &context, [[maybe_unused]] float dt) {

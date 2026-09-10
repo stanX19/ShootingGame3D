@@ -1,6 +1,9 @@
-#pragma once
+#ifndef COMPONENTS_LIFETIME_HPP
+#define COMPONENTS_LIFETIME_HPP
 
 #include "includes.hpp"
+
+namespace lifetime {
 
 struct Lifespan
 {
@@ -12,3 +15,10 @@ struct DisappearBound
 	Vector3 start;
 	Vector3 end;
 };
+
+} // namespace lifetime
+
+using ::lifetime::Lifespan;
+using ::lifetime::DisappearBound;
+
+#endif // COMPONENTS_LIFETIME_HPP

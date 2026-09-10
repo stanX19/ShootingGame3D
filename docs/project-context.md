@@ -41,6 +41,7 @@ project/
 ├── shaders/              GLSL shaders
 ├── includes/             Vendored dependencies
 └── docs/                 Canonical engineering documentation
+    ├── components.md     ECS component domains, tags, and conventions
 ```
 
 ## Ownership and Runtime Flow

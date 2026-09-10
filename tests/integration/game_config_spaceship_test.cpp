@@ -46,22 +46,21 @@ TEST_CASE("GameConfig loads materialized unit definitions", "[integration][unit]
 	config.init(kConfigRoots);
 
 	const auto& units = config.units();
-	CHECK(units.contains("player"));
+	CHECK(units.contains("fighter"));
 	CHECK(units.contains("basic"));
 	CHECK(units.contains("terminator"));
 	CHECK(units.ids() == std::vector<std::string>{
 		"basic",
 		"elite",
 		"fastElite",
+		"fighter",
 		"mothership",
-		"player",
 		"terminator"
 	});
-	CHECK(units.get("player").spaceshipReference == "player");
-	CHECK(units.get("player").stats.collisionRadius == Catch::Approx(1.0f));
-	CHECK(units.get("player").stats.shieldRegen == Catch::Approx(200.0f));
-	CHECK(units.get("elite").elite);
-	CHECK(units.get("elite").stats.maxSpeed == Catch::Approx(40.0f));
+	CHECK(units.get("fighter").spaceshipReference == "player");
+	CHECK(units.get("fighter").stats.collisionRadius == Catch::Approx(1.0f));
+	CHECK(units.get("fighter").stats.shieldRegen == Catch::Approx(50.0f));
+	CHECK(units.get("elite").stats.maxSpeed == Catch::Approx(80.0f));
 }
 
 TEST_CASE("GameConfig rejects a unit with an unknown spaceship reference", "[integration][unit]") {
@@ -90,6 +89,10 @@ TEST_CASE("GameConfig rejects a unit with an unknown spaceship reference", "[int
 }
 
 TEST_CASE("Spaceship factory scales the unit-radius model by collision radius", "[integration][spaceship]") {
+	if (!IsWindowReady()) {
+		SetConfigFlags(FLAG_WINDOW_HIDDEN);
+		InitWindow(64, 64, "integration test");
+	}
 	GameConfig config;
 	config.init(kConfigRoots);
 	ModelManager modelManager;

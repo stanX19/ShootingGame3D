@@ -1,6 +1,9 @@
-#pragma once
+#ifndef COMPONENTS_ANCHOR_HPP
+#define COMPONENTS_ANCHOR_HPP
 
 #include "includes.hpp"
+
+namespace anchor {
 
 struct PositionAnchor
 {
@@ -21,5 +24,19 @@ struct DeathAnchor
 };
 
 namespace tag {
-	struct GetVelOnAnchorDeath {};
-}
+
+struct GetVelOnAnchorDeath {};
+
+} // namespace tag
+
+} // namespace anchor
+
+namespace tag {
+using ::anchor::tag::GetVelOnAnchorDeath;
+} // namespace tag
+
+using ::anchor::PositionAnchor;
+using ::anchor::RotationAnchor;
+using ::anchor::DeathAnchor;
+
+#endif // COMPONENTS_ANCHOR_HPP

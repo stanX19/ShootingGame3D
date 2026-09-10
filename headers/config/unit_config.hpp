@@ -38,7 +38,6 @@ public:
 		std::string spaceshipReference;
 		Stats stats;
 		Effects effects;
-		bool elite = false;
 	};
 
 	void init(

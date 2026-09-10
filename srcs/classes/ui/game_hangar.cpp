@@ -402,7 +402,7 @@ void GameHangar::destroyPreviewShip()
 		return;
 
 	std::vector<entt::entity> linkedTurrets;
-	for (auto [entity, parent] : m_context.registry.view<WeaponParent>().each())
+	for (auto [entity, parent] : m_context.registry.view<weapon::WeaponParent>().each())
 	{
 		if (parent.parent == m_previewPlayer)
 			linkedTurrets.push_back(entity);

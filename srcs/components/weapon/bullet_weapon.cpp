@@ -1,10 +1,21 @@
 #include "weapons.hpp"
 #include "utils.hpp"
-#include "factions.hpp"
+#include "components/faction.hpp"
 #include "components/sound.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include "game_config.hpp"
 #include <string>
+
+using namespace render;
+using namespace combat;
+using namespace collision;
+using namespace lifetime;
+using namespace physics;
+using namespace spaceship;
+using namespace identity;
+using namespace weapon;
+using namespace effect;
+namespace tag = ::tag;
 
 namespace
 {
@@ -15,7 +26,7 @@ namespace
 
 	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_BULLET_SHOOT)
 	{
-		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+		context.registry.emplace_or_replace<weapon::tag::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
 		context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.5f);
@@ -29,10 +40,10 @@ namespace
 		const Vector3 bulletBound = {cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2};
 
 		entt::entity bullet = context.templateReg.create();
-		context.templateReg.emplace<tag::Bullet>(bullet);
+		context.templateReg.emplace<weapon::tag::Bullet>(bullet);
 		context.templateReg.emplace<faction::Faction>(bullet, faction::FAC_BULLET);
-		context.templateReg.emplace<tag::VelocitySyncModelRot>(bullet);
-		context.templateReg.emplace<tag::bullet_type::Kinetic>(bullet);
+		context.templateReg.emplace<render::tag::VelocitySyncModelRot>(bullet);
+		context.templateReg.emplace<weapon::tag::Kinetic>(bullet);
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f);
 		context.templateReg.emplace<DisappearBound>(bullet, bulletBound * -1, bulletBound);
 		context.templateReg.emplace<sound::HitSound>(bullet, sound::RANDOM_BULLET_HIT, 0.4f);

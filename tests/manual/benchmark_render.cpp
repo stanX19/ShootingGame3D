@@ -394,8 +394,7 @@ int main() {
 		}
 
 		// Simulation Cleanup Systems
-		systems::BlueUnitRespawn{}.update(context, dt);
-		systems::RedUnitRespawn{}.update(context, dt);
+		systems::UnitSpawn{}.update(context, dt);
 		systems::AsteroidRespawn{}.update(context, dt);
 		systems::EntityAnchorRelease{}.update(context, dt);
 		systems::EntityLifetime{}.update(context, dt);

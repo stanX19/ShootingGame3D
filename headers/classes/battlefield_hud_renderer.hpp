@@ -3,12 +3,12 @@
 
 #include "includes.hpp"
 #include "components/physics.hpp"
-#include "components/movement.hpp"
+#include "components/spaceship.hpp"
 #include "components/combat.hpp"
 #include "components/collision.hpp"
 #include "components/weapon.hpp"
-#include "components/unit.hpp"
-#include "components/factions.hpp"
+#include "components/identity.hpp"
+#include "components/faction.hpp"
 #include "utils.hpp"
 #include "game_context.hpp"
 

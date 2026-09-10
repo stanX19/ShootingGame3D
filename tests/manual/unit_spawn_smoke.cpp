@@ -69,8 +69,7 @@ int main() {
 	const bool selectedPlayerValid = context.registry.valid(selectedPlayer)
 		&& context.registry.all_of<AimTarget>(selectedPlayer)
 		&& context.registry.all_of<tag::weapon::PlayerControlledFire>(selectedPlayer)
-		&& context.registry.all_of<tag::weapon::AIControlledAim>(selectedPlayer)
-		&& !context.registry.all_of<tag::EliteUnit>(selectedPlayer);
+		&& context.registry.all_of<tag::weapon::AIControlledAim>(selectedPlayer);
 	std::size_t selectedTurretCount = 0;
 	for (const auto [entity, parent] :
 		context.registry.view<WeaponParent>().each()) {

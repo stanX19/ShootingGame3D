@@ -2,7 +2,7 @@
 #include "game_context.hpp"
 #include "components/physics.hpp"
 #include "components/weapon.hpp"
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include "utils/math_utils.hpp"
 #include <cmath>
 

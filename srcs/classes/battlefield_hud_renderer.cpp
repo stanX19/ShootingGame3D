@@ -7,6 +7,13 @@
 #include <cmath>
 #include <cstdio>
 
+using namespace physics;
+using namespace combat;
+using namespace collision;
+using namespace spaceship;
+using namespace identity;
+using namespace weapon;
+
 BattlefieldHUDRenderer::BattlefieldHUDRenderer(Camera3D &camera, GameContext &context)
     : m_camera(camera), m_context(context), m_currentDt(0.0f)
 {
@@ -110,7 +117,7 @@ void BattlefieldHUDRenderer::drawHealthBars()
 	if (!m_context.config.settings.showHPBar)
 		return;
 
-    auto view = m_context.registry.view<Position, CollisionBody, HP, tag::Targetable>();
+    auto view = m_context.registry.view<Position, CollisionBody, HP, combat::tag::Targetable>();
     for (auto entity : view)
     {
         auto &pos = view.get<Position>(entity);
@@ -171,7 +178,7 @@ void BattlefieldHUDRenderer::drawTargetable()
     m_prevTargetedEntity = targetedEntity;
     std::vector<std::tuple<entt::entity, Vector3, float, faction::FacVal>> allPosArr;
     std::vector<std::tuple<entt::entity, Vector3, float, faction::FacVal>> posArr;
-    for (auto [entity, pos, faction] : m_context.registry.view<Position, tag::Targetable, faction::Faction>().each())
+    for (auto [entity, pos, faction] : m_context.registry.view<Position, combat::tag::Targetable, faction::Faction>().each())
     {
         if (entity == m_context.currentPlayer)
             continue;

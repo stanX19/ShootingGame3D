@@ -1,7 +1,10 @@
-#pragma once
+#ifndef COMPONENTS_COMBAT_HPP
+#define COMPONENTS_COMBAT_HPP
 
 #include "includes.hpp"
 #include <array>
+
+namespace combat {
 
 struct HP
 {
@@ -117,3 +120,24 @@ private:
 	}
 };
 
+namespace tag {
+
+struct Targetable {};
+
+} // namespace tag
+
+} // namespace combat
+
+namespace tag {
+using ::combat::tag::Targetable;
+} // namespace tag
+
+using ::combat::HP;
+using ::combat::HPRegen;
+using ::combat::EnergyShield;
+using ::combat::EnergyShieldRegen;
+using ::combat::Damage;
+using ::combat::DelayedDamage;
+using ::combat::DamageContributors;
+
+#endif // COMPONENTS_COMBAT_HPP

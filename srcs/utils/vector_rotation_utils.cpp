@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iostream>
 
+using physics::Rotation;
+
 Vector3 getForwardVector(const Rotation &rotation)
 {
 	return Vector3Transform({0, 0, 1}, QuaternionToMatrix(rotation.value));

@@ -5,6 +5,17 @@
 #include "game_config.hpp"
 #include <algorithm>
 
+using namespace render;
+using namespace combat;
+using namespace collision;
+using namespace lifetime;
+using namespace physics;
+using namespace spaceship;
+using namespace identity;
+using namespace weapon;
+using namespace effect;
+namespace tag = ::tag;
+
 namespace
 {
 	const Color BASE_COLOR = GRAY;
@@ -18,7 +29,7 @@ namespace
 
 	void emplaceMissileWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_MISSILE_SHOOT)
 	{
-		context.registry.emplace_or_replace<tag::weapon::IsWeapon>(entity);
+		context.registry.emplace_or_replace<weapon::tag::IsWeapon>(entity);
 		context.registry.emplace_or_replace<AimTarget>(entity);
 		context.registry.emplace_or_replace<AimDirection>(entity);
 		context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.5f);
@@ -84,7 +95,7 @@ namespace
 
 		entt::entity missile = context.templateReg.create();
 		const t_model_id model = context.modelManager.loadModel("assets/Models/missile/missile.glb");
-		context.templateReg.emplace<tag::VelocitySyncModelRot>(missile);
+		context.templateReg.emplace<render::tag::VelocitySyncModelRot>(missile);
 		context.templateReg.emplace<CollisionBody>(missile, CollisionBody{rad});
 		context.templateReg.emplace<Damage>(missile, Damage{bodyDamage});
 		context.templateReg.emplace<RenderBody>(missile, RenderBody{model, color, rad});
@@ -100,11 +111,11 @@ namespace
 			}
 		);
 		context.templateReg.emplace<Rotation>(missile);
-		context.templateReg.emplace<tag::VelocitySyncRot>(missile);
+		context.templateReg.emplace<physics::tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);
-		context.templateReg.emplace<tag::AIMoveControl>(missile);
-		context.templateReg.emplace<tag::Suicidal>(missile);
-		context.templateReg.emplace<tag::Missile>(missile);
+		context.templateReg.emplace<spaceship::tag::AIMoveControl>(missile);
+		context.templateReg.emplace<spaceship::tag::Suicidal>(missile);
+		context.templateReg.emplace<weapon::tag::Missile>(missile);
 		context.templateReg.emplace<Lifespan>(missile, Lifespan{lifespan});
 		context.templateReg.emplace<sound::DeathSound>(missile, sound::RANDOM_EXPLOSION, std::min(1.0f, rad / 1.0f * 0.5f));
 		context.templateReg.emplace<Mass>(missile, mass);
@@ -392,7 +403,7 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 
 	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
-	context.templateReg.emplace<tag::Targetable>(bulletTemplate);
+	context.templateReg.emplace<combat::tag::Targetable>(bulletTemplate);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{baseLifespan * lifespanMultiplier});
 	context.templateReg.emplace_or_replace<SpawnsTrailParticles>(

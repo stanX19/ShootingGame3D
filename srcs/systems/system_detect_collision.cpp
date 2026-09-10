@@ -5,7 +5,7 @@
 #include "components/physics.hpp"
 #include "components/collision.hpp"
 #include "components/render.hpp"
-#include "components/unit.hpp"
+#include "components/weapon.hpp"
 #include "utils/algorithm_utils.hpp"
 
 #include <algorithm>

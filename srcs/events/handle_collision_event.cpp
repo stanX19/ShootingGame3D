@@ -5,7 +5,8 @@
 #include "components/effect.hpp"
 #include "components/sound.hpp"
 #include "components/score.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
+#include "components/weapon.hpp"
 #include "entities.hpp"
 #include "entt_utils.hpp"
 
@@ -28,11 +29,11 @@ namespace {
 	                   const event::CollisionParty& damager) {
 		entt::registry &registry = context->registry;
 		
-		if (!registry.any_of<tag::effect::DropDebris>(victim.id))
+		if (!registry.any_of<effect::tag::DropDebris>(victim.id))
 			return;
 
-		auto [hpPtr, posPtr, bodyPtr] = registry.try_get<HP, Position, RenderBody>(victim.id);
-		auto dmgPtr = registry.try_get<Damage>(damager.id);
+		auto [hpPtr, posPtr, bodyPtr] = registry.try_get<combat::HP, physics::Position, render::RenderBody>(victim.id);
+		auto dmgPtr = registry.try_get<combat::Damage>(damager.id);
 
 		if (!hpPtr || hpPtr->value <= 0 || !dmgPtr || dmgPtr->value < 0 || !bodyPtr || !posPtr)
 			return;
@@ -54,8 +55,8 @@ namespace {
 		const auto& b = evt.b;
 		entt::registry &registry = evt.context->registry;
 		
-		auto [aMass, aVel, aRot, aHp] = registry.try_get<Mass, Velocity, Rotation, HP>(a.id);
-		auto [bMass, bVel, bRot, bHp] = registry.try_get<Mass, Velocity, Rotation, HP>(b.id);
+		auto [aMass, aVel, aRot, aHp] = registry.try_get<physics::Mass, physics::Velocity, physics::Rotation, combat::HP>(a.id);
+		auto [bMass, bVel, bRot, bHp] = registry.try_get<physics::Mass, physics::Velocity, physics::Rotation, combat::HP>(b.id);
 		
 		// handle velocity changes
 		if (!aMass || !aVel || !bMass || !bVel)
@@ -122,7 +123,7 @@ namespace {
 			return;
 		if (rootAttacker == entt::null || damage <= 0.0f)
 			return;
-		auto &contributors = evt.context->registry.get_or_emplace<DamageContributors>(victimId);
+		auto &contributors = evt.context->registry.get_or_emplace<combat::DamageContributors>(victimId);
 		contributors.recordDamage(rootAttacker, damage, evt.context->gameTime);
 	}
 
@@ -137,14 +138,13 @@ namespace {
 			return;
 		if (victim.id == entt::null || !evt.context->registry.valid(victim.id))
 			return;
-		// const bool isProjectile = evt.context->registry.any_of<tag::Bullet, tag::Missile>(victim.id);
-		if (!evt.context->registry.all_of<tag::Targetable>(victim.id))
+		if (!evt.context->registry.all_of<combat::tag::Targetable>(victim.id))
 			return;
 
 		const HitType hitType = isKill ? HitType::KILL : HitType::NORMAL;
 		Vector3 targetOffset = Vector3Zeros;
-		if (evt.context->registry.all_of<Position>(victim.id)) {
-			const Vector3 targetPos = evt.context->registry.get<Position>(victim.id).value;
+		if (evt.context->registry.all_of<physics::Position>(victim.id)) {
+			const Vector3 targetPos = evt.context->registry.get<physics::Position>(victim.id).value;
 			targetOffset = Vector3Subtract(victim.pos, targetPos);
 		}
 		evt.context->hudManager.reportDamage(rootAttacker, victim.id, damage, victim.pos, targetOffset, hitType);
@@ -158,8 +158,8 @@ namespace {
 	) {
 		entt::registry &registry = evt.context->registry;
 		
-		Damage *dmgPtr = registry.try_get<Damage>(killer.id);
-		auto [shieldPtr, hpPtr] = registry.try_get<EnergyShield, HP>(victim.id);
+		combat::Damage *dmgPtr = registry.try_get<combat::Damage>(killer.id);
+		auto [shieldPtr, hpPtr] = registry.try_get<combat::EnergyShield, combat::HP>(victim.id);
 
 		if (!dmgPtr || !hpPtr || hpPtr->value <= 0.0f)
 			return;
@@ -168,7 +168,7 @@ namespace {
 		float remainingDmg = dmgPtr->value;
 
 		// Use shield to block if it's an energy weapon
-		if (registry.all_of<tag::bullet_type::Energy>(killer.id) && shieldPtr && shieldPtr->hp > 0) {
+		if (registry.all_of<weapon::tag::Energy>(killer.id) && shieldPtr && shieldPtr->hp > 0) {
 			if (shieldPtr->hp > remainingDmg) {  // Can block all damage
 				shieldPtr->hp -= remainingDmg;
 				shieldPtr->activeTimer = shieldPtr->activeDuration;
@@ -200,8 +200,8 @@ namespace {
 
 	void handleCollisionDamage(const event::CollisionEvent &evt) {
 		entt::registry &registry = evt.context->registry;
-		HP *aHpPtr = registry.try_get<HP>(evt.a.id);
-		HP *bHpPtr = registry.try_get<HP>(evt.b.id);
+		combat::HP *aHpPtr = registry.try_get<combat::HP>(evt.a.id);
+		combat::HP *bHpPtr = registry.try_get<combat::HP>(evt.b.id);
 
 		bool aWasAlive = !aHpPtr || aHpPtr->value > 0;
 		bool bWasAlive = !bHpPtr || bHpPtr->value > 0;

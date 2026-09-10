@@ -2,12 +2,12 @@
 #include "entt_utils.hpp"
 #include "components/combat.hpp"
 #include "components/score.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include "components/sound.hpp"
 #include "components/physics.hpp"
 #include "components/collision.hpp"
 #include "components/weapon.hpp"
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include <iostream>
 
 namespace {
@@ -26,7 +26,7 @@ namespace {
 	}
 
 	void addScore(GameContext &context, entt::entity entity, int score) {
-		auto [scorePtr, scoreParentPtr] = context.registry.try_get<Score, ScoreParent>(entity);
+		auto [scorePtr, scoreParentPtr] = context.registry.try_get<score::Score, score::ScoreParent>(entity);
 		if (scorePtr)
 			scorePtr->value += score;
 		if (scoreParentPtr)
@@ -34,12 +34,12 @@ namespace {
 	}
 
 	void handleFactionDataUpdate(const KillEvent& evt) {
-		if (!evt.context->registry.all_of<tag::Spaceship>(evt.victim.id))
+		if (!evt.context->registry.all_of<identity::tag::Spaceship>(evt.victim.id))
 			return;
 		auto &factions = evt.context->factions;
 		auto killerFacPtr = evt.context->registry.try_get<faction::Faction>(evt.killer.id);
 		auto victimFacPtr = evt.context->registry.try_get<faction::Faction>(evt.victim.id);
-		auto victimScorePtr = evt.context->registry.try_get<KilledScore>(evt.victim.id);
+		auto victimScorePtr = evt.context->registry.try_get<score::KilledScore>(evt.victim.id);
 
 		if (killerFacPtr) {
 			auto &killerData = factions[killerFacPtr->value];
@@ -53,27 +53,27 @@ namespace {
 	}
 
 	void handleScoreTransfer(const KillEvent& evt) {
-		auto victimScorePtr = evt.context->registry.try_get<KilledScore>(evt.victim.id);
+		auto victimScorePtr = evt.context->registry.try_get<score::KilledScore>(evt.victim.id);
 		if (victimScorePtr)
 			addScore(*evt.context, evt.killer.id, victimScorePtr->value);
 	}
 
 
 	void fixVictimPosition(const KillEvent& evt) {
-		auto victimPosPtr = evt.context->registry.try_get<Position>(evt.victim.id);
+		auto victimPosPtr = evt.context->registry.try_get<physics::Position>(evt.victim.id);
 		if (victimPosPtr) {
 			victimPosPtr->value = evt.victim.pos;
 		}
 	}
 
 	void updateVictimVelocity(const KillEvent& evt) {
-		if (evt.context->registry.any_of<tag::bullet_type::Energy>(evt.killer.id))
+		if (evt.context->registry.any_of<weapon::tag::Energy>(evt.killer.id))
 			return;
-		if (evt.context->registry.any_of<tag::bullet_type::Lazer, tag::bullet_type::Kinetic>(evt.victim.id))
+		if (evt.context->registry.any_of<weapon::tag::Lazer, weapon::tag::Kinetic>(evt.victim.id))
 			return;
 
-		auto [victimVelPtr, victimBodyPtr] = evt.context->registry.try_get<Velocity, CollisionBody>(evt.victim.id);
-		CollisionBody* killerBodyPtr = evt.context->registry.try_get<CollisionBody>(evt.killer.id);
+		auto [victimVelPtr, victimBodyPtr] = evt.context->registry.try_get<physics::Velocity, collision::CollisionBody>(evt.victim.id);
+		collision::CollisionBody* killerBodyPtr = evt.context->registry.try_get<collision::CollisionBody>(evt.killer.id);
 
 		if (victimVelPtr && victimBodyPtr && killerBodyPtr) {
 			if (victimBodyPtr->radius * 1.2f < killerBodyPtr->radius) {
@@ -95,11 +95,11 @@ namespace {
 		const bool isSuicide = (rootKiller == evt.victim.id);
 		const bool isAsteroid = (directKiller != entt::null &&
 		                         evt.context->registry.valid(directKiller) &&
-		                         evt.context->registry.any_of<tag::Asteroid>(directKiller));
+		                         evt.context->registry.any_of<identity::tag::Asteroid>(directKiller));
 		if (!isInvalidKiller && !isSuicide && !isAsteroid)
 			return rootKiller;
 
-		const auto *contributors = evt.context->registry.try_get<DamageContributors>(evt.victim.id);
+		const auto *contributors = evt.context->registry.try_get<combat::DamageContributors>(evt.victim.id);
 		if (!contributors)
 			return rootKiller;
 
@@ -115,16 +115,16 @@ namespace {
 		if (evt.victim.id != evt.context->currentPlayer)
 			return false;
 
-		const Name *killerName = evt.context->registry.try_get<Name>(effectiveKiller);
+		const identity::Name *killerName = evt.context->registry.try_get<identity::Name>(effectiveKiller);
 		const std::string message = (killerName && effectiveKiller != entt::null)
-			? ("Killed by " + killerName->val)
+			? ("Killed by " + killerName->value)
 			: "You have been killed";
 		evt.context->hudManager.addToastLeftLog(message, RED);
 		return true;
 	}
 
 	bool isEligibleForAssist(
-		const DamageContributors::DamageContributorEntry &entry,
+		const combat::DamageContributors::DamageContributorEntry &entry,
 		float maxHp,
 		float totalDamage,
 		float gameTime,
@@ -140,11 +140,11 @@ namespace {
 	}
 
 	void tryHandleKillAssistToast(const KillEvent& evt, entt::entity effectiveKiller, const std::string &victimName) {
-		const auto *contributors = evt.context->registry.try_get<DamageContributors>(evt.victim.id);
+		const auto *contributors = evt.context->registry.try_get<combat::DamageContributors>(evt.victim.id);
 		if (!contributors)
 			return;
 
-		const HP *hpPtr = evt.context->registry.try_get<HP>(evt.victim.id);
+		const combat::HP *hpPtr = evt.context->registry.try_get<combat::HP>(evt.victim.id);
 		const float maxHp = hpPtr ? hpPtr->maxValue : 0.0f;
 		const float totalDamage = contributors->getTotalDamage();
 
@@ -168,11 +168,11 @@ namespace {
 		if (tryHandlePlayerDeathToast(evt, effectiveKiller))
 			return;
 
-		if (!evt.context->registry.all_of<tag::Spaceship>(evt.victim.id))
+		if (!evt.context->registry.all_of<identity::tag::Spaceship>(evt.victim.id))
 			return;
 
-		const Name *victimNamePtr = evt.context->registry.try_get<Name>(evt.victim.id);
-		const std::string victimName = victimNamePtr ? victimNamePtr->val : "Enemy";
+		const identity::Name *victimNamePtr = evt.context->registry.try_get<identity::Name>(evt.victim.id);
+		const std::string victimName = victimNamePtr ? victimNamePtr->value : "Enemy";
 
 		if (effectiveKiller == evt.context->currentPlayer) {
 			evt.context->hudManager.addToastLeftLog("Killed " + victimName, GREEN);

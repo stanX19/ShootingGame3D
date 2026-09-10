@@ -4,11 +4,11 @@
 #include "components/physics.hpp"
 
 Quaternion rotateAroundAxis(const Quaternion& current, const Vector3& axis, float angle);
-Vector3 getForwardVector(const Rotation& rotation);
+Vector3 getForwardVector(const physics::Rotation& rotation);
 Vector3 getForwardVector(const Quaternion &rotation);
-Vector3 getRightVector(const Rotation& rotation);
+Vector3 getRightVector(const physics::Rotation& rotation);
 Vector3 getRightVector(const Quaternion &rotation);
-Vector3 getUpVector(const Rotation& rotation);
+Vector3 getUpVector(const physics::Rotation& rotation);
 Vector3 getUpVector(const Quaternion &rotation);
 Quaternion vector3ToRotation(const Vector3& forward);
 Quaternion vector3ToRotation(const Vector3& forward, const Vector3& up);
@@ -19,6 +19,6 @@ Matrix getTransformMatrix(const Vector3 &scale, const Vector3 &rotation, const V
 
 float angleDifference(const Vector3 &a, const Vector3 &b);
 float angleDifference(const Quaternion& a, const Quaternion& b);
-float angleDifference(const Rotation& a, const Rotation& b);
-float angleDifference(const Quaternion& a, const Rotation& b);
-float angleDifference(const Rotation& a, const Quaternion& b);
+float angleDifference(const physics::Rotation& a, const physics::Rotation& b);
+float angleDifference(const Quaternion& a, const physics::Rotation& b);
+float angleDifference(const physics::Rotation& a, const Quaternion& b);

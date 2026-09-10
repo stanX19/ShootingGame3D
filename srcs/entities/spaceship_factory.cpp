@@ -3,14 +3,14 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include "components/physics.hpp"
-#include "components/movement.hpp"
+#include "components/spaceship.hpp"
 #include "components/combat.hpp"
 #include "components/collision.hpp"
 #include "components/render.hpp"
 #include "components/effect.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include "components/score.hpp"
 #include "utils.hpp"
 #include <iostream>
@@ -19,16 +19,16 @@ namespace spaceship::factory {
 
 namespace {
 
-SpawnsTrailParticles makeShipTrailParticles(
+effect::SpawnsTrailParticles makeShipTrailParticles(
 	const std::vector<EnginePoint>& engines,
 	float bodyScale
 ) {
-	if (engines.size() > SpawnsTrailParticles::maxSpawnLocations)
+	if (engines.size() > effect::SpawnsTrailParticles::maxSpawnLocations)
 		throw std::invalid_argument(
 			"SPACESHIP: engine count exceeds trail spawn capacity"
 		);
 
-	SpawnsTrailParticles result{};
+	effect::SpawnsTrailParticles result{};
 	result.spawnCount = static_cast<std::uint8_t>(engines.size());
 	result.radius = 0.3f * bodyScale;
 	result.lifespan = 0.1f;
@@ -106,18 +106,18 @@ SpawnedSpaceship spawnConfiguredSpaceship(
 	SpawnedSpaceship assembly;
 	assembly.entity = context.registry.create();
 
-	context.registry.emplace<Position>(assembly.entity, params.position);
-	context.registry.emplace<Velocity>(assembly.entity);
-	context.registry.emplace<Rotation>(assembly.entity, params.rotation);
-	context.registry.emplace<CollisionBody>(assembly.entity, params.radius);
-	context.registry.emplace<RenderBody>(assembly.entity, RenderBody{geometry.modelId, params.bodyColor, geometry.bodyScale});
+	context.registry.emplace<physics::Position>(assembly.entity, params.position);
+	context.registry.emplace<physics::Velocity>(assembly.entity);
+	context.registry.emplace<physics::Rotation>(assembly.entity, params.rotation);
+	context.registry.emplace<collision::CollisionBody>(assembly.entity, params.radius);
+	context.registry.emplace<render::RenderBody>(assembly.entity, render::RenderBody{geometry.modelId, params.bodyColor, geometry.bodyScale});
 	context.registry.emplace<faction::Faction>(assembly.entity, faction::Faction{params.faction});
-	context.registry.emplace<tag::Targetable>(assembly.entity);
-	context.registry.emplace<tag::Spaceship>(assembly.entity);
-	context.registry.emplace<tag::Shaded>(assembly.entity);
-	context.registry.emplace<tag::RotationSyncModel>(assembly.entity);
-	context.registry.emplace<tag::effect::DropDebris>(assembly.entity);
-	context.registry.emplace<SpawnsTrailParticles>(
+	context.registry.emplace<combat::tag::Targetable>(assembly.entity);
+	context.registry.emplace<identity::tag::Spaceship>(assembly.entity);
+	context.registry.emplace<render::tag::Shaded>(assembly.entity);
+	context.registry.emplace<render::tag::RotationSyncModel>(assembly.entity);
+	context.registry.emplace<effect::tag::DropDebris>(assembly.entity);
+	context.registry.emplace<effect::SpawnsTrailParticles>(
 		assembly.entity,
 		makeShipTrailParticles(geometry.engines, geometry.bodyScale)
 	);

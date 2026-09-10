@@ -1,6 +1,6 @@
 #include "entities.hpp"
-#include "components/factions.hpp"
-#include "components/unit_camera.hpp"
+#include "components/faction.hpp"
+#include "components/camera.hpp"
 #include "utils.hpp"
 
 #include <stdexcept>
@@ -41,9 +41,9 @@ void addPlayerControlTags(GameContext& context, entt::entity player) {
 	// Weapon attachment may already install AimTarget on the player entity.
 	// Keep the player-control adapter idempotent so the spawn order cannot
 	// trigger EnTT's duplicate-component assertion.
-	context.registry.emplace_or_replace<AimTarget>(player);
-	context.registry.emplace<tag::weapon::AIControlledAim>(player);
-	context.registry.emplace<tag::weapon::PlayerControlledFire>(player);
+	context.registry.emplace_or_replace<weapon::AimTarget>(player);
+	context.registry.emplace<weapon::tag::AIControlledAim>(player);
+	context.registry.emplace<weapon::tag::PlayerControlledFire>(player);
 	context.registry.emplace<camera::UnitCamera>(player);
 }
 
@@ -71,8 +71,6 @@ entt::entity spawnPlayer(GameContext& context, Vector3 pos) {
 	params.loadout = makePlayerLoadout(context, mountCount);
 	const unit::SpawnedUnit spawned =
 		unit::spawnConfiguredUnit(context, unitId, params);
-	if (context.registry.all_of<tag::EliteUnit>(spawned.entity))
-		context.registry.remove<tag::EliteUnit>(spawned.entity);
 	addPlayerControlTags(context, spawned.entity);
 	context.currentPlayer = spawned.entity;
 	return spawned.entity;

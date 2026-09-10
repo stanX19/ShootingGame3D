@@ -1,12 +1,11 @@
 #include "entities/turret.hpp"
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include "components/physics.hpp"
 #include "components/anchor.hpp"
 #include "components/combat.hpp"
 #include "components/collision.hpp"
 #include "components/render.hpp"
 #include "components/weapon.hpp"
-#include "components/unit.hpp"
 #include "components/score.hpp"
 #include "components/effect.hpp"
 
@@ -21,17 +20,17 @@ namespace {
 		entt::entity turret = context.registry.create();
 		const t_model_id turretModel =
 			context.modelManager.loadModel("assets/Models/canon/canon3.glb");
-		context.registry.emplace<Position>(turret);
-		context.registry.emplace<Rotation>(turret);
-		context.registry.emplace<CollisionBody>(turret, radius);
-		context.registry.emplace<RenderBody>(
-			turret, RenderBody{turretModel, color, radius}
+		context.registry.emplace<physics::Position>(turret);
+		context.registry.emplace<physics::Rotation>(turret);
+		context.registry.emplace<collision::CollisionBody>(turret, radius);
+		context.registry.emplace<render::RenderBody>(
+			turret, render::RenderBody{turretModel, color, radius}
 		);
-		context.registry.emplace<HP>(turret, 750.0f);
-		context.registry.emplace<HPRegen>(turret, 10.0f);
-		context.registry.emplace<tag::Shaded>(turret);
-		context.registry.emplace<tag::AimDirectionSyncModel>(turret);
-		context.registry.emplace<tag::effect::DropDebris>(turret);
+		context.registry.emplace<combat::HP>(turret, 750.0f);
+		context.registry.emplace<combat::HPRegen>(turret, 10.0f);
+		context.registry.emplace<render::tag::Shaded>(turret);
+		context.registry.emplace<render::tag::AimDirectionSyncModel>(turret);
+		context.registry.emplace<effect::tag::DropDebris>(turret);
 		context.registry.emplace<effect::ExplodeOnDeath>(
 			turret,
 			effect::ExplodeOnDeath::createFromRadDmg(
@@ -39,7 +38,7 @@ namespace {
 				effect::DEFAULT_EXPLOSION_DAMAGE
 			)
 		);
-		context.registry.emplace<Mass>(
+		context.registry.emplace<physics::Mass>(
 			turret,
 			context.config.getFloat("units.turret.mass", 500.0f)
 		);
@@ -52,34 +51,34 @@ namespace {
 		entt::entity parent,
 		Vector3 relativePosition
 	) {
-		context.registry.emplace_or_replace<PositionAnchor>(
+		context.registry.emplace_or_replace<anchor::PositionAnchor>(
 			turret,
-			PositionAnchor{parent, relativePosition}
+			anchor::PositionAnchor{parent, relativePosition}
 		);
-		context.registry.emplace_or_replace<RotationAnchor>(
+		context.registry.emplace_or_replace<anchor::RotationAnchor>(
 			turret,
-			RotationAnchor{parent}
+			anchor::RotationAnchor{parent}
 		);
-		context.registry.emplace_or_replace<WeaponParent>(
+		context.registry.emplace_or_replace<weapon::WeaponParent>(
 			turret,
-			WeaponParent{parent}
+			weapon::WeaponParent{parent}
 		);
-		context.registry.emplace_or_replace<DeathAnchor>(
+		context.registry.emplace_or_replace<anchor::DeathAnchor>(
 			turret,
-			DeathAnchor{parent, 0.75f}
+			anchor::DeathAnchor{parent, 0.75f}
 		);
-		context.registry.emplace_or_replace<ScoreParent>(
+		context.registry.emplace_or_replace<score::ScoreParent>(
 			turret,
-			ScoreParent{parent}
+			score::ScoreParent{parent}
 		);
 
-		const Position* parentPosition = context.registry.try_get<Position>(parent);
-		const Rotation* parentRotation = context.registry.try_get<Rotation>(parent);
+		const physics::Position* parentPosition = context.registry.try_get<physics::Position>(parent);
+		const physics::Rotation* parentRotation = context.registry.try_get<physics::Rotation>(parent);
 		if (parentPosition == nullptr || parentRotation == nullptr)
 			return;
-		context.registry.emplace_or_replace<Position>(
+		context.registry.emplace_or_replace<physics::Position>(
 			turret,
-			Position{
+			physics::Position{
 				parentPosition->value
 					+ Vector3RotateByQuaternion(
 						relativePosition,
@@ -103,12 +102,12 @@ namespace {
 		turret::TurretControlMode controlMode
 	) {
 		if (controlMode == turret::TurretControlMode::FollowParent) {
-			context.registry.emplace<tag::weapon::FollowParentAim>(turret);
-			context.registry.emplace<tag::weapon::FollowParentFire>(turret);
+			context.registry.emplace<weapon::tag::FollowParentAim>(turret);
+			context.registry.emplace<weapon::tag::FollowParentFire>(turret);
 			return;
 		}
-		context.registry.emplace<tag::weapon::AIControlledAim>(turret);
-		context.registry.emplace<tag::weapon::AIControlledFire>(turret);
+		context.registry.emplace<weapon::tag::AIControlledAim>(turret);
+		context.registry.emplace<weapon::tag::AIControlledFire>(turret);
 	}
 }
 
@@ -127,7 +126,7 @@ entt::entity spawnConfiguredTurret(
 		throw std::invalid_argument("TURRET: radius must be positive");
 	entt::entity turretEntity = spawnBaseTurret(context, color, radius);
 	linkWithParent(context, turretEntity, parent, relativePosition);
-	context.registry.get<RotationAnchor>(turretEntity).relrot = relativeRotation;
+	context.registry.get<anchor::RotationAnchor>(turretEntity).relrot = relativeRotation;
 	addControlTags(context, turretEntity, controlMode);
 	return turretEntity;
 }
@@ -136,8 +135,8 @@ entt::entity spawnConfiguredTurret(
 
 entt::entity spawnUnlinkedAutoTurret(GameContext& context, Color color) {
 	entt::entity turretEntity = spawnBaseTurret(context, color, 0.25f);
-	context.registry.emplace<tag::weapon::AIControlledAim>(turretEntity);
-	context.registry.emplace<tag::weapon::AIControlledFire>(turretEntity);
+	context.registry.emplace<weapon::tag::AIControlledAim>(turretEntity);
+	context.registry.emplace<weapon::tag::AIControlledFire>(turretEntity);
 	return turretEntity;
 }
 

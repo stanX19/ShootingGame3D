@@ -1,6 +1,6 @@
 {
     "shipId": "fighter",
-    "specialWeapon": "missile.basic",
+    "specialWeapon": "missile.swarm",
     "turretWeapons": [
         "lazer.deletor",
         "lazer.deletor",

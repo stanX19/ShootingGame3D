@@ -3,8 +3,8 @@
 #include "components/physics.hpp"
 #include "components/collision.hpp"
 #include "components/combat.hpp"
-#include "components/movement.hpp"
-#include "components/unit.hpp"
+#include "components/spaceship.hpp"
+#include "components/identity.hpp"
 #include "utils/algorithm_utils.hpp"
 #include "raymath.h"
 #include <algorithm>
@@ -16,9 +16,9 @@ namespace {
 	constexpr float FLOAT_SPEED = 3.5f;
 
 	Vector3 computeTargetOffset(const entt::registry &registry, entt::entity target, Vector3 hitPos) {
-		if (target == entt::null || !registry.valid(target) || !registry.all_of<Position>(target))
+		if (target == entt::null || !registry.valid(target) || !registry.all_of<physics::Position>(target))
 			return Vector3Zeros;
-		const Vector3 targetPos = registry.get<Position>(target).value;
+		const Vector3 targetPos = registry.get<physics::Position>(target).value;
 		return Vector3Subtract(hitPos, targetPos);
 	}
 
@@ -27,8 +27,8 @@ namespace {
 		dmg.offset.y += FLOAT_SPEED * dt;
 		dmg.scale = std::max(1.0f, dmg.scale - 3.0f * dt);
 
-		if (dmg.target != entt::null && registry.valid(dmg.target) && registry.all_of<Position>(dmg.target)) {
-			const Vector3 targetPos = registry.get<Position>(dmg.target).value;
+		if (dmg.target != entt::null && registry.valid(dmg.target) && registry.all_of<physics::Position>(dmg.target)) {
+			const Vector3 targetPos = registry.get<physics::Position>(dmg.target).value;
 			dmg.worldPos = Vector3Add(targetPos, dmg.offset);
 			return;
 		}

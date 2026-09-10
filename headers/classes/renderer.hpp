@@ -6,7 +6,7 @@
 #include "components/render.hpp"
 #include "components/effect.hpp"
 #include "components/combat.hpp"
-#include "components/movement.hpp"
+#include "components/spaceship.hpp"
 #include "utils.hpp"
 #include "game_context.hpp"
 #include "frustum.hpp"
@@ -48,8 +48,8 @@ private:
 	void setupShaderUniforms();
 	void updateFrustum();
 	StrechDat getStrech(entt::entity entity) const;
-	bool isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech) const;
-	void drawEntityModel(const Position &pos, const RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
+	bool isEntityVisible(entt::entity entity, const physics::Position &pos, const render::RenderBody &body, StrechDat &strech) const;
+	void drawEntityModel(const physics::Position &pos, const render::RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
 	void drawTrails();
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
 	void drawEntitiesWithShader();

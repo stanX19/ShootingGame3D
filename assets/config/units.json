@@ -31,8 +31,7 @@
 			"effects": {
 				"explosionRadiusScale": 1.0,
 				"deathSoundRadiusScale": 0.5
-			},
-			"elite": false
+			}
 		},
 		"elite": {
 			"spaceshipReference": "elite",
@@ -52,8 +51,7 @@
 			"effects": {
 				"explosionRadiusScale": 1.0,
 				"deathSoundRadiusScale": 0.5
-			},
-			"elite": true
+			}
 		},
 		"fighter": {
 			"spaceshipReference": "player",
@@ -73,8 +71,7 @@
 			"effects": {
 				"explosionRadiusScale": 1.0,
 				"deathSoundRadiusScale": 0.5
-			},
-			"elite": true
+			}
 		},
 		"fastElite": {
 			"spaceshipReference": "fastElite",
@@ -94,8 +91,7 @@
 			"effects": {
 				"explosionRadiusScale": 1.0,
 				"deathSoundRadiusScale": 0.5
-			},
-			"elite": true
+			}
 		},
 		"terminator": {
 			"spaceshipReference": "terminator",
@@ -115,8 +111,7 @@
 			"effects": {
 				"explosionRadiusScale": 2.0,
 				"deathSoundRadiusScale": 0.5
-			},
-			"elite": true
+			}
 		},
 		"mothership": {
 			"spaceshipReference": "mothership",
@@ -136,8 +131,7 @@
 			"effects": {
 				"explosionRadiusScale": 2.0,
 				"deathSoundRadiusScale": 0.5
-			},
-			"elite": true
+			}
 		}
 	}
 }

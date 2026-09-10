@@ -2,13 +2,13 @@
 
 #include "systems/base_system.hpp"
 #include "components/weapon.hpp"
-#include "components/unit_camera.hpp"
+#include "components/camera.hpp"
 #include <random>
 
 struct GameContext;
 
 // utils
-bool aimTargetExists(const GameContext &context, const AimTarget &target);
+bool aimTargetExists(const GameContext &context, const weapon::AimTarget &target);
 
 namespace systems
 {
@@ -34,8 +34,7 @@ namespace systems
 	class AiMoveControl : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class AiShootControl : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class AiFindTarget : public BaseSystem { public: void update(GameContext &context, float dt) override; };
-	class BlueUnitRespawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
-	class RedUnitRespawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class UnitSpawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class ProcessMoveRequest : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class EntityMovement : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class EntityTransformation : public BaseSystem { public: void update(GameContext &context, float dt) override; };

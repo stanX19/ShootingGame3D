@@ -1,5 +1,5 @@
 #include "renderer.hpp"
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include "rlgl.h"
 #include <iostream>
 #include <algorithm>
@@ -80,7 +80,7 @@ void Renderer::updateFrustum()
 	m_currentFrustum = Frustum::fromViewProjection(viewProjMat);
 }
 
-bool Renderer::isEntityVisible(entt::entity entity, const Position &pos, const RenderBody &body, StrechDat &strech) const
+bool Renderer::isEntityVisible(entt::entity entity, const physics::Position &pos, const render::RenderBody &body, StrechDat &strech) const
 {
 	strech = getStrech(entity);
 	const float baseRadius = m_context.modelManager.getModelRadius(body.modelID);
@@ -93,35 +93,31 @@ bool Renderer::isEntityVisible(entt::entity entity, const Position &pos, const R
 void Renderer::render(float dt)
 {
 	m_currentDt = dt;
-	// std::cout << "start draw\n" << std::endl;
 	ClearBackground(BLACK);
 
 	drawEntitiesWithSkyboxShader();
 
 	BeginMode3D(m_camera);
 	updateFrustum();
-	// DrawGrid(ARENA_SIZE * 2 / 10 + 1, 10);
 
 	handleLightSource();
 	drawEntitiesWithoutShader();
 	drawEntitiesWithShader();
-	// drawTrails();
 	drawBoundaryWarning();
 	drawEnergyShield();
 	drawDebug();
 
 	EndMode3D();
-	// std::cout << "end draw\n" << std::endl;
 }
 
 void Renderer::drawTrails()
 {
-	auto trailView = m_context.registry.view<Position, PrevPosition, Trail>();
+	auto trailView = m_context.registry.view<physics::Position, physics::PrevPosition, effect::Trail>();
 	for (auto entity : trailView)
 	{
-		const Position &p = trailView.get<Position>(entity);
-		const PrevPosition &pp = trailView.get<PrevPosition>(entity);
-		const Trail &t = trailView.get<Trail>(entity);
+		const physics::Position &p = trailView.get<physics::Position>(entity);
+		const physics::PrevPosition &pp = trailView.get<physics::PrevPosition>(entity);
+		const effect::Trail &t = trailView.get<effect::Trail>(entity);
 		drawTrailBetween(p.value, pp.value, t.rad, t.color);
 	}
 }
@@ -140,12 +136,12 @@ void Renderer::drawTrailBetween(const Vector3 &head, const Vector3 &tail, float 
 
 void Renderer::handleLightSource()
 {
-	auto view = m_context.registry.view<Position, RenderBody, tag::LightSource>();
+	auto view = m_context.registry.view<physics::Position, render::RenderBody, render::tag::LightSource>();
 
 	for (auto entity : view)
 	{
-		const Position &pos = view.get<Position>(entity);
-		const RenderBody &body = view.get<RenderBody>(entity);
+		const physics::Position &pos = view.get<physics::Position>(entity);
+		const render::RenderBody &body = view.get<render::RenderBody>(entity);
 
 		Vector3 color = {body.color.r / 255.0f, body.color.g / 255.0f, body.color.b / 255.0f};
 		SetShaderValue(m_lightedShader, m_lightPosLoc, &pos.value, SHADER_UNIFORM_VEC3);
@@ -156,7 +152,7 @@ void Renderer::handleLightSource()
 
 Renderer::StrechDat Renderer::getStrech(entt::entity entity) const {
 	StrechDat result = {1.0f, {0, 0, 0}};
-	auto [pos, prevPos, strechComp] = m_context.registry.try_get<Position, PrevPosition, ModelStrech>(entity);
+	auto [pos, prevPos, strechComp] = m_context.registry.try_get<physics::Position, physics::PrevPosition, render::ModelStrech>(entity);
 	if (!pos || !prevPos || !strechComp)
 		return result;
 	result.dir = Vector3Normalize(pos->value - prevPos->value);
@@ -164,7 +160,7 @@ Renderer::StrechDat Renderer::getStrech(entt::entity entity) const {
 	return result;
 }
 
-void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, StrechDat strech)
+void Renderer::drawEntityModel(const physics::Position &pos, const render::RenderBody &body, StrechDat strech)
 {
 	Model &model = m_context.modelManager.getModel(body.modelID);
 
@@ -180,12 +176,12 @@ void Renderer::drawEntityModel(const Position &pos, const RenderBody &body, Stre
 
 void Renderer::drawEntitiesWithoutShader()
 {
-	auto view = m_context.registry.view<Position, RenderBody>(entt::exclude<tag::Shaded, tag::SkyBox>);
+	auto view = m_context.registry.view<physics::Position, render::RenderBody>(entt::exclude<render::tag::Shaded, render::tag::SkyBox>);
 
 	for (auto entity : view)
 	{
-		const Position &pos = view.get<Position>(entity);
-		const RenderBody &body = view.get<RenderBody>(entity);
+		const physics::Position &pos = view.get<physics::Position>(entity);
+		const render::RenderBody &body = view.get<render::RenderBody>(entity);
 		StrechDat strech;
 		if (!isEntityVisible(entity, pos, body, strech))
 			continue;
@@ -200,11 +196,11 @@ void Renderer::drawEntitiesWithoutShader()
 
 void Renderer::drawEntitiesWithShader()
 {
-	auto view = m_context.registry.view<Position, RenderBody, tag::Shaded>();
+	auto view = m_context.registry.view<physics::Position, render::RenderBody, render::tag::Shaded>();
 	for (auto entity : view)
 	{
-		const Position &pos = view.get<Position>(entity);
-		const RenderBody &body = view.get<RenderBody>(entity);
+		const physics::Position &pos = view.get<physics::Position>(entity);
+		const render::RenderBody &body = view.get<render::RenderBody>(entity);
 		StrechDat strech;
 		if (!isEntityVisible(entity, pos, body, strech))
 			continue;
@@ -232,11 +228,11 @@ void Renderer::drawEntitiesWithSkyboxShader()
 	rlDisableDepthMask();
 	rlDisableBackfaceCulling();
 
-	auto view = m_context.registry.view<Position, RenderBody, tag::SkyBox>();
+	auto view = m_context.registry.view<physics::Position, render::RenderBody, render::tag::SkyBox>();
 	for (auto entity : view)
 	{
-		const Position &pos = view.get<Position>(entity);
-		const RenderBody &body = view.get<RenderBody>(entity);
+		const physics::Position &pos = view.get<physics::Position>(entity);
+		const render::RenderBody &body = view.get<render::RenderBody>(entity);
 		Model &model = m_context.modelManager.getModel(body.modelID);
 		for (int i = 0; i < model.materialCount; i++) {
 			model.materials[i].shader = m_skyboxShader;
@@ -251,7 +247,7 @@ void Renderer::drawEntitiesWithSkyboxShader()
 
 void Renderer::drawEnergyShield()
 {
-	auto view = m_context.registry.view<Position, RenderBody, EnergyShield>();
+	auto view = m_context.registry.view<physics::Position, render::RenderBody, combat::EnergyShield>();
 	const t_model_id model = m_context.modelManager.loadModel("assets/Models/shield/spherical_hex_force_field.glb", 0.01f);
 
 	for (auto [entity, pos, body, shield] : view.each())
@@ -274,7 +270,7 @@ void Renderer::drawBoundaryWarning()
 	if (!m_context.registry.valid(m_context.currentPlayer))
 		return;
 	
-	const auto posPtr = m_context.registry.try_get<Position>(m_context.currentPlayer);
+	const auto posPtr = m_context.registry.try_get<physics::Position>(m_context.currentPlayer);
 	if (!posPtr)
 		return;
 	
@@ -359,7 +355,7 @@ void Renderer::drawDebug()
 	if (!m_context.config.debug.showTarget)
 		return;
 
-	auto view = m_context.registry.view<Position, TargetRotation>();
+	auto view = m_context.registry.view<physics::Position, spaceship::TargetRotation>();
 	for (auto [entity, pos, tRot] : view.each())
 	{
 		const Vector3 start = pos.value;

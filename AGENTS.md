@@ -24,6 +24,7 @@ Before broad exploration, read [docs/project-context.md](docs/project-context.md
 For model or asset pipeline work, read [docs/model-asset-conventions.md](docs/model-asset-conventions.md).
 For procedural model design, implementation, benchmarking, and screenshot QC, read [procedural model generation workflow](docs/workflows/procedural-model-generation.md).
 For asteroid asset work and repeated-render benchmarks, also read [procedural asteroid generator and rendering evidence rules](docs/specs/procedural-asteroid-and-wsl-rendering.md)
+For ECS component domains, contracts, and tag conventions, read [docs/components.md](docs/components.md).
 
 
 ## Editing Philosophy
@@ -78,7 +79,7 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - **Naming Conventions:** Types in `PascalCase`; functions, methods, parameters, and locals in `camelCase`; member variables in `m_camelCase` (or `camelCase` for plain data structs); constants in `UPPER_SNAKE`. File names in `snake_case` matching the feature/domain (`system_camera_follow_player.cpp`, `unit_camera.hpp`).
 - **Header / Source Hygiene:** Declarations in `.hpp`, definitions in `.cpp`. Prefer `#pragma once` on line 1 of headers. Use forward declarations where pointers/references suffice (light headers compile fast and avoid rebuild cascades).
 - **Namespace Formatting:** In `.hpp`, tab-indent declarations inside `namespace` blocks. In `.cpp`, do NOT wrap files in `namespace { }` blocks; explicitly qualify symbol definitions at the definition site (e.g. `void ecs_systems::foo(...)`).
-- **Component Cleanliness:** Component structs contain pure ECS data. Nest component-specific helper/POV structs inside the parent component struct.
+- **Component Cleanliness:** Component structs contain pure ECS data. Nest component-specific helper/POV structs inside the parent component struct. See [docs/components.md](docs/components.md) for canonical domain conventions.
 - **Function Cleaness** Anything more than 2 indentation from the parent function should be factored out into its subfunction. NEVER create hell of nested indent! A function should never be more than 50 lines.
 
 ### C++ Foundations
@@ -103,6 +104,7 @@ For asteroid asset work and repeated-render benchmarks, also read [procedural as
 - Follow Red-Green-Refactor for behavioral code.
 - Bug fixes start with a regression test. Risky legacy changes start with characterization tests.
 - Unit tests must be deterministic, bounded, and headless: no window, GPU, audio device, user input, network, or asset pack requirement.
+- **Headless OpenGL Guard:** Any integration or smoke test that exercises 3D model loading (`ModelManager`, `spaceship::factory`) or Raylib textures must guard with `if (!IsWindowReady()) { SetConfigFlags(FLAG_WINDOW_HIDDEN); InitWindow(64, 64, "headless_test"); }` to avoid `SIGSEGV` null-pointer dereferences in headless WSL/CI environments.
 - **No Brittle Change-Detector Tests:** Do not write tests that assert exact literal values of configurable tuning parameters (e.g. `CHECK(config.val == 10.0f)`). Tests must verify **behavior** and systems logic, not configuration file contents. Tuning changes in JSON must never break tests unless the behavioral contract itself is broken.
 - Use `tests/unit/`, `tests/integration/`, `tests/smoke/`, and `tests/manual/` as the test taxonomy. Existing interactive visual programs are manual tests, not smoke tests.
 - `make test` and `make all_test` run deterministic automated tests only. Use `make test-manual TEST=<basename>` to launch one manual program; use `make test-manual-bin` only when you explicitly want to build all manual programs.

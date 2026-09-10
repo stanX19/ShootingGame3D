@@ -1,10 +1,11 @@
 #include "systems.hpp"
 #include "game_context.hpp"
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include "components/physics.hpp"
-#include "components/movement.hpp"
+#include "components/spaceship.hpp"
 #include "components/weapon.hpp"
-#include "components/unit.hpp"
+#include "components/combat.hpp"
+#include "components/identity.hpp"
 #include "utils/vector_rotation_utils.hpp"
 #include <map>
 #include <vector>

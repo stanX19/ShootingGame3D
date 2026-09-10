@@ -1,7 +1,7 @@
 #include "systems.hpp"
 #include "game_context.hpp"
 #include "components/physics.hpp"
-#include "components/movement.hpp"
+#include "components/spaceship.hpp"
 #include "components/render.hpp"
 #include "utils/vector_rotation_utils.hpp"
 #include <cmath>

@@ -2,8 +2,9 @@
 #include "game_context.hpp"
 #include "components/physics.hpp"
 #include "components/collision.hpp"
-#include "components/unit.hpp"
-#include "components/unit_camera.hpp"
+#include "components/identity.hpp"
+#include "components/camera.hpp"
+#include "components/combat.hpp"
 #include "utils/vector_rotation_utils.hpp"
 #include <cmath>
 #include <iostream>

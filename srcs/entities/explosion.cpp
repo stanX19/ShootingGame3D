@@ -11,7 +11,7 @@ namespace
 		if (!context.registry.valid(parent))
 			return;
 
-		context.registry.emplace<ScoreParent>(entity, parent);
+		context.registry.emplace<score::ScoreParent>(entity, parent);
 		context.registry.emplace<faction::Faction>(
 			entity, context.registry.get_or_emplace<faction::Faction>(parent).value
 		);
@@ -48,20 +48,20 @@ namespace
 			float renderStartRadius = std::min(subRad, std::max(subStartRadius, MIN_RENDER_RADIUS));
 
 			entt::entity explosion = context.registry.create();
-			context.registry.emplace<Position>(explosion, subPos);
-			context.registry.emplace<Velocity>(explosion, velocity + displaceDir * finalRadius / lifespan);
-			context.registry.emplace<RenderBody>(explosion,
-				RenderBody{explosionModel, ColorAlpha(color, GetRandomValue(25, 75) / 100.0f), renderStartRadius}
+			context.registry.emplace<physics::Position>(explosion, subPos);
+			context.registry.emplace<physics::Velocity>(explosion, velocity + displaceDir * finalRadius / lifespan);
+			context.registry.emplace<render::RenderBody>(explosion,
+				render::RenderBody{explosionModel, ColorAlpha(color, GetRandomValue(25, 75) / 100.0f), renderStartRadius}
 			);
-			context.registry.emplace<RadiusExpand>(explosion, expansion);
-			context.registry.emplace<Lifespan>(explosion, subLifespan);
+			context.registry.emplace<render::RadiusExpand>(explosion, expansion);
+			context.registry.emplace<lifetime::Lifespan>(explosion, subLifespan);
 
 			if (!isCore || damage <= 0.0f)
 				continue;
 
-			context.registry.emplace<CollisionBody>(explosion, subStartRadius);
-			context.registry.emplace<Damage>(explosion, damage);
-			context.registry.emplace<tag::bullet_type::Energy>(explosion);
+			context.registry.emplace<collision::CollisionBody>(explosion, subStartRadius);
+			context.registry.emplace<combat::Damage>(explosion, damage);
+			context.registry.emplace<weapon::tag::Energy>(explosion);
 			inheritExplosionParent(context, explosion, parent);
 		}
 	}
@@ -108,10 +108,10 @@ void spawnInstantDamage(GameContext &context, const Vector3& pos, const effect::
 		return;
 
 	entt::entity damagePulse = context.registry.create();
-	context.registry.emplace<Position>(damagePulse, pos);
-	context.registry.emplace<CollisionBody>(damagePulse, effect.radius);
-	context.registry.emplace<Damage>(damagePulse, effect.instantDamage);
-	context.registry.emplace<Lifespan>(damagePulse, 0.0f);
-	context.registry.emplace<tag::bullet_type::Energy>(damagePulse);
+	context.registry.emplace<physics::Position>(damagePulse, pos);
+	context.registry.emplace<collision::CollisionBody>(damagePulse, effect.radius);
+	context.registry.emplace<combat::Damage>(damagePulse, effect.instantDamage);
+	context.registry.emplace<lifetime::Lifespan>(damagePulse, 0.0f);
+	context.registry.emplace<weapon::tag::Energy>(damagePulse);
 	inheritExplosionParent(context, damagePulse, parent);
 }

@@ -1,7 +1,7 @@
 #include "catch2/catch_amalgamated.hpp"
 #include "classes/hud_manager.hpp"
 #include "game_context.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
 #include "components/score.hpp"
 #include "components/combat.hpp"
 #include "components/physics.hpp"

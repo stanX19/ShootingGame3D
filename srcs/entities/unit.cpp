@@ -1,8 +1,13 @@
 #include "entities.hpp"
 #include "entities/unit.hpp"
-#include "components/factions.hpp"
+#include "components/faction.hpp"
 #include "components/sound.hpp"
-#include "components/unit.hpp"
+#include "components/identity.hpp"
+#include "components/combat.hpp"
+#include "components/spaceship.hpp"
+#include "components/physics.hpp"
+#include "components/score.hpp"
+#include "components/effect.hpp"
 #include "weapon_registry.hpp"
 
 #include <cctype>
@@ -69,10 +74,10 @@ std::string resolveWeaponId(
 }
 
 void addEnemyControlTags(GameContext& context, entt::entity entity) {
-	context.registry.emplace<MoveTarget>(entity);
-	context.registry.emplace<tag::weapon::AIControlledAim>(entity);
-	context.registry.emplace<tag::weapon::AIControlledFire>(entity);
-	context.registry.emplace<tag::AIMoveControl>(entity);
+	context.registry.emplace<spaceship::MoveTarget>(entity);
+	context.registry.emplace<weapon::tag::AIControlledAim>(entity);
+	context.registry.emplace<weapon::tag::AIControlledFire>(entity);
+	context.registry.emplace<spaceship::tag::AIMoveControl>(entity);
 }
 
 unit::SpawnParams makeSpawnParams(
@@ -142,16 +147,16 @@ SpawnedUnit spawnConfiguredUnit(
 	const auto& stats = definition.stats;
 	const auto& effects = definition.effects;
 
-	context.registry.emplace<HP>(entity, stats.hp);
-	context.registry.emplace<HPRegen>(entity, stats.hpRegen);
-	context.registry.emplace<EnergyShield>(entity, stats.shield);
-	context.registry.emplace<EnergyShieldRegen>(entity, stats.shieldRegen);
-	context.registry.emplace<Damage>(entity, stats.damage);
-	context.registry.emplace<MaxSpeed>(entity, stats.maxSpeed);
-	context.registry.emplace<TurnSpeed>(entity, stats.turnSpeed);
-	context.registry.emplace<Mass>(entity, stats.mass);
-	context.registry.emplace<Score>(entity, stats.score);
-	context.registry.emplace<KilledScore>(entity, stats.killedScore);
+	context.registry.emplace<combat::HP>(entity, stats.hp);
+	context.registry.emplace<combat::HPRegen>(entity, stats.hpRegen);
+	context.registry.emplace<combat::EnergyShield>(entity, stats.shield);
+	context.registry.emplace<combat::EnergyShieldRegen>(entity, stats.shieldRegen);
+	context.registry.emplace<combat::Damage>(entity, stats.damage);
+	context.registry.emplace<spaceship::MaxSpeed>(entity, stats.maxSpeed);
+	context.registry.emplace<spaceship::TurnSpeed>(entity, stats.turnSpeed);
+	context.registry.emplace<physics::Mass>(entity, stats.mass);
+	context.registry.emplace<score::Score>(entity, stats.score);
+	context.registry.emplace<score::KilledScore>(entity, stats.killedScore);
 	context.registry.emplace<effect::ExplodeOnDeath>(
 		entity,
 		effect::ExplodeOnDeath::createFromStartEndRad(
@@ -165,9 +170,7 @@ SpawnedUnit spawnConfiguredUnit(
 		sound::RANDOM_EXPLOSION,
 		stats.collisionRadius * effects.deathSoundRadiusScale
 	);
-	if (definition.elite)
-		context.registry.emplace<tag::EliteUnit>(entity);
-	context.registry.emplace<Name>(entity, std::string(unitId));
+	context.registry.emplace<identity::Name>(entity, std::string(unitId));
 
 	for (std::size_t index = 0;
 		index < params.loadout.turretWeapons.size()
@@ -203,7 +206,7 @@ SpawnedUnit spawnConfiguredUnit(
 			entity,
 			specialWeaponId
 		);
-		context.registry.emplace<tag::weapon::IsSpecialWeapon>(entity);
+		context.registry.emplace<weapon::tag::IsSpecialWeapon>(entity);
 	}
 
 	return SpawnedUnit{assembly.entity, assembly.turrets};
@@ -226,6 +229,25 @@ entt::entity spawnUnit(
 	return spawnEnemyWithLoadout(
 		context,
 		"basic",
+		pos,
+		faction,
+		turret::TurretControlMode::FollowParent,
+		std::move(loadout)
+	);
+}
+
+entt::entity spawnFighterUnit(
+	GameContext& context,
+	const Vector3& pos,
+	faction::Faction faction
+) {
+	const int seed = GetRandomValue(0, 1000);
+	unit::Loadout loadout;
+	loadout.turretWeapons = randomTurretLoadout(context, "fighter", seed);
+	loadout.specialWeapon = "missile.basic";
+	return spawnEnemyWithLoadout(
+		context,
+		"fighter",
 		pos,
 		faction,
 		turret::TurretControlMode::FollowParent,

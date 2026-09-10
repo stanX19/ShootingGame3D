@@ -1,6 +1,9 @@
-#pragma once
+#ifndef COMPONENTS_PHYSICS_HPP
+#define COMPONENTS_PHYSICS_HPP
 
 #include "includes.hpp"
+
+namespace physics {
 
 struct Position
 {
@@ -46,3 +49,27 @@ struct ImpulseRequest
 {
 	Vector3 value = {0, 0, 0};
 };
+
+namespace tag {
+
+struct VelocitySyncRot {};
+
+} // namespace tag
+
+} // namespace physics
+
+namespace tag {
+using ::physics::tag::VelocitySyncRot;
+} // namespace tag
+
+using ::physics::Position;
+using ::physics::PrevPosition;
+using ::physics::Velocity;
+using ::physics::ScalarAcceleration;
+using ::physics::Rotation;
+using ::physics::PrevRotation;
+using ::physics::RotationVelocity;
+using ::physics::Mass;
+using ::physics::ImpulseRequest;
+
+#endif // COMPONENTS_PHYSICS_HPP

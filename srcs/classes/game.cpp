@@ -77,8 +77,7 @@ EngineState Game::run() {
         m_hudRenderer.renderAll(dt);
         EndDrawing();
 
-        m_systemBlueUnitRespawn.update(m_context, dt);
-        m_systemRedUnitRespawn.update(m_context, dt);
+        m_systemUnitSpawn.update(m_context, dt);
         m_systemAsteroidRespawn.update(m_context, dt);
         m_systemEntityAnchorRelease.update(m_context, dt);
         m_systemEntityLifetime.update(m_context, dt);
@@ -104,7 +103,7 @@ void Game::inputControls([[maybe_unused]] float dt, EngineState &nextState) {
         reset();
     }
     if (IsKeyPressed(KEY_DELETE) && m_context.registry.valid(m_context.currentPlayer)) {
-        m_context.registry.emplace<DelayedDamage>(m_context.currentPlayer, DelayedDamage{0.0f, 100000000.0f});
+        m_context.registry.emplace<combat::DelayedDamage>(m_context.currentPlayer, combat::DelayedDamage{0.0f, 100000000.0f});
         spawnPlayer(m_context);
     }
     if (IsKeyPressed(KEY_C)) {
