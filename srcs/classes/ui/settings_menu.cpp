@@ -6,6 +6,15 @@ SettingsMenu::SettingsMenu(GameContext &context)
       m_damageNumbersToggleWidget("DAMAGE NUMBERS: ON", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
       m_toastsToggleWidget("TOASTS: ON", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
       m_killLogsToggleWidget("KILL LOGS: ON", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
+      m_screenShakeWidget(
+          "SCREEN SHAKE",
+          context.config.settings.screenShakeMagnitude,
+          0.0f,
+          2.0f,
+          0.1f,
+          Rectangle{0.0f, 0.0f, 0.0f, 0.0f},
+          SKYBLUE
+      ),
       m_volumeWidget(
           "VOLUME",
           context.config.settings.masterVolume,
@@ -64,7 +73,7 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
     DrawText(title, screenWidth / 2 - titleWidth / 2, screenHeight / 6, 40, SKYBLUE);
 
     int startY = screenHeight / 4;
-    int spacing = 50;
+    int spacing = 42;
 
     float buttonWidth = 400;
     float buttonHeight = 36;
@@ -97,9 +106,20 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
         m_context.config.setBool("settings.showKillLogs", !m_context.config.settings.showKillLogs);
     }
 
-    const Rectangle volumeBounds = {
+    const Rectangle screenShakeBounds = {
         (float)screenWidth / 2 - buttonWidth / 2,
         (float)startY + spacing * 4,
+        buttonWidth,
+        buttonHeight
+    };
+    m_screenShakeWidget.setBounds(screenShakeBounds);
+    if (m_screenShakeWidget.tickAndDraw()) {
+        m_context.config.setFloat("settings.screenShakeMagnitude", m_context.config.settings.screenShakeMagnitude);
+    }
+
+    const Rectangle volumeBounds = {
+        (float)screenWidth / 2 - buttonWidth / 2,
+        (float)startY + spacing * 5,
         buttonWidth,
         buttonHeight
     };
@@ -111,7 +131,7 @@ void SettingsMenu::drawSettingsUI(EngineState &nextState)
 
     const Rectangle sensitivityBounds = {
         (float)screenWidth / 2 - buttonWidth / 2,
-        (float)startY + spacing * 5,
+        (float)startY + spacing * 6,
         buttonWidth,
         buttonHeight
     };

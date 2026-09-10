@@ -95,9 +95,11 @@ void Renderer::render(float dt)
 	m_currentDt = dt;
 	ClearBackground(BLACK);
 
-	drawEntitiesWithSkyboxShader();
+	const Camera3D renderCam = m_context.hudManager.getRenderingCamera();
 
-	BeginMode3D(m_camera);
+	drawEntitiesWithSkyboxShader(renderCam);
+
+	BeginMode3D(renderCam);
 	updateFrustum();
 
 	handleLightSource();
@@ -218,11 +220,11 @@ void Renderer::drawEntitiesWithShader()
 	}
 }
 
-void Renderer::drawEntitiesWithSkyboxShader()
+void Renderer::drawEntitiesWithSkyboxShader(const Camera3D &camera)
 {
-	Camera3D centerCam = m_camera;
+	Camera3D centerCam = camera;
 	centerCam.position = {0, 0, 0};
-	centerCam.target = Vector3Normalize(m_camera.target - m_camera.position) * 0.01f;
+	centerCam.target = Vector3Normalize(camera.target - camera.position) * 0.01f;
 
 	BeginMode3D(centerCam);
 	rlDisableDepthMask();

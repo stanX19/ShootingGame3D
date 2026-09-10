@@ -90,6 +90,7 @@ void GameConfig::initConstants() {
 	settings.showDamageNumbers = getBool("settings.showDamageNumbers", true);
 	settings.showToasts = getBool("settings.showToasts", true);
 	settings.showKillLogs = getBool("settings.showKillLogs", true);
+	settings.screenShakeMagnitude = getFloat("settings.screenShakeMagnitude", 1.0f);
 	settings.masterVolume = getFloat("audio.masterVolume", 0.5f);
 	settings.controlSensitivity = Clamp(
 		getFloat("settings.controlSensitivity", 1.0f), 0.01f, 1.0f

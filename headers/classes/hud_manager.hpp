@@ -67,6 +67,8 @@ public:
 
 	void reportDamage(entt::entity attacker, entt::entity target, float amount, Vector3 hitPos, HitType hitType = HitType::NORMAL);
 	void reportDamage(entt::entity attacker, entt::entity target, float amount, Vector3 hitPos, Vector3 targetOffset, HitType hitType = HitType::NORMAL);
+	void reportImpact(entt::entity target, float damage, bool isEnergy = false);
+	void reportImpact(entt::entity target, float damage, Vector3 impactDir, bool isEnergy = false);
 	void addToast(const ToastConfig &config);
 	void addToastLeftLog(const std::string &message, Color color = WHITE);
 	void addToastTopNotif(const std::string &message, ToastPriority priority = ToastPriority::HIGH, Color color = YELLOW);
@@ -82,6 +84,17 @@ public:
 
 	size_t getActiveDamageNumberCount() const;
 	size_t getActiveToastCount() const;
+	size_t getActiveShakeCount() const { return m_activeShakes.size(); }
+	Vector3 getScreenShakeOffset() const { return m_shakeOffset; }
+	const Camera3D& getRenderingCamera() const { return m_renderingCamera; }
+
+	struct ActiveShake {
+		Vector3 direction{0.0f, 0.0f, 0.0f};
+		float magnitude = 0.0f;
+		float duration = 0.2f;
+		float timer = 0.0f;
+		float frequency = 25.0f;
+	};
 
 	struct ActiveDamageNumber {
 		entt::entity target = entt::null;
@@ -107,6 +120,7 @@ public:
 
 	const std::vector<ActiveDamageNumber>& getActiveDamageNumbers() const { return m_damageNumbers; }
 	const std::vector<ActiveToast>& getActiveToasts() const { return m_toasts; }
+	const std::vector<ActiveShake>& getActiveShakes() const { return m_activeShakes; }
 
 	bool hasCollisionWarnings() const { return !m_collisionWarnings.empty(); }
 	float getCollisionAlertAlpha() const { return m_collisionAlpha; }
@@ -163,4 +177,10 @@ private:
 	void processToastRequests();
 	void updateActiveDamageNumbers(float dt, GameContext &context);
 	void updateActiveToasts(float dt);
+	void updateScreenShake(float dt, GameContext &context);
+
+	static constexpr size_t MAX_ACTIVE_SHAKES = 8;
+	std::vector<ActiveShake> m_activeShakes;
+	Vector3 m_shakeOffset = Vector3Zeros;
+	Camera3D m_renderingCamera{};
 };

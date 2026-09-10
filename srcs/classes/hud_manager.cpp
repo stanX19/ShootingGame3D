@@ -59,6 +59,79 @@ void HudManager::reportDamage(entt::entity attacker, entt::entity target, float 
 	m_damageRequests.push_back({attacker, target, amount, hitPos, targetOffset, hitType});
 }
 
+void HudManager::reportImpact(entt::entity target, float damage, bool isEnergy) {
+	reportImpact(target, damage, Vector3{0.0f, 0.0f, 1.0f}, isEnergy);
+}
+
+void HudManager::reportImpact(entt::entity target, float damage, Vector3 impactDir, bool isEnergy) {
+	if (damage <= 0.0f)
+		return;
+	if (m_observedEntity == entt::null || target != m_observedEntity)
+		return;
+
+	if (Vector3LengthSqr(impactDir) < 0.001f) {
+		impactDir = Vector3{0.0f, 0.0f, 1.0f};
+	} else {
+		impactDir = Vector3Normalize(impactDir);
+	}
+
+	float mag = 0.0f;
+	float dur = 0.0f;
+	float freq = 0.0f;
+
+	if (isEnergy) {
+		mag = std::clamp(damage * 0.0015f, 0.03f, 0.06f);
+		dur = 0.08f;
+		freq = 30.0f;
+	} else if (damage < 35.0f) {
+		mag = std::clamp(damage * 0.005f, 0.05f, 0.14f);
+		dur = 0.15f;
+		freq = 20.0f;
+	} else if (damage < 90.0f) {
+		mag = std::clamp(damage * 0.004f, 0.14f, 0.32f);
+		dur = 0.22f;
+		freq = 16.0f;
+	} else {
+		mag = std::clamp(damage * 0.0035f, 0.32f, 0.60f);
+		dur = std::clamp(damage * 0.0025f, 0.25f, 0.45f);
+		freq = 11.0f;
+	}
+
+	// 1. Directional Coalescing: combine rapid hits from similar directions (~35 deg cone)
+	for (auto &existing : m_activeShakes) {
+		if (Vector3DotProduct(existing.direction, impactDir) > 0.8f) {
+			existing.timer = 0.0f;
+			existing.magnitude = std::min(existing.magnitude + mag * 0.5f, 1.00f);
+			existing.duration = std::max(existing.duration, dur);
+			existing.frequency = freq;
+			return;
+		}
+	}
+
+	// 2. Add new shake if slots available
+	if (m_activeShakes.size() < MAX_ACTIVE_SHAKES) {
+		m_activeShakes.push_back(ActiveShake{impactDir, mag, dur, 0.0f, freq});
+		return;
+	}
+
+	// 3. Energy-Based Eviction: evict the shake with lowest remaining energy
+	float lowestEnergy = 1e9f;
+	size_t lowestIdx = 0;
+	for (size_t i = 0; i < m_activeShakes.size(); ++i) {
+		const float progress = m_activeShakes[i].timer / m_activeShakes[i].duration;
+		const float env = (progress < 1.0f) ? (1.0f - progress) : 0.0f;
+		const float energy = m_activeShakes[i].magnitude * (env * env);
+		if (energy < lowestEnergy) {
+			lowestEnergy = energy;
+			lowestIdx = i;
+		}
+	}
+
+	if (mag > lowestEnergy) {
+		m_activeShakes[lowestIdx] = ActiveShake{impactDir, mag, dur, 0.0f, freq};
+	}
+}
+
 void HudManager::addToast(const ToastConfig &config) {
 	m_toastRequests.push_back(config);
 }
@@ -154,6 +227,9 @@ void HudManager::reset() {
 	m_observedEntity = entt::null;
 	clearWarnings();
 	clearWarningToasts();
+	m_activeShakes.clear();
+	m_shakeOffset = Vector3Zeros;
+	m_renderingCamera = Camera3D{};
 }
 
 size_t HudManager::getActiveDamageNumberCount() const {
@@ -290,9 +366,71 @@ void HudManager::updateActiveToasts(float dt) {
 	}
 }
 
+void HudManager::updateScreenShake(float dt, GameContext &context) {
+	m_renderingCamera = context.mainCamera;
+
+	const float shakeScale = context.config.settings.screenShakeMagnitude;
+	if (shakeScale <= 0.001f || m_activeShakes.empty()) {
+		m_activeShakes.clear();
+		m_shakeOffset = Vector3Zeros;
+		return;
+	}
+
+	Vector3 camForward = Vector3Subtract(context.mainCamera.target, context.mainCamera.position);
+	if (Vector3LengthSqr(camForward) < 0.001f) {
+		camForward = Vector3{0.0f, 0.0f, 1.0f};
+	} else {
+		camForward = Vector3Normalize(camForward);
+	}
+	Vector3 camUp = context.mainCamera.up;
+	if (Vector3LengthSqr(camUp) < 0.001f) {
+		camUp = Vector3{0.0f, 1.0f, 0.0f};
+	} else {
+		camUp = Vector3Normalize(camUp);
+	}
+
+	Vector3 totalOffset = Vector3Zeros;
+
+	for (auto it = m_activeShakes.begin(); it != m_activeShakes.end();) {
+		it->timer += dt;
+		if (it->timer >= it->duration) {
+			it = m_activeShakes.erase(it);
+			continue;
+		}
+
+		const float progress = it->timer / it->duration;
+		const float envelope = (1.0f - progress) * (1.0f - progress);
+		const float wave = std::cos(it->timer * it->frequency * 2.0f * PI);
+		const float disp = it->magnitude * envelope * wave;
+
+		Vector3 effectiveDir = it->direction;
+		const float dF = Vector3DotProduct(it->direction, camForward);
+		// Only kinetic impacts (frequency < 25.0f) induce mechanical pitch recoil
+		if (std::abs(dF) > 0.05f && it->frequency < 25.0f) {
+			const Vector3 pitchRecoil = Vector3Scale(camUp, -dF * 0.35f);
+			effectiveDir = Vector3Add(effectiveDir, pitchRecoil);
+		}
+
+		totalOffset = Vector3Add(totalOffset, Vector3Scale(effectiveDir, disp));
+		++it;
+	}
+
+	constexpr float MAX_BASE_OFFSET = 1.2f;
+	const float len = Vector3Length(totalOffset);
+	if (len > MAX_BASE_OFFSET) {
+		totalOffset = Vector3Scale(totalOffset, MAX_BASE_OFFSET / len);
+	}
+	totalOffset = Vector3Scale(totalOffset, shakeScale);
+
+	m_shakeOffset = totalOffset;
+	m_renderingCamera.target = Vector3Add(m_renderingCamera.target, m_shakeOffset);
+	m_renderingCamera.position = Vector3Add(m_renderingCamera.position, Vector3Scale(m_shakeOffset, 0.18f));
+}
+
 void HudManager::update(float dt, GameContext &context) {
 	processDamageRequests(context);
 	processToastRequests();
 	updateActiveDamageNumbers(dt, context);
 	updateActiveToasts(dt);
+	updateScreenShake(dt, context);
 }

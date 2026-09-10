@@ -185,6 +185,14 @@ namespace {
 		recordAttackerContribution(evt, victim.id, rootAttacker, remainingDmg);
 		tryReportPlayerDamage(evt, victim, rootAttacker, remainingDmg, isKill);
 
+		const bool isEnergy = registry.all_of<weapon::tag::Energy>(killer.id);
+		const Vector3 impactDir = (Vector3LengthSqr(killer.vel) > 0.01f)
+			? Vector3Normalize(killer.vel)
+			: ((Vector3LengthSqr(Vector3Subtract(victim.pos, killer.pos)) > 0.01f)
+				? Vector3Normalize(Vector3Subtract(victim.pos, killer.pos))
+				: Vector3{0.0f, 0.0f, 1.0f});
+		evt.context->hudManager.reportImpact(victim.id, remainingDmg, impactDir, isEnergy);
+
 		if (isKill) {
 			evt.context->dispatcher.enqueue<event::KillEvent>(event::KillEvent{
 				evt.context,

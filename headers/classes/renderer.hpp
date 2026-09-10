@@ -53,7 +53,7 @@ private:
 	void drawTrails();
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
 	void drawEntitiesWithShader();
-	void drawEntitiesWithSkyboxShader();
+	void drawEntitiesWithSkyboxShader(const Camera3D &camera);
 	void drawEntitiesWithoutShader();
 	void drawBoundaryWarning();
 	void drawEnergyShield();

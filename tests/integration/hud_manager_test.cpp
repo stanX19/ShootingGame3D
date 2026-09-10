@@ -827,5 +827,199 @@ TEST_CASE("HudWarning: Avoiding danger clears warning toast immediately", "[inte
 	CHECK(context.hudManager.getActiveToastCount() == 0);
 }
 
+TEST_CASE("HudManager: Kinetic bullet impact creates active shake and decays", "[integration][hud][shake]") {
+	GameContext context;
+	HudManager &hud = context.hudManager;
+	const entt::entity player = context.registry.create();
+	hud.setObservedEntity(player);
 
+	CHECK(hud.getActiveShakeCount() == 0);
+	CHECK(hud.getScreenShakeOffset().x == 0.0f);
 
+	// Kinetic hit on observed player entity
+	hud.reportImpact(player, 50.0f, Vector3{1.0f, 0.0f, 0.0f}, /*isEnergy=*/false);
+	CHECK(hud.getActiveShakeCount() == 1);
+	CHECK(hud.getActiveShakes()[0].magnitude > 0.0f);
+
+	// Shake offset and rendering camera computed on update
+	hud.update(0.016f, context);
+	CHECK(hud.getScreenShakeOffset().x != 0.0f);
+	CHECK(hud.getRenderingCamera().position.x != context.mainCamera.position.x);
+	// mainCamera remains 100% untainted!
+	CHECK(context.mainCamera.position.x == 0.0f);
+
+	// Over time shake duration expires and decays to zero
+	hud.update(1.0f, context);
+	CHECK(hud.getActiveShakeCount() == 0);
+	CHECK(hud.getScreenShakeOffset().x == 0.0f);
+	CHECK(hud.getRenderingCamera().position.x == context.mainCamera.position.x);
+}
+
+TEST_CASE("HudManager: Multi-channel directional separation for simultaneous impacts", "[integration][hud][shake]") {
+	GameContext context;
+	HudManager &hud = context.hudManager;
+	const entt::entity player = context.registry.create();
+	hud.setObservedEntity(player);
+
+	// Sniper from left (X axis) and machine gun from top (Y axis)
+	hud.reportImpact(player, 120.0f, Vector3{1.0f, 0.0f, 0.0f}, /*isEnergy=*/false);
+	hud.reportImpact(player, 25.0f, Vector3{0.0f, 1.0f, 0.0f}, /*isEnergy=*/false);
+
+	// Orthogonal vectors do not coalesce
+	CHECK(hud.getActiveShakeCount() == 2);
+	CHECK(hud.getActiveShakes()[0].direction.x == Catch::Approx(1.0f));
+	CHECK(hud.getActiveShakes()[1].direction.y == Catch::Approx(1.0f));
+
+	hud.update(0.016f, context);
+	CHECK(hud.getScreenShakeOffset().x != 0.0f);
+	CHECK(hud.getScreenShakeOffset().y != 0.0f);
+}
+
+TEST_CASE("HudManager: Directional coalescing merges rapid hits from similar directions", "[integration][hud][shake]") {
+	GameContext context;
+	HudManager &hud = context.hudManager;
+	const entt::entity player = context.registry.create();
+	hud.setObservedEntity(player);
+
+	// Rapid fire from top (~35 degree cone: dot > 0.8)
+	hud.reportImpact(player, 20.0f, Vector3{0.0f, 1.0f, 0.0f}, /*isEnergy=*/false);
+	const float initialMag = hud.getActiveShakes()[0].magnitude;
+
+	for (int i = 0; i < 5; ++i) {
+		hud.reportImpact(player, 20.0f, Vector3{0.05f, 0.998f, 0.0f}, /*isEnergy=*/false);
+	}
+
+	// All coalesce into a single channel
+	CHECK(hud.getActiveShakeCount() == 1);
+	CHECK(hud.getActiveShakes()[0].magnitude > initialMag);
+	CHECK(hud.getActiveShakes()[0].magnitude <= 1.00f);
+}
+
+TEST_CASE("HudManager: Energy-based eviction drops weakest shake when queue is full", "[integration][hud][shake]") {
+	GameContext context;
+	HudManager &hud = context.hudManager;
+	const entt::entity player = context.registry.create();
+	hud.setObservedEntity(player);
+
+	// Fill all 8 slots with 8 distinct angles (separated by 45 degrees, dot = 0.707 <= 0.8)
+	for (int i = 0; i < 8; ++i) {
+		const float angle = static_cast<float>(i) * (2.0f * PI / 8.0f);
+		const Vector3 dir{std::cos(angle), 0.0f, std::sin(angle)};
+		hud.reportImpact(player, 30.0f, dir, /*isEnergy=*/false);
+	}
+	CHECK(hud.getActiveShakeCount() == 8);
+
+	// Advance time so older shakes lose energy (envelope decay)
+	hud.update(0.08f, context);
+
+	// Incoming heavy sniper bullet (150 dmg)
+	hud.reportImpact(player, 150.0f, Vector3{0.0f, 1.0f, 0.0f}, /*isEnergy=*/false);
+	CHECK(hud.getActiveShakeCount() == 8);
+
+	// Heavy hit successfully evicted a dying shake
+	bool foundHeavy = false;
+	for (const auto &s : hud.getActiveShakes()) {
+		if (s.direction.y == Catch::Approx(1.0f) && s.magnitude >= 0.25f)
+			foundHeavy = true;
+	}
+	CHECK(foundHeavy);
+}
+
+TEST_CASE("HudManager: Non-observed entity or energy bullet does not trigger shake", "[integration][hud][shake]") {
+	GameContext context;
+	HudManager &hud = context.hudManager;
+	const entt::entity player = context.registry.create();
+	const entt::entity enemy = context.registry.create();
+	hud.setObservedEntity(player);
+
+	// Hit on non-observed entity
+	hud.reportImpact(enemy, 100.0f, Vector3{1.0f, 0.0f, 0.0f}, /*isEnergy=*/false);
+	CHECK(hud.getActiveShakeCount() == 0);
+
+	// Energy hit on observed player triggers subtle micro-kick
+	hud.reportImpact(player, 100.0f, Vector3{1.0f, 0.0f, 0.0f}, /*isEnergy=*/true);
+	CHECK(hud.getActiveShakeCount() == 1);
+	CHECK(hud.getActiveShakes()[0].magnitude <= 0.06f);
+
+	// Zero damage
+	hud.reset();
+	hud.setObservedEntity(player);
+	hud.reportImpact(player, 0.0f, Vector3{1.0f, 0.0f, 0.0f}, /*isEnergy=*/false);
+	CHECK(hud.getActiveShakeCount() == 0);
+}
+
+TEST_CASE("HudManager: Settings screenShakeMagnitude scales or disables shake", "[integration][hud][shake][settings]") {
+	GameContext context;
+	HudManager &hud = context.hudManager;
+	const entt::entity player = context.registry.create();
+	hud.setObservedEntity(player);
+
+	// 0.0 magnitude disables shake
+	context.config.settings.screenShakeMagnitude = 0.0f;
+	hud.reportImpact(player, 100.0f, Vector3{1.0f, 0.0f, 0.0f}, /*isEnergy=*/false);
+	hud.update(0.016f, context);
+
+	CHECK(hud.getActiveShakeCount() == 0);
+	CHECK(hud.getScreenShakeOffset().x == 0.0f);
+	CHECK(hud.getRenderingCamera().position.x == context.mainCamera.position.x);
+
+	// 1.0 magnitude (default) scales shake
+	context.config.settings.screenShakeMagnitude = 1.0f;
+	hud.reportImpact(player, 100.0f, Vector3{1.0f, 0.0f, 0.0f}, /*isEnergy=*/false);
+	hud.update(0.016f, context);
+
+	CHECK(hud.getActiveShakeCount() == 1);
+	CHECK(hud.getScreenShakeOffset().x > 0.0f);
+	CHECK(hud.getRenderingCamera().target.x != context.mainCamera.target.x);
+	CHECK(hud.getRenderingCamera().position.x != context.mainCamera.position.x);
+}
+
+TEST_CASE("Events: Kinetic bullet collision triggers screen shake via HudManager", "[integration][hud][shake][events]") {
+	GameContext context;
+	const entt::entity player = context.registry.create();
+	context.currentPlayer = player;
+	context.hudManager.setObservedEntity(player);
+	context.registry.emplace<combat::HP>(player, 100.0f);
+	context.registry.emplace<physics::Position>(player, Position{Vector3Zeros});
+	context.registry.emplace<combat::tag::Targetable>(player);
+
+	// Kinetic bullet
+	const entt::entity bullet = context.registry.create();
+	context.registry.emplace<combat::Damage>(bullet, 50.0f);
+	context.registry.emplace<weapon::tag::Bullet>(bullet);
+
+	event::CollisionEvent evt{
+		&context,
+		{bullet, Vector3Zeros, Vector3{0.0f, 0.0f, 10.0f}},
+		{player, Vector3Zeros, Vector3Zeros},
+		0.016f,
+		1.0f
+	};
+
+	event::Listener listener;
+	listener.handleCollisionEvent(evt);
+
+	CHECK(context.hudManager.getActiveShakeCount() == 1);
+	CHECK(context.hudManager.getActiveShakes()[0].direction.z == Catch::Approx(1.0f));
+
+	// Energy bullet
+	const entt::entity laser = context.registry.create();
+	context.registry.emplace<combat::Damage>(laser, 50.0f);
+	context.registry.emplace<weapon::tag::Bullet>(laser);
+	context.registry.emplace<weapon::tag::Energy>(laser);
+
+	context.hudManager.reset();
+	context.hudManager.setObservedEntity(player);
+
+	event::CollisionEvent laserEvt{
+		&context,
+		{laser, Vector3Zeros, Vector3{0.0f, 0.0f, 10.0f}},
+		{player, Vector3Zeros, Vector3Zeros},
+		0.016f,
+		1.0f
+	};
+
+	listener.handleCollisionEvent(laserEvt);
+	CHECK(context.hudManager.getActiveShakeCount() == 1);
+	CHECK(context.hudManager.getActiveShakes()[0].magnitude <= 0.06f);
+}

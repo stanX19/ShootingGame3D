@@ -24,7 +24,7 @@ void BattlefieldHUDRenderer::renderAll(float dt)
     setDt(dt);
     drawHUD();
     drawTexts();
-    drawDamageNumbers(m_camera);
+    drawDamageNumbers(m_context.hudManager.getRenderingCamera());
     drawToasts();
 }
 

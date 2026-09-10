@@ -1,6 +1,7 @@
 {
     "controlSensitivity": 0.4899999797344208,
     "controlSensitivityCurve": "smoothstep",
+    "screenShakeMagnitude": 1.0,
     "showDamageNumbers": true,
     "showHPBar": true,
     "showKillLogs": true,

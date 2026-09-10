@@ -99,6 +99,7 @@ public:
 		bool showDamageNumbers = true;
 		bool showToasts = true;
 		bool showKillLogs = true;
+		float screenShakeMagnitude = 1.0f;
 		float masterVolume = 0.5f;
 		float controlSensitivity = 1.0f;
 	} settings;
