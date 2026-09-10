@@ -11,7 +11,7 @@ namespace {
 
 GameMenu::GameMenu(GameContext &context)
 	: m_context(context),
-	  m_renderer(context.mainCamera, context),
+	  m_renderer(context),
 	  m_startButton("START GAME", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
 	  m_hangarButton("HANGAR", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
 	  m_settingsButton("SETTINGS", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20)
@@ -45,7 +45,7 @@ EngineState GameMenu::run()
 
 		BeginDrawing();
 		ClearBackground(BLACK);
-		m_renderer.render(dt);
+		m_renderer.render(dt, m_context.mainCamera);
 		drawMenuUI(nextState);
 		EndDrawing();
 

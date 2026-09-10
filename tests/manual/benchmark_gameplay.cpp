@@ -304,7 +304,7 @@ int main() {
 		runProfiled<SYS_CAMERA_FOLLOW_PLAYER>(metrics, isProfiling, [&]() { sysCameraFollowPlayer.update(context, dt); });
 
 		BeginDrawing();
-		runProfiled<SYS_RENDERER_RENDER>(metrics, isProfiling, [&]() { renderer.Render(dt); });
+		runProfiled<SYS_RENDERER_RENDER>(metrics, isProfiling, [&]() { renderer.Render(dt, context.mainCamera); });
 		runProfiled<SYS_HUD_RENDERER_RENDER>(metrics, isProfiling, [&]() { hudRenderer.RenderAll(dt); });
 
 		runProfiled<SYS_UNIT_SPAWN>(metrics, isProfiling, [&]() { sysUnitSpawn.update(context, dt); });

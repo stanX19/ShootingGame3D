@@ -4,7 +4,7 @@
 
 Game::Game(GameContext &context) 
     : m_context(context), 
-      m_renderer(context.mainCamera, context), 
+      m_renderer(context), 
       m_hudRenderer(context.mainCamera, context) 
 {}
 
@@ -73,7 +73,7 @@ EngineState Game::run() {
         m_context.hudManager.setObservedEntity(m_context.currentPlayer);
         m_context.hudManager.update(dt, m_context);
         BeginDrawing();
-        m_renderer.render(dt);
+        m_renderer.render(dt, m_context.hudManager.getRenderingCamera());
         m_hudRenderer.renderAll(dt);
         EndDrawing();
 

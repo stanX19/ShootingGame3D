@@ -4,8 +4,8 @@
 #include <iostream>
 #include <algorithm>
 
-Renderer::Renderer(Camera3D &cam, GameContext &context)
-	: m_camera(cam), m_context(context)
+Renderer::Renderer(GameContext &context)
+	: m_context(context)
 {
 	loadDefaultShader();
 	loadShaderWithFallback();
@@ -90,16 +90,15 @@ bool Renderer::isEntityVisible(entt::entity entity, const physics::Position &pos
 	return m_currentFrustum.isSphereInside(pos.value, effectiveRadius);
 }
 
-void Renderer::render(float dt)
+void Renderer::render(float dt, const Camera3D &camera)
 {
 	m_currentDt = dt;
+	m_camera = camera;
 	ClearBackground(BLACK);
 
-	const Camera3D renderCam = m_context.hudManager.getRenderingCamera();
+	drawEntitiesWithSkyboxShader();
 
-	drawEntitiesWithSkyboxShader(renderCam);
-
-	BeginMode3D(renderCam);
+	BeginMode3D(m_camera);
 	updateFrustum();
 
 	handleLightSource();
@@ -220,11 +219,11 @@ void Renderer::drawEntitiesWithShader()
 	}
 }
 
-void Renderer::drawEntitiesWithSkyboxShader(const Camera3D &camera)
+void Renderer::drawEntitiesWithSkyboxShader()
 {
-	Camera3D centerCam = camera;
+	Camera3D centerCam = m_camera;
 	centerCam.position = {0, 0, 0};
-	centerCam.target = Vector3Normalize(camera.target - camera.position) * 0.01f;
+	centerCam.target = Vector3Normalize(m_camera.target - m_camera.position) * 0.01f;
 
 	BeginMode3D(centerCam);
 	rlDisableDepthMask();

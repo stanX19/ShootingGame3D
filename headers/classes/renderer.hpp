@@ -15,16 +15,17 @@
 class Renderer {
 	friend class BenchmarkRenderer;
 public:
-	Renderer(Camera3D& camera, GameContext &context);
+	explicit Renderer(GameContext &context);
+	Renderer(Camera3D&, GameContext &context) : Renderer(context) {}
 	~Renderer();
 	Renderer(const Renderer &) = delete;
 	Renderer &operator=(const Renderer &) = delete;
 
-	void render(float dt);
-	void Render(float dt) { render(dt); }
+	void render(float dt, const Camera3D &camera);
+	void Render(float dt, const Camera3D &camera) { render(dt, camera); }
 
 private:
-	Camera3D& m_camera;
+	Camera3D m_camera{};
 	GameContext &m_context;
 	float m_currentDt = 0.0f;
 	Shader m_lightedShader{};
@@ -53,7 +54,7 @@ private:
 	void drawTrails();
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
 	void drawEntitiesWithShader();
-	void drawEntitiesWithSkyboxShader(const Camera3D &camera);
+	void drawEntitiesWithSkyboxShader();
 	void drawEntitiesWithoutShader();
 	void drawBoundaryWarning();
 	void drawEnergyShield();

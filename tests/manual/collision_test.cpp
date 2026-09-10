@@ -71,7 +71,7 @@ int main() {
 		context.dispatcher.update();
 
 		BeginDrawing();
-		renderer.Render(dt);
+		renderer.Render(dt, camera);
 		hudRenderer.setDt(dt);
 		hudRenderer.drawHealthBars();
 		EndDrawing();

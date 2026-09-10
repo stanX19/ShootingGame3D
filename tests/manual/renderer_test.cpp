@@ -68,7 +68,7 @@ int main()
 
 		// Draw
 		//----------------------------------------------------------------------------------
-		renderer.Render(GetFrameTime()); // Use the existing Renderer::Render method
+		renderer.Render(GetFrameTime(), camera); // Use the existing Renderer::Render method
 
 		// Drawing specific to main for testing purposes if needed
 		BeginDrawing();

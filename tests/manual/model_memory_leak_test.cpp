@@ -58,7 +58,7 @@ void runScopedModelRender(Camera& camera)
 
     // 5. Render once with Renderer
     std::cout << "[Test Scope] Performing single frame render...\n";
-    renderer.Render(0.016f);
+    renderer.Render(0.016f, camera);
 
     // 6. Unload models from manager
     std::cout << "[Test Scope] Calling ModelManager::unloadAll()...\n";

@@ -83,7 +83,7 @@ namespace
 
 GameHangar::GameHangar(GameContext &context)
   : m_context(context),
-	m_renderer(context.mainCamera, context),
+	m_renderer(context),
 	m_previewPlayer(entt::null),
 	m_specialButton("Special Weapon", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
 	m_shipButton("SELECT SHIP", Rectangle{0.0f, 0.0f, 0.0f, 0.0f}, SKYBLUE, 20),
@@ -156,7 +156,7 @@ EngineState GameHangar::run()
 
 		BeginDrawing();
 		ClearBackground(BLACK);
-		m_renderer.render(dt);
+		m_renderer.render(dt, m_context.mainCamera);
 		drawUI(nextState);
 		EndDrawing();
 

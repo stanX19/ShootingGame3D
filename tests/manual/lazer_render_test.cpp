@@ -86,7 +86,7 @@ int main() {
 
 	while (!WindowShouldClose()) {
 		BeginDrawing();
-		renderer.Render(dt);
+		renderer.Render(dt, camera);
 		hudRenderer.setDt(dt);
 		hudRenderer.drawHealthBars();
 		EndDrawing();
