@@ -87,7 +87,7 @@
         "length": 5
       },
       "hull": {
-        "width": 2.30,
+        "width": 2.3,
         "height": 1.15,
         "length": 4.95,
         "crown": 0.13,
@@ -253,12 +253,36 @@
         }
       ],
       "material": {
-        "armorBase": [86, 103, 118],
-        "armorSecondary": [42, 55, 69],
-        "accent": [202, 132, 45],
-        "structure": [52, 62, 72],
-        "canopy": [18, 112, 148],
-        "engine": [74, 177, 225],
+        "armorBase": [
+          86,
+          103,
+          118
+        ],
+        "armorSecondary": [
+          42,
+          55,
+          69
+        ],
+        "accent": [
+          202,
+          132,
+          45
+        ],
+        "structure": [
+          52,
+          62,
+          72
+        ],
+        "canopy": [
+          18,
+          112,
+          148
+        ],
+        "engine": [
+          74,
+          177,
+          225
+        ],
         "pattern": "chevron",
         "secondaryCoverage": 0.32,
         "accentCoverage": 0.1,
@@ -343,7 +367,7 @@
         "rootFrontZ": 0.85,
         "rootRearZ": -1.55,
         "tipFrontZ": -0.45,
-        "tipRearZ": -0.90,
+        "tipRearZ": -0.9,
         "rootX": 0.54,
         "topY": -0.12,
         "bottomY": -0.36,
@@ -446,12 +470,36 @@
         }
       ],
       "material": {
-        "armorBase": [132, 140, 142],
-        "armorSecondary": [78, 88, 90],
-        "accent": [211, 166, 55],
-        "structure": [64, 70, 74],
-        "canopy": [28, 101, 122],
-        "engine": [75, 164, 202],
+        "armorBase": [
+          132,
+          140,
+          142
+        ],
+        "armorSecondary": [
+          78,
+          88,
+          90
+        ],
+        "accent": [
+          211,
+          166,
+          55
+        ],
+        "structure": [
+          64,
+          70,
+          74
+        ],
+        "canopy": [
+          28,
+          101,
+          122
+        ],
+        "engine": [
+          75,
+          164,
+          202
+        ],
         "pattern": "wing_bands",
         "secondaryCoverage": 0.26,
         "accentCoverage": 0.08,
@@ -523,7 +571,7 @@
         "length": 4.8
       },
       "hull": {
-        "width": 2.10,
+        "width": 2.1,
         "height": 1.15,
         "length": 4.65,
         "crown": 0.16,
@@ -536,7 +584,7 @@
         "rootFrontZ": 1.1,
         "rootRearZ": -2.05,
         "tipFrontZ": -0.45,
-        "tipRearZ": -0.90,
+        "tipRearZ": -0.9,
         "rootX": 0.72,
         "topY": -0.22,
         "bottomY": -0.55,
@@ -649,12 +697,36 @@
         }
       ],
       "material": {
-        "armorBase": [74, 88, 108],
-        "armorSecondary": [32, 41, 55],
-        "accent": [177, 51, 46],
-        "structure": [48, 55, 65],
-        "canopy": [20, 93, 140],
-        "engine": [64, 150, 222],
+        "armorBase": [
+          74,
+          88,
+          108
+        ],
+        "armorSecondary": [
+          32,
+          41,
+          55
+        ],
+        "accent": [
+          177,
+          51,
+          46
+        ],
+        "structure": [
+          48,
+          55,
+          65
+        ],
+        "canopy": [
+          20,
+          93,
+          140
+        ],
+        "engine": [
+          64,
+          150,
+          222
+        ],
         "pattern": "spine_band",
         "secondaryCoverage": 0.34,
         "accentCoverage": 0.09,
@@ -686,7 +758,7 @@
         "propulsionLayout": "twin_boom",
         "propulsionPlacement": "auto",
         "targetAcceleration": 1.48,
-        "endurance": 0.70,
+        "endurance": 0.7,
         "armorMassScale": 0.72,
         "engineTechnology": 1.12,
         "moduleClearance": 0.11,
@@ -763,7 +835,7 @@
         "crew": 1,
         "primarySpineWidth": 0.42,
         "reactorRadius": 0.43,
-        "serviceBayLength": 0.70,
+        "serviceBayLength": 0.7,
         "radiatorScale": 0.82,
         "weaponDeckCantDegrees": 0
       },
@@ -842,12 +914,36 @@
         }
       ],
       "material": {
-        "armorBase": [118, 128, 138],
-        "armorSecondary": [48, 60, 74],
-        "accent": [226, 103, 34],
-        "structure": [52, 60, 70],
-        "canopy": [15, 110, 155],
-        "engine": [70, 190, 240],
+        "armorBase": [
+          118,
+          128,
+          138
+        ],
+        "armorSecondary": [
+          48,
+          60,
+          74
+        ],
+        "accent": [
+          226,
+          103,
+          34
+        ],
+        "structure": [
+          52,
+          60,
+          70
+        ],
+        "canopy": [
+          15,
+          110,
+          155
+        ],
+        "engine": [
+          70,
+          190,
+          240
+        ],
         "pattern": "wing_bands",
         "secondaryCoverage": 0.3,
         "accentCoverage": 0.09,
@@ -882,10 +978,10 @@
         "propulsionLayout": "distributed_aft",
         "propulsionPlacement": "auto",
         "targetAcceleration": 0.82,
-        "endurance": 1.30,
+        "endurance": 1.3,
         "armorMassScale": 1.72,
         "engineTechnology": 1.18,
-        "moduleClearance": 0.20,
+        "moduleClearance": 0.2,
         "hardSurfaceBias": 0.88,
         "weaponLayout": {
           "placement": "auto",
@@ -1261,7 +1357,7 @@
         "crew": 24,
         "primarySpineWidth": 1.25,
         "reactorRadius": 1.05,
-        "serviceBayLength": 2.40,
+        "serviceBayLength": 2.4,
         "radiatorScale": 1.15,
         "weaponDeckCantDegrees": 32
       },
@@ -2130,12 +2226,36 @@
         }
       ],
       "material": {
-        "armorBase": [70, 76, 82],
-        "armorSecondary": [30, 34, 40],
-        "accent": [168, 30, 26],
-        "structure": [54, 61, 68],
-        "canopy": [65, 13, 16],
-        "engine": [94, 168, 202],
+        "armorBase": [
+          70,
+          76,
+          82
+        ],
+        "armorSecondary": [
+          30,
+          34,
+          40
+        ],
+        "accent": [
+          168,
+          30,
+          26
+        ],
+        "structure": [
+          54,
+          61,
+          68
+        ],
+        "canopy": [
+          65,
+          13,
+          16
+        ],
+        "engine": [
+          94,
+          168,
+          202
+        ],
         "pattern": "hazard",
         "secondaryCoverage": 0.5,
         "accentCoverage": 0.11,
@@ -2191,7 +2311,11 @@
               "supportWidth": 0.72,
               "supportHeight": 0.58,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             },
             {
               "turretRadius": 0.25,
@@ -2201,7 +2325,11 @@
               "supportWidth": 0.72,
               "supportHeight": 0.58,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             },
             {
               "turretRadius": 0.25,
@@ -2211,7 +2339,11 @@
               "supportWidth": 0.72,
               "supportHeight": 0.58,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             },
             {
               "turretRadius": 0.25,
@@ -2221,7 +2353,11 @@
               "supportWidth": 0.72,
               "supportHeight": 0.58,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             },
             {
               "turretRadius": 0.25,
@@ -2231,7 +2367,11 @@
               "supportWidth": 0.52,
               "supportHeight": 0.46,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             },
             {
               "turretRadius": 0.25,
@@ -2241,7 +2381,11 @@
               "supportWidth": 0.52,
               "supportHeight": 0.46,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             },
             {
               "turretRadius": 0.25,
@@ -2251,7 +2395,11 @@
               "supportWidth": 0.52,
               "supportHeight": 0.46,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             },
             {
               "turretRadius": 0.25,
@@ -2261,7 +2409,11 @@
               "supportWidth": 0.52,
               "supportHeight": 0.46,
               "socketHeight": 0.3,
-              "facingDirection": {"x": 0.0, "y": 0.0, "z": 1.0}
+              "facingDirection": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              }
             }
           ]
         }
@@ -2308,8 +2460,8 @@
         "archetype": "carrier",
         "crew": 120,
         "primarySpineWidth": 1.55,
-        "reactorRadius": 1.30,
-        "serviceBayLength": 3.10,
+        "reactorRadius": 1.3,
+        "serviceBayLength": 3.1,
         "radiatorScale": 1.45,
         "weaponDeckCantDegrees": 0
       },
@@ -2558,12 +2710,36 @@
         }
       ],
       "material": {
-        "armorBase": [116, 123, 128],
-        "armorSecondary": [50, 62, 73],
-        "accent": [211, 150, 40],
-        "structure": [70, 80, 88],
-        "canopy": [20, 95, 128],
-        "engine": [75, 168, 210],
+        "armorBase": [
+          116,
+          123,
+          128
+        ],
+        "armorSecondary": [
+          50,
+          62,
+          73
+        ],
+        "accent": [
+          211,
+          150,
+          40
+        ],
+        "structure": [
+          70,
+          80,
+          88
+        ],
+        "canopy": [
+          20,
+          95,
+          128
+        ],
+        "engine": [
+          75,
+          168,
+          210
+        ],
         "pattern": "blocked",
         "secondaryCoverage": 0.38,
         "accentCoverage": 0.08,
@@ -2584,6 +2760,648 @@
         "height": 1024
       },
       "armorDepth": 0.1
+    },
+    "interceptor_quad": {
+      "modelPath": "assets/Models/spaceships/interceptor_quad/spaceship_interceptor_quad.obj",
+      "seed": 4501,
+      "design": {
+        "propulsionLayout": "twin_boom",
+        "propulsionPlacement": "manual",
+        "targetAcceleration": 1.35,
+        "endurance": 0.95,
+        "armorMassScale": 0.95,
+        "engineTechnology": 1.25,
+        "moduleClearance": 0.14,
+        "hardSurfaceBias": 0.74,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "forward",
+          "symmetry": "bilateral",
+          "batteryStyle": "integrated",
+          "turretCount": 4,
+          "minimumSeparationScale": 1.3,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.55,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.55,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.58,
+              "supportHeight": 0.44,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.58,
+              "supportHeight": 0.44,
+              "socketHeight": 0.22
+            }
+          ]
+        }
+      },
+      "mountAttachment": {
+        "directBlisterGapScale": 2.0
+      },
+      "dimensions": {
+        "width": 8.6,
+        "height": 2.0,
+        "length": 6.6
+      },
+      "hull": {
+        "width": 1.2,
+        "height": 0.95,
+        "length": 6.2,
+        "crown": 0.18,
+        "keel": 0.12,
+        "noseSharpness": 0.96,
+        "rearTaper": 0.85
+      },
+      "wings": {
+        "halfSpan": 4.2,
+        "rootFrontZ": 0.4,
+        "rootRearZ": -1.8,
+        "tipFrontZ": 1.8,
+        "tipRearZ": 1.0,
+        "rootX": 0.55,
+        "topY": -0.04,
+        "bottomY": -0.26,
+        "shoulderWidth": 0.48
+      },
+      "cockpit": {
+        "center": {
+          "x": 0.0,
+          "y": 0.52,
+          "z": 1.4
+        },
+        "size": {
+          "x": 0.72,
+          "y": 0.38,
+          "z": 1.45
+        },
+        "browDepth": 0.14
+      },
+      "layout": {
+        "archetype": "interceptor",
+        "crew": 1,
+        "primarySpineWidth": 0.48,
+        "reactorRadius": 0.46,
+        "serviceBayLength": 1.1,
+        "radiatorScale": 0.5,
+        "weaponDeckCantDegrees": 0.0
+      },
+      "wear": {
+        "paintLoss": 0.12,
+        "oxidation": 0.04,
+        "heatStaining": 0.18,
+        "repairPanels": 2
+      },
+      "material": {
+        "armorBase": [
+          42,
+          54,
+          70
+        ],
+        "armorSecondary": [
+          22,
+          28,
+          38
+        ],
+        "accent": [
+          0,
+          210,
+          245
+        ],
+        "structure": [
+          50,
+          56,
+          64
+        ],
+        "canopy": [
+          18,
+          110,
+          145
+        ],
+        "engine": [
+          60,
+          180,
+          230
+        ],
+        "pattern": "chevron",
+        "secondaryCoverage": 0.36,
+        "accentCoverage": 0.24,
+        "normalStrength": 0.14,
+        "detailScale": 1.0
+      },
+      "texture": {
+        "width": 2048,
+        "height": 2048
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "armorDepth": 0.1,
+      "engines": [
+        {
+          "center": {
+            "x": -2.200000047683716,
+            "y": 0.005091680213809013,
+            "z": -0.6000000238418579
+          },
+          "length": 1.4500000476837158,
+          "nozzleCells": 5,
+          "nozzleDepth": 0.2199999988079071,
+          "radius": 0.30000001192092896
+        },
+        {
+          "center": {
+            "x": 2.200000047683716,
+            "y": 0.005091680213809013,
+            "z": -0.6000000238418579
+          },
+          "length": 1.4500000476837158,
+          "nozzleCells": 5,
+          "nozzleDepth": 0.2199999988079071,
+          "radius": 0.30000001192092896
+        }
+      ],
+      "runtime": {
+        "modelRadius": 4.798995494842529
+      },
+      "mounts": [
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_0",
+          "position": {
+            "x": 1.4500000476837158,
+            "y": 0.8092881441116333,
+            "z": 0.9475996494293213
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": 0.9000000357627869,
+            "y": 0.2992880940437317,
+            "z": 0.9225996732711792
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        },
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_1",
+          "position": {
+            "x": -1.4500000476837158,
+            "y": 0.8092881441116333,
+            "z": 0.9475996494293213
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": -0.9000000357627869,
+            "y": 0.2992880940437317,
+            "z": 0.9225996732711792
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        },
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_2",
+          "position": {
+            "x": 4.037499904632568,
+            "y": -0.5554805397987366,
+            "z": 2.0824899673461914
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": 3.487499952316284,
+            "y": -0.045480549335479736,
+            "z": 2.0574898719787598
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        },
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_3",
+          "position": {
+            "x": -4.037499904632568,
+            "y": -0.5554805397987366,
+            "z": 2.0824899673461914
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": -3.487499952316284,
+            "y": -0.045480549335479736,
+            "z": 2.0574898719787598
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        }
+      ]
+    },
+    "heavy_quad": {
+      "modelPath": "assets/Models/spaceships/heavy_quad/spaceship_heavy_quad.obj",
+      "seed": 4301,
+      "design": {
+        "propulsionLayout": "spine_cluster",
+        "propulsionPlacement": "auto",
+        "targetAcceleration": 1.05,
+        "endurance": 1.1,
+        "armorMassScale": 1.15,
+        "engineTechnology": 1.1,
+        "moduleClearance": 0.14,
+        "hardSurfaceBias": 0.78,
+        "weaponLayout": {
+          "placement": "auto",
+          "coverage": "forward",
+          "symmetry": "bilateral",
+          "batteryStyle": "integrated",
+          "turretCount": 4,
+          "minimumSeparationScale": 1.3,
+          "capabilities": [
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.55,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.55,
+              "supportHeight": 0.42,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.58,
+              "supportHeight": 0.44,
+              "socketHeight": 0.22
+            },
+            {
+              "turretRadius": 0.25,
+              "barrelRadius": 0.25,
+              "barrelLength": 3.25,
+              "traverseHalfAngleDegrees": 8.0,
+              "supportWidth": 0.58,
+              "supportHeight": 0.44,
+              "socketHeight": 0.22
+            }
+          ]
+        }
+      },
+      "mountAttachment": {
+        "directBlisterGapScale": 2.0
+      },
+      "dimensions": {
+        "width": 7.2,
+        "height": 2.8,
+        "length": 4.6
+      },
+      "hull": {
+        "width": 3.6,
+        "height": 1.65,
+        "length": 4.0,
+        "crown": 0.22,
+        "keel": 0.16,
+        "noseSharpness": 0.15,
+        "rearTaper": 0.45
+      },
+      "wings": {
+        "halfSpan": 3.2,
+        "rootFrontZ": 1.2,
+        "rootRearZ": -1.2,
+        "tipFrontZ": 1.0,
+        "tipRearZ": -1.0,
+        "rootX": 1.5,
+        "topY": 0.4,
+        "bottomY": 0.14,
+        "shoulderWidth": 0.6
+      },
+      "secondaryWings": {
+        "halfSpan": 3.2,
+        "rootFrontZ": 1.2,
+        "rootRearZ": -1.2,
+        "tipFrontZ": 1.0,
+        "tipRearZ": -1.0,
+        "rootX": 1.5,
+        "topY": -0.14,
+        "bottomY": -0.4,
+        "shoulderWidth": 0.6
+      },
+      "cockpit": {
+        "center": {
+          "x": 0.0,
+          "y": 0.82,
+          "z": 0.6
+        },
+        "size": {
+          "x": 1.4,
+          "y": 0.35,
+          "z": 1.1
+        },
+        "browDepth": 0.22
+      },
+      "layout": {
+        "archetype": "heavy_fighter",
+        "crew": 2,
+        "primarySpineWidth": 0.55,
+        "reactorRadius": 0.5,
+        "serviceBayLength": 1.2,
+        "radiatorScale": 0.55,
+        "weaponDeckCantDegrees": 0.0
+      },
+      "wear": {
+        "paintLoss": 0.18,
+        "oxidation": 0.08,
+        "heatStaining": 0.22,
+        "repairPanels": 3
+      },
+      "material": {
+        "armorBase": [
+          62,
+          68,
+          74
+        ],
+        "armorSecondary": [
+          34,
+          38,
+          44
+        ],
+        "accent": [
+          46,
+          204,
+          113
+        ],
+        "structure": [
+          48,
+          55,
+          65
+        ],
+        "canopy": [
+          24,
+          110,
+          140
+        ],
+        "engine": [
+          70,
+          160,
+          210
+        ],
+        "pattern": "chevron",
+        "secondaryCoverage": 0.38,
+        "accentCoverage": 0.28,
+        "normalStrength": 0.14,
+        "detailScale": 1.0
+      },
+      "texture": {
+        "width": 2048,
+        "height": 2048
+      },
+      "topology": {
+        "cylinderSegments": 12
+      },
+      "armorDepth": 0.1,
+      "engines": [
+        {
+          "center": {
+            "x": -1.424763798713684,
+            "y": 0.02901596389710903,
+            "z": -1.8100955486297607
+          },
+          "length": 1.3913118839263916,
+          "nozzleCells": 2,
+          "nozzleDepth": 0.24537599086761475,
+          "radius": 0.3957677185535431
+        },
+        {
+          "center": {
+            "x": 0.0,
+            "y": 0.02901596389710903,
+            "z": -1.6320000886917114
+          },
+          "length": 1.3913118839263916,
+          "nozzleCells": 2,
+          "nozzleDepth": 0.24537599086761475,
+          "radius": 0.3957677185535431
+        },
+        {
+          "center": {
+            "x": 1.424763798713684,
+            "y": 0.02901596389710903,
+            "z": -1.8100955486297607
+          },
+          "length": 1.3913118839263916,
+          "nozzleCells": 2,
+          "nozzleDepth": 0.24537599086761475,
+          "radius": 0.3957677185535431
+        }
+      ],
+      "runtime": {
+        "modelRadius": 3.559795379638672
+      },
+      "mounts": [
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_0",
+          "position": {
+            "x": 1.7256876230239868,
+            "y": 0.7275078296661377,
+            "z": 0.2427278757095337
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": 1.175687551498413,
+            "y": 0.21750786900520325,
+            "z": 0.2177278697490692
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        },
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_1",
+          "position": {
+            "x": -1.7256876230239868,
+            "y": 0.7275078296661377,
+            "z": 0.2427278757095337
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": -1.175687551498413,
+            "y": 0.21750786900520325,
+            "z": 0.2177278697490692
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        },
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_2",
+          "position": {
+            "x": 2.7080001831054688,
+            "y": 0.554122805595398,
+            "z": -0.41064199805259705
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": 2.1580002307891846,
+            "y": 0.04412281513214111,
+            "z": -0.4356420040130615
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        },
+        {
+          "barrelLength": 3.25,
+          "barrelRadius": 0.25,
+          "facingDirection": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "id": "mount_3",
+          "position": {
+            "x": -2.7080001831054688,
+            "y": 0.554122805595398,
+            "z": -0.41064199805259705
+          },
+          "socketHeight": 0.2199999988079071,
+          "supportHeight": 0.5,
+          "supportRoot": {
+            "x": -2.1580002307891846,
+            "y": 0.04412281513214111,
+            "z": -0.4356420040130615
+          },
+          "supportWidth": 0.6000000238418579,
+          "traverseHalfAngleDegrees": 8.0,
+          "turretRadius": 0.25
+        }
+      ]
     }
   }
 }

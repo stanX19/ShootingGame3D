@@ -30,6 +30,8 @@ entt::entity spawnFastEliteUnit(GameContext& context, const Vector3& pos, factio
 entt::entity spawnEliteUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnTerminatorUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnMothershipUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
+entt::entity spawnInterceptorQuadUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
+entt::entity spawnHeavyQuadUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnPlayer(GameContext& context);
 entt::entity spawnPlayer(GameContext& context, Vector3 pos);
 

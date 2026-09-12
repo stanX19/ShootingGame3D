@@ -1,7 +1,7 @@
-newmtl asteroid_small
+newmtl spaceship_heavy_quad
 Ka 0.060000 0.070000 0.080000
 Kd 0.920000 0.940000 0.960000
 Ks 0.620000 0.660000 0.720000
 Ns 48.000000
-map_Kd asteroid_small.png
-bump asteroid_small_normal.png
+map_Kd spaceship_heavy_quad.png
+bump spaceship_heavy_quad_normal.png

@@ -39,6 +39,14 @@ TEST_CASE("GameConfig loads spaceship roots into typed definitions", "[integrati
 	CHECK(terminator.mounts.size() == 32);
 	CHECK(terminator.engines.size() == 6);
 	CHECK(terminator.modelRadius == Catch::Approx(8.6744432449f));
+
+	const auto& interceptor = config.spaceship().get("interceptor_quad");
+	CHECK(interceptor.mounts.size() == 4);
+	CHECK(interceptor.engines.size() == 2);
+
+	const auto& heavyQuad = config.spaceship().get("heavy_quad");
+	CHECK(heavyQuad.mounts.size() == 4);
+	CHECK(heavyQuad.engines.size() == 3);
 }
 
 TEST_CASE("GameConfig loads materialized unit definitions", "[integration][unit]") {
@@ -49,18 +57,24 @@ TEST_CASE("GameConfig loads materialized unit definitions", "[integration][unit]
 	CHECK(units.contains("fighter"));
 	CHECK(units.contains("basic"));
 	CHECK(units.contains("terminator"));
+	CHECK(units.contains("heavy_quad"));
+	CHECK(units.contains("interceptor_quad"));
 	CHECK(units.ids() == std::vector<std::string>{
 		"basic",
 		"elite",
 		"fastElite",
 		"fighter",
+		"heavy_quad",
+		"interceptor_quad",
 		"mothership",
 		"terminator"
 	});
 	CHECK(units.get("fighter").spaceshipReference == "player");
 	CHECK(units.get("fighter").stats.collisionRadius == Catch::Approx(1.0f));
-	CHECK(units.get("fighter").stats.shieldRegen == Catch::Approx(50.0f));
-	CHECK(units.get("elite").stats.maxSpeed == Catch::Approx(80.0f));
+	CHECK(units.get("fighter").stats.shieldRegen == Catch::Approx(25.0f));
+	CHECK(units.get("elite").stats.maxSpeed == Catch::Approx(85.0f));
+	CHECK(units.get("heavy_quad").stats.collisionRadius == Catch::Approx(2.4f));
+	CHECK(units.get("interceptor_quad").stats.collisionRadius == Catch::Approx(1.6f));
 }
 
 TEST_CASE("GameConfig rejects a unit with an unknown spaceship reference", "[integration][unit]") {

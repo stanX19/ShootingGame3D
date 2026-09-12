@@ -180,6 +180,7 @@ namespace gen_model::spaceship {
 		Dimensions dimensions{};
 		HullSettings hull{};
 		WingSettings wings{};
+		std::optional<WingSettings> secondaryWings{};
 		CockpitSettings cockpit{};
 		std::vector<EngineSettings> engines;
 		std::vector<MountSettings> mounts;

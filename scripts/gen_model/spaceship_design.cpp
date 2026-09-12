@@ -271,6 +271,13 @@ namespace {
 		));
 	}
 
+	bool isFighterArchetype(const Settings& settings) {
+		return settings.layout.archetype == "patrol_fighter"
+			|| settings.layout.archetype == "multirole"
+			|| settings.layout.archetype == "heavy_fighter"
+			|| settings.layout.archetype == "interceptor";
+	}
+
 	std::vector<gen_model::spaceship::design::EnginePod> resolveEngines(
 		const Settings& settings,
 		PropulsionLayout layout,
@@ -305,11 +312,13 @@ namespace {
 			const float podCapacity = PI * runtime.radius * runtime.radius
 				* runtime.length * technology * 4.8f;
 			const float requiredPodThrust = performance.requiredThrust / static_cast<float>(count);
-			const int cells = std::clamp(
-				static_cast<int>(std::ceil(requiredPodThrust / std::max(podCapacity, EPSILON))),
-				1,
-				6
-			);
+			const int cells = (isFighterArchetype(settings) && layout == PropulsionLayout::CentralCluster)
+				? 1
+				: std::clamp(
+					static_cast<int>(std::ceil(requiredPodThrust / std::max(podCapacity, EPSILON))),
+					1,
+					6
+				);
 			result.push_back({
 				runtime,
 				{0.0f, 0.0f, -1.0f},

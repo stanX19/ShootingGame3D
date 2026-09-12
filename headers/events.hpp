@@ -39,13 +39,13 @@ namespace event {
 
 	struct Listener {
 		// CollisionEvent
-		void handleCollisionEvent(const CollisionEvent& evt);
+		static void handleCollisionEvent(const CollisionEvent& evt);
 		
 		// KillEvent
-		void handleKillEvent(const KillEvent& evt);
+		static void handleKillEvent(const KillEvent& evt);
 
 		// SoundEvent
-		void handleSoundEvent(const SoundEvent& evt);
+		static void handleSoundEvent(const SoundEvent& evt);
 	};
 }
 

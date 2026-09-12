@@ -1,10 +1,11 @@
 {
 	"bullet": {
-		"baseDamage": 50,
+		"baseDamage": 25,
 		"baseSpeed": 1000,
 		"effectiveRangeMultiplier": 2,
 		"weapons": {
 			"basic": {
+				"name": "Shooter",
 				"ammo": 30,
 				"bulletCount": 1,
 				"cooldown": 0.15,
@@ -12,26 +13,26 @@
 				"hp": 1,
 				"lifespan": 10,
 				"mass": 5,
-				"name": "Basic",
 				"radius": 0.05,
 				"reloadTime": 2,
 				"speedMultiplier": 1.2,
 				"spreadMultiplier": 5
 			},
-			"bigBall": {
-				"ammo": 1,
+			"sniper": {
+				"name": "Sniper",
 				"bulletCount": 1,
-				"damageMultiplier": 4,
-				"hp": 10000000,
-				"lifespan": 15,
-				"mass": 500,
-				"name": "Big Ball",
-				"radius": 1.5,
-				"reloadTime": 3,
-				"speedMultiplier": 0.5,
-				"spreadMultiplier": 0
+				"cooldown": 1.5,
+				"damageMultiplier": 3.5,
+				"hp": 50,
+				"lifespan": 10,
+				"mass": 20,
+				"radius": 0.2,
+				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3",
+				"speedMultiplier": 8,
+				"spreadMultiplier": 0.01
 			},
 			"burstSniper": {
+				"name": "Burst Sniper",
 				"ammo": 10,
 				"bulletCount": 1,
 				"cooldown": 0.35,
@@ -39,7 +40,6 @@
 				"hp": 50,
 				"lifespan": 10,
 				"mass": 20,
-				"name": "Burstsniper",
 				"radius": 0.2,
 				"reloadTime": 6,
 				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3",
@@ -54,13 +54,14 @@
 				"hp": 1,
 				"lifespan": 10,
 				"mass": 5,
-				"name": "Machinegun",
+				"name": "Machine Gun",
 				"radius": 0.05,
 				"reloadTime": 4,
 				"speedMultiplier": 2,
 				"spreadMultiplier": 20
 			},
 			"shotgun": {
+				"name": "Shotgun",
 				"ammo": 5,
 				"bulletCount": 10,
 				"cooldown": 0.1,
@@ -70,24 +71,23 @@
 				"lifespan": 5,
 				"mass": 5,
 				"modelStretch": 0.5,
-				"name": "Shotgun",
 				"radius": 0.025,
 				"reloadTime": 1.5,
 				"speedMultiplier": 2,
 				"spreadMultiplier": 50
 			},
-			"sniper": {
+			"bigBall": {
+				"name": "Asteroid Cannon",
+				"ammo": 1,
 				"bulletCount": 1,
-				"cooldown": 1.5,
-				"damageMultiplier": 2.5,
-				"hp": 50,
-				"lifespan": 10,
-				"mass": 20,
-				"name": "Sniper",
-				"radius": 0.2,
-				"sound": "assets/sounds/gunshot/sound_of_firegun-384760_cockpit.mp3",
-				"speedMultiplier": 8,
-				"spreadMultiplier": 0.01
+				"damageMultiplier": 10,
+				"hp": 10000000,
+				"lifespan": 15,
+				"mass": 500,
+				"radius": 1.5,
+				"reloadTime": 3,
+				"speedMultiplier": 0.5,
+				"spreadMultiplier": 0
 			}
 		}
 	},
@@ -98,50 +98,50 @@
 		"modelPath": "assets/Models/bullet/lazer.glb",
 		"weapons": {
 			"basic": {
+				"name": "Lazer Shooter",
 				"bulletCount": 1,
 				"cooldown": 0.3,
 				"damageMultiplier": 2,
 				"hp": 1,
-				"name": "Lazer Basic",
 				"radius": 0.05,
 				"spreadMultiplier": 1
 			},
-			"deletor": {
-				"ammo": 1,
-				"ammoRegen": 0.125,
-				"bulletCount": 1,
-				"chargeTime": 1.5,
-				"damageMultiplier": 2,
-				"extendFireDuration": 1.5,
-				"extendFireRequest": 2,
-				"hp": 1,
-				"isSpecial": false,
-				"name": "Lazer Deletor",
-				"radius": 0.5,
-				"spreadMultiplier": 0
-			},
 			"machineGun": {
+				"name": "Lazer Machine Gun",
 				"ammo": 120,
-				"ammoRegen": 6,
+				"ammoRegen": 8,
 				"bulletCount": 1,
 				"cooldown": 0.05,
 				"damageMultiplier": 0.5,
 				"extendFireRequest": 0.5,
 				"hp": 1,
-				"name": "Lazer Machinegun",
 				"radius": 0.05,
 				"spreadMultiplier": 3
 			},
 			"shotgun": {
+				"name": "Lazer Shotgun",
 				"ammo": 3,
 				"ammoRegen": 1,
 				"bulletCount": 20,
 				"cooldown": 0.5,
 				"damageMultiplier": 1,
 				"hp": 1,
-				"name": "Lazer Shotgun",
 				"radius": 0.025,
 				"spreadMultiplier": 15
+			},
+			"deletor": {
+				"name": "Lazer Deletor",
+				"ammo": 1,
+				"ammoRegen": 0.125,
+				"bulletCount": 1,
+				"chargeTime": 1.5,
+				"damageMultiplier": 1.0,
+				"extendFireDuration": 1.5,
+				"extendFireRequest": 2,
+				"hp": 1,
+				"isSpecial": false,
+				"radius": 0.5,
+				"spreadMultiplier": 0
 			}
 		}
 	},
@@ -155,6 +155,7 @@
 		"maxSpeed": 400,
 		"weapons": {
 			"basic": {
+				"name": "Missile Classic",
 				"acceleration": -1e-7,
 				"ammo": 2,
 				"ammoRegen": 0.05,
@@ -166,12 +167,12 @@
 				"instantDamage": 250,
 				"instantRadius": 0.25,
 				"isSpecial": true,
-				"name": "Missile Basic",
 				"radius": 0.5,
 				"speedMultiplier": 1,
 				"turnSpeed": 0.5
 			},
 			"flares": {
+				"name": "Flares",
 				"ammo": 4,
 				"ammoReload": 10,
 				"bulletCount": 2,
@@ -180,13 +181,13 @@
 				"hp": 1,
 				"isSpecial": true,
 				"lifespanMultiplier": 0.2,
-				"name": "Flares",
 				"radius": 0.15,
 				"speedMultiplier": 0.5,
 				"spreadAngle": 1.571,
 				"turnSpeed": 0.05
 			},
 			"nuke": {
+				"name": "Nuke",
 				"ammo": 1,
 				"delayedDamage": 1000000,
 				"delayedDamageTime": 40,
@@ -198,13 +199,13 @@
 				"instantRadius": 5,
 				"isSpecial": true,
 				"mass": 100,
-				"name": "Nuke",
 				"radius": 0.75,
 				"reloadTime": 40,
 				"speedMultiplier": 0.5,
 				"turnSpeed": 1.5
 			},
 			"sniper": {
+				"name": "Missile Sniper",
 				"cooldown": 2,
 				"explosionDamage": 50,
 				"explosionFinalRadius": 5,
@@ -213,11 +214,11 @@
 				"instantDamage": 0,
 				"instantRadius": 0.25,
 				"mass": 5,
-				"name": "Missile Sniper",
 				"radius": 0.5,
 				"speedMultiplier": 10
 			},
 			"swarm": {
+				"name": "Missile Swarm",
 				"ammo": 3,
 				"bulletCount": 6,
 				"cooldown": 0.25,
@@ -230,7 +231,6 @@
 				"instantRadius": 0.25,
 				"isSpecial": true,
 				"lifespanMultiplier": 0.5,
-				"name": "Missile Swarm",
 				"radius": 0.15,
 				"reloadTime": 15,
 				"speedMultiplier": 2,
@@ -238,20 +238,20 @@
 				"turnSpeed": 0.75
 			},
 			"torpedo": {
-				"ammo": 8,
-				"cooldown": 0.1,
+				"name": "Torpedo",
+				"ammo": 20,
+				"cooldown": 0.2,
 				"explosionDamage": 50,
 				"explosionFinalRadius": 1.5,
 				"explosionStartRadius": 0.075,
-				"extendFireRequest": 5,
+				"extendFireRequest": 0.15,
 				"hp": 1,
 				"instantDamage": 125,
 				"instantRadius": 0.075,
-				"isSpecial": true,
+				"isSpecial": false,
 				"mass": 2.5,
-				"name": "Torpedo",
 				"radius": 0.15,
-				"reloadTime": 20,
+				"reloadTime": 10,
 				"speedMultiplier": 4,
 				"turnSpeed": 0
 			}

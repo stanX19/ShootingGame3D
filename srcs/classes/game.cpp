@@ -18,6 +18,7 @@ void Game::reset() {
     spawnSunAndStars(m_context);
     SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
     m_context.factions.clear();
+    m_context.hudManager.reset();
     
     m_context.mainCamera.position = Vector3{ 0.0f, 1.0f, 4.0f };
     m_context.mainCamera.target = Vector3{ 0.0f, 0.0f, 0.0f };

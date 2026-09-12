@@ -375,6 +375,21 @@ namespace {
 			requireFloat(wings, "shoulderWidth", path + ".wings")
 		};
 
+		if (value.contains("secondaryWings")) {
+			const Json& sec = requireObjectMember(value, "secondaryWings", path);
+			settings.secondaryWings = gen_model::spaceship::WingSettings{
+				requireFloat(sec, "halfSpan", path + ".secondaryWings"),
+				requireFloat(sec, "rootFrontZ", path + ".secondaryWings"),
+				requireFloat(sec, "rootRearZ", path + ".secondaryWings"),
+				requireFloat(sec, "tipFrontZ", path + ".secondaryWings"),
+				requireFloat(sec, "tipRearZ", path + ".secondaryWings"),
+				requireFloat(sec, "rootX", path + ".secondaryWings"),
+				requireFloat(sec, "topY", path + ".secondaryWings"),
+				requireFloat(sec, "bottomY", path + ".secondaryWings"),
+				requireFloat(sec, "shoulderWidth", path + ".secondaryWings")
+			};
+		}
+
 		const Json& cockpit = requireObjectMember(value, "cockpit", path);
 		settings.cockpit.center = requirePoint(cockpit, "center", path + ".cockpit");
 		settings.cockpit.size = requirePoint(cockpit, "size", path + ".cockpit");

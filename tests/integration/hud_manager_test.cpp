@@ -326,6 +326,35 @@ TEST_CASE("HudManager: Simultaneous multi-kill stacks multiple toasts in left lo
 	}
 }
 
+TEST_CASE("HudManager: Re-hooking listeners or multiple Game resets never duplicates kill toasts", "[integration][hud]") {
+	GameContext context;
+	const entt::entity player = context.registry.create();
+	context.registry.emplace<tag::Spaceship>(player);
+	context.currentPlayer = player;
+	context.hudManager.setObservedEntity(player);
+
+	// Simulate multiple resets / hookAllListeners calls at various call points
+	for (int i = 0; i < 5; ++i) {
+		event::utils::hookAllListeners(context);
+	}
+
+	const entt::entity enemy = context.registry.create();
+	context.registry.emplace<tag::Spaceship>(enemy);
+	context.registry.emplace<Name>(enemy, "TargetShip");
+
+	context.dispatcher.enqueue<event::KillEvent>(event::KillEvent{
+		&context,
+		event::CollisionParty{player, Vector3Zeros, Vector3Zeros},
+		event::CollisionParty{enemy, Vector3Zeros, Vector3Zeros},
+		0.016f
+	});
+	context.dispatcher.update();
+	context.hudManager.update(0.016f, context);
+
+	REQUIRE(context.hudManager.getActiveToastCount() == 1);
+	CHECK(context.hudManager.getActiveToasts()[0].text == "Killed TargetShip");
+}
+
 TEST_CASE("Settings: Damage numbers, toasts, and kill logs configuration toggles", "[integration][hud][settings]") {
 	GameContext context;
 	context.config.init({{"settings", "assets/config/settings.json"}});

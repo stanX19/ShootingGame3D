@@ -64,6 +64,8 @@ For ECS component domains, contracts, and tag conventions, read [docs/components
   * good: DRY, split reusable components into different files, reusable by future codebase: common_util.cpp/hpp, feat_a.cpp/hpp, feat_b.cpp/hpp
   * bad: inventing 10+ systems just to solve one requirement, when a simplified tweak in upstream code can simplify the problem
   * good: clearly consider available options before choosing the approach
+  * bad: Renderer manually reading from hudManager every frame, coupling Renderer to hudManager
+  * good: Renderer does not know hudManager, main calls hudManager.getRenderingCamera() and passes Camera3D to renderer every round  instead, achieving minimal coupling
 
 ## C++ and ECS Rules
 

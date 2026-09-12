@@ -170,7 +170,7 @@ SpawnedUnit spawnConfiguredUnit(
 		sound::RANDOM_EXPLOSION,
 		stats.collisionRadius * effects.deathSoundRadiusScale
 	);
-	context.registry.emplace<identity::Name>(entity, std::string(unitId));
+	context.registry.emplace<identity::Name>(entity, definition.name);
 
 	for (std::size_t index = 0;
 		index < params.loadout.turretWeapons.size()
@@ -335,3 +335,42 @@ entt::entity spawnMothershipUnit(
 		std::move(loadout)
 	);
 }
+
+entt::entity spawnInterceptorQuadUnit(
+	GameContext& context,
+	const Vector3& pos,
+	faction::Faction faction
+) {
+	const int seed = GetRandomValue(0, 1000);
+	unit::Loadout loadout;
+	loadout.turretWeapons = randomTurretLoadout(context, "interceptor_quad", seed);
+	loadout.specialWeapon = "missile.basic";
+	return spawnEnemyWithLoadout(
+		context,
+		"interceptor_quad",
+		pos,
+		faction,
+		turret::TurretControlMode::FollowParent,
+		std::move(loadout)
+	);
+}
+
+entt::entity spawnHeavyQuadUnit(
+	GameContext& context,
+	const Vector3& pos,
+	faction::Faction faction
+) {
+	const int seed = GetRandomValue(0, 1000);
+	unit::Loadout loadout;
+	loadout.turretWeapons = randomTurretLoadout(context, "heavy_quad", seed);
+	loadout.specialWeapon = "missile.basic";
+	return spawnEnemyWithLoadout(
+		context,
+		"heavy_quad",
+		pos,
+		faction,
+		turret::TurretControlMode::FollowParent,
+		std::move(loadout)
+	);
+}
+

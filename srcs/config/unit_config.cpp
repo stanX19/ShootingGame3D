@@ -128,6 +128,7 @@ UnitConfig::Definition UnitConfig::parseDefinition(
 
 	Definition definition;
 	definition.id = id;
+	definition.name = stringValue(value, "name", path);
 	definition.spaceshipReference =
 		stringValue(value, "spaceshipReference", path);
 	definition.stats = parseStats(

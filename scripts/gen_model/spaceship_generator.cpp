@@ -163,6 +163,13 @@ namespace {
 			|| settings.wings.topY <= settings.wings.bottomY || settings.wings.shoulderWidth <= 0.0f) {
 			throw std::invalid_argument("Spaceship wing layout is invalid");
 		}
+		if (settings.secondaryWings.has_value()) {
+			const auto& sec = *settings.secondaryWings;
+			if (sec.halfSpan <= sec.rootX || sec.rootX <= 0.0f
+				|| sec.topY <= sec.bottomY || sec.shoulderWidth <= 0.0f) {
+				throw std::invalid_argument("Spaceship secondary wing layout is invalid");
+			}
+		}
 		if (!finite(settings.cockpit.center) || !finite(settings.cockpit.size)
 			|| settings.cockpit.size.x <= 0.0f || settings.cockpit.size.y <= 0.0f || settings.cockpit.size.z <= 0.0f) {
 			throw std::invalid_argument("Spaceship cockpit settings are invalid");
@@ -423,19 +430,36 @@ namespace {
 		return radialReference;
 	}
 
-	std::vector<WingStation> makeWingStations(const gen_model::spaceship::Settings& settings) {
-		const float span = settings.wings.halfSpan;
-		const float rootX = isFighterArchetype(settings)
-			? std::max(settings.wings.rootX * 0.75f, settings.hull.width * 0.28f)
-			: std::max(settings.wings.rootX, settings.hull.width * 0.42f);
+	std::vector<WingStation> makeWingStationsFrom(
+		const gen_model::spaceship::Settings& settings,
+		const gen_model::spaceship::WingSettings& wing
+	) {
+		const float span = wing.halfSpan;
+		const float rootX = (isFighterArchetype(settings) && !settings.secondaryWings.has_value())
+			? std::max(wing.rootX * 0.75f, settings.hull.width * 0.28f)
+			: std::max(wing.rootX, settings.hull.width * 0.42f);
 		const bool broadAirframe = settings.layout.archetype == "siege_gunship"
 			|| settings.layout.archetype == "carrier";
-		const float rootTop = broadAirframe
+		float rootTop = broadAirframe
 			? settings.hull.height * 0.13f + settings.hull.crown * 0.72f
 			: wingRootTop(settings);
-		const float rootBottom = wingRootBottom(settings);
-		const float tipTop = settings.wings.topY + 0.05f;
-		const float tipBottom = settings.wings.bottomY + 0.20f;
+		float rootBottom = wingRootBottom(settings);
+		float tipTop = wing.topY + 0.05f;
+		float tipBottom = wing.bottomY + 0.20f;
+		if (settings.secondaryWings.has_value()) {
+			const float thickness = std::max(wing.topY - wing.bottomY, 0.14f);
+			if (wing.bottomY < 0.0f && wing.topY <= 0.05f) {
+				rootBottom = std::min(wing.bottomY - 0.04f, -settings.hull.height * 0.15f - settings.hull.keel * 0.30f);
+				rootTop = rootBottom + thickness * 1.25f;
+				tipBottom = wing.bottomY - 0.02f;
+				tipTop = tipBottom + thickness;
+			} else {
+				rootTop = std::max(wing.topY + 0.04f, settings.hull.height * 0.15f + settings.hull.crown * 0.30f);
+				rootBottom = rootTop - thickness * 1.25f;
+				tipTop = wing.topY + 0.02f;
+				tipBottom = tipTop - thickness;
+			}
+		}
 		const float rootCamber = settings.layout.archetype == "interceptor" ? 0.20f : 0.16f;
 		const float tipCamber = settings.layout.archetype == "interceptor" ? 0.08f : 0.06f;
 		const std::array<float, 7> stationAmounts{0.0f, 0.16f, 0.32f, 0.50f, 0.68f, 0.84f, 1.0f};
@@ -445,14 +469,18 @@ namespace {
 			const float eased = smoothStep(amount);
 			stations.push_back({
 				rootX + (span - rootX) * amount,
-				settings.wings.rootFrontZ + (settings.wings.tipFrontZ - settings.wings.rootFrontZ) * eased,
-				settings.wings.rootRearZ + (settings.wings.tipRearZ - settings.wings.rootRearZ) * eased,
+				wing.rootFrontZ + (wing.tipFrontZ - wing.rootFrontZ) * eased,
+				wing.rootRearZ + (wing.tipRearZ - wing.rootRearZ) * eased,
 				rootTop + (tipTop - rootTop) * eased,
 				rootBottom + (tipBottom - rootBottom) * eased,
 				rootCamber + (tipCamber - rootCamber) * eased
 			});
 		}
 		return stations;
+	}
+
+	std::vector<WingStation> makeWingStations(const gen_model::spaceship::Settings& settings) {
+		return makeWingStationsFrom(settings, settings.wings);
 	}
 
 	// A wing is an airfoil-like load path, not a flat plate.  Each station has a
@@ -482,6 +510,11 @@ namespace {
 		const auto stations = makeWingStations(settings);
 		addWingHalf(builder, stations, 1.0f, Surface::Armor);
 		addWingHalf(builder, stations, -1.0f, Surface::Armor);
+		if (settings.secondaryWings.has_value()) {
+			const auto secStations = makeWingStationsFrom(settings, *settings.secondaryWings);
+			addWingHalf(builder, secStations, 1.0f, Surface::Armor);
+			addWingHalf(builder, secStations, -1.0f, Surface::Armor);
+		}
 	}
 
 	void appendTriangleSamples(
@@ -583,31 +616,35 @@ namespace {
 				}
 			}
 		}
-		const auto stations = makeWingStations(settings);
-		for (const float side : {1.0f, -1.0f}) {
-			if (std::abs(mount.position.x) > EPSILON && side * mount.position.x < 0.0f)
-				continue;
-			std::vector<std::array<Point3, 12>> rings;
-			rings.reserve(stations.size());
-			for (const WingStation& station : stations)
-				rings.push_back(wingRing(station, side));
-			for (std::size_t station = 0; station + 1 < rings.size(); ++station) {
-				const Point3 centerLine = (rings[station][0] + rings[station + 1][0]) * 0.5f;
-				for (std::size_t section = 0; section < rings[station].size(); ++section) {
-					const std::size_t next = (section + 1) % rings[station].size();
-					const Point3 faceCenter = (
-						rings[station][section] + rings[station][next]
-						+ rings[station + 1][next] + rings[station + 1][section]
-					) * 0.25f;
-					appendQuadSamples(
-						candidates,
-						rings[station][section], rings[station + 1][section],
-						rings[station + 1][next], rings[station][next],
-						wingSectionExpectedNormal(faceCenter - centerLine, section), mount
-					);
+		auto sampleStations = [&](const std::vector<WingStation>& wingStations) {
+			for (const float side : {1.0f, -1.0f}) {
+				if (std::abs(mount.position.x) > EPSILON && side * mount.position.x < 0.0f)
+					continue;
+				std::vector<std::array<Point3, 12>> rings;
+				rings.reserve(wingStations.size());
+				for (const WingStation& station : wingStations)
+					rings.push_back(wingRing(station, side));
+				for (std::size_t station = 0; station + 1 < rings.size(); ++station) {
+					const Point3 centerLine = (rings[station][0] + rings[station + 1][0]) * 0.5f;
+					for (std::size_t section = 0; section < rings[station].size(); ++section) {
+						const std::size_t next = (section + 1) % rings[station].size();
+						const Point3 faceCenter = (
+							rings[station][section] + rings[station][next]
+							+ rings[station + 1][next] + rings[station + 1][section]
+						) * 0.25f;
+						appendQuadSamples(
+							candidates,
+							rings[station][section], rings[station + 1][section],
+							rings[station + 1][next], rings[station][next],
+							wingSectionExpectedNormal(faceCenter - centerLine, section), mount
+						);
+					}
 				}
 			}
-		}
+		};
+		sampleStations(makeWingStations(settings));
+		if (settings.secondaryWings.has_value())
+			sampleStations(makeWingStationsFrom(settings, *settings.secondaryWings));
 		return candidates;
 	}
 
@@ -1142,7 +1179,11 @@ namespace {
 				? 0.68f
 				: (nozzleCells == 2
 					? 0.34f
-					: (nozzleCells <= 4 ? 0.30f : 0.24f))
+					: (nozzleCells == 3
+						? 0.28f
+						: (nozzleCells == 4
+							? 0.23f
+							: 0.18f)))
 		);
 	}
 
@@ -1287,7 +1328,7 @@ namespace {
 			if (lateralDistance > EPSILON)
 				maximumCollarRadius = std::min(
 					maximumCollarRadius,
-					lateralDistance * 0.44f
+					lateralDistance * 0.49f
 				);
 		}
 		const auto collar = [&](float radiusScale, float depthScale, Surface surface, float zOffset) {
@@ -1296,7 +1337,7 @@ namespace {
 			// already carries the throat; suppressing this nested ring prevents two
 			// coplanar annular skins from occupying the same tight engine bay.
 			if (surface == Surface::Engine
-				&& maximumCollarRadius < r * 0.90f)
+				&& (maximumCollarRadius < r * 0.90f || nozzleCells > 1))
 				return;
 			const float depth = std::max(engine.nozzleDepth * depthScale, r * 0.07f);
 			const float centerZ = rearZ - depth * (0.72f + zOffset * 0.08f);
@@ -1307,18 +1348,19 @@ namespace {
 				r * radiusScale,
 				collarRadiusLimit
 			);
-			const float openingRadius = nozzleCellRadius(r, nozzleCells) + r * 0.04f;
+			const float segmentFactor = std::cos(PI / static_cast<float>(collarSegments));
+			const float openingRadius = exhaustApertureRadius(engine, nozzleCells) / segmentFactor + r * 0.005f;
 			// A collar is a hollow structural ring, never a capped disk.  Its clear
 			// inner throat is larger than every nozzle cell envelope, so the exhaust
 			// aperture remains visibly open and the topology stays closed by annular
 			// front/rear faces rather than a surface across the hole.
-			if (outerRadius <= openingRadius + r * 0.02f)
+			if (outerRadius <= openingRadius + r * 0.01f)
 				return;
-			const float innerRadius = std::min(
-				outerRadius * 0.76f,
-				outerRadius - r * 0.04f
+			const float innerRadius = std::max(
+				openingRadius,
+				std::min(outerRadius * 0.76f, outerRadius - r * 0.02f)
 			);
-			if (innerRadius <= openingRadius || innerRadius >= outerRadius - EPSILON)
+			if (innerRadius >= outerRadius - EPSILON)
 				return;
 			for (int segment = 0; segment < collarSegments; ++segment) {
 				const float angle = 2.0f * PI * static_cast<float>(segment)
@@ -1535,6 +1577,17 @@ namespace {
 		case PropulsionLayout::TwinBoom:
 		case PropulsionLayout::WingNacelles:
 			{
+				if (isFighterArchetype(settings)) {
+					bool hasAftEngines = false;
+					for (const auto& eng : settings.engines) {
+						if (eng.center.z - eng.length * 0.5f <= rear + settings.hull.length * 0.20f) {
+							hasAftEngines = true;
+							break;
+						}
+					}
+					if (!hasAftEngines)
+						break;
+				}
 				const float aftBeamCenterY = isFighterArchetype(settings)
 					? tailCenterY
 					: -height * 0.08f;
@@ -3064,6 +3117,18 @@ std::uint64_t gen_model::spaceship::fingerprint(const gen_model::spaceship::Sett
 	hashFloat(hash, settings.wings.topY);
 	hashFloat(hash, settings.wings.bottomY);
 	hashFloat(hash, settings.wings.shoulderWidth);
+	if (settings.secondaryWings.has_value()) {
+		const auto& sec = *settings.secondaryWings;
+		hashFloat(hash, sec.halfSpan);
+		hashFloat(hash, sec.rootFrontZ);
+		hashFloat(hash, sec.rootRearZ);
+		hashFloat(hash, sec.tipFrontZ);
+		hashFloat(hash, sec.tipRearZ);
+		hashFloat(hash, sec.rootX);
+		hashFloat(hash, sec.topY);
+		hashFloat(hash, sec.bottomY);
+		hashFloat(hash, sec.shoulderWidth);
+	}
 	hashPoint(hash, settings.cockpit.center);
 	hashPoint(hash, settings.cockpit.size);
 	hashFloat(hash, settings.cockpit.browDepth);
@@ -3152,8 +3217,9 @@ std::uint64_t gen_model::spaceship::fingerprint(const gen_model::spaceship::Sett
 	validateSettings(settings);
 	MeshBuilder builder;
 	const bool broadAirframe = settings.layout.archetype == "siege_gunship"
-		|| settings.layout.archetype == "carrier";
-	if (isFighterArchetype(settings)) {
+		|| settings.layout.archetype == "carrier"
+		|| settings.secondaryWings.has_value();
+	if (isFighterArchetype(settings) && !settings.secondaryWings.has_value()) {
 		addIntegratedFighterAirframe(builder, settings);
 		addWings(builder, settings);
 	}
@@ -3221,8 +3287,9 @@ gen_model::spaceship::GeneratedShip gen_model::spaceship::generate(
 
 			MeshBuilder builder;
 			const bool broadAirframe = resolved.layout.archetype == "siege_gunship"
-				|| resolved.layout.archetype == "carrier";
-			if (isFighterArchetype(resolved)) {
+				|| resolved.layout.archetype == "carrier"
+				|| resolved.secondaryWings.has_value();
+			if (isFighterArchetype(resolved) && !resolved.secondaryWings.has_value()) {
 				addIntegratedFighterAirframe(builder, resolved);
 				addWings(builder, resolved);
 			} else if (broadAirframe) {

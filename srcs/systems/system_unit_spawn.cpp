@@ -13,26 +13,39 @@ namespace {
 
 using SpawnFn = entt::entity(*)(GameContext&, const Vector3&, faction::Faction);
 
-const std::array<SpawnFn, 6> kShipSpawners = {
+const std::array<SpawnFn, 8> kShipSpawners = {
 	spawnUnit,
 	spawnFighterUnit,
 	spawnEliteUnit,
 	spawnFastEliteUnit,
 	spawnTerminatorUnit,
-	spawnMothershipUnit
+	spawnMothershipUnit,
+	spawnInterceptorQuadUnit,
+	spawnHeavyQuadUnit
 };
 
 Vector3 generateSpawnPos(const GameContext& context, const Vector3& playerPos, float zSign) {
-	float arenaSize = context.config.ARENA_SIZE;
-	const float box = 0.2f;
-	const float dist = 0.2f;
+	const float halfArena = context.config.ARENA_SIZE * 0.5f;
 
-	float minZ = (zSign < 0.0f) ? -arenaSize * (1.0f - dist) : arenaSize * (1.0f - box - dist);
-	float maxZ = (zSign < 0.0f) ? -arenaSize * (1.0f - box - dist) : arenaSize * (1.0f - dist);
+	// Ratio of half-arena: wide XY spread across spawn
+	const float minXRatio = -0.9f;
+	const float maxXRatio = +0.9f;
+	const float minYRatio = -0.9f;
+	const float maxYRatio = +0.9f;
+
+	// Symmetrical Z distance range from center (0.0 = center, 1.0 = arena edge)
+	const float minZDistRatio = 0.5f;
+	const float maxZDistRatio = 0.9f;
+
+	const float zA = zSign * (minZDistRatio * halfArena);
+	const float zB = zSign * (maxZDistRatio * halfArena);
+
+	const float startZ = std::min(zA, zB);
+	const float endZ = std::max(zA, zB);
 
 	return game_utils::randomPosInBoxOffCombat(
-		Vector3{-arenaSize * box, -arenaSize * box, minZ},
-		Vector3{+arenaSize * box, +arenaSize * box, maxZ},
+		Vector3{minXRatio * halfArena, minYRatio * halfArena, startZ},
+		Vector3{maxXRatio * halfArena, maxYRatio * halfArena, endZ},
 		playerPos,
 		context.config.COMBAT_DIST
 	);

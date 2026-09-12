@@ -604,8 +604,11 @@ namespace {
 				// long, detached bar across the entire aft silhouette (and a near-
 				// coplanar cap at the wing root).  Keep this fairing local to the pod's
 				// forward shoulder so the wing itself owns the load path.
+				const float rootX = (fighterArchetype(settings) && std::abs(center.x) > settings.hull.width * 1.5f)
+					? center.x
+					: center.x * 0.45f;
 				root = {
-					center.x * 0.45f,
+					rootX,
 					center.y + pod.runtime.radius * 0.15f,
 					center.z + pod.runtime.length * 0.16f
 				};
@@ -619,8 +622,11 @@ namespace {
 				end = {center.x, center.y + pod.runtime.radius * 0.10f, settings.hull.length * 0.26f};
 			}
 		} else if (layout == PropulsionLayout::WingNacelles) {
+			const float rootX = (fighterArchetype(settings) && std::abs(center.x) > settings.hull.width * 1.5f)
+				? center.x
+				: std::copysign(settings.hull.width * 0.34f, center.x);
 			root = {
-				std::copysign(settings.hull.width * 0.34f, center.x),
+				rootX,
 				center.y + pod.runtime.radius * 0.18f,
 				center.z + pod.runtime.length * 0.44f
 			};

@@ -51,22 +51,6 @@ namespace
 		};
 	}
 
-	std::string displayNameForUnitId(const std::string &id)
-	{
-		std::string displayName;
-		displayName.reserve(id.size() + 4);
-		for (std::size_t index = 0; index < id.size(); ++index)
-		{
-			const unsigned char character = static_cast<unsigned char>(id[index]);
-			if (index > 0 && std::isupper(character))
-				displayName += ' ';
-			displayName += index == 0
-							   ? static_cast<char>(std::toupper(character))
-							   : static_cast<char>(character);
-		}
-		return displayName;
-	}
-
 	std::string nextWeaponId(
 		const std::string &currentWeapon,
 		const std::vector<std::string> &options)
@@ -279,7 +263,7 @@ void GameHangar::drawShipPanel()
 		shipPanelWidth,
 		55.0f
 	});
-	m_shipButton.setText("SHIP: " + displayNameForUnitId(m_selectedShipId));
+	m_shipButton.setText("SHIP: " + definition.name);
 	if (m_shipButton.tickAndDraw())
 	{
 		cycleShip();

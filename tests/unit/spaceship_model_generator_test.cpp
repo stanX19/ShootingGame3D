@@ -103,24 +103,28 @@ namespace {
 TEST_CASE("spaceship catalog exposes the complete unit fleet", "[unit][gen_model]")
 {
 	const auto ships = catalog();
-	REQUIRE(ships.size() == 6);
+	REQUIRE(ships.size() == 8);
 	REQUIRE(ships[0].id == "basic");
 	REQUIRE(ships[1].id == "elite");
 	REQUIRE(ships[2].id == "fastElite");
-	REQUIRE(ships[3].id == "mothership");
-	REQUIRE(ships[4].id == "player");
-	REQUIRE(ships[5].id == "terminator");
+	REQUIRE(ships[3].id == "heavy_quad");
+	REQUIRE(ships[4].id == "interceptor_quad");
+	REQUIRE(ships[5].id == "mothership");
+	REQUIRE(ships[6].id == "player");
+	REQUIRE(ships[7].id == "terminator");
 	REQUIRE(ships[0].mounts.size() == 2);
 	REQUIRE(ships[1].mounts.size() == 2);
 	REQUIRE(ships[2].mounts.size() == 2);
-	REQUIRE(ships[3].mounts.size() == 8);
+	REQUIRE(ships[3].mounts.size() == 4);
 	REQUIRE(ships[4].mounts.size() == 4);
-	REQUIRE(ships[5].mounts.size() == 32);
+	REQUIRE(ships[5].mounts.size() == 8);
+	REQUIRE(ships[6].mounts.size() == 4);
+	REQUIRE(ships[7].mounts.size() == 32);
 	REQUIRE(ships[2].mounts[0].traverseHalfAngleDegrees == Catch::Approx(5.0f));
 	REQUIRE(ships[2].mounts[1].traverseHalfAngleDegrees == Catch::Approx(5.0f));
-	REQUIRE(ships[4].mountAttachment.directBlisterGapScale == Catch::Approx(2.0f));
-	REQUIRE(ships[3].mountAttachment.directBlisterGapScale == Catch::Approx(4.2f));
+	REQUIRE(ships[6].mountAttachment.directBlisterGapScale == Catch::Approx(2.0f));
 	REQUIRE(ships[5].mountAttachment.directBlisterGapScale == Catch::Approx(4.2f));
+	REQUIRE(ships[7].mountAttachment.directBlisterGapScale == Catch::Approx(4.2f));
 	for (std::size_t left = 0; left < ships.size(); ++left)
 		for (std::size_t right = left + 1u; right < ships.size(); ++right) {
 			CAPTURE(ships[left].id, ships[right].id);

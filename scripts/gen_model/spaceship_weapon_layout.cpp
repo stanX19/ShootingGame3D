@@ -155,6 +155,12 @@ namespace {
 		mount.supportRoot = mount.supportRoot + direction * (shift * 0.65f);
 	}
 
+	bool isMountVentral(std::size_t pairIndex, std::size_t pairCount) {
+		if (pairCount == 4u)
+			return (pairIndex % 2u == 0u);
+		return (pairIndex % 2u == 1u);
+	}
+
 	MountSettings resolvedMount(
 		const Settings& settings,
 		std::size_t index,
@@ -219,14 +225,24 @@ namespace {
 			moveOutsideUnitParentSphere(result);
 			return result;
 		}
-		const float wingSpan = std::max(settings.wings.halfSpan, settings.hull.width * 0.70f);
+
+		const bool fourWings = !dense && paired && settings.secondaryWings.has_value();
+		const bool alternatingBilevel = !dense && paired && pairCount >= 2u && !fourWings;
+		const bool ventral = fourWings
+			? (pairIndex % 2u == 1u)
+			: (alternatingBilevel && isMountVentral(pairIndex, pairCount));
+		const auto& activeWing = (fourWings && (pairIndex % 2u == 1u))
+			? *settings.secondaryWings
+			: settings.wings;
+
+		const float wingSpan = std::max(activeWing.halfSpan, settings.hull.width * 0.70f);
 		const float edgeClearanceScale = preliminary.metrics.selectedLayout == PropulsionLayout::TwinBoom
 			? 0.65f
 			: 1.8f;
 		const float lateralLimit = wingSpan - radius * edgeClearanceScale;
 		const float innerLateral = std::min(
 			lateralLimit,
-			std::max(settings.hull.width * 0.70f, settings.wings.rootX + radius * 3.4f)
+			std::max(settings.hull.width * 0.70f, activeWing.rootX + radius * 3.4f)
 		);
 		const float outerLateral = std::max(innerLateral, lateralLimit);
 		// Sparse batteries follow the swept leading-edge load path.  Additional
@@ -248,7 +264,42 @@ namespace {
 			innerLateral,
 			outerLateral
 		);
-		if (!dense && paired && pairCount == 2u) {
+		if (fourWings) {
+			// One wing one weapon: seat cleanly at middle/outboard of each wing
+			const float quadAmount = std::clamp(
+				0.72f + architectureBias(preliminary.metrics.selectedLayout),
+				0.25f,
+				0.90f
+			);
+			lateral = std::clamp(
+				innerLateral + (outerLateral - innerLateral) * quadAmount
+					+ static_cast<float>(variant) * radius * 0.12f,
+				innerLateral,
+				outerLateral
+			);
+		} else if (alternatingBilevel) {
+			const float sweptPeerSeparation = source.barrelRadius * 2.0f
+				+ std::sin(sweepRadians) * source.barrelLength
+				+ radius * 0.12f;
+			const float spanNeeded = sweptPeerSeparation * static_cast<float>(pairCount - 1u);
+			const float availableSpan = outerLateral - innerLateral;
+			if (availableSpan >= spanNeeded) {
+				// No vertical overlap: stagger laterally across the available span
+				const float fraction = static_cast<float>(pairIndex) / static_cast<float>(pairCount - 1u);
+				lateral = innerLateral + availableSpan * fraction
+					+ static_cast<float>(variant) * radius * 0.10f;
+			} else {
+				// Avoid vertical if possible, but if no space then allow
+				const std::size_t slots = std::max<std::size_t>(
+					1u, static_cast<std::size_t>(availableSpan / std::max(sweptPeerSeparation * 0.65f, radius * 2.2f)) + 1u
+				);
+				const std::size_t slotIndex = pairIndex % slots;
+				const float frac = slots <= 1u ? 0.5f : static_cast<float>(slotIndex) / static_cast<float>(slots - 1u);
+				lateral = innerLateral + availableSpan * frac
+					+ static_cast<float>(variant) * radius * 0.10f;
+			}
+			lateral = std::clamp(lateral, innerLateral, outerLateral);
+		} else if (!dense && paired && pairCount == 2u) {
 			const float outerAmount = std::clamp(
 				0.90f + architectureBias(preliminary.metrics.selectedLayout),
 				0.20f,
@@ -272,19 +323,19 @@ namespace {
 			|| settings.layout.archetype == "heavy_fighter"
 			|| settings.layout.archetype == "interceptor";
 		const float generatedWingRootX = fighter
-			? std::max(settings.wings.rootX * 0.75f, settings.hull.width * 0.28f)
-			: std::max(settings.wings.rootX, settings.hull.width * 0.42f);
+			? std::max(activeWing.rootX * 0.75f, settings.hull.width * 0.28f)
+			: std::max(activeWing.rootX, settings.hull.width * 0.42f);
 		const float wingAmount = std::clamp(
 			(std::abs(lateral) - generatedWingRootX)
-				/ std::max(settings.wings.halfSpan - generatedWingRootX, radius),
+				/ std::max(activeWing.halfSpan - generatedWingRootX, radius),
 			0.0f,
 			1.0f
 		);
 		const float easedWingAmount = smoothStep(wingAmount);
-		const float localFront = settings.wings.rootFrontZ
-			+ (settings.wings.tipFrontZ - settings.wings.rootFrontZ) * easedWingAmount;
-		const float localRear = settings.wings.rootRearZ
-			+ (settings.wings.tipRearZ - settings.wings.rootRearZ) * easedWingAmount;
+		const float localFront = activeWing.rootFrontZ
+			+ (activeWing.tipFrontZ - activeWing.rootFrontZ) * easedWingAmount;
+		const float localRear = activeWing.rootRearZ
+			+ (activeWing.tipRearZ - activeWing.rootRearZ) * easedWingAmount;
 		// Twin-boom fighters seat their battery in the swept wing's leading-edge
 		// shoulder.  Moving it aft into the chord makes an inward/downward barrel
 		// sweep cross the wing before it can leave the airframe.
@@ -297,16 +348,28 @@ namespace {
 			z += source.barrelRadius;
 		const float wingRootTop = fighter
 			? std::max(
-				settings.wings.topY + 0.04f,
+				activeWing.topY + 0.04f,
 				settings.hull.height * 0.13f + settings.hull.crown * 0.40f
 			)
 			: settings.hull.height * 0.13f + settings.hull.crown * 0.72f;
-		const float wingTipTop = settings.wings.topY + 0.05f;
+		const float wingTipTop = activeWing.topY + 0.05f;
 		const float rootCamber = settings.layout.archetype == "interceptor" ? 0.20f : 0.16f;
 		const float tipCamber = settings.layout.archetype == "interceptor" ? 0.08f : 0.06f;
 		float integratedDeckY = wingRootTop
 			+ (wingTipTop - wingRootTop) * easedWingAmount
 			+ rootCamber + (tipCamber - rootCamber) * easedWingAmount;
+
+		const float wingRootBottom = fighter
+			? std::min(
+				activeWing.bottomY - 0.04f,
+				-settings.hull.height * 0.13f - settings.hull.keel * 0.40f
+			)
+			: -settings.hull.height * 0.13f - settings.hull.keel * 0.72f;
+		const float wingTipBottom = activeWing.bottomY + 0.20f;
+		float integratedVentralDeckY = wingRootBottom
+			+ (wingTipBottom - wingRootBottom) * easedWingAmount
+			- (rootCamber + (tipCamber - rootCamber) * easedWingAmount) * 0.30f;
+
 		if (preliminary.metrics.selectedLayout == PropulsionLayout::TwinBoom
 			|| preliminary.metrics.selectedLayout == PropulsionLayout::WingNacelles) {
 			float nearestPodDistance = std::numeric_limits<float>::max();
@@ -319,29 +382,41 @@ namespace {
 				if (podDistance >= nearestPodDistance)
 					continue;
 				nearestPodDistance = podDistance;
-				integratedDeckY = std::max(
-					integratedDeckY,
-					pod.runtime.center.y + pod.runtime.radius * 1.15f
-				);
+				if (!ventral) {
+					integratedDeckY = std::max(
+						integratedDeckY,
+						pod.runtime.center.y + pod.runtime.radius * 1.15f
+					);
+				} else {
+					integratedVentralDeckY = std::min(
+						integratedVentralDeckY,
+						pod.runtime.center.y - pod.runtime.radius * 1.15f
+					);
+				}
 			}
 		}
 		if (!dense) {
 			const bool centerline = paired && count % 2u == 1u && index == count - 1u;
+			const float resolvedY = centerline
+				? settings.hull.height * 0.50f + radius + socketHeight
+				: (ventral
+					? (integratedVentralDeckY - radius - socketHeight)
+					: (integratedDeckY + radius + socketHeight));
 			result.position = centerline
 				? Point3{
 					0.0f,
-					settings.hull.height * 0.50f + radius + socketHeight,
+					resolvedY,
 					settings.hull.length * 0.20f
 				}
 				: Point3{
 					side * lateral,
-					integratedDeckY + radius + socketHeight,
+					resolvedY,
 					z
 				};
 			result.forward = coverageDirection(
 				settings.design.weaponLayout.coverage,
 				side,
-				1.0f,
+				ventral ? -1.0f : 1.0f,
 				pairIndex
 			);
 			result.supportRoot = centerline
@@ -352,10 +427,10 @@ namespace {
 				}
 				: Point3{
 					side * std::max(
-						settings.wings.rootX,
-						lateral - std::max(radius * 2.2f, settings.wings.shoulderWidth * 0.80f)
+						activeWing.rootX,
+						lateral - std::max(radius * 2.2f, activeWing.shoulderWidth * 0.80f)
 					),
-					integratedDeckY - radius * 0.16f,
+					ventral ? (integratedVentralDeckY + radius * 0.16f) : (integratedDeckY - radius * 0.16f),
 					z - radius * 0.10f
 				};
 		} else {
@@ -513,7 +588,10 @@ namespace {
 			}
 			const float sweepRadians = mount.traverseHalfAngleDegrees
 				* 3.14159265358979323846f / 180.0f;
-			const float outerX = std::max(settings.wings.halfSpan, settings.hull.width * 0.5f)
+			const float maxWingSpan = settings.secondaryWings.has_value()
+				? std::max(settings.wings.halfSpan, settings.secondaryWings->halfSpan)
+				: settings.wings.halfSpan;
+			const float outerX = std::max(maxWingSpan, settings.hull.width * 0.5f)
 				+ std::sin(sweepRadians) * mount.barrelLength
 				+ mount.turretRadius * 2.0f;
 			if (!denseBattery(settings) && std::abs(mount.position.x) > outerX + EPSILON) {

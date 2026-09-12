@@ -14,17 +14,18 @@
 	},
 	"definitions": {
 		"basic": {
+			"name": "Scout",
 			"spaceshipReference": "basic",
 			"stats": {
 				"collisionRadius": 1.0,
-				"hp": 2500.0,
-				"hpRegen": 25.0,
-				"shield": 2500.0,
-				"shieldRegen": 50.0,
+				"hp": 1800.0,
+				"hpRegen": 50.0,
+				"shield": 2200.0,
+				"shieldRegen": 100.0,
 				"damage": 500.0,
-				"maxSpeed": 120.0,
-				"turnSpeed": 3.0,
-				"mass": 10000.0,
+				"maxSpeed": 135.0,
+				"turnSpeed": 4.2,
+				"mass": 100000.0,
 				"score": 0,
 				"killedScore": 500
 			},
@@ -34,17 +35,18 @@
 			}
 		},
 		"elite": {
+			"name": "Elite",
 			"spaceshipReference": "elite",
 			"stats": {
-				"collisionRadius": 3.0,
-				"hp": 6000.0,
-				"hpRegen": 50.0,
-				"shield": 2500.0,
-				"shieldRegen": 100.0,
+				"collisionRadius": 1.5,
+				"hp": 4500.0,
+				"hpRegen": 35.0,
+				"shield": 2000.0,
+				"shieldRegen": 25.0,
 				"damage": 500.0,
-				"maxSpeed": 80.0,
-				"turnSpeed": 2.0,
-				"mass": 10000.0,
+				"maxSpeed": 85.0,
+				"turnSpeed": 2.5,
+				"mass": 100000.0,
 				"score": 0,
 				"killedScore": 1000
 			},
@@ -54,19 +56,20 @@
 			}
 		},
 		"fighter": {
+			"name": "Fighter",
 			"spaceshipReference": "player",
 			"stats": {
 				"collisionRadius": 1.0,
 				"hp": 3000.0,
-				"hpRegen": 10.0,
-				"shield": 1000.0,
-				"shieldRegen": 50.0,
+				"hpRegen": 15.0,
+				"shield": 2000.0,
+				"shieldRegen": 25.0,
 				"damage": 500.0,
-				"maxSpeed": 80.0,
-				"turnSpeed": 2.0,
-				"mass": 10000.0,
+				"maxSpeed": 100.0,
+				"turnSpeed": 2.8,
+				"mass": 100000.0,
 				"score": 0,
-				"killedScore": 0
+				"killedScore": 800
 			},
 			"effects": {
 				"explosionRadiusScale": 1.0,
@@ -74,17 +77,18 @@
 			}
 		},
 		"fastElite": {
+			"name": "Fast Elite",
 			"spaceshipReference": "fastElite",
 			"stats": {
-				"collisionRadius": 2.0,
-				"hp": 2000.0,
+				"collisionRadius": 1.1,
+				"hp": 1800.0,
 				"hpRegen": 10.0,
-				"shield": 500.0,
-				"shieldRegen": 200.0,
+				"shield": 1400.0,
+				"shieldRegen": 100.0,
 				"damage": 500.0,
-				"maxSpeed": 160.0,
-				"turnSpeed": 4.0,
-				"mass": 10000.0,
+				"maxSpeed": 170.0,
+				"turnSpeed": 3.2,
+				"mass": 100000.0,
 				"score": 0,
 				"killedScore": 1000
 			},
@@ -93,40 +97,84 @@
 				"deathSoundRadiusScale": 0.5
 			}
 		},
-		"terminator": {
-			"spaceshipReference": "terminator",
+		"heavy_quad": {
+			"name": "Heavy Quad",
+			"spaceshipReference": "heavy_quad",
 			"stats": {
-				"collisionRadius": 2.0,
-				"hp": 2400.0,
-				"hpRegen": 10.0,
-				"shield": 500.0,
-				"shieldRegen": 100.0,
+				"collisionRadius": 2.4,
+				"hp": 5500.0,
+				"hpRegen": 30.0,
+				"shield": 2500.0,
+				"shieldRegen": 25.0,
 				"damage": 500.0,
-				"maxSpeed": 20.0,
+				"maxSpeed": 70.0,
 				"turnSpeed": 0.5,
-				"mass": 10000.0,
+				"mass": 100000.0,
 				"score": 0,
-				"killedScore": 25000
+				"killedScore": 2000
+			},
+			"effects": {
+				"explosionRadiusScale": 1.5,
+				"deathSoundRadiusScale": 0.8
+			}
+		},
+		"interceptor_quad": {
+			"name": "Interceptor Quad",
+			"spaceshipReference": "interceptor_quad",
+			"stats": {
+				"collisionRadius": 1.6,
+				"hp": 2000.0,
+				"hpRegen": 20.0,
+				"shield": 1200.0,
+				"shieldRegen": 50.0,
+				"damage": 500.0,
+				"maxSpeed": 135.0,
+				"turnSpeed": 2.2,
+				"mass": 100000.0,
+				"score": 0,
+				"killedScore": 1200
+			},
+			"effects": {
+				"explosionRadiusScale": 1.2,
+				"deathSoundRadiusScale": 0.6
+			}
+		},
+		"mothership": {
+			"name": "Mothership",
+			"spaceshipReference": "mothership",
+			"stats": {
+				"collisionRadius": 5.5,
+				"hp": 8500.0,
+				"hpRegen": 25.0,
+				"shield": 1500.0,
+				"shieldRegen": 25.0,
+				"damage": 500.0,
+				"maxSpeed": 25.0,
+				"turnSpeed": 0.5,
+				"mass": 100000.0,
+				"score": 0,
+				"killedScore": 5000
 			},
 			"effects": {
 				"explosionRadiusScale": 2.0,
 				"deathSoundRadiusScale": 0.5
 			}
 		},
-		"mothership": {
-			"spaceshipReference": "mothership",
+		"terminator": {
+			"name": "Terminator",
+			"spaceshipReference": "terminator",
 			"stats": {
-				"collisionRadius": 6.0,
-				"hp": 8000.0,
-				"hpRegen": 25.0,
-				"shield": 500.0,
-				"shieldRegen": 100.0,
+				"collisionRadius": 3.5,
+				"hp": 6000.0,
+				"hpRegen": 20.0,
+				"shield": 1500.0,
+				"shieldRegen": 25.0,
 				"damage": 500.0,
-				"maxSpeed": 20.0,
-				"turnSpeed": 0.5,
-				"mass": 50000.0,
+				"maxSpeed": 35.0,
+				"turnSpeed": 0.8,
+				"mass": 100000.0,
 				"score": 0,
-				"killedScore": 2500
+				"killedScore": 3000
 			},
 			"effects": {
 				"explosionRadiusScale": 2.0,
