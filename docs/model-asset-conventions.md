@@ -2,11 +2,22 @@
 
 These conventions apply to runtime 3D models and to offline model generators.
 
-## Nominal unit radius
+## Nominal unit radius (MANDATORY ENFORCING RULE)
 
-Runtime model loading assumes that a model is authored around a nominal local radius of `1.0`. `RenderBody.scale` is the world-space nominal radius; a model is not corrected or normalized on the loading path.
+Every 3D model in this game (spaceships, asteroids, turrets, weapons, props) MUST be authored around a nominal local base radius of exactly `1.0f` centered at `(0, 0, 0)`.
 
-Asteroid visual geometry uses the approved local-radius range `0.5–1.0`. Its `CollisionBody.radius` remains the nominal radius `1.0`, so the sphere is a conservative broad-phase proxy: the visual model never extends beyond the initial collision radius. Future mesh-collision refinement may reject broad-phase false positives without changing this asset convention.
+`RenderBody.scale` is the world-space nominal radius multiplier; a model is not corrected or normalized on the runtime loading path.
+
+### Specific Turret Contract
+- Center `(0, 0, 0)` MUST be the exact center of the pivot sphere.
+- The pivot sphere radius MUST be exactly `1.0f`.
+- This guarantees that when the game scales the turret by `mount.turretRadius` (e.g. 0.25f), the rendered sphere radius is exactly `1.0f * turretRadius = turretRadius`, perfectly resting in the spaceship socket blister without hovering or clipping.
+
+### Mandatory Verification Evidence Rule
+After every single model generation work, the developer or agent MUST run geometric inspection on the generated OBJ model and show the user verifiable evidence that:
+1. The pivot / local origin is centered at `(0.0, 0.0, 0.0)`.
+2. The nominal base radius is verified to be exactly `1.0f`.
+3. The model extents match the expected unit dimensions.
 
 Models should be centered at their intended local origin. Any asset-specific normalization or geometry generation belongs in the offline asset pipeline under `scripts/gen_model/`, not in entity factories or the runtime renderer.
 

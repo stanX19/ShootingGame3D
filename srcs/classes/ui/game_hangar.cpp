@@ -130,21 +130,21 @@ EngineState GameHangar::run()
 	while (!WindowShouldClose() && nextState == EngineState::HANGAR)
 	{
 		float dt = GetFrameTime();
+		inputControls(dt, nextState);
 
-		float time = (float)GetTime() * 0.025f;
 		const auto &selectedDefinition = m_context.config.units().get(m_selectedShipId);
-		float dist = 30.0f * selectedDefinition.stats.collisionRadius;
-		m_context.mainCamera.position.x = dist * cosf(time);
-		m_context.mainCamera.position.z = dist * sinf(time);
-		m_context.mainCamera.position.y = 10.0f;
+		const float baseDist = 30.0f * selectedDefinition.stats.collisionRadius;
+		const float currentDist = baseDist * m_zoomFactor;
+
+		m_context.mainCamera.position.x = currentDist * cosf(m_cameraPitch) * sinf(m_cameraYaw);
+		m_context.mainCamera.position.y = currentDist * sinf(m_cameraPitch);
+		m_context.mainCamera.position.z = currentDist * cosf(m_cameraPitch) * cosf(m_cameraYaw);
 
 		BeginDrawing();
 		ClearBackground(BLACK);
 		m_renderer.render(dt, m_context.mainCamera);
 		drawUI(nextState);
 		EndDrawing();
-
-		inputControls(dt, nextState);
 	}
 
 	destroyPreviewShip();
@@ -365,11 +365,84 @@ void GameHangar::drawUI(EngineState &nextState)
 	DrawText(hint, screenWidth / 2 - hintWidth / 2, screenHeight - 120, 20, GRAY);
 }
 
-void GameHangar::inputControls([[maybe_unused]] float dt, EngineState &nextState)
+void GameHangar::inputControls(float dt, EngineState &nextState)
 {
 	if (IsKeyPressed(KEY_ESCAPE))
 	{
 		nextState = EngineState::MENU;
+		return;
+	}
+
+	const Vector2 mousePos = GetMousePosition();
+	const int screenWidth = GetScreenWidth();
+	const int screenHeight = GetScreenHeight();
+
+	const float leftPaneX = 50.0f;
+	const float leftPaneWidth = 400.0f;
+	const float leftPaneTop = 100.0f;
+	const float panelX = std::max(20.0f, static_cast<float>(screenWidth) - shipPanelWidth - 40.0f);
+
+	const Rectangle leftPaneRec{
+		leftPaneX - 10.0f,
+		leftPaneTop - 10.0f,
+		leftPaneWidth + 20.0f,
+		static_cast<float>(screenHeight) - leftPaneTop
+	};
+	const Rectangle rightPaneRec{
+		panelX - 20.0f,
+		shipPanelY - 20.0f,
+		shipPanelWidth + 40.0f,
+		shipPanelHeight + 40.0f
+	};
+	const Rectangle backBtnRec{
+		(float)screenWidth / 2 - 100,
+		(float)screenHeight - 80,
+		200,
+		50
+	};
+
+	const bool isOverUI = CheckCollisionPointRec(mousePos, leftPaneRec)
+		|| CheckCollisionPointRec(mousePos, rightPaneRec)
+		|| CheckCollisionPointRec(mousePos, backBtnRec);
+
+	if (!isOverUI && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+	{
+		m_isDragging = true;
+	}
+	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	{
+		m_isDragging = false;
+	}
+
+	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	{
+		m_isDragging = true;
+	}
+
+	if (m_isDragging)
+	{
+		const Vector2 delta = GetMouseDelta();
+		m_cameraYaw -= delta.x * 0.005f;
+		m_cameraPitch = std::clamp(m_cameraPitch + delta.y * 0.005f, -1.35f, 1.35f);
+	}
+	else
+	{
+		m_cameraYaw += dt * 0.12f;
+	}
+
+	const Rectangle turretListRec{
+		leftPaneX,
+		leftPaneTop + 60.0f,
+		leftPaneWidth,
+		std::max(120.0f, static_cast<float>(screenHeight) - leftPaneTop - 190.0f)
+	};
+	if (!CheckCollisionPointRec(mousePos, turretListRec))
+	{
+		const float wheel = GetMouseWheelMove();
+		if (wheel != 0.0f)
+		{
+			m_zoomFactor = std::clamp(m_zoomFactor - wheel * 0.10f, 0.35f, 2.5f);
+		}
 	}
 }
 

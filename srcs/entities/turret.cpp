@@ -18,8 +18,12 @@ namespace {
 		float radius
 	) {
 		entt::entity turret = context.registry.create();
+		const std::string defaultModel = context.config.getString(
+			"turrets.default",
+			"assets/Models/turrets/basic_shooter/turret_basic_shooter.obj"
+		);
 		const t_model_id turretModel =
-			context.modelManager.loadModel("assets/Models/canon/canon3.glb");
+			context.modelManager.loadModel(defaultModel);
 		context.registry.emplace<physics::Position>(turret);
 		context.registry.emplace<physics::Rotation>(turret);
 		context.registry.emplace<collision::CollisionBody>(turret, radius);

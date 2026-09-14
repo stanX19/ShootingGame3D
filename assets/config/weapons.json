@@ -6,6 +6,7 @@
 		"weapons": {
 			"basic": {
 				"name": "Shooter",
+				"turretRef": "basic_shooter",
 				"ammo": 30,
 				"bulletCount": 1,
 				"cooldown": 0.15,
@@ -20,6 +21,7 @@
 			},
 			"sniper": {
 				"name": "Sniper",
+				"turretRef": "heavy_mg_rifle",
 				"bulletCount": 1,
 				"cooldown": 1.5,
 				"damageMultiplier": 3.5,
@@ -33,6 +35,7 @@
 			},
 			"burstSniper": {
 				"name": "Burst Sniper",
+				"turretRef": "heavy_mg_rifle",
 				"ammo": 10,
 				"bulletCount": 1,
 				"cooldown": 0.35,
@@ -55,6 +58,7 @@
 				"lifespan": 10,
 				"mass": 5,
 				"name": "Machine Gun",
+				"turretRef": "heavy_mg_rifle",
 				"radius": 0.05,
 				"reloadTime": 4,
 				"speedMultiplier": 2,
@@ -62,6 +66,7 @@
 			},
 			"shotgun": {
 				"name": "Shotgun",
+				"turretRef": "basic_shooter",
 				"ammo": 5,
 				"bulletCount": 10,
 				"cooldown": 0.1,
@@ -99,6 +104,7 @@
 		"weapons": {
 			"basic": {
 				"name": "Lazer Shooter",
+				"turretRef": "basic_shooter",
 				"bulletCount": 1,
 				"cooldown": 0.3,
 				"damageMultiplier": 2,
@@ -108,6 +114,7 @@
 			},
 			"machineGun": {
 				"name": "Lazer Machine Gun",
+				"turretRef": "heavy_mg_rifle",
 				"ammo": 120,
 				"ammoRegen": 8,
 				"bulletCount": 1,
@@ -120,6 +127,7 @@
 			},
 			"shotgun": {
 				"name": "Lazer Shotgun",
+				"turretRef": "lazer_shotgun",
 				"ammo": 3,
 				"ammoRegen": 1,
 				"bulletCount": 20,
@@ -131,6 +139,7 @@
 			},
 			"deletor": {
 				"name": "Lazer Deletor",
+				"turretRef": "lazer_deletor",
 				"ammo": 1,
 				"ammoRegen": 0.125,
 				"bulletCount": 1,
@@ -239,8 +248,9 @@
 			},
 			"torpedo": {
 				"name": "Torpedo",
-				"ammo": 20,
-				"cooldown": 0.2,
+				"turretRef": "basic_shooter",
+				"ammo": 40,
+				"cooldown": 0.1,
 				"explosionDamage": 50,
 				"explosionFinalRadius": 1.5,
 				"explosionStartRadius": 0.075,
@@ -251,7 +261,7 @@
 				"isSpecial": false,
 				"mass": 2.5,
 				"radius": 0.15,
-				"reloadTime": 10,
+				"reloadTime": 15,
 				"speedMultiplier": 4,
 				"turnSpeed": 0
 			}

@@ -35,6 +35,7 @@ GEN_MODEL_CORE_SRCS := \
 	$(GEN_MODEL_DIR)/spaceship_envelope.cpp \
 	$(GEN_MODEL_DIR)/spaceship_generator.cpp \
 	$(GEN_MODEL_DIR)/spaceship_config.cpp \
+	$(GEN_MODEL_DIR)/turret_generator.cpp \
 	$(GEN_MODEL_DIR)/asset_writer.cpp
 GEN_MODEL_CORE_OBJS := $(patsubst $(GEN_MODEL_DIR)/%.cpp,$(GEN_MODEL_OBJDIR)/%.o,$(GEN_MODEL_CORE_SRCS))
 GEN_MODEL_MAIN_OBJ := $(GEN_MODEL_OBJDIR)/main.o
@@ -42,6 +43,8 @@ GEN_MODEL_LIB := $(BUILD_DIR)/libgen_model.a
 GEN_MODEL_BIN := $(GEN_MODEL_OBJDIR)/gen_model
 SPACESHIP_MAIN_OBJ := $(GEN_MODEL_OBJDIR)/spaceship_main.o
 SPACESHIP_BIN := $(GEN_MODEL_OBJDIR)/gen_spaceships
+TURRET_MAIN_OBJ := $(GEN_MODEL_OBJDIR)/turret_main.o
+TURRET_BIN := $(GEN_MODEL_OBJDIR)/gen_turrets
 
 COLLISION_CORE_SRCS := \
 	$(COLLISION_DIR)/model_importer.cpp \
@@ -51,7 +54,7 @@ COLLISION_MAIN_OBJ := $(COLLISION_OBJDIR)/main.o
 COLLISION_LIB := $(BUILD_DIR)/libgen_collision.a
 COLLISION_BIN := $(COLLISION_OBJDIR)/gen_collision
 
-.PHONY: all gen_model gen_model_lib gen_spaceships gen_collision gen_collision_lib clean
+.PHONY: all gen_model gen_model_lib gen_spaceships gen_turrets gen_collision gen_collision_lib clean
 
 all: gen_model
 
@@ -61,6 +64,9 @@ gen_model: $(GEN_MODEL_BIN)
 gen_spaceships: $(SPACESHIP_BIN)
 	@cd "$(ROOT_DIR)" && "$(SPACESHIP_BIN)"
 	@cd "$(ROOT_DIR)" && "$(PYTHON)" scripts/gen_model/turret_clearance_gate.py
+
+gen_turrets: $(TURRET_BIN)
+	@cd "$(ROOT_DIR)" && "$(TURRET_BIN)"
 
 gen_model_lib: $(GEN_MODEL_LIB)
 
@@ -85,6 +91,9 @@ $(GEN_MODEL_BIN): $(GEN_MODEL_MAIN_OBJ) $(GEN_MODEL_LIB) | $(GEN_MODEL_OBJDIR)
 $(SPACESHIP_BIN): $(SPACESHIP_MAIN_OBJ) $(GEN_MODEL_LIB) | $(GEN_MODEL_OBJDIR)
 	$(CC) $(CFLAGS) $(SPACESHIP_MAIN_OBJ) $(GEN_MODEL_LIB) $(LFLAGS) -o $@
 
+$(TURRET_BIN): $(TURRET_MAIN_OBJ) $(GEN_MODEL_LIB) | $(GEN_MODEL_OBJDIR)
+	$(CC) $(CFLAGS) $(TURRET_MAIN_OBJ) $(GEN_MODEL_LIB) $(LFLAGS) -o $@
+
 $(COLLISION_BIN): $(COLLISION_MAIN_OBJ) $(COLLISION_LIB) | $(COLLISION_OBJDIR)
 	$(CC) $(CFLAGS) $(COLLISION_MAIN_OBJ) $(COLLISION_LIB) -o $@
 
@@ -100,5 +109,5 @@ $(BUILD_DIR) $(GEN_MODEL_OBJDIR) $(COLLISION_OBJDIR):
 clean:
 	@$(RM) $(BUILD_DIR)
 
--include $(GEN_MODEL_CORE_OBJS:.o=.d) $(GEN_MODEL_MAIN_OBJ:.o=.d) $(SPACESHIP_MAIN_OBJ:.o=.d) \
+-include $(GEN_MODEL_CORE_OBJS:.o=.d) $(GEN_MODEL_MAIN_OBJ:.o=.d) $(SPACESHIP_MAIN_OBJ:.o=.d) $(TURRET_MAIN_OBJ:.o=.d) \
 	$(COLLISION_CORE_OBJS:.o=.d) $(COLLISION_MAIN_OBJ:.o=.d)

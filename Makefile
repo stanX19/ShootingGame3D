@@ -106,6 +106,9 @@ gen_model:
 gen_spaceships:
 	$(MAKE) -C $(SCRIPT_DIR) gen_spaceships
 
+gen_turrets:
+	$(MAKE) -C $(SCRIPT_DIR) gen_turrets
+
 gen_collision:
 	$(MAKE) -C $(SCRIPT_DIR) gen_collision INPUT="$(INPUT)"
 
@@ -209,5 +212,5 @@ push:
 code:
 	find $(SRCDIR) $(HEADER_DIR) -type f \( -name "*.hpp" -o -name "*.cpp" \) -exec cat {} + > ../code.txt
 
-.PHONY: all clean fclean re bonus push run gen_model gen_spaceships gen_collision test test-unit test-integration test-smoke test-manual test-manual-bin testbin all_test
+.PHONY: all clean fclean re bonus push run gen_model gen_spaceships gen_turrets gen_collision test test-unit test-integration test-smoke test-manual test-manual-bin testbin all_test $(GEN_MODEL_LIB) $(GEN_COLLISION_LIB)
 -include $(OBJS:.o=.d) $(PCH_DEPS) $(CATCH_DEP)

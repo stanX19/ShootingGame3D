@@ -1,0 +1,10 @@
+{
+  "id": "heavy_mg_rifle",
+  "archetype": "heavy_mg_rifle",
+  "vertexCount": 844,
+  "triangleCount": 910,
+  "boundingRadius": 7.98313,
+  "boundingHeight": 1,
+  "muzzlePosition": {"x": 0, "y": 0, "z": 7.96},
+  "pivotPosition": {"x": 0, "y": 0, "z": 0}
+}

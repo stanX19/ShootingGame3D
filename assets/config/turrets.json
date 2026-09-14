@@ -1,0 +1,17 @@
+{
+  "default": "assets/Models/turrets/basic_shooter/turret_basic_shooter.obj",
+  "turrets": {
+    "basic_shooter": {
+      "modelPath": "assets/Models/turrets/basic_shooter/turret_basic_shooter.obj"
+    },
+    "heavy_mg_rifle": {
+      "modelPath": "assets/Models/turrets/heavy_mg_rifle/turret_heavy_mg_rifle.obj"
+    },
+    "lazer_deletor": {
+      "modelPath": "assets/Models/turrets/lazer_deletor/turret_lazer_deletor.obj"
+    },
+    "lazer_shotgun": {
+      "modelPath": "assets/Models/turrets/lazer_shotgun/turret_lazer_shotgun.obj"
+    }
+  }
+}

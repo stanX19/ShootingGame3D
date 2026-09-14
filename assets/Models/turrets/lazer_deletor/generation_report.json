@@ -1,0 +1,10 @@
+{
+  "id": "lazer_deletor",
+  "archetype": "lazer_deletor",
+  "vertexCount": 848,
+  "triangleCount": 802,
+  "boundingRadius": 8.20929,
+  "boundingHeight": 1,
+  "muzzlePosition": {"x": 0, "y": 0, "z": 8.19},
+  "pivotPosition": {"x": 0, "y": 0, "z": 0}
+}

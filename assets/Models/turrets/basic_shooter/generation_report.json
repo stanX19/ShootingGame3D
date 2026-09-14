@@ -1,0 +1,10 @@
+{
+  "id": "basic_shooter",
+  "archetype": "basic_shooter",
+  "vertexCount": 753,
+  "triangleCount": 840,
+  "boundingRadius": 6.25613,
+  "boundingHeight": 1,
+  "muzzlePosition": {"x": 0, "y": 0, "z": 6.23},
+  "pivotPosition": {"x": 0, "y": 0, "z": 0}
+}

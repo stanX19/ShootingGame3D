@@ -15,6 +15,7 @@ int main() {
 		{"sounds", "assets/config/sounds.json"},
 		{"units", "assets/config/units.json"},
 		{"weapons", "assets/config/weapons.json"},
+		{"turrets", "assets/config/turrets.json"},
 		{"spaceship", "assets/config/spaceships.json"}
 	});
 	context.weaponRegistry.init(context.config);

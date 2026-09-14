@@ -106,6 +106,10 @@ namespace gen_model {
 		writeModelAssets(asset, outputDirectory, basename, true);
 	}
 
+	void writeTurretAssets(const gen_types::AssetData& asset, const std::filesystem::path& outputDirectory, const std::string& basename) {
+		writeModelAssets(asset, outputDirectory, basename, true);
+	}
+
 	void writeAsteroidAssets(const gen_types::AssetData& asset, const std::filesystem::path& outputDirectory) {
 		writeModelAssets(asset, outputDirectory, "generated_asteroid");
 	}

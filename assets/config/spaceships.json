@@ -2513,7 +2513,7 @@
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": 6.813213348388672,
-            "y": 3.6337132453918457,
+            "y": 3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2531,14 +2531,14 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         },
         {
           "id": "mount_1",
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": -6.813213348388672,
-            "y": 3.6337132453918457,
+            "y": 3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2556,14 +2556,14 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         },
         {
           "id": "mount_2",
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": 7.613213539123535,
-            "y": 3.6337132453918457,
+            "y": 3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2581,14 +2581,14 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         },
         {
           "id": "mount_3",
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": -7.613213539123535,
-            "y": 3.6337132453918457,
+            "y": 3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2606,14 +2606,14 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         },
         {
           "id": "mount_4",
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": 6.813213348388672,
-            "y": -3.6337132453918457,
+            "y": -3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2631,14 +2631,14 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         },
         {
           "id": "mount_5",
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": -6.813213348388672,
-            "y": -3.6337132453918457,
+            "y": -3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2656,14 +2656,14 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         },
         {
           "id": "mount_6",
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": 7.613213539123535,
-            "y": -3.6337132453918457,
+            "y": -3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2681,14 +2681,14 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         },
         {
           "id": "mount_7",
           "traverseHalfAngleDegrees": 12.0,
           "position": {
             "x": -7.613213539123535,
-            "y": -3.6337132453918457,
+            "y": -3.0300002098083496,
             "z": 2.128000020980835
           },
           "forward": {
@@ -2706,7 +2706,7 @@
           "barrelLength": 3.25,
           "supportWidth": 0.75,
           "supportHeight": 0.6000000238418579,
-          "socketHeight": 0.9037129878997803
+          "socketHeight": 0.30000001192092896
         }
       ],
       "material": {

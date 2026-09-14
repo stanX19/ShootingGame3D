@@ -1,6 +1,7 @@
 #include "classes/weapon_registry.hpp"
 #include "weapons.hpp"
 #include "basic_utils.hpp"
+#include "components/render.hpp"
 #include <iostream>
 #include <vector>
 
@@ -184,6 +185,18 @@ namespace weapon
 			const std::string subId = id.substr(id.find('.') + 1);
 			const SubGameConfig subCfg = context.config.getSubConfig("weapons." + type + ".weapons." + subId);
 			it->second.emplaceFunc(context, entity, subCfg);
+
+			const std::string turretRef = subCfg.getString("turretRef", "");
+			if (!turretRef.empty() && context.registry.all_of<render::tag::AimDirectionSyncModel>(entity))
+			{
+				const std::string defaultModel = context.config.getString("turrets.default", "assets/Models/turrets/basic_shooter/turret_basic_shooter.obj");
+				const std::string modelPath = context.config.getString("turrets.turrets." + turretRef + ".modelPath", defaultModel);
+				auto* renderBody = context.registry.try_get<render::RenderBody>(entity);
+				if (renderBody != nullptr)
+				{
+					renderBody->modelID = context.modelManager.loadModel(modelPath);
+				}
+			}
 		}
 	}
 

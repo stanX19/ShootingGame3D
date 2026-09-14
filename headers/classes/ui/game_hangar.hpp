@@ -48,6 +48,11 @@ private:
     std::size_t m_selectedShipIndex = 0;
     std::string m_selectedShipId;
 
+    float m_cameraYaw = 0.75f;
+    float m_cameraPitch = 0.35f;
+    float m_zoomFactor = 1.0f;
+    bool m_isDragging = false;
+
     ui::TextButtonWidget m_specialButton;
     ui::TextButtonWidget m_shipButton;
     ui::TextButtonWidget m_backButton;
