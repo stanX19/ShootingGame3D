@@ -140,6 +140,9 @@ SpaceshipConfig::Definition SpaceshipConfig::parseDefinition(
 	definition.id = id;
 	definition.modelPath = modelPath.get<std::string>();
 	definition.modelRadius = number(runtime, "modelRadius", path + ".runtime");
+	const auto collisionIt = value.find("collisionModelPath");
+	if (collisionIt != value.end() && collisionIt->is_string())
+		definition.collisionModelPath = collisionIt->get<std::string>();
 	for (std::size_t index = 0; index < engines.size(); ++index)
 		definition.engines.push_back(parseEngine(
 			engines.at(index),

@@ -181,7 +181,8 @@ namespace {
 		hpPtr->value -= remainingDmg;
 
 		const bool isKill = (prevHp > 0.0f && hpPtr->value <= 0.0f);
-		const entt::entity rootAttacker = entt_utils::getRootScoreParent(evt.context->registry, killer.id);
+		const auto *attackerOwner = evt.context->registry.try_get<identity::Owner>(killer.id);
+		const entt::entity rootAttacker = attackerOwner ? attackerOwner->root : killer.id;
 		recordAttackerContribution(evt, victim.id, rootAttacker, remainingDmg);
 		tryReportPlayerDamage(evt, victim, rootAttacker, remainingDmg, isKill);
 
@@ -229,8 +230,12 @@ void event::Listener::handleCollisionEvent(const CollisionEvent &evt) {
 	applyCollisionPhysics(evt);
 
 	// Emit hit sounds only if collision involves player
-	const bool involvesPlayer = entt_utils::getRootScoreParent(evt.context->registry, evt.a.id) == evt.context->currentPlayer ||
-		entt_utils::getRootScoreParent(evt.context->registry, evt.b.id) == evt.context->currentPlayer;
+	const auto *ownerA = evt.context->registry.try_get<identity::Owner>(evt.a.id);
+	const auto *ownerB = evt.context->registry.try_get<identity::Owner>(evt.b.id);
+	const entt::entity rootA = ownerA ? ownerA->root : evt.a.id;
+	const entt::entity rootB = ownerB ? ownerB->root : evt.b.id;
+	const bool involvesPlayer = (rootA == evt.context->currentPlayer) ||
+		(rootB == evt.context->currentPlayer);
 	if (!involvesPlayer)
 		return;
 	tryEmitHitSound(evt.context, evt.a);

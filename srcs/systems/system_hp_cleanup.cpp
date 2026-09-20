@@ -4,6 +4,7 @@
 #include "components/combat.hpp"
 #include "components/physics.hpp"
 #include "components/render.hpp"
+#include "components/identity.hpp"
 #include "components/score.hpp"
 #include "components/effect.hpp"
 #include <vector>
@@ -22,11 +23,11 @@ void systems::HpCleanup::update(GameContext &context, [[maybe_unused]] float dt)
 	for (auto entity : toDestroy) {
 		if (!context.registry.valid(entity)) continue;
 
-		auto [posPtr, bodyPtr, velPtr, scoreParentPtr, explodePtr, instantDamagePtr] = context.registry.try_get<
+		auto [posPtr, bodyPtr, velPtr, ownerPtr, explodePtr, instantDamagePtr] = context.registry.try_get<
 			Position,
 			RenderBody,
 			Velocity,
-			ScoreParent,
+			identity::Owner,
 			effect::ExplodeOnDeath,
 			effect::InstantDamageOnDeath
 		>(entity);
@@ -37,7 +38,7 @@ void systems::HpCleanup::update(GameContext &context, [[maybe_unused]] float dt)
 		}
 
 		const Vector3 velocity = velPtr ? velPtr->value : Vector3Zeros;
-		entt::entity parent = scoreParentPtr ? scoreParentPtr->parent : entt::null;
+		entt::entity parent = ownerPtr ? ownerPtr->root : entt::null;
 
 		if (bodyPtr && context.registry.any_of<tag::effect::DropDebris>(entity)) {
 			spawnDebris(context, posPtr->value, bodyPtr, 5.0f, velocity);

@@ -35,7 +35,7 @@ namespace {
 		context.registry.emplace<lifetime::DisappearBound>(asteroid, getArenaSizeVec(context) * -1, getArenaSizeVec(context));
 		context.registry.emplace<identity::tag::Asteroid>(asteroid);
 		context.registry.emplace<render::tag::Shaded>(asteroid);
-		// context.registry.emplace<tag::RotationSyncModel>(asteroid);
+		context.registry.emplace<render::tag::RotationSyncModel>(asteroid);
 		context.registry.emplace<collision::CollisionBody>(asteroid, rad);
 		context.registry.emplace<collision::CollisionBodyModel>(asteroid, asteroidCollisionModel);
 		context.registry.emplace<render::RenderBody>(asteroid, render::RenderBody{

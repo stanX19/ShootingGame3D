@@ -4,6 +4,7 @@
 #include "entt_utils.hpp"
 #include "components/physics.hpp"
 #include "components/weapon.hpp"
+#include "components/identity.hpp"
 #include "components/score.hpp"
 #include "components/faction.hpp"
 #include "components/sound.hpp"
@@ -85,8 +86,11 @@ void systems::WeaponShoot::shootBullets(GameContext &context, [[maybe_unused]] f
 		const Velocity *velocityPtr = context.registry.try_get<Velocity>(entity);
 		const Vector3 shooterVel = velocityPtr ? velocityPtr->value : Vector3Zeros;
 
+		const auto *shooterOwner = context.registry.try_get<identity::Owner>(entity);
+		const entt::entity rootShooter = shooterOwner ? shooterOwner->root : entity;
+
 		// Emit shoot sound if weapon has ShootSound component and belongs to player
-		if (entt_utils::getRootScoreParent(context.registry, entity) == context.currentPlayer) {
+		if (rootShooter == context.currentPlayer) {
 			if (auto *shootSound = context.registry.try_get<sound::ShootSound>(entity)) {
 				if (shootSound->id != sound::NONE) {
 					context.dispatcher.enqueue<event::SoundEvent>(event::SoundEvent{
@@ -116,7 +120,7 @@ void systems::WeaponShoot::shootBullets(GameContext &context, [[maybe_unused]] f
 			const entt::entity bullet = entt_utils::cloneEntity(context.templateReg, weapon.bulletTemplate, context.registry);
 			context.registry.emplace_or_replace<Position>(bullet, Position{pos + dir * (rad + 0.1f)});
 			context.registry.emplace_or_replace<Velocity>(bullet, Velocity{dir * weapon.bulletData.speed + shooterVel});
-			context.registry.emplace_or_replace<ScoreParent>(bullet, ScoreParent{entity});
+			context.registry.emplace_or_replace<identity::Owner>(bullet, identity::Owner{rootShooter});
 			context.registry.emplace_or_replace<faction::Faction>(bullet, faction);
 		}
 		context.registry.remove<tag::weapon::IsFiring>(entity);

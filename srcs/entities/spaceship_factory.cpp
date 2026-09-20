@@ -62,12 +62,27 @@ ModelAndMounts getModelAndMounts(
 ) {
 	if (!std::isfinite(radius) || radius <= 0.0f)
 		throw std::invalid_argument("SPACESHIP: radius must be positive");
+	CollisionBodyManager dummyManager;
+	return getModelAndMounts(config, modelManager, dummyManager, shipId, radius);
+}
+
+ModelAndMounts getModelAndMounts(
+	const GameConfig& config,
+	ModelManager& modelManager,
+	CollisionBodyManager& collisionBodyManager,
+	std::string_view shipId,
+	float radius
+) {
+	if (!std::isfinite(radius) || radius <= 0.0f)
+		throw std::invalid_argument("SPACESHIP: radius must be positive");
 	const auto& definition = config.spaceship().get(shipId);
 	const float bodyScale = radius;
 
 	ModelAndMounts result;
 	result.modelId = modelManager.loadModel(definition.modelPath);
 	result.bodyScale = bodyScale;
+	if (!definition.collisionModelPath.empty())
+		result.collisionModelId = collisionBodyManager.loadCollisionModel(definition.collisionModelPath);
 	result.modelRadius = definition.modelRadius;
 	result.engines = definition.engines;
 	result.mounts = definition.mounts;
@@ -99,6 +114,7 @@ SpawnedSpaceship spawnConfiguredSpaceship(
 	const ModelAndMounts geometry = getModelAndMounts(
 		context.config,
 		context.modelManager,
+		context.collisionBodyManager,
 		shipId,
 		params.radius
 	);
@@ -110,7 +126,11 @@ SpawnedSpaceship spawnConfiguredSpaceship(
 	context.registry.emplace<physics::Velocity>(assembly.entity);
 	context.registry.emplace<physics::Rotation>(assembly.entity, params.rotation);
 	context.registry.emplace<collision::CollisionBody>(assembly.entity, params.radius);
-	context.registry.emplace<render::RenderBody>(assembly.entity, render::RenderBody{geometry.modelId, params.bodyColor, geometry.bodyScale});
+	if (geometry.collisionModelId.has_value())
+		context.registry.emplace<collision::CollisionBodyModel>(assembly.entity, *geometry.collisionModelId);
+	context.registry.emplace<collision::Assembly>(assembly.entity, assembly.entity);
+	context.registry.emplace<identity::Owner>(assembly.entity, assembly.entity);
+	context.registry.emplace<render::RenderBody>(assembly.entity, render::RenderBody{geometry.modelId, params.bodyColor, geometry.bodyScale, Vector3Zeros, params.rotation});
 	context.registry.emplace<faction::Faction>(assembly.entity, faction::Faction{params.faction});
 	context.registry.emplace<combat::tag::Targetable>(assembly.entity);
 	context.registry.emplace<identity::tag::Spaceship>(assembly.entity);

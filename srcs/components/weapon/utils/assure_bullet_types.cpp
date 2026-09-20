@@ -1,6 +1,10 @@
 #include "weapons.hpp"
 #include "entt_utils.hpp"
 #include "components/sound.hpp"
+#include "components/physics.hpp"
+#include "components/spaceship.hpp"
+#include "components/faction.hpp"
+#include "components/combat.hpp"
 
 void weapon::utils::assureBulletTypes(entt::registry &registry) {
 	entt_utils::assureTypes<
@@ -18,12 +22,21 @@ void weapon::utils::assureBulletTypes(entt::registry &registry) {
 		weapon::tag::Lazer,
 		spaceship::tag::Suicidal,
 		render::ModelStrech,
-		collision::CollisionBody,
-		render::RenderBody,
 		lifetime::DisappearBound,
 		sound::HitSound,
 		sound::ShootSound,
 		sound::DeathSound,
-		effect::SpawnsTrailParticles
+		effect::SpawnsTrailParticles,
+		physics::Rotation,
+		physics::tag::VelocitySyncRot,
+		spaceship::MoveTarget,
+		spaceship::tag::AIMoveControl,
+		weapon::tag::Missile,
+		physics::Mass,
+		spaceship::TurnSpeed,
+		physics::ScalarAcceleration,
+		combat::DelayedDamage,
+		combat::tag::Targetable,
+		faction::Faction
 	>(registry);
 }

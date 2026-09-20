@@ -5,11 +5,6 @@
 
 namespace score {
 
-struct ScoreParent
-{
-	entt::entity parent = entt::null;
-};
-
 struct KilledScore
 {
 	int value;
@@ -22,7 +17,6 @@ struct Score
 
 } // namespace score
 
-using ::score::ScoreParent;
 using ::score::KilledScore;
 using ::score::Score;
 

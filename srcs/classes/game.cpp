@@ -60,6 +60,7 @@ EngineState Game::run() {
         m_systemEntityMovement.update(m_context, dt);
         m_systemEntityAnchor.update(m_context, dt);
         m_systemEntityTransformation.update(m_context, dt);
+        m_systemSyncModelRotation.update(m_context, dt);
         
         m_systemDetectEntityCollision.update(m_context, dt);
         m_context.dispatcher.update();
@@ -67,8 +68,6 @@ EngineState Game::run() {
         m_systemSoundSfx.update(m_context, dt);
 
         m_systemEnergyShield.update(m_context, dt);
-        
-        m_systemSyncModelRotation.update(m_context, dt);
         m_systemCameraFollowPlayer.update(m_context, dt);
         m_systemHudWarning.update(m_context, dt);
         m_context.hudManager.setObservedEntity(m_context.currentPlayer);

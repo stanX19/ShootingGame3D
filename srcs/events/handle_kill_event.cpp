@@ -26,11 +26,11 @@ namespace {
 	}
 
 	void addScore(GameContext &context, entt::entity entity, int score) {
-		auto [scorePtr, scoreParentPtr] = context.registry.try_get<score::Score, score::ScoreParent>(entity);
+		auto [scorePtr, ownerPtr] = context.registry.try_get<score::Score, identity::Owner>(entity);
 		if (scorePtr)
 			scorePtr->value += score;
-		if (scoreParentPtr)
-			addScore(context, scoreParentPtr->parent, score);
+		if (ownerPtr && ownerPtr->root != entity && context.registry.valid(ownerPtr->root))
+			addScore(context, ownerPtr->root, score);
 	}
 
 	void handleFactionDataUpdate(const KillEvent& evt) {
@@ -89,7 +89,8 @@ namespace {
 
 	entt::entity resolveEffectiveKiller(const KillEvent& evt) {
 		const entt::entity directKiller = evt.killer.id;
-		const entt::entity rootKiller = entt_utils::getRootScoreParent(evt.context->registry, directKiller);
+		const auto *killerOwner = evt.context->registry.try_get<identity::Owner>(directKiller);
+		const entt::entity rootKiller = killerOwner ? killerOwner->root : directKiller;
 
 		const bool isInvalidKiller = (rootKiller == entt::null || !evt.context->registry.valid(rootKiller));
 		const bool isSuicide = (rootKiller == evt.victim.id);

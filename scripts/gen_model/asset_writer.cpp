@@ -95,6 +95,38 @@ namespace gen_model {
 			writePng(asset.texture, outputDirectory / (basename + ".png"));
 			writePng(asset.normalMap, outputDirectory / (basename + "_normal.png"));
 		}
+		void writeCollisionObj(
+			const gen_types::MeshData& mesh,
+			const std::filesystem::path& path
+		) {
+			if (mesh.positions.empty() || mesh.triangles.empty()) {
+				throw std::invalid_argument("Cannot write empty collision geometry: " + path.string());
+			}
+			std::ofstream output(path);
+			if (!output) {
+				throw std::runtime_error("Unable to write collision OBJ: " + path.string());
+			}
+			output << std::fixed << std::setprecision(8);
+			for (const auto& point : mesh.positions) {
+				output << "v " << point.x << ' ' << point.y << ' ' << point.z << "\n";
+			}
+			for (const auto& normal : mesh.normals) {
+				output << "vn " << normal.x << ' ' << normal.y << ' ' << normal.z << "\n";
+			}
+			for (const auto& triangle : mesh.triangles) {
+				output << "f";
+				for (int corner = 0; corner < 3; ++corner) {
+					output << ' ' << triangle.positionIndices[corner] + 1;
+					if (!mesh.normals.empty() && triangle.normalIndices[corner] >= 0) {
+						output << "//" << triangle.normalIndices[corner] + 1;
+					}
+				}
+				output << "\n";
+			}
+			if (!output) {
+				throw std::runtime_error("Unable to finish collision OBJ: " + path.string());
+			}
+		}
 	}
 
 	void writeModelAssets(const gen_types::AssetData& asset, const std::filesystem::path& outputDirectory, const std::string& basename) {
@@ -104,6 +136,19 @@ namespace gen_model {
 	void writeSpaceshipAssets(const gen_types::AssetData& asset, const std::filesystem::path& outputDirectory, const std::string& basename) {
 		spaceship::topology::requireClosedOrientedMesh(asset.mesh);
 		writeModelAssets(asset, outputDirectory, basename, true);
+	}
+
+	void writeSpaceshipAssets(
+		const gen_types::AssetData& asset,
+		const gen_types::MeshData& collisionMesh,
+		const std::filesystem::path& outputDirectory,
+		const std::string& basename
+	) {
+		spaceship::topology::requireClosedOrientedMesh(asset.mesh);
+		writeModelAssets(asset, outputDirectory, basename, true);
+		if (!collisionMesh.positions.empty() && !collisionMesh.triangles.empty()) {
+			writeCollisionObj(collisionMesh, outputDirectory / (basename + ".collision.obj"));
+		}
 	}
 
 	void writeTurretAssets(const gen_types::AssetData& asset, const std::filesystem::path& outputDirectory, const std::string& basename) {

@@ -1,5 +1,6 @@
 #include "entities.hpp"
 #include "utils.hpp"
+#include "components/identity.hpp"
 #include <algorithm>
 
 namespace
@@ -11,7 +12,9 @@ namespace
 		if (!context.registry.valid(parent))
 			return;
 
-		context.registry.emplace<score::ScoreParent>(entity, parent);
+		const auto *parentOwner = context.registry.try_get<identity::Owner>(parent);
+		const entt::entity rootOwner = parentOwner ? parentOwner->root : parent;
+		context.registry.emplace<identity::Owner>(entity, rootOwner);
 		context.registry.emplace<faction::Faction>(
 			entity, context.registry.get_or_emplace<faction::Faction>(parent).value
 		);

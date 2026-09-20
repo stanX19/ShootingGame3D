@@ -6,7 +6,7 @@
 #include "components/collision.hpp"
 #include "components/render.hpp"
 #include "components/weapon.hpp"
-#include "components/score.hpp"
+#include "components/identity.hpp"
 #include "components/effect.hpp"
 
 #include <stdexcept>
@@ -71,10 +71,13 @@ namespace {
 			turret,
 			anchor::DeathAnchor{parent, 0.75f}
 		);
-		context.registry.emplace_or_replace<score::ScoreParent>(
-			turret,
-			score::ScoreParent{parent}
-		);
+		const auto *parentAsm = context.registry.try_get<collision::Assembly>(parent);
+		const entt::entity rootAsm = parentAsm ? parentAsm->root : parent;
+		context.registry.emplace_or_replace<collision::Assembly>(turret, rootAsm);
+
+		const auto *parentOwner = context.registry.try_get<identity::Owner>(parent);
+		const entt::entity rootOwner = parentOwner ? parentOwner->root : parent;
+		context.registry.emplace_or_replace<identity::Owner>(turret, rootOwner);
 
 		const physics::Position* parentPosition = context.registry.try_get<physics::Position>(parent);
 		const physics::Rotation* parentRotation = context.registry.try_get<physics::Rotation>(parent);

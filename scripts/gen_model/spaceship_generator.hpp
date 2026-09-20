@@ -254,6 +254,7 @@ namespace gen_model::spaceship {
 
 	struct GeneratedShip {
 		gen_types::AssetData asset;
+		gen_types::MeshData collisionMesh;
 		Bounds bounds;
 		std::vector<MountReport> mounts;
 		std::vector<EngineSettings> resolvedEngines;

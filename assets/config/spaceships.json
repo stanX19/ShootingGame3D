@@ -18,6 +18,7 @@
   "ships": {
     "player": {
       "modelPath": "assets/Models/spaceships/player/spaceship_player.obj",
+      "collisionModelPath": "assets/Models/spaceships/player/spaceship_player.collision.obj",
       "runtime": {
         "modelRadius": 3.879911184310913
       },
@@ -306,6 +307,7 @@
     },
     "basic": {
       "modelPath": "assets/Models/spaceships/basic/spaceship_basic.obj",
+      "collisionModelPath": "assets/Models/spaceships/basic/spaceship_basic.collision.obj",
       "runtime": {
         "modelRadius": 2.2811813354492188
       },
@@ -523,6 +525,7 @@
     },
     "elite": {
       "modelPath": "assets/Models/spaceships/elite/spaceship_elite.obj",
+      "collisionModelPath": "assets/Models/spaceships/elite/spaceship_elite.collision.obj",
       "runtime": {
         "modelRadius": 3.164418935775757
       },
@@ -750,6 +753,7 @@
     },
     "fastElite": {
       "modelPath": "assets/Models/spaceships/fastElite/spaceship_fastElite.obj",
+      "collisionModelPath": "assets/Models/spaceships/fastElite/spaceship_fastElite.collision.obj",
       "runtime": {
         "modelRadius": 3.589148759841919
       },
@@ -967,6 +971,7 @@
     },
     "terminator": {
       "modelPath": "assets/Models/spaceships/terminator/spaceship_terminator.obj",
+      "collisionModelPath": "assets/Models/spaceships/terminator/spaceship_terminator.collision.obj",
       "runtime": {
         "modelRadius": 8.674443244934082
       },
@@ -2279,6 +2284,7 @@
     },
     "mothership": {
       "modelPath": "assets/Models/spaceships/mothership/spaceship_mothership.obj",
+      "collisionModelPath": "assets/Models/spaceships/mothership/spaceship_mothership.collision.obj",
       "runtime": {
         "modelRadius": 9.046356201171875
       },
@@ -2763,6 +2769,7 @@
     },
     "interceptor_quad": {
       "modelPath": "assets/Models/spaceships/interceptor_quad/spaceship_interceptor_quad.obj",
+      "collisionModelPath": "assets/Models/spaceships/interceptor_quad/spaceship_interceptor_quad.collision.obj",
       "seed": 4501,
       "design": {
         "propulsionLayout": "twin_boom",
@@ -3073,6 +3080,7 @@
     },
     "heavy_quad": {
       "modelPath": "assets/Models/spaceships/heavy_quad/spaceship_heavy_quad.obj",
+      "collisionModelPath": "assets/Models/spaceships/heavy_quad/spaceship_heavy_quad.collision.obj",
       "seed": 4301,
       "design": {
         "propulsionLayout": "spine_cluster",

@@ -5,7 +5,6 @@
 
 namespace entt_utils {
 	entt::entity cloneEntity(entt::registry &src, entt::entity srcEntity, entt::registry &dst);
-	entt::entity getRootScoreParent(const entt::registry &registry, entt::entity entity);
 
 	template<typename... Cs>
 	void assureTypes(entt::registry &reg) {

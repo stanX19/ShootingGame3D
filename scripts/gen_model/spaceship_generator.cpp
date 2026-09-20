@@ -3211,6 +3211,245 @@ std::uint64_t gen_model::spaceship::fingerprint(const gen_model::spaceship::Sett
 	return hash;
 }
 
+namespace {
+	struct CollisionMeshBuilder {
+		gen_model::gen_types::MeshData mesh;
+
+		void addTriangle(
+			Point3 a,
+			Point3 b,
+			Point3 c
+		) {
+			const int base = static_cast<int>(mesh.positions.size());
+			mesh.positions.push_back(a);
+			mesh.positions.push_back(b);
+			mesh.positions.push_back(c);
+			const Point3 normal = gen_model::gen_types::normalize(
+				gen_model::gen_types::cross(b - a, c - a)
+			);
+			mesh.normals.push_back(normal);
+			mesh.normals.push_back(normal);
+			mesh.normals.push_back(normal);
+			mesh.texcoords.push_back({0.0f, 0.0f});
+			mesh.texcoords.push_back({0.0f, 0.0f});
+			mesh.texcoords.push_back({0.0f, 0.0f});
+			mesh.triangles.push_back({
+				{base, base + 1, base + 2},
+				{base, base + 1, base + 2},
+				{base, base + 1, base + 2}
+			});
+		}
+
+		void addQuad(
+			Point3 a,
+			Point3 b,
+			Point3 c,
+			Point3 d
+		) {
+			addTriangle(a, b, c);
+			addTriangle(a, c, d);
+		}
+
+		void addBox(Point3 center, Point3 size) {
+			const Point3 half = size * 0.5f;
+			const Point3 min = center - half;
+			const Point3 max = center + half;
+
+			const Point3 p000{min.x, min.y, min.z};
+			const Point3 p001{min.x, min.y, max.z};
+			const Point3 p010{min.x, max.y, min.z};
+			const Point3 p011{min.x, max.y, max.z};
+			const Point3 p100{max.x, min.y, min.z};
+			const Point3 p101{max.x, min.y, max.z};
+			const Point3 p110{max.x, max.y, min.z};
+			const Point3 p111{max.x, max.y, max.z};
+
+			// +X face
+			addQuad(p100, p101, p111, p110);
+			// -X face
+			addQuad(p001, p000, p010, p011);
+			// +Y face
+			addQuad(p010, p110, p111, p011);
+			// -Y face
+			addQuad(p000, p001, p101, p100);
+			// +Z face
+			addQuad(p001, p011, p111, p101);
+			// -Z face
+			addQuad(p000, p100, p110, p010);
+		}
+
+		void addTaperedPrism(
+			const std::array<Point3, 4>& root,
+			const std::array<Point3, 4>& tip,
+			bool mirrored
+		) {
+			if (!mirrored) {
+				// Root cap (-X)
+				addQuad(root[0], root[1], root[2], root[3]);
+				// Tip cap (+X)
+				addQuad(tip[0], tip[3], tip[2], tip[1]);
+				// Top side (+Y)
+				addQuad(root[0], tip[0], tip[1], root[1]);
+				// Rear side (-Z)
+				addQuad(root[1], tip[1], tip[2], root[2]);
+				// Bottom side (-Y)
+				addQuad(root[2], tip[2], tip[3], root[3]);
+				// Front side (+Z)
+				addQuad(root[3], tip[3], tip[0], root[0]);
+			} else {
+				// Mirrored across X: reverse vertex order of each quad to preserve outward normals
+				// Root cap (+X)
+				addQuad(root[3], root[2], root[1], root[0]);
+				// Tip cap (-X)
+				addQuad(tip[1], tip[2], tip[3], tip[0]);
+				// Top side (+Y)
+				addQuad(root[1], tip[1], tip[0], root[0]);
+				// Rear side (-Z)
+				addQuad(root[2], tip[2], tip[1], root[1]);
+				// Bottom side (-Y)
+				addQuad(root[3], tip[3], tip[2], root[2]);
+				// Front side (+Z)
+				addQuad(root[0], tip[0], tip[3], root[3]);
+			}
+		}
+	};
+
+	gen_model::gen_types::MeshData buildCollisionMesh(const gen_model::spaceship::Settings& settings) {
+		CollisionMeshBuilder builder;
+
+		// 1. Inner Fuselage (Hull):
+		// 5 key stations from makeHullSections with a 6-sided cross section.
+		// Contracted 15% inward in X/Y, and 10% in Z to guarantee strict containment inside hull.
+		const auto sections = makeHullSections(settings);
+		const std::array<std::size_t, 5> stationIndices{1, 3, 4, 6, 7};
+		std::vector<std::vector<Point3>> rings;
+		rings.reserve(stationIndices.size());
+
+		constexpr float hullScaleX = 0.85f;
+		constexpr float hullScaleY = 0.85f;
+		constexpr float hullScaleZ = 0.90f;
+
+		for (std::size_t idx : stationIndices) {
+			const auto& s = sections[idx];
+			const float z = s.z * hullScaleZ;
+			const float top = s.top * hullScaleY;
+			const float bottom = s.bottom * hullScaleY;
+			const float halfW = s.halfWidth * hullScaleX;
+
+			// 6-sided ring: Top (12 o'clock), UR (2 o'clock), LR (4 o'clock),
+			//               Bot (6 o'clock), LL (8 o'clock), UL (10 o'clock)
+			rings.push_back({
+				Point3{0.0f, top, z},
+				Point3{halfW * 0.75f, top * 0.50f, z},
+				Point3{halfW * 0.75f, bottom * 0.50f, z},
+				Point3{0.0f, bottom, z},
+				Point3{-halfW * 0.75f, bottom * 0.50f, z},
+				Point3{-halfW * 0.75f, top * 0.50f, z}
+			});
+		}
+
+		// Loft sides between consecutive stations (station i is front, i+1 is rear)
+		for (std::size_t i = 0; i + 1 < rings.size(); ++i) {
+			for (std::size_t j = 0; j < 6; ++j) {
+				const std::size_t next = (j + 1) % 6;
+				builder.addQuad(rings[i][j], rings[i][next], rings[i + 1][next], rings[i + 1][j]);
+			}
+		}
+
+		// Front cap at station 0 (facing +Z)
+		const Point3 frontCenter{0.0f, 0.0f, rings[0][0].z};
+		for (std::size_t j = 0; j < 6; ++j) {
+			const std::size_t next = (j + 1) % 6;
+			builder.addTriangle(frontCenter, rings[0][next], rings[0][j]);
+		}
+
+		// Rear cap at station 4 (facing -Z)
+		const Point3 rearCenter{0.0f, 0.0f, rings.back()[0].z};
+		for (std::size_t j = 0; j < 6; ++j) {
+			const std::size_t next = (j + 1) % 6;
+			builder.addTriangle(rearCenter, rings.back()[j], rings.back()[next]);
+		}
+
+		// 2. Inner Wings:
+		// 4-sided tapered prisms contracted 10% in span, 10% in chord, and 20% in thickness.
+		auto addWingHitboxes = [&](const gen_model::spaceship::WingSettings& wing) {
+			if (wing.halfSpan <= wing.rootX + 0.1f)
+				return;
+
+			const float innerX = std::max(wing.rootX, settings.hull.width * 0.35f);
+			const float outerX = wing.rootX + (wing.halfSpan - wing.rootX) * 0.90f;
+			if (outerX <= innerX)
+				return;
+
+			const float rootChord = wing.rootFrontZ - wing.rootRearZ;
+			const float tipChord = wing.tipFrontZ - wing.tipRearZ;
+			if (rootChord <= 0.05f || tipChord <= 0.05f)
+				return;
+
+			const float rootFrontZ = wing.rootFrontZ - rootChord * 0.10f;
+			const float rootRearZ = wing.rootRearZ + rootChord * 0.10f;
+			const float tipFrontZ = wing.tipFrontZ - tipChord * 0.10f;
+			const float tipRearZ = wing.tipRearZ + tipChord * 0.10f;
+
+			const float midY = (wing.topY + wing.bottomY) * 0.5f;
+			const float halfThick = std::max((wing.topY - wing.bottomY) * 0.5f * 0.80f, 0.04f);
+			const float topY = midY + halfThick;
+			const float botY = midY - halfThick;
+
+			const std::array<Point3, 4> rootR{
+				Point3{innerX, topY, rootFrontZ},
+				Point3{innerX, topY, rootRearZ},
+				Point3{innerX, botY, rootRearZ},
+				Point3{innerX, botY, rootFrontZ}
+			};
+			const std::array<Point3, 4> tipR{
+				Point3{outerX, topY, tipFrontZ},
+				Point3{outerX, topY, tipRearZ},
+				Point3{outerX, botY, tipRearZ},
+				Point3{outerX, botY, tipFrontZ}
+			};
+			builder.addTaperedPrism(rootR, tipR, false);
+
+			const std::array<Point3, 4> rootL{
+				Point3{-innerX, topY, rootFrontZ},
+				Point3{-innerX, topY, rootRearZ},
+				Point3{-innerX, botY, rootRearZ},
+				Point3{-innerX, botY, rootFrontZ}
+			};
+			const std::array<Point3, 4> tipL{
+				Point3{-outerX, topY, tipFrontZ},
+				Point3{-outerX, topY, tipRearZ},
+				Point3{-outerX, botY, tipRearZ},
+				Point3{-outerX, botY, tipFrontZ}
+			};
+			builder.addTaperedPrism(rootL, tipL, true);
+		};
+
+		addWingHitboxes(settings.wings);
+		if (settings.secondaryWings.has_value()) {
+			addWingHitboxes(*settings.secondaryWings);
+		}
+
+		// 3. External Engine Pods:
+		// Only added for engines placed outside the central hull hitbox.
+		for (const auto& engine : settings.engines) {
+			if (std::abs(engine.center.x) > settings.hull.width * 0.35f) {
+				const float boxW = engine.radius * 1.30f;
+				const float boxH = engine.radius * 1.30f;
+				const float boxL = (engine.length + engine.nozzleDepth) * 0.85f;
+				const Point3 center{
+					engine.center.x,
+					engine.center.y,
+					engine.center.z - engine.nozzleDepth * 0.20f
+				};
+				builder.addBox(center, Point3{boxW, boxH, boxL});
+			}
+		}
+
+		return builder.mesh;
+	}
+}
+
 [[maybe_unused]] gen_model::spaceship::GeneratedShip gen_model::spaceship::generateLegacy(
 	const gen_model::spaceship::Settings& settings
 ) {
@@ -3257,6 +3496,7 @@ std::uint64_t gen_model::spaceship::fingerprint(const gen_model::spaceship::Sett
 		result.mounts.push_back(report);
 	}
 	result.asset.mesh = std::move(taggedMesh.mesh);
+	result.collisionMesh = buildCollisionMesh(settings);
 	result.materialDetails = generateTextures(result.asset, settings);
 	result.settingsFingerprint = fingerprint(settings);
 	return result;
@@ -3326,6 +3566,7 @@ gen_model::spaceship::GeneratedShip gen_model::spaceship::generate(
 				result.mounts.push_back(report);
 			}
 			result.asset.mesh = std::move(taggedMesh.mesh);
+			result.collisionMesh = buildCollisionMesh(resolved);
 			result.materialDetails = generateTextures(result.asset, resolved);
 			result.resolvedEngines = resolved.engines;
 			result.resolvedNozzleCells.reserve(plan.enginePods.size());

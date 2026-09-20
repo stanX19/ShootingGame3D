@@ -4,6 +4,7 @@
 #include "collision_algorithm.hpp"
 #include "components/physics.hpp"
 #include "components/collision.hpp"
+#include "components/anchor.hpp"
 #include "components/render.hpp"
 #include "components/weapon.hpp"
 #include "utils/algorithm_utils.hpp"
@@ -19,6 +20,7 @@ namespace {
 		Vector3 vel;
 		float rad;
 		int faction;
+		entt::entity assemblyRoot;
 		const CollisionBodyModel *collisionBodyModel;
 		const RenderBody *renderBody;
 	};
@@ -42,14 +44,23 @@ namespace {
 	{
 		const bool AUsesMesh = usesMeshCollision(A);
 		const bool BUsesMesh = usesMeshCollision(B);
-		if (AUsesMesh == BUsesMesh)
+		if (!AUsesMesh && !BUsesMesh)
 		{
-			// Mesh versus mesh remains on the conservative sphere path for now.
 			return MeshCollisionResult{false, std::nullopt};
 		}
 
-		const EntityData *meshEntity = AUsesMesh ? &A : &B;
-		const EntityData *sphereEntity = AUsesMesh ? &B : &A;
+		const EntityData *meshEntity = nullptr;
+		const EntityData *sphereEntity = nullptr;
+		if (AUsesMesh && BUsesMesh)
+		{
+			meshEntity = (A.rad >= B.rad) ? &A : &B;
+			sphereEntity = (A.rad >= B.rad) ? &B : &A;
+		}
+		else
+		{
+			meshEntity = AUsesMesh ? &A : &B;
+			sphereEntity = AUsesMesh ? &B : &A;
+		}
 		const CollisionModel &collisionModel = context.collisionBodyManager.getCollisionModel(
 			meshEntity->collisionBodyModel->modelID
 		);
@@ -98,12 +109,16 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 			effectiveRadius = std::max(effectiveRadius, proxyRadius);
 		}
 
+		const auto *assembly = context.registry.try_get<collision::Assembly>(entity);
+		const entt::entity assemblyRoot = assembly ? assembly->root : entt::null;
+
 		entities.emplace_back(EntityData{
 			entity,
 			position.value - velocity,
 			velocity,
 			effectiveRadius,
 			faction,
+			assemblyRoot,
 			collisionBodyModel,
 			renderBody
 		});
@@ -115,6 +130,9 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 			const EntityData &B = entities[j];
 
 			if ((A.faction & B.faction) != 0)
+				continue;
+
+			if (A.assemblyRoot != entt::null && A.assemblyRoot == B.assemblyRoot)
 				continue;
 
 			const float combinedRadius = A.rad + B.rad;

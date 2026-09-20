@@ -5,6 +5,8 @@
 #include <string_view>
 #include <vector>
 
+#include <optional>
+#include "classes/collision_body_manager.hpp"
 #include "config/spaceship_config.hpp"
 #include "entities/turret.hpp"
 #include "game_context.hpp"
@@ -16,6 +18,7 @@ using MountPoint = config::SpaceshipConfig::Mount;
 
 struct ModelAndMounts {
 	t_model_id modelId = 0;
+	std::optional<t_collision_mesh_id> collisionModelId;
 	float bodyScale = 1.0f;
 	float modelRadius = 0.0f;
 	std::vector<EnginePoint> engines;
@@ -42,6 +45,14 @@ struct SpawnedSpaceship {
 ModelAndMounts getModelAndMounts(
 	const GameConfig& config,
 	ModelManager& modelManager,
+	std::string_view shipId,
+	float radius
+);
+
+ModelAndMounts getModelAndMounts(
+	const GameConfig& config,
+	ModelManager& modelManager,
+	CollisionBodyManager& collisionBodyManager,
 	std::string_view shipId,
 	float radius
 );

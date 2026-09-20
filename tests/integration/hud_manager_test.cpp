@@ -186,7 +186,7 @@ TEST_CASE("Events: Bullet destruction does not trigger killed by toast", "[integ
 	// Player fires bullet
 	const entt::entity bullet = context.registry.create();
 	context.registry.emplace<tag::Bullet>(bullet);
-	context.registry.emplace<ScoreParent>(bullet, player);
+	context.registry.emplace<Owner>(bullet, player);
 
 	// Bullet impacts enemy and bullet dies
 	event::KillEvent bulletKilledEvt{
@@ -234,12 +234,12 @@ TEST_CASE("Combat: Two bullets hitting same target in same tick triggers exactly
 	const entt::entity bulletA = context.registry.create();
 	context.registry.emplace<tag::Bullet>(bulletA);
 	context.registry.emplace<Damage>(bulletA, Damage{40.0f});
-	context.registry.emplace<ScoreParent>(bulletA, player);
+	context.registry.emplace<Owner>(bulletA, player);
 
 	const entt::entity bulletB = context.registry.create();
 	context.registry.emplace<tag::Bullet>(bulletB);
 	context.registry.emplace<Damage>(bulletB, Damage{40.0f});
-	context.registry.emplace<ScoreParent>(bulletB, player);
+	context.registry.emplace<Owner>(bulletB, player);
 
 	event::Listener listener;
 	event::utils::hookAllListeners(context);
@@ -256,7 +256,7 @@ TEST_CASE("Combat: Two bullets hitting same target in same tick triggers exactly
 	const entt::entity bulletC = context.registry.create();
 	context.registry.emplace<tag::Bullet>(bulletC);
 	context.registry.emplace<Damage>(bulletC, Damage{40.0f});
-	context.registry.emplace<ScoreParent>(bulletC, player);
+	context.registry.emplace<Owner>(bulletC, player);
 
 	event::CollisionEvent hitC{&context, event::CollisionParty{bulletC, Vector3Zeros, Vector3Zeros}, event::CollisionParty{target, Vector3Zeros, Vector3Zeros}, 0.016f, 0.0f};
 	listener.handleCollisionEvent(hitC);

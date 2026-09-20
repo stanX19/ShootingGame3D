@@ -37,6 +37,7 @@ public:
 	struct Definition {
 		std::string id;
 		std::string modelPath;
+		std::string collisionModelPath;
 		float modelRadius = 0.0f;
 		std::vector<Engine> engines;
 		std::vector<Mount> mounts;

@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 			const std::filesystem::path outputDirectory = outputRoot
 				/ (settings.id + "_" + fingerprintLabel(generated.settingsFingerprint));
 			const std::string basename = "spaceship_" + settings.id;
-			gen_model::writeSpaceshipAssets(generated.asset, outputDirectory, basename);
+			gen_model::writeSpaceshipAssets(generated.asset, generated.collisionMesh, outputDirectory, basename);
 			gen_model::spaceship::writeGenerationReport(generated, outputDirectory / "generation_report.json");
 			std::cout << "Generated " << settings.id << " -> " << outputDirectory.string() << '\n';
 		}
