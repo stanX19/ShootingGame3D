@@ -54,7 +54,7 @@ namespace
 			context.registry.emplace<physics::Position>(explosion, subPos);
 			context.registry.emplace<physics::Velocity>(explosion, velocity + displaceDir * finalRadius / lifespan);
 			context.registry.emplace<render::RenderBody>(explosion,
-				render::RenderBody{explosionModel, ColorAlpha(color, GetRandomValue(25, 75) / 100.0f), renderStartRadius}
+				render::RenderBody{explosionModel, ColorAlpha(color, GetRandomValue(1, 3) * 0.25f), renderStartRadius}
 			);
 			context.registry.emplace<render::RadiusExpand>(explosion, expansion);
 			context.registry.emplace<lifetime::Lifespan>(explosion, subLifespan);

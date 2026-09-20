@@ -89,6 +89,14 @@ For ECS component domains, contracts, and tag conventions, read [docs/components
   * bad: `float vel = Vector3Length(velPtr->value)`
   * good: `const float vel = Vector3Length(velPtr->value)`
 - **Parameter Passing:** Pass small, trivially-copyable types (`int`, `float`, `Vector3`) by value. Pass all other read-only parameters by `const T&` (avoids copies, accepts temporaries/literals).
+- **No Assignment in `if` Statements:** Assignment inside `if` statements (such as `if (auto *ptr = ...)`) is strictly banned. Declare the variable explicitly before the `if` statement and check against condition / `nullptr`.
+  * bad: `if (auto *prev = context.registry.try_get<PrevPosition>(entity)) { ... }`
+  * good: `const auto *prev = context.registry.try_get<PrevPosition>(entity); if (prev != nullptr) { ... }`
+- **Multi-Component `try_get`:** When querying multiple optional components for an entity from EnTT, use structured bindings with multi-component `try_get` to avoid sequential calls and nested `if` blocks.
+  * bad:
+    `const auto *strech = registry.try_get<render::ModelStrech>(entity); if (strech) { const auto *prev = registry.try_get<physics::PrevPosition>(entity); ... }`
+  * good:
+    `const auto [strech, prev] = registry.try_get<render::ModelStrech, physics::PrevPosition>(entity); if (strech != nullptr && prev != nullptr) { ... }`
 
 ### Control Flow & Simulation
 - Use guard clauses and early returns instead of nested `if/else` blocks.

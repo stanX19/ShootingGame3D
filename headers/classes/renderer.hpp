@@ -31,18 +31,39 @@ private:
 	Shader m_lightedShader{};
 	Shader m_skyboxShader{};
 	Shader m_defaultShader{};
+	Shader m_instancedShader{};
+	Shader m_instancedLightedShader{};
 	
 	Model m_trailModel{};
 	int m_lightPosLoc = 0;
 	int m_lightColorLoc = 0;
 	int m_ambientStrengthLoc = 0;
 	int m_normalMapAvailableLoc = 0;
+	int m_instancedNormalMapAvailableLoc = 0;
 	Frustum m_currentFrustum;
 
 	struct StrechDat {
 		float strech;
 		Vector3 dir;
 	};
+
+	struct BatchKey {
+		t_model_id modelId;
+		Color color;
+		bool shaded;
+
+		bool operator<(const BatchKey &other) const {
+			if (modelId != other.modelId) return modelId < other.modelId;
+			if (color.r != other.color.r) return color.r < other.color.r;
+			if (color.g != other.color.g) return color.g < other.color.g;
+			if (color.b != other.color.b) return color.b < other.color.b;
+			if (color.a != other.color.a) return color.a < other.color.a;
+			return shaded < other.shaded;
+		}
+	};
+
+	std::map<BatchKey, std::vector<Matrix>> m_instancedBatches;
+	std::vector<Matrix> m_tempTransformBuffer;
 
 	void loadDefaultShader();
 	void loadShaderWithFallback();
@@ -53,6 +74,7 @@ private:
 	void drawEntityModel(const physics::Position &pos, const render::RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
 	void drawTrails();
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
+	void drawEntitiesBatched();
 	void drawEntitiesWithShader();
 	void drawEntitiesWithSkyboxShader();
 	void drawEntitiesWithoutShader();

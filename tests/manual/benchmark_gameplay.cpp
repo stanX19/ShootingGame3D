@@ -9,6 +9,7 @@
 #include <numeric>
 #include <algorithm>
 #include <cstdint>
+#include <filesystem>
 
 namespace {
 	enum SystemId : size_t {
@@ -41,6 +42,8 @@ namespace {
 		SYS_ENERGY_SHIELD,
 		SYS_SYNC_MODEL_ROTATION,
 		SYS_CAMERA_FOLLOW_PLAYER,
+		SYS_HUD_WARNING,
+		SYS_HUD_MANAGER_UPDATE,
 
 		SYS_RENDERER_RENDER,
 		SYS_HUD_RENDERER_RENDER,
@@ -132,6 +135,8 @@ namespace {
 		metrics[SYS_ENERGY_SHIELD].name = "energyShield";
 		metrics[SYS_SYNC_MODEL_ROTATION].name = "syncModelRotation";
 		metrics[SYS_CAMERA_FOLLOW_PLAYER].name = "cameraFollowPlayer";
+		metrics[SYS_HUD_WARNING].name = "hudWarning";
+		metrics[SYS_HUD_MANAGER_UPDATE].name = "hudManager.update";
 
 		metrics[SYS_RENDERER_RENDER].name = "renderer.Render";
 		metrics[SYS_HUD_RENDERER_RENDER].name = "hudRenderer.RenderAll";
@@ -155,9 +160,20 @@ namespace {
 			metrics[i].sampleCount = 0;
 		}
 	}
+
+	void attachPlayerAutopilot(GameContext &context) {
+		if (!context.registry.valid(context.currentPlayer)) {
+			return;
+		}
+		context.registry.emplace_or_replace<spaceship::MoveTarget>(context.currentPlayer);
+		context.registry.emplace_or_replace<weapon::tag::AIControlledAim>(context.currentPlayer);
+		context.registry.emplace_or_replace<weapon::tag::AIControlledFire>(context.currentPlayer);
+		context.registry.emplace_or_replace<spaceship::tag::AIMoveControl>(context.currentPlayer);
+	}
 }
 
 int main() {
+	const std::filesystem::path projectRoot = std::filesystem::current_path();
 	const int screenWidth = 1280;
 	const int screenHeight = 720;
 
@@ -184,11 +200,14 @@ int main() {
 	event::utils::hookAllListeners(context);
 	spawnSunAndStars(context);
 
-	context.mainCamera.position = Vector3{ 0.0f, 600.0f, 1200.0f };
+	context.mainCamera.position = Vector3{ 0.0f, 1.0f, 4.0f };
 	context.mainCamera.target = Vector3{ 0.0f, 0.0f, 0.0f };
 	context.mainCamera.up = Vector3{ 0.0f, 1.0f, 0.0f };
-	context.mainCamera.fovy = 60.0f;
+	context.mainCamera.fovy = 45.0f;
 	context.mainCamera.projection = CAMERA_PERSPECTIVE;
+
+	// Attach autopilot to player ship
+	attachPlayerAutopilot(context);
 
 	Renderer renderer(context.mainCamera, context);
 	BattlefieldHUDRenderer hudRenderer(context.mainCamera, context);
@@ -216,6 +235,7 @@ int main() {
 	systems::EnergyShield sysEnergyShield;
 	systems::SyncModelRotation sysSyncModelRotation;
 	systems::CameraFollowPlayer sysCameraFollowPlayer;
+	systems::HudWarning sysHudWarning;
 	systems::UnitSpawn sysUnitSpawn;
 	systems::AsteroidRespawn sysAsteroidRespawn;
 	systems::EntityAnchorRelease sysEntityAnchorRelease;
@@ -244,14 +264,6 @@ int main() {
 		float instantaneousFps = dt > 0.0001f ? (1.0f / dt) : 60.0f;
 		smoothedFps = smoothedFps * 0.92f + instantaneousFps * 0.08f;
 
-		// Spectator camera slow orbital movement
-		float camAngle = GetTime() * 0.06f;
-		context.mainCamera.position = Vector3{
-			std::sin(camAngle) * 1500.0f,
-			700.0f,
-			std::cos(camAngle) * 1500.0f
-		};
-
 		// State transitions
 		if (state == BenchmarkState::WARMUP) {
 			if ((smoothedFps < 30.0f && currentFrame > 180) || GetTime() >= 35.0 || IsKeyPressed(KEY_B) || IsKeyPressed(KEY_SPACE)) {
@@ -274,6 +286,9 @@ int main() {
 
 		// --- Frame Simulation Probes (O(1) inlined enum index, zero allocation) ---
 		runProfiled<SYS_PLAYER_RESPAWN>(metrics, isProfiling, [&]() { sysPlayerRespawn.update(context, dt); });
+		if (context.registry.valid(context.currentPlayer) && !context.registry.all_of<spaceship::tag::AIMoveControl>(context.currentPlayer)) {
+			attachPlayerAutopilot(context);
+		}
 		runProfiled<SYS_AI_FIND_TARGET>(metrics, isProfiling, [&]() { sysAiFindTarget.update(context, dt); });
 		runProfiled<SYS_AI_MOVE_CONTROL>(metrics, isProfiling, [&]() { sysAiMoveControl.update(context, dt); });
 		runProfiled<SYS_AI_SHOOT_CONTROL>(metrics, isProfiling, [&]() { sysAiShootControl.update(context, dt); });
@@ -302,10 +317,19 @@ int main() {
 		runProfiled<SYS_ENERGY_SHIELD>(metrics, isProfiling, [&]() { sysEnergyShield.update(context, dt); });
 		runProfiled<SYS_SYNC_MODEL_ROTATION>(metrics, isProfiling, [&]() { sysSyncModelRotation.update(context, dt); });
 		runProfiled<SYS_CAMERA_FOLLOW_PLAYER>(metrics, isProfiling, [&]() { sysCameraFollowPlayer.update(context, dt); });
+		runProfiled<SYS_HUD_WARNING>(metrics, isProfiling, [&]() { sysHudWarning.update(context, dt); });
+		runProfiled<SYS_HUD_MANAGER_UPDATE>(metrics, isProfiling, [&]() {
+			context.hudManager.setObservedEntity(context.currentPlayer);
+			context.hudManager.update(dt, context);
+		});
 
 		BeginDrawing();
-		runProfiled<SYS_RENDERER_RENDER>(metrics, isProfiling, [&]() { renderer.Render(dt, context.mainCamera); });
-		runProfiled<SYS_HUD_RENDERER_RENDER>(metrics, isProfiling, [&]() { hudRenderer.RenderAll(dt); });
+		runProfiled<SYS_RENDERER_RENDER>(metrics, isProfiling, [&]() {
+			renderer.render(dt, context.hudManager.getRenderingCamera());
+		});
+		runProfiled<SYS_HUD_RENDERER_RENDER>(metrics, isProfiling, [&]() {
+			hudRenderer.renderAll(dt);
+		});
 
 		runProfiled<SYS_UNIT_SPAWN>(metrics, isProfiling, [&]() { sysUnitSpawn.update(context, dt); });
 		runProfiled<SYS_ASTEROID_RESPAWN>(metrics, isProfiling, [&]() { sysAsteroidRespawn.update(context, dt); });
@@ -353,6 +377,18 @@ int main() {
 			DrawText("BENCHMARK COMPLETE!", 20, 20, 20, GREEN);
 			DrawText("Diagnostic report printed to console!", 20, 45, 16, WHITE);
 			DrawText("Press 'R' to rerun benchmark, ESC to exit.", 20, 68, 13, GRAY);
+		}
+
+		const char *qaFramesEnv = getenv("QA_SCREENSHOT_FRAMES");
+		const size_t targetQaFrames = qaFramesEnv ? static_cast<size_t>(std::max(0, std::atoi(qaFramesEnv))) : 0;
+		if (targetQaFrames > 0 && currentFrame >= targetQaFrames) {
+			std::filesystem::create_directories(projectRoot / "assets/snapshots");
+			const std::string snapshotPath = (projectRoot / "assets/snapshots/gameplay_qa.png").string();
+			Image screenshot = LoadImageFromScreen();
+			ExportImage(screenshot, snapshotPath.c_str());
+			UnloadImage(screenshot);
+			EndDrawing();
+			break;
 		}
 
 		EndDrawing();

@@ -14,6 +14,9 @@ Renderer::Renderer(GameContext &context)
 
 Renderer::~Renderer()
 {
+	if (!IsWindowReady())
+		return;
+
 	if (m_lightedShader.id > 0 && m_lightedShader.id != rlGetShaderIdDefault())
 	{
 		UnloadShader(m_lightedShader);
@@ -30,6 +33,18 @@ Renderer::~Renderer()
 	{
 		UnloadShader(m_defaultShader);
 		m_defaultShader = {0, nullptr};
+	}
+
+	if (m_instancedShader.id > 0 && m_instancedShader.id != rlGetShaderIdDefault())
+	{
+		UnloadShader(m_instancedShader);
+		m_instancedShader = {0, nullptr};
+	}
+
+	if (m_instancedLightedShader.id > 0 && m_instancedLightedShader.id != rlGetShaderIdDefault())
+	{
+		UnloadShader(m_instancedLightedShader);
+		m_instancedLightedShader = {0, nullptr};
 	}
 }
 
@@ -54,6 +69,30 @@ void Renderer::loadShaderWithFallback()
 		m_skyboxShader = LoadShader(NULL, NULL);
 	}
 
+	m_instancedShader = LoadShader("shaders/instanced.vs", "shaders/instanced.fs");
+	if (m_instancedShader.id == 0)
+	{
+		TraceLog(LOG_WARNING, "Instanced shader failed to load. Using default shader.");
+		m_instancedShader = LoadShader(NULL, NULL);
+	}
+	else
+	{
+		m_instancedShader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(m_instancedShader, "mvp");
+		m_instancedShader.locs[SHADER_LOC_VERTEX_INSTANCE_TX] = GetShaderLocationAttrib(m_instancedShader, "instanceTransform");
+	}
+
+	m_instancedLightedShader = LoadShader("shaders/instanced_sunlight.vs", "shaders/sunlight.fs");
+	if (m_instancedLightedShader.id == 0)
+	{
+		TraceLog(LOG_WARNING, "Instanced lighted shader failed to load. Using lighted shader.");
+		m_instancedLightedShader = m_lightedShader;
+	}
+	else
+	{
+		m_instancedLightedShader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(m_instancedLightedShader, "mvp");
+		m_instancedLightedShader.locs[SHADER_LOC_VERTEX_INSTANCE_TX] = GetShaderLocationAttrib(m_instancedLightedShader, "instanceTransform");
+	}
+
 	// create a unit cone mesh (height = 1, base radius = 1) for trails
 	const t_model_id trailModelID = m_context.modelManager.loadModel("assets/Models/Trail/trail.glb");
 	m_trailModel = m_context.modelManager.getModel(trailModelID);
@@ -70,6 +109,15 @@ void Renderer::setupShaderUniforms()
 
 	Vector3 lightColor = { 1.0f, 1.0f, 1.0f };
 	SetShaderValue(m_lightedShader, m_lightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
+
+	if (m_instancedLightedShader.id > 0)
+	{
+		int instLightPosLoc = GetShaderLocation(m_instancedLightedShader, "lightPosition");
+		int instLightColorLoc = GetShaderLocation(m_instancedLightedShader, "lightColor");
+		m_instancedNormalMapAvailableLoc = GetShaderLocation(m_instancedLightedShader, "normalMapAvailable");
+		SetShaderValue(m_instancedLightedShader, instLightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
+		SetShaderValue(m_instancedLightedShader, instLightColorLoc, &lightColor, SHADER_UNIFORM_VEC3);
+	}
 }
 
 void Renderer::updateFrustum()
@@ -102,8 +150,7 @@ void Renderer::render(float dt, const Camera3D &camera)
 	updateFrustum();
 
 	handleLightSource();
-	drawEntitiesWithoutShader();
-	drawEntitiesWithShader();
+	drawEntitiesBatched();
 	drawBoundaryWarning();
 	drawEnergyShield();
 	drawDebug();
@@ -173,6 +220,120 @@ void Renderer::drawEntityModel(const physics::Position &pos, const render::Rende
 	const Vector3 renderScale = body.scale * Vector3{shrink, shrink, strech.strech};
 	const Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation) + strech.dir * (-renderScale.z);
 	DrawModelEx(model, position, axis, angle * RAD2DEG, renderScale, body.color);
+}
+
+void Renderer::drawEntitiesBatched()
+{
+	for (auto &[key, transforms] : m_instancedBatches) {
+		transforms.clear();
+	}
+
+	auto view = m_context.registry.view<physics::Position, render::RenderBody>(entt::exclude<render::tag::SkyBox>);
+
+	for (auto entity : view)
+	{
+		const physics::Position &pos = view.get<physics::Position>(entity);
+		const render::RenderBody &body = view.get<render::RenderBody>(entity);
+		StrechDat strech{1.0f, {0.0f, 0.0f, 0.0f}};
+		const auto [strechComp, prevPos] = m_context.registry.try_get<render::ModelStrech, physics::PrevPosition>(entity);
+		if (strechComp != nullptr && prevPos != nullptr) {
+			strech.dir = Vector3Normalize(pos.value - prevPos->value);
+			strech.strech = std::max(1.0f, Vector3Distance(pos.value, prevPos->value) * strechComp->scale);
+		}
+
+		const float baseRadius = m_context.modelManager.getModelRadius(body.modelID);
+		const float maxScale = std::max({body.scale.x, body.scale.y, body.scale.z, 0.01f});
+		const float translationLen = Vector3Length(body.translation);
+		const float effectiveRadius = baseRadius * maxScale + translationLen + (strech.strech > 1.0f ? strech.strech * maxScale : 0.0f);
+		if (!m_currentFrustum.isSphereInside(pos.value, effectiveRadius))
+			continue;
+
+		const bool isShaded = m_context.registry.all_of<render::tag::Shaded>(entity);
+		const BatchKey key{body.modelID, body.color, isShaded};
+
+		const float shrink = 1.0f;
+		const Vector3 renderScale = body.scale * Vector3{shrink, shrink, strech.strech};
+		const Vector3 position = pos.value + Vector3RotateByQuaternion(body.translation, body.rotation) + strech.dir * (-renderScale.z);
+
+		const Matrix mat = MatrixMultiply(
+			MatrixScale(renderScale.x, renderScale.y, renderScale.z),
+			MatrixMultiply(
+				QuaternionToMatrix(body.rotation),
+				MatrixTranslate(position.x, position.y, position.z)
+			)
+		);
+		m_instancedBatches[key].push_back(mat);
+	}
+	auto hasNormalMap = [](const Model &model) {
+		for (int i = 0; i < model.materialCount; i++) {
+			if (model.materials[i].maps != nullptr && model.materials[i].maps[MATERIAL_MAP_NORMAL].texture.id > 0) {
+				return true;
+			}
+		}
+		return false;
+	};
+
+	for (const auto &[key, transforms] : m_instancedBatches)
+	{
+		if (transforms.empty())
+			continue;
+
+		Model &model = m_context.modelManager.getModel(key.modelId);
+		const Matrix modelTransform = model.transform; // Read-only, model.transform is never mutated!
+
+		const bool useInstancing = (transforms.size() > 1) &&
+			((key.shaded && m_instancedLightedShader.id > 0) || (!key.shaded && m_instancedShader.id > 0));
+
+		// If single instance or unsupported instanced shader, draw standard way
+		if (!useInstancing)
+		{
+			const Shader activeShader = key.shaded ? m_lightedShader : m_defaultShader;
+			if (key.shaded) {
+				const int normalMapAvailable = hasNormalMap(model) ? 1 : 0;
+				SetShaderValue(m_lightedShader, m_normalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
+			}
+
+			for (int i = 0; i < model.materialCount; i++) {
+				model.materials[i].shader = activeShader;
+				model.materials[i].maps[MATERIAL_MAP_DIFFUSE].color = key.color;
+			}
+
+			for (const Matrix &mat : transforms)
+			{
+				const Matrix finalMat = MatrixMultiply(modelTransform, mat);
+				for (int m = 0; m < model.meshCount; m++) {
+					DrawMesh(model.meshes[m], model.materials[model.meshMaterial[m]], finalMat);
+				}
+			}
+			continue;
+		}
+
+		// Fast-path: Instanced batch rendering for multiple instances (both shaded and unshaded)
+		const Shader activeShader = key.shaded ? m_instancedLightedShader : m_instancedShader;
+		if (key.shaded) {
+			const int normalMapAvailable = hasNormalMap(model) ? 1 : 0;
+			SetShaderValue(m_instancedLightedShader, m_instancedNormalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
+		}
+
+		for (int i = 0; i < model.materialCount; i++) {
+			model.materials[i].shader = activeShader;
+			model.materials[i].maps[MATERIAL_MAP_DIFFUSE].color = key.color;
+		}
+
+		m_tempTransformBuffer.resize(transforms.size());
+		for (size_t idx = 0; idx < transforms.size(); ++idx) {
+			m_tempTransformBuffer[idx] = MatrixMultiply(modelTransform, transforms[idx]);
+		}
+
+		for (int m = 0; m < model.meshCount; m++) {
+			DrawMeshInstanced(
+				model.meshes[m],
+				model.materials[model.meshMaterial[m]],
+				m_tempTransformBuffer.data(),
+				static_cast<int>(transforms.size())
+			);
+		}
+	}
 }
 
 void Renderer::drawEntitiesWithoutShader()

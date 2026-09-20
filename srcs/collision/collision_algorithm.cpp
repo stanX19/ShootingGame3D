@@ -264,23 +264,18 @@ namespace
 
 	bool isPointInsideMesh(const SweepContext &context)
 	{
-		const BoundingBox bounds = transformBounds(
-			context.mesh.bounds,
-			context.baseTransform
-		);
-		if (context.sphereStart.x < bounds.min.x || context.sphereStart.x > bounds.max.x ||
-			context.sphereStart.y < bounds.min.y || context.sphereStart.y > bounds.max.y ||
-			context.sphereStart.z < bounds.min.z || context.sphereStart.z > bounds.max.z)
+		const Matrix invTransform = MatrixInvert(context.baseTransform);
+		const Vector3 localPoint = Vector3Transform(context.sphereStart, invTransform);
+
+		if (localPoint.x < context.mesh.bounds.min.x || localPoint.x > context.mesh.bounds.max.x ||
+			localPoint.y < context.mesh.bounds.min.y || localPoint.y > context.mesh.bounds.max.y ||
+			localPoint.z < context.mesh.bounds.min.z || localPoint.z > context.mesh.bounds.max.z)
 			return false;
 
 		float solidAngle = 0.0f;
 		for (const CollisionTriangle &localTriangle : context.mesh.triangles)
 		{
-			const CollisionTriangle triangle = transformTriangle(
-				localTriangle,
-				context.baseTransform
-			);
-			solidAngle += getTriangleSolidAngle(context.sphereStart, triangle);
+			solidAngle += getTriangleSolidAngle(localPoint, localTriangle);
 		}
 
 		return std::fabs(solidAngle) > twoPi;
@@ -603,10 +598,14 @@ std::optional<CollisionHit> sweepSphereAgainstMesh(
 		std::nullopt
 	};
 
-	if (isPointInsideMesh(context))
+	// 1. Traverse BVH first (O(log N))
+	visitBvhNode(context, 0);
+	if (context.earliestHit && context.earliestHit->collisionDt <= context.startDt)
+		return context.earliestHit;
+
+	// 2. Fallback containment check only if no surface contact was made
+	if (!context.earliestHit && isPointInsideMesh(context))
 	{
-		// Containment in a closed mesh is an initial collision.
-		// A hole remains outside because its winding number is zero.
 		considerHit(
 			context,
 			context.startDt,
@@ -616,6 +615,5 @@ std::optional<CollisionHit> sweepSphereAgainstMesh(
 		return context.earliestHit;
 	}
 
-	visitBvhNode(context, 0);
 	return context.earliestHit;
 }
