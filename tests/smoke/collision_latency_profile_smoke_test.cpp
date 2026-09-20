@@ -81,11 +81,6 @@ TEST_CASE("Smoke test: Collision detection latency profiling with mesh models ac
 			static_cast<float>((i / 6) * 10.0f - 20.0f),
 			static_cast<float>(i * 5.0f - 40.0f)
 		});
-		context.registry.emplace<physics::PrevPosition>(asteroid, Vector3{
-			static_cast<float>((i % 6) * 20.0f - 50.0f),
-			static_cast<float>((i / 6) * 10.0f - 20.0f),
-			static_cast<float>(i * 5.0f - 40.0f)
-		});
 		context.registry.emplace<physics::Velocity>(asteroid, Vector3{0.5f, 0.0f, 0.5f});
 		context.registry.emplace<collision::CollisionBody>(asteroid, 4.0f);
 	}
@@ -94,16 +89,18 @@ TEST_CASE("Smoke test: Collision detection latency profiling with mesh models ac
 	for (int i = 0; i < 60; ++i)
 	{
 		const entt::entity bullet = context.registry.create();
-		context.registry.emplace<physics::Position>(bullet, Vector3{
-			static_cast<float>((i % 10) * 10.0f - 45.0f),
-			0.0f,
-			static_cast<float>(i * 2.0f - 30.0f)
-		});
-		context.registry.emplace<physics::PrevPosition>(bullet, Vector3{
-			static_cast<float>((i % 10) * 10.0f - 45.0f),
-			0.0f,
-			static_cast<float>(i * 2.0f - 32.0f)
-		});
+		context.registry.emplace<physics::Position>(bullet,
+			Vector3{
+				static_cast<float>((i % 10) * 10.0f - 45.0f),
+				0.0f,
+				static_cast<float>(i * 2.0f - 30.0f)
+			},
+			Vector3{
+				static_cast<float>((i % 10) * 10.0f - 45.0f),
+				0.0f,
+				static_cast<float>(i * 2.0f - 32.0f)
+			}
+		);
 		context.registry.emplace<physics::Velocity>(bullet, Vector3{0.0f, 0.0f, 50.0f});
 		context.registry.emplace<collision::CollisionBody>(bullet, 0.3f);
 		context.registry.emplace<weapon::tag::Bullet>(bullet);

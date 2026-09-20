@@ -8,11 +8,11 @@ namespace physics {
 struct Position
 {
 	Vector3 value = {0, 0, 0};
-};
+	Vector3 prevValue = {0, 0, 0};
 
-struct PrevPosition
-{
-	Vector3 value;
+	Position() = default;
+	Position(Vector3 val) : value(val), prevValue(val) {}
+	Position(Vector3 val, Vector3 prev) : value(val), prevValue(prev) {}
 };
 
 struct Velocity
@@ -63,7 +63,6 @@ using ::physics::tag::VelocitySyncRot;
 } // namespace tag
 
 using ::physics::Position;
-using ::physics::PrevPosition;
 using ::physics::Velocity;
 using ::physics::ScalarAcceleration;
 using ::physics::Rotation;

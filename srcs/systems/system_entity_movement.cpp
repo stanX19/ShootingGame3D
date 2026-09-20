@@ -9,12 +9,7 @@ void systems::EntityMovement::update(GameContext &context, float dt) {
 	}
 
 	for (auto [entity, position, velocity] : context.registry.view<Position, const Velocity>(entt::exclude<PositionAnchor>).each()) {
-		PrevPosition *prev = context.registry.try_get<PrevPosition>(entity);
-		if (prev != nullptr) {
-			prev->value = position.value;
-		} else {
-			context.registry.emplace<PrevPosition>(entity, position.value);
-		}
+		position.prevValue = position.value;
 		position.value = position.value + velocity.value * dt;
 	}
 
@@ -23,8 +18,6 @@ void systems::EntityMovement::update(GameContext &context, float dt) {
 		PrevRotation *prevRot = context.registry.try_get<PrevRotation>(entity);
 		if (prevRot != nullptr) {
 			prevRot->value = rotation.value;
-		} else {
-			context.registry.emplace<PrevRotation>(entity, rotation.value);
 		}
 		rotation.value = QuaternionMultiply(rotation.value, delta);
 	}

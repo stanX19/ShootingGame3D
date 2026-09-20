@@ -305,9 +305,7 @@ int main()
 			// Gather
 			std::vector<EntityData> entities;
 			for (auto [entity, position, body] : context.registry.view<Position, CollisionBody>().each()) {
-				Vector3 velocity = {0, 0, 0};
-				PrevPosition *prev = context.registry.try_get<PrevPosition>(entity);
-				if (prev != nullptr) velocity = position.value - prev->value;
+				Vector3 velocity = position.value - position.prevValue;
 				int faction = context.registry.any_of<tag::Bullet>(entity) << 0;
 				const CollisionBodyModel *cbm = context.registry.try_get<CollisionBodyModel>(entity);
 				const RenderBody *rb = context.registry.try_get<RenderBody>(entity);

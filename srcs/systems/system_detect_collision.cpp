@@ -19,6 +19,7 @@ namespace {
 		Vector3 pos;
 		Vector3 vel;
 		float rad;
+		float maxReach;
 		int faction;
 		entt::entity assemblyRoot;
 		const CollisionBodyModel *collisionBodyModel;
@@ -212,10 +213,10 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 	projectiles.reserve(1024);
 
 	for (auto [entity, position, body] : context.registry.view<Position, CollisionBody>().each()) {
-		const auto [prev, collisionBodyModel, renderBody, assembly] =
-			context.registry.try_get<PrevPosition, CollisionBodyModel, RenderBody, collision::Assembly>(entity);
+		const auto [collisionBodyModel, renderBody, assembly] =
+			context.registry.try_get<CollisionBodyModel, RenderBody, collision::Assembly>(entity);
 
-		const Vector3 velocity = (prev != nullptr) ? (position.value - prev->value) : Vector3{0, 0, 0};
+		const Vector3 velocity = position.value - position.prevValue;
 		const bool isBullet = context.registry.any_of<tag::Bullet>(entity);
 		const int faction = isBullet ? 1 : 0;
 		float effectiveRadius = body.radius;
@@ -232,11 +233,13 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 
 		const entt::entity assemblyRoot = assembly ? assembly->root : entt::null;
 
+		const float velLen = Vector3Length(velocity);
 		EntityData ed{
 			entity,
-			position.value - velocity,
+			position.prevValue,
 			velocity,
 			effectiveRadius,
+			effectiveRadius + velLen,
 			faction,
 			assemblyRoot,
 			collisionBodyModel,
@@ -251,6 +254,13 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 
 	auto testPair = [&](const EntityData &A, const EntityData &B) {
 		if (A.assemblyRoot != entt::null && A.assemblyRoot == B.assemblyRoot)
+			return;
+
+		const float dx = A.pos.x - B.pos.x;
+		const float dy = A.pos.y - B.pos.y;
+		const float dz = A.pos.z - B.pos.z;
+		const float maxDist = A.maxReach + B.maxReach;
+		if (dx * dx + dy * dy + dz * dz > maxDist * maxDist)
 			return;
 
 		const float combinedRadius = A.rad + B.rad;

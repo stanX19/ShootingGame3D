@@ -12,7 +12,7 @@ Every ECS component belongs to a cohesive domain header under `headers/component
 
 | Domain Header | Namespace | Core Components (`domain::Component`) | Tags (`domain::tag::TagName`) | Responsibility |
 |---|---|---|---|---|
-| `physics.hpp` | `physics` | `Position`, `PrevPosition`, `Velocity`, `ScalarAcceleration`, `Rotation`, `PrevRotation`, `RotationVelocity`, `Mass`, `ImpulseRequest` | `VelocitySyncRot` | Pure Newtonian kinematic & physical state. |
+| `physics.hpp` | `physics` | `Position`, `Velocity`, `ScalarAcceleration`, `Rotation`, `PrevRotation`, `RotationVelocity`, `Mass`, `ImpulseRequest` | `VelocitySyncRot` | Pure Newtonian kinematic & physical state. |
 | `identity.hpp` | `identity` | `Name` | `Spaceship`, `Asteroid` | Entity identification and macro archetype classification. |
 | `spaceship.hpp` | `spaceship` | `MaxSpeed`, `TurnSpeed`, `TargetVelocity`, `TargetRotation`, `MoveTarget` | `AIMoveControl`, `Suicidal` | Vehicle flight envelope and steering control targets. |
 | `combat.hpp` | `combat` | `HP`, `HPRegen`, `EnergyShield`, `EnergyShieldRegen`, `Damage`, `DelayedDamage`, `DamageContributors` | `Targetable` | Vitality, health regeneration, and damage payloads. |

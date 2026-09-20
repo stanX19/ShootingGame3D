@@ -34,11 +34,11 @@ entt::entity spawnBody(GameContext &context, const Vector3 &position, const Vect
 }
 
 void printEntityStats(GameContext &context) {
-	auto view = context.registry.view<PrevPosition, Position, Velocity, HP, ModelStrech>();
-	for (auto [entity, prevPos, pos, vel, hp, strech] : view.each()) {
+	auto view = context.registry.view<Position, Velocity, HP, ModelStrech>();
+	for (auto [entity, pos, vel, hp, strech] : view.each()) {
 		printf("Entity %d: PrevPos(%.2f, %.2f, %.2f) Pos(%.2f, %.2f, %.2f) Vel(%.2f, %.2f, %.2f) HP(%.2f/%.2f) Strech(%.4f)\n",
 		       static_cast<int>(entity),
-		       prevPos.value.x, prevPos.value.y, prevPos.value.z,
+		       pos.prevValue.x, pos.prevValue.y, pos.prevValue.z,
 		       pos.value.x, pos.value.y, pos.value.z,
 		       vel.value.x, vel.value.y, vel.value.z,
 		       hp.value, hp.maxValue,

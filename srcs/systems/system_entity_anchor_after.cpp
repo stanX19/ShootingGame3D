@@ -5,9 +5,9 @@
 #include "components/combat.hpp"
 
 void systems::EntityAnchorRelease::update(GameContext& context, float dt) {
-	for (auto [entity, anchor, pos, prevPos] : context.registry.view<const PositionAnchor, const Position, const PrevPosition>().each()) {
+	for (auto [entity, anchor, pos] : context.registry.view<const PositionAnchor, const Position>().each()) {
 		if (!context.registry.valid(anchor.parent)) {
-			context.registry.emplace_or_replace<Velocity>(entity, Velocity{(pos.value - prevPos.value) / dt});
+			context.registry.emplace_or_replace<Velocity>(entity, Velocity{(pos.value - pos.prevValue) / dt});
 			context.registry.remove<PositionAnchor>(entity);
 		}
 	}

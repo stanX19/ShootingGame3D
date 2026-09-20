@@ -54,8 +54,7 @@ TEST_CASE("Assembly: Ship and mounted turrets with same Assembly root do not col
 
 	// Now introduce an external hostile entity without Assembly
 	const entt::entity hostileEntity = context.registry.create();
-	context.registry.emplace<physics::Position>(hostileEntity, Vector3{2.0f, 0.0f, 0.0f});
-	context.registry.emplace<physics::PrevPosition>(hostileEntity, Vector3{10.0f, 0.0f, 0.0f});
+	context.registry.emplace<physics::Position>(hostileEntity, Vector3{2.0f, 0.0f, 0.0f}, Vector3{10.0f, 0.0f, 0.0f});
 	context.registry.emplace<collision::CollisionBody>(hostileEntity, 1.0f);
 
 	detectCollision.update(context, 0.016f);

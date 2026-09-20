@@ -10,10 +10,9 @@ void systems::EntityAnchor::update(GameContext& context, float dt) {
 		if (parentView.contains(anchor.parent)) {
 			const auto& parentPos = parentView.get<const Position>(anchor.parent).value;
 			const auto& parentRot = parentView.get<const Rotation>(anchor.parent).value;
-			const Vector3 prevPos = pos.value;
-			context.registry.emplace_or_replace<PrevPosition>(entity, pos.value);
+			pos.prevValue = pos.value;
 			pos.value = parentPos + Vector3RotateByQuaternion(anchor.relpos, parentRot);
-			context.registry.emplace_or_replace<Velocity>(entity, (pos.value - prevPos) / dt);
+			context.registry.emplace_or_replace<Velocity>(entity, (pos.value - pos.prevValue) / dt);
 		}
 	}
 

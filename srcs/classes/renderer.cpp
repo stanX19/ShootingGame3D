@@ -160,13 +160,12 @@ void Renderer::render(float dt, const Camera3D &camera)
 
 void Renderer::drawTrails()
 {
-	auto trailView = m_context.registry.view<physics::Position, physics::PrevPosition, effect::Trail>();
+	auto trailView = m_context.registry.view<physics::Position, effect::Trail>();
 	for (auto entity : trailView)
 	{
 		const physics::Position &p = trailView.get<physics::Position>(entity);
-		const physics::PrevPosition &pp = trailView.get<physics::PrevPosition>(entity);
 		const effect::Trail &t = trailView.get<effect::Trail>(entity);
-		drawTrailBetween(p.value, pp.value, t.rad, t.color);
+		drawTrailBetween(p.value, p.prevValue, t.rad, t.color);
 	}
 }
 
@@ -200,11 +199,11 @@ void Renderer::handleLightSource()
 
 Renderer::StrechDat Renderer::getStrech(entt::entity entity) const {
 	StrechDat result = {1.0f, {0, 0, 0}};
-	auto [pos, prevPos, strechComp] = m_context.registry.try_get<physics::Position, physics::PrevPosition, render::ModelStrech>(entity);
-	if (!pos || !prevPos || !strechComp)
+	auto [pos, strechComp] = m_context.registry.try_get<physics::Position, render::ModelStrech>(entity);
+	if (!pos || !strechComp)
 		return result;
-	result.dir = Vector3Normalize(pos->value - prevPos->value);
-	result.strech = std::max(1.0f, Vector3Distance(pos->value, prevPos->value) * strechComp->scale);
+	result.dir = Vector3Normalize(pos->value - pos->prevValue);
+	result.strech = std::max(1.0f, Vector3Distance(pos->value, pos->prevValue) * strechComp->scale);
 	return result;
 }
 
@@ -235,10 +234,10 @@ void Renderer::drawEntitiesBatched()
 		const physics::Position &pos = view.get<physics::Position>(entity);
 		const render::RenderBody &body = view.get<render::RenderBody>(entity);
 		StrechDat strech{1.0f, {0.0f, 0.0f, 0.0f}};
-		const auto [strechComp, prevPos] = m_context.registry.try_get<render::ModelStrech, physics::PrevPosition>(entity);
-		if (strechComp != nullptr && prevPos != nullptr) {
-			strech.dir = Vector3Normalize(pos.value - prevPos->value);
-			strech.strech = std::max(1.0f, Vector3Distance(pos.value, prevPos->value) * strechComp->scale);
+		const auto *strechComp = m_context.registry.try_get<render::ModelStrech>(entity);
+		if (strechComp != nullptr) {
+			strech.dir = Vector3Normalize(pos.value - pos.prevValue);
+			strech.strech = std::max(1.0f, Vector3Distance(pos.value, pos.prevValue) * strechComp->scale);
 		}
 
 		const float baseRadius = m_context.modelManager.getModelRadius(body.modelID);

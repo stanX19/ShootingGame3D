@@ -112,8 +112,7 @@ TEST_CASE("Smoke test: Spaceship with collision model does not collide with or d
 	// --- External Collision Test ---
 	// Spawn an external foreign projectile sweeping across the ship hull
 	const entt::entity externalBullet = context.registry.create();
-	context.registry.emplace<physics::Position>(externalBullet, Vector3{0.0f, 0.0f, 1.5f});
-	context.registry.emplace<physics::PrevPosition>(externalBullet, Vector3{0.0f, 0.0f, 3.5f});
+	context.registry.emplace<physics::Position>(externalBullet, Vector3{0.0f, 0.0f, 1.5f}, Vector3{0.0f, 0.0f, 3.5f});
 	context.registry.emplace<physics::Velocity>(externalBullet, Vector3{0.0f, 0.0f, -120.0f});
 	context.registry.emplace<collision::CollisionBody>(externalBullet, 0.5f);
 	context.registry.emplace<combat::Damage>(externalBullet, 50.0f);
@@ -146,8 +145,7 @@ TEST_CASE("Smoke test: Spaceship with collision model does not collide with or d
 	const Vector3 turretPos = context.registry.get<physics::Position>(targetTurret).value;
 
 	const entt::entity externalTurretHunter = context.registry.create();
-	context.registry.emplace<physics::Position>(externalTurretHunter, turretPos);
-	context.registry.emplace<physics::PrevPosition>(externalTurretHunter, turretPos + Vector3{0.0f, 1.5f, 0.0f});
+	context.registry.emplace<physics::Position>(externalTurretHunter, turretPos, turretPos + Vector3{0.0f, 1.5f, 0.0f});
 	context.registry.emplace<physics::Velocity>(externalTurretHunter, Vector3{0.0f, -100.0f, 0.0f});
 	context.registry.emplace<collision::CollisionBody>(externalTurretHunter, 0.5f);
 	context.registry.emplace<combat::Damage>(externalTurretHunter, 25.0f);

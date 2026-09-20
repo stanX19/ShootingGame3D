@@ -174,8 +174,8 @@ namespace {
 
 int main() {
 	const std::filesystem::path projectRoot = std::filesystem::current_path();
-	const int screenWidth = 1280;
-	const int screenHeight = 720;
+	const int screenWidth = 1600;
+	const int screenHeight = 900;
 
 	InitWindow(screenWidth, screenHeight, "Gameplay Performance Benchmark");
 	SetTargetFPS(60);
@@ -185,12 +185,14 @@ int main() {
 		{"audio", "assets/config/audio.json"},
 		{"debug", "assets/config/debug.json"},
 		{"game", "assets/config/game.json"},
+		{"hud", "assets/config/hud.json"},
 		{"loadout", "assets/config/loadout.json"},
 		{"physics", "assets/config/physics.json"},
 		{"settings", "assets/config/settings.json"},
 		{"sounds", "assets/config/sounds.json"},
 		{"units", "assets/config/units.json"},
 		{"weapons", "assets/config/weapons.json"},
+		{"turrets", "assets/config/turrets.json"},
 		{"spaceship", "assets/config/spaceships.json"}
 	});
 
@@ -198,6 +200,7 @@ int main() {
 	context.soundManager.init(context.config);
 	weapon::utils::setUpRegistry(context);
 	event::utils::hookAllListeners(context);
+	spawnPlayer(context);
 	spawnSunAndStars(context);
 
 	context.mainCamera.position = Vector3{ 0.0f, 1.0f, 4.0f };
@@ -254,7 +257,7 @@ int main() {
 
 	BenchmarkState state = BenchmarkState::WARMUP;
 	double benchmarkTimer = 0.0;
-	const double BENCHMARK_DURATION = 10.0;
+	const double BENCHMARK_DURATION = getenv("BENCHMARK_DURATION_SECONDS") ? std::atof(getenv("BENCHMARK_DURATION_SECONDS")) : 10.0;
 	float smoothedFps = 60.0f;
 	size_t currentFrame = 0;
 
@@ -266,7 +269,8 @@ int main() {
 
 		// State transitions
 		if (state == BenchmarkState::WARMUP) {
-			if ((smoothedFps < 30.0f && currentFrame > 180) || GetTime() >= 35.0 || IsKeyPressed(KEY_B) || IsKeyPressed(KEY_SPACE)) {
+			const double warmupLimit = getenv("BENCHMARK_WARMUP_SECONDS") ? std::atof(getenv("BENCHMARK_WARMUP_SECONDS")) : 15.0;
+			if ((smoothedFps < 30.0f && currentFrame > 180) || GetTime() >= warmupLimit || IsKeyPressed(KEY_B) || IsKeyPressed(KEY_SPACE)) {
 				state = BenchmarkState::BENCHMARKING;
 				benchmarkTimer = 0.0;
 				resetMetrics(metrics);
@@ -331,6 +335,45 @@ int main() {
 			hudRenderer.renderAll(dt);
 		});
 
+		// Realtime UI Overlay
+		if (state == BenchmarkState::WARMUP) {
+			DrawRectangle(10, 10, 380, 95, ColorAlpha(BLACK, 0.75f));
+			DrawText("WARMUP: Fleets Battling...", 20, 20, 18, YELLOW);
+			DrawText(TextFormat("FPS: %.1f (Drop < 30 triggers 10s benchmark)", smoothedFps), 20, 45, 16, smoothedFps < 30 ? RED : GREEN);
+			DrawText("Press 'B' or SPACE to force trigger benchmark", 20, 72, 13, GRAY);
+		} else if (state == BenchmarkState::BENCHMARKING) {
+			size_t entCount = context.registry.storage<entt::entity>().size();
+			size_t bulCount = context.registry.storage<tag::Bullet>().size();
+			size_t colCount = context.registry.storage<CollisionBody>().size();
+			size_t renCount = context.registry.storage<RenderBody>().size();
+
+			DrawRectangle(10, 10, 380, 110, ColorAlpha(BLACK, 0.85f));
+			DrawText(TextFormat("BENCHMARKING: %.1fs / %.0fs", benchmarkTimer, BENCHMARK_DURATION), 20, 20, 18, RED);
+			DrawText(TextFormat("FPS: %.1f | Frame: %.2f ms", smoothedFps, dt * 1000.0f), 20, 45, 16, WHITE);
+			DrawText(TextFormat("Entities: %zu | Bullets: %zu", entCount, bulCount), 20, 68, 14, SKYBLUE);
+			DrawText(TextFormat("CollisionBodies: %zu | RenderBodies: %zu", colCount, renCount), 20, 88, 13, LIGHTGRAY);
+		} else {
+			DrawRectangle(10, 10, 480, 85, ColorAlpha(BLACK, 0.85f));
+			DrawText("BENCHMARK COMPLETE!", 20, 20, 20, GREEN);
+			DrawText("Diagnostic report printed to console!", 20, 45, 16, WHITE);
+			DrawText("Exiting benchmark cleanly...", 20, 68, 13, GRAY);
+		}
+
+		const char *qaFramesEnv = getenv("QA_SCREENSHOT_FRAMES");
+		const size_t targetQaFrames = qaFramesEnv ? static_cast<size_t>(std::max(0, std::atoi(qaFramesEnv))) : 0;
+		if (targetQaFrames > 0 && currentFrame >= targetQaFrames) {
+			std::filesystem::create_directories(projectRoot / "assets/snapshots");
+			const std::string snapshotPath = (projectRoot / "assets/snapshots/gameplay_qa.png").string();
+			Image screenshot = LoadImageFromScreen();
+			ExportImage(screenshot, snapshotPath.c_str());
+			UnloadImage(screenshot);
+			EndDrawing();
+			break;
+		}
+
+		EndDrawing();
+
+		// System updates after drawing (matching game.cpp!)
 		runProfiled<SYS_UNIT_SPAWN>(metrics, isProfiling, [&]() { sysUnitSpawn.update(context, dt); });
 		runProfiled<SYS_ASTEROID_RESPAWN>(metrics, isProfiling, [&]() { sysAsteroidRespawn.update(context, dt); });
 		runProfiled<SYS_ENTITY_ANCHOR_RELEASE>(metrics, isProfiling, [&]() { sysEntityAnchorRelease.update(context, dt); });
@@ -355,53 +398,16 @@ int main() {
 			samples.push_back(s);
 		}
 
-		// Realtime UI Overlay
-		if (state == BenchmarkState::WARMUP) {
-			DrawRectangle(10, 10, 380, 95, ColorAlpha(BLACK, 0.75f));
-			DrawText("WARMUP: Fleets Battling...", 20, 20, 18, YELLOW);
-			DrawText(TextFormat("FPS: %.1f (Drop < 30 triggers 10s benchmark)", smoothedFps), 20, 45, 16, smoothedFps < 30 ? RED : GREEN);
-			DrawText("Press 'B' or SPACE to force trigger benchmark", 20, 72, 13, GRAY);
-		} else if (state == BenchmarkState::BENCHMARKING) {
-			size_t entCount = context.registry.storage<entt::entity>().size();
-			size_t bulCount = context.registry.storage<tag::Bullet>().size();
-			size_t colCount = context.registry.storage<CollisionBody>().size();
-			size_t renCount = context.registry.storage<RenderBody>().size();
-
-			DrawRectangle(10, 10, 380, 110, ColorAlpha(BLACK, 0.85f));
-			DrawText(TextFormat("BENCHMARKING: %.1fs / %.0fs", benchmarkTimer, BENCHMARK_DURATION), 20, 20, 18, RED);
-			DrawText(TextFormat("FPS: %.1f | Frame: %.2f ms", smoothedFps, dt * 1000.0f), 20, 45, 16, WHITE);
-			DrawText(TextFormat("Entities: %zu | Bullets: %zu", entCount, bulCount), 20, 68, 14, SKYBLUE);
-			DrawText(TextFormat("CollisionBodies: %zu | RenderBodies: %zu", colCount, renCount), 20, 88, 13, LIGHTGRAY);
-		} else {
-			DrawRectangle(10, 10, 480, 85, ColorAlpha(BLACK, 0.85f));
-			DrawText("BENCHMARK COMPLETE!", 20, 20, 20, GREEN);
-			DrawText("Diagnostic report printed to console!", 20, 45, 16, WHITE);
-			DrawText("Press 'R' to rerun benchmark, ESC to exit.", 20, 68, 13, GRAY);
-		}
-
-		const char *qaFramesEnv = getenv("QA_SCREENSHOT_FRAMES");
-		const size_t targetQaFrames = qaFramesEnv ? static_cast<size_t>(std::max(0, std::atoi(qaFramesEnv))) : 0;
-		if (targetQaFrames > 0 && currentFrame >= targetQaFrames) {
-			std::filesystem::create_directories(projectRoot / "assets/snapshots");
-			const std::string snapshotPath = (projectRoot / "assets/snapshots/gameplay_qa.png").string();
-			Image screenshot = LoadImageFromScreen();
-			ExportImage(screenshot, snapshotPath.c_str());
-			UnloadImage(screenshot);
-			EndDrawing();
-			break;
-		}
-
-		EndDrawing();
-
 		// Post-benchmark diagnostic report (executed once)
-		if (state == BenchmarkState::REPORT && !samples.empty()) {
-			std::cout << "\n=================================================================================" << std::endl;
-			std::cout << "                           GAMEPLAY BENCHMARK REPORT                             " << std::endl;
-			std::cout << "=================================================================================" << std::endl;
-			std::cout << "Total Frames Sampled: " << samples.size() << std::endl;
-			std::cout << "Total Benchmark Time: " << std::fixed << std::setprecision(2) << benchmarkTimer << " s" << std::endl;
-			const double avgFps = samples.size() / benchmarkTimer;
-			std::cout << "Average FPS:          " << std::fixed << std::setprecision(1) << avgFps << std::endl;
+		if (state == BenchmarkState::REPORT) {
+			if (!samples.empty()) {
+				std::cout << "\n=================================================================================" << std::endl;
+				std::cout << "                           GAMEPLAY BENCHMARK REPORT                             " << std::endl;
+				std::cout << "=================================================================================" << std::endl;
+				std::cout << "Total Frames Sampled: " << samples.size() << std::endl;
+				std::cout << "Total Benchmark Time: " << std::fixed << std::setprecision(2) << benchmarkTimer << " s" << std::endl;
+				const double avgFps = samples.size() / benchmarkTimer;
+				std::cout << "Average FPS:          " << std::fixed << std::setprecision(1) << avgFps << std::endl;
 
 			// Aggregate & sort metrics
 			std::vector<SystemMetric> sortedMetrics;
@@ -465,6 +471,8 @@ int main() {
 			std::cout << "=================================================================================\n" << std::endl;
 
 			samples.clear();
+			}
+			std::cout << std::flush;
 			break; // Auto-close after benchmarking report
 		}
 	}

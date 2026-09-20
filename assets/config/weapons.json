@@ -249,19 +249,19 @@
 			"torpedo": {
 				"name": "Torpedo",
 				"turretRef": "basic_shooter",
-				"ammo": 40,
+				"ammo": 8,
 				"cooldown": 0.1,
 				"explosionDamage": 50,
 				"explosionFinalRadius": 1.5,
 				"explosionStartRadius": 0.075,
-				"extendFireRequest": 0.15,
+				"extendFireRequest": 2.5,
 				"hp": 1,
 				"instantDamage": 125,
 				"instantRadius": 0.075,
 				"isSpecial": false,
 				"mass": 2.5,
 				"radius": 0.15,
-				"reloadTime": 15,
+				"reloadTime": 5,
 				"speedMultiplier": 4,
 				"turnSpeed": 0
 			}
