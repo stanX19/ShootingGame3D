@@ -7,6 +7,7 @@
 #include "components/anchor.hpp"
 #include "components/render.hpp"
 #include "components/weapon.hpp"
+#include "components/identity.hpp"
 #include "utils/algorithm_utils.hpp"
 
 #include <algorithm>
@@ -22,6 +23,7 @@ namespace {
 		float maxReach;
 		int faction;
 		entt::entity assemblyRoot;
+		entt::entity ownerRoot;
 		const CollisionBodyModel *collisionBodyModel;
 		const RenderBody *renderBody;
 	};
@@ -213,8 +215,8 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 	projectiles.reserve(1024);
 
 	for (auto [entity, position, body] : context.registry.view<Position, CollisionBody>().each()) {
-		const auto [collisionBodyModel, renderBody, assembly] =
-			context.registry.try_get<CollisionBodyModel, RenderBody, collision::Assembly>(entity);
+		const auto [collisionBodyModel, renderBody, assembly, owner] =
+			context.registry.try_get<CollisionBodyModel, RenderBody, collision::Assembly, identity::Owner>(entity);
 
 		const Vector3 velocity = position.value - position.prevValue;
 		const bool isBullet = context.registry.any_of<tag::Bullet>(entity);
@@ -232,6 +234,7 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 		}
 
 		const entt::entity assemblyRoot = assembly ? assembly->root : entt::null;
+		const entt::entity ownerRoot = owner ? owner->root : entt::null;
 
 		const float velLen = Vector3Length(velocity);
 		EntityData ed{
@@ -242,6 +245,7 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 			effectiveRadius + velLen,
 			faction,
 			assemblyRoot,
+			ownerRoot,
 			collisionBodyModel,
 			renderBody
 		};
@@ -254,6 +258,12 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 
 	auto testPair = [&](const EntityData &A, const EntityData &B) {
 		if (A.assemblyRoot != entt::null && A.assemblyRoot == B.assemblyRoot)
+			return;
+		if (A.ownerRoot != entt::null && (A.ownerRoot == B.id || A.ownerRoot == B.assemblyRoot))
+			return;
+		if (B.ownerRoot != entt::null && (B.ownerRoot == A.id || B.ownerRoot == A.assemblyRoot))
+			return;
+		if (A.ownerRoot != entt::null && A.ownerRoot == B.ownerRoot)
 			return;
 
 		const float dx = A.pos.x - B.pos.x;

@@ -107,3 +107,56 @@ TEST_CASE("Owner: Kill attribution and score transfer using flat identity::Owner
 	const entt::entity rootA = ownerA ? ownerA->root : entityA;
 	CHECK(rootA == entityB); // Direct O(1) resolution without graph traversal
 }
+
+TEST_CASE("Owner: Projectiles do not collide with shooter, shooter turrets, or sibling projectiles", "[integration][owner][collision]") {
+	GameContext context;
+	systems::DetectEntityCollision detectCollision;
+
+	CollisionRecorder recorder;
+	context.dispatcher.sink<event::CollisionEvent>().connect<&CollisionRecorder::onCollision>(recorder);
+
+	// Create spaceship with Assembly{ship} and Owner{ship}
+	const entt::entity ship = context.registry.create();
+	context.registry.emplace<physics::Position>(ship, Vector3{0.0f, 0.0f, 0.0f});
+	context.registry.emplace<physics::Velocity>(ship, Vector3{0.0f, 0.0f, 0.0f});
+	context.registry.emplace<collision::CollisionBody>(ship, 10.0f);
+	context.registry.emplace<collision::Assembly>(ship, ship);
+	context.registry.emplace<identity::Owner>(ship, ship);
+
+	// Create mounted turret with Assembly{ship} and Owner{ship}
+	const entt::entity turret = context.registry.create();
+	context.registry.emplace<physics::Position>(turret, Vector3{5.0f, 0.0f, 0.0f});
+	context.registry.emplace<physics::Velocity>(turret, Vector3{0.0f, 0.0f, 0.0f});
+	context.registry.emplace<collision::CollisionBody>(turret, 3.0f);
+	context.registry.emplace<collision::Assembly>(turret, ship);
+	context.registry.emplace<identity::Owner>(turret, ship);
+
+	// Create missile owned by ship overlapping the ship body
+	const entt::entity missile1 = context.registry.create();
+	context.registry.emplace<physics::Position>(missile1, Vector3{1.0f, 0.0f, 0.0f});
+	context.registry.emplace<physics::Velocity>(missile1, Vector3{10.0f, 0.0f, 0.0f});
+	context.registry.emplace<collision::CollisionBody>(missile1, 1.0f);
+	context.registry.emplace<identity::Owner>(missile1, ship);
+
+	// Create second missile owned by ship overlapping missile1 and turret
+	const entt::entity missile2 = context.registry.create();
+	context.registry.emplace<physics::Position>(missile2, Vector3{4.5f, 0.0f, 0.0f});
+	context.registry.emplace<physics::Velocity>(missile2, Vector3{10.0f, 0.0f, 0.0f});
+	context.registry.emplace<collision::CollisionBody>(missile2, 1.0f);
+	context.registry.emplace<identity::Owner>(missile2, ship);
+
+	detectCollision.update(context, 0.016f);
+	context.dispatcher.update();
+	CHECK(recorder.count == 0);
+
+	// Introduce an external hostile projectile not owned by ship
+	const entt::entity hostileMissile = context.registry.create();
+	context.registry.emplace<physics::Position>(hostileMissile, Vector3{2.0f, 0.0f, 0.0f});
+	context.registry.emplace<physics::Velocity>(hostileMissile, Vector3{-10.0f, 0.0f, 0.0f});
+	context.registry.emplace<collision::CollisionBody>(hostileMissile, 1.0f);
+
+	detectCollision.update(context, 0.016f);
+	context.dispatcher.update();
+	CHECK(recorder.count > 0);
+}
+

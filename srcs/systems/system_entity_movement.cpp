@@ -14,11 +14,11 @@ void systems::EntityMovement::update(GameContext &context, float dt) {
 	}
 
 	for (auto [entity, rotation, rotVel] : context.registry.view<Rotation, const RotationVelocity>(entt::exclude<RotationAnchor>).each()) {
-		const Quaternion delta = QuaternionLerp(QuaternionIdentity(), rotVel.value, dt);
+		const Quaternion delta = QuaternionNlerp(QuaternionIdentity(), rotVel.value, dt);
 		PrevRotation *prevRot = context.registry.try_get<PrevRotation>(entity);
 		if (prevRot != nullptr) {
 			prevRot->value = rotation.value;
 		}
-		rotation.value = QuaternionMultiply(rotation.value, delta);
+		rotation.value = QuaternionNormalize(QuaternionMultiply(rotation.value, delta));
 	}
 }

@@ -30,7 +30,7 @@ namespace {
 
 		entt::entity asteroid = context.registry.create();
 		context.registry.emplace<physics::Rotation>(asteroid, randomRotation());
-		context.registry.emplace<physics::RotationVelocity>(asteroid, QuaternionLerp(QuaternionIdentity(), randomRotation(), rotLerp));
+		context.registry.emplace<physics::RotationVelocity>(asteroid, QuaternionNlerp(QuaternionIdentity(), randomRotation(), rotLerp));
 		context.registry.emplace<combat::Damage>(asteroid, damageVal);
 		context.registry.emplace<lifetime::DisappearBound>(asteroid, getArenaSizeVec(context) * -1, getArenaSizeVec(context));
 		context.registry.emplace<identity::tag::Asteroid>(asteroid);

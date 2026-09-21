@@ -257,7 +257,7 @@ void Renderer::drawEntitiesBatched()
 		const Matrix mat = MatrixMultiply(
 			MatrixScale(renderScale.x, renderScale.y, renderScale.z),
 			MatrixMultiply(
-				QuaternionToMatrix(body.rotation),
+				QuaternionToMatrix(QuaternionNormalize(body.rotation)),
 				MatrixTranslate(position.x, position.y, position.z)
 			)
 		);
