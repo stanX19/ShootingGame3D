@@ -21,6 +21,8 @@ namespace {
 		Vector3 vel;
 		float rad;
 		float maxReach;
+		float minZ;
+		float maxZ;
 		int faction;
 		entt::entity assemblyRoot;
 		entt::entity ownerRoot;
@@ -209,10 +211,14 @@ namespace {
 }
 
 void systems::DetectEntityCollision::update(GameContext& context, float dt) {
+	constexpr float LARGE_TARGET_RADIUS = 50.0f;
 	std::vector<EntityData> targets;
+	std::vector<EntityData> largeTargets;
 	std::vector<EntityData> projectiles;
 	targets.reserve(128);
+	largeTargets.reserve(8);
 	projectiles.reserve(1024);
+	float maxRegularTargetDiameter = 0.0f;
 
 	for (auto [entity, position, body] : context.registry.view<Position, CollisionBody>().each()) {
 		const auto [collisionBodyModel, renderBody, assembly, owner] =
@@ -237,12 +243,18 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 		const entt::entity ownerRoot = owner ? owner->root : entt::null;
 
 		const float velLen = Vector3Length(velocity);
+		const float z0 = position.prevValue.z;
+		const float z1 = position.prevValue.z + velocity.z;
+		const float minZ = std::min(z0, z1) - effectiveRadius;
+		const float maxZ = std::max(z0, z1) + effectiveRadius;
 		EntityData ed{
 			entity,
 			position.prevValue,
 			velocity,
 			effectiveRadius,
 			effectiveRadius + velLen,
+			minZ,
+			maxZ,
 			faction,
 			assemblyRoot,
 			ownerRoot,
@@ -250,11 +262,22 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 			renderBody
 		};
 
-		if (isBullet)
+		if (isBullet) {
 			projectiles.emplace_back(std::move(ed));
-		else
+		} else if (effectiveRadius > LARGE_TARGET_RADIUS) {
+			largeTargets.emplace_back(std::move(ed));
+		} else {
+			const float diameter = maxZ - minZ;
+			if (diameter > maxRegularTargetDiameter) {
+				maxRegularTargetDiameter = diameter;
+			}
 			targets.emplace_back(std::move(ed));
+		}
 	}
+
+	std::sort(targets.begin(), targets.end(), [](const EntityData &a, const EntityData &b) {
+		return a.minZ < b.minZ;
+	});
 
 	auto testPair = [&](const EntityData &A, const EntityData &B) {
 		if (A.assemblyRoot != entt::null && A.assemblyRoot == B.assemblyRoot)
@@ -300,17 +323,49 @@ void systems::DetectEntityCollision::update(GameContext& context, float dt) {
 		);
 	};
 
-	// 1. Targets vs Targets
+	// 1a. Targets vs Targets (Regular)
 	for (std::size_t i = 0; i < targets.size(); ++i) {
+		const float limitZ = targets[i].maxZ;
 		for (std::size_t j = i + 1; j < targets.size(); ++j) {
+			if (targets[j].minZ > limitZ) {
+				break;
+			}
 			testPair(targets[i], targets[j]);
+		}
+	}
+
+	// 1b. Regular Targets vs Large Targets
+	for (const auto &large : largeTargets) {
+		for (const auto &tgt : targets) {
+			testPair(large, tgt);
+		}
+	}
+
+	// 1c. Large Targets vs Large Targets
+	for (std::size_t i = 0; i < largeTargets.size(); ++i) {
+		for (std::size_t j = i + 1; j < largeTargets.size(); ++j) {
+			testPair(largeTargets[i], largeTargets[j]);
 		}
 	}
 
 	// 2. Projectiles vs Targets (zero bullet-bullet checks!)
 	for (const auto &proj : projectiles) {
-		for (const auto &tgt : targets) {
-			testPair(proj, tgt);
+		auto it = std::lower_bound(targets.begin(), targets.end(), proj.minZ - maxRegularTargetDiameter,
+			[](const EntityData &tgt, float val) {
+				return tgt.minZ < val;
+			});
+		for (; it != targets.end(); ++it) {
+			if (it->minZ > proj.maxZ) {
+				break;
+			}
+			if (it->maxZ < proj.minZ) {
+				continue;
+			}
+			testPair(proj, *it);
+		}
+
+		for (const auto &large : largeTargets) {
+			testPair(proj, large);
 		}
 	}
 }

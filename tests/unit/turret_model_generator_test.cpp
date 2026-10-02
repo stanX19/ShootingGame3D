@@ -1,9 +1,11 @@
 #include "catch2/catch_amalgamated.hpp"
 
 #include <cmath>
+#include <iostream>
 #include <stdexcept>
 
 #include "gen_model/turret_generator.hpp"
+#include "gen_model/spaceship_topology.hpp"
 
 namespace {
 	using namespace gen_model::turret;
@@ -165,4 +167,44 @@ TEST_CASE("Turret generator validates input bounds", "[model][turret]") {
 	Settings badBarrel = defaultHeavyMgRifle();
 	badBarrel.barrelLength = 0.0f;
 	CHECK_THROWS_AS(generate(badBarrel), std::invalid_argument);
+}
+
+TEST_CASE("Turret geometry does not contain coplanar Z-fighting overlapping faces or self-intersections", "[model][turret][zfighting]") {
+	const std::vector<Settings> profiles = {
+		defaultBasicShooter(),
+		defaultHeavyMgRifle(),
+		defaultLazerDeletor(),
+		defaultLazerShotgun()
+	};
+
+	for (const auto& settings : profiles) {
+		DYNAMIC_SECTION("Profile " << settings.id) {
+			const GeneratedTurret turret = generate(settings);
+			const auto coplanarReport = gen_model::spaceship::topology::auditCoplanarZFighting(turret.asset.mesh);
+			if (coplanarReport.coplanarPairs > 0) {
+				for (std::size_t k = 0; k < std::min<std::size_t>(5, coplanarReport.issues.size()); ++k) {
+					const auto& iss = coplanarReport.issues[k];
+					std::cout << settings.id << " COPLANAR: Tri " << iss.triangleA << " and Tri " << iss.triangleB
+						<< " delta=" << iss.planeDistanceDelta << " dot=" << iss.normalDot << " area=" << iss.overlapArea << "\n";
+				}
+			}
+			CHECK(coplanarReport.coplanarPairs == 0);
+
+			const auto intersectReport = gen_model::spaceship::topology::auditMeshIntersections(turret.asset.mesh);
+			CHECK(intersectReport.intersectingPairs == 0);
+
+			const auto clearanceReport = gen_model::spaceship::topology::auditSurfaceClearance(turret.asset.mesh, 0.05f);
+			if (clearanceReport.closePairs > 0) {
+				std::cout << settings.id << " CLEARANCE FAIL: " << clearanceReport.closePairs
+					<< " pair(s) closer than 0.05f, min distance = " << clearanceReport.minimumDistance << "\n";
+				for (std::size_t k = 0; k < std::min<std::size_t>(10, clearanceReport.issues.size()); ++k) {
+					const auto& iss = clearanceReport.issues[k];
+					std::cout << "  Tri " << iss.triangleA << " (c" << iss.componentA << ") and Tri "
+						<< iss.triangleB << " (c" << iss.componentB << "): dist=" << iss.distance << "\n";
+				}
+			}
+			CHECK(clearanceReport.closePairs == 0);
+			CHECK(clearanceReport.minimumDistance >= 0.05f - 1e-4f);
+		}
+	}
 }

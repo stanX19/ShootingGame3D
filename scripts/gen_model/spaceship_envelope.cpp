@@ -635,7 +635,7 @@ namespace {
 		} else if (layout == PropulsionLayout::DistributedAft
 			|| layout == PropulsionLayout::CapitalSideBlocks) {
 			root = {
-				std::copysign(settings.hull.width * 0.42f, center.x),
+				std::copysign(settings.hull.width * 0.34f, center.x) + center.x * 0.05f,
 				center.y * 0.55f,
 				center.z + pod.runtime.length * 0.24f
 			};
@@ -645,7 +645,7 @@ namespace {
 				// apertures, so route each load path from the hull to the pod's
 				// forward shoulder instead.
 				root = {
-					std::copysign(settings.hull.width * 0.42f, center.x),
+					std::copysign(settings.hull.width * 0.34f, center.x) + center.x * 0.05f,
 					center.y + pod.runtime.radius * 0.20f,
 					center.z + pod.runtime.length * 0.42f
 				};

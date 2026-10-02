@@ -85,7 +85,7 @@ EngineState Game::run() {
         m_systemDelayedDamage.update(m_context, dt);
         m_systemHpCleanup.update(m_context, dt);
         m_systemHpRegen.update(m_context, dt);
-        m_systemSpawnTrailParticles.update(m_context, dt);
+        m_systemUpdateTrails.update(m_context, dt);
 
         inputControls(dt, nextState);
     }

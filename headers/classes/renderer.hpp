@@ -47,22 +47,18 @@ private:
 		Vector3 dir;
 	};
 
-	struct BatchKey {
-		t_model_id modelId;
-		Color color;
-		bool shaded;
-
-		bool operator<(const BatchKey &other) const {
-			if (modelId != other.modelId) return modelId < other.modelId;
-			if (color.r != other.color.r) return color.r < other.color.r;
-			if (color.g != other.color.g) return color.g < other.color.g;
-			if (color.b != other.color.b) return color.b < other.color.b;
-			if (color.a != other.color.a) return color.a < other.color.a;
-			return shaded < other.shaded;
-		}
+	struct ModelInstanceGroup {
+		uint64_t key = 0;
+		Color color{255, 255, 255, 255};
+		bool shaded = false;
+		std::vector<Matrix> transforms;
 	};
 
-	std::map<BatchKey, std::vector<Matrix>> m_instancedBatches;
+	struct ModelBatch {
+		std::vector<ModelInstanceGroup> groups;
+	};
+
+	std::vector<ModelBatch> m_modelBatches;
 	std::vector<Matrix> m_tempTransformBuffer;
 
 	void loadDefaultShader();
@@ -73,6 +69,8 @@ private:
 	bool isEntityVisible(entt::entity entity, const physics::Position &pos, const render::RenderBody &body, StrechDat &strech) const;
 	void drawEntityModel(const physics::Position &pos, const render::RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
 	void drawTrails();
+	void drawSimpleRibbon(const effect::HasSimpleTrail &trail);
+	void drawMultiRibbon(const effect::HasMultiTrail::Emitter &emitter, const effect::HasMultiTrail &trail);
 	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
 	void drawEntitiesBatched();
 	void drawEntitiesWithShader();

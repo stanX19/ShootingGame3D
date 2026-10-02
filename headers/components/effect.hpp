@@ -47,6 +47,53 @@ struct InstantDamageOnDeath
 	float radius = 0.0f;
 };
 
+struct TrailNode {
+	Vector3 pos = Vector3Zeros;
+	float alpha = 1.0f;
+	float age = 0.0f;
+};
+
+struct HasSimpleTrail {
+	static constexpr std::size_t MAX_NODES = 8;
+
+	TrailNode nodes[MAX_NODES]{};
+	std::uint8_t count = 0;
+	std::uint8_t maxNodes = 2; // 2 for Bullet Tracers, 8 for Missiles
+
+	float maxAge = 0.05f;       // Lifetime of nodes in seconds
+	float minDistance = 1.0f;   // Distance threshold before dropping next breadcrumb
+	float width = 0.15f;        // Width at head
+	float endWidth = 0.0f;      // Width at tail
+	Color color = GRAY;
+	Vector3 lastRecordedPos = Vector3Zeros;
+	bool hasLastRecordedPos = false;
+};
+
+struct HasMultiTrail {
+	static constexpr std::size_t MAX_NODES = 10;
+	static constexpr std::size_t MAX_EMITTERS = 8;
+
+	struct Emitter {
+		TrailNode nodes[MAX_NODES]{};
+		std::uint8_t count = 0;
+		Vector3 localOffset = Vector3Zeros; // Nozzle offset in local space
+		float width = 0.3f;                 // Nozzle-specific width
+		Vector3 lastRecordedPos = Vector3Zeros;
+		bool hasLastRecordedPos = false;
+	};
+
+	Emitter emitters[MAX_EMITTERS]{};
+	std::uint8_t emitterCount = 0;
+	std::uint8_t maxNodes = 10;
+
+	float maxAge = 0.35f;       // Lifetime of nodes in seconds
+	float minDistance = 1.5f;   // Distance threshold before dropping next breadcrumb
+	float endWidth = 0.0f;      // Width at tail
+	Color color = SKYBLUE;
+};
+
+using HasTrails = HasSimpleTrail;
+
 struct SpawnsTrailParticles {
 	static constexpr std::size_t maxSpawnLocations = 8;
 
@@ -66,6 +113,7 @@ struct Trail {
 namespace tag {
 
 struct DropDebris {};
+struct PostDeath {};
 
 } // namespace tag
 
@@ -73,6 +121,7 @@ struct DropDebris {};
 
 namespace tag {
 using ::effect::tag::DropDebris;
+using ::effect::tag::PostDeath;
 namespace effect = ::effect::tag;
 } // namespace tag
 
@@ -83,5 +132,9 @@ using ::effect::ExplodeOnDeath;
 using ::effect::InstantDamageOnDeath;
 using ::effect::SpawnsTrailParticles;
 using ::effect::Trail;
+using ::effect::TrailNode;
+using ::effect::HasSimpleTrail;
+using ::effect::HasMultiTrail;
+using ::effect::HasTrails;
 
 #endif // COMPONENTS_EFFECT_HPP

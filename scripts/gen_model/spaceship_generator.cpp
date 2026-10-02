@@ -1331,7 +1331,9 @@ namespace {
 					lateralDistance * 0.49f
 				);
 		}
-		const auto collar = [&](float radiusScale, float depthScale, Surface surface, float zOffset) {
+		int collarIndex = 0;
+		const auto collar = [&](float radiusScale, float depthScale, Surface surface, [[maybe_unused]] float zOffset = 0.0f) {
+			const int index = collarIndex++;
 			// When paired engine pods are closer than one pod radius, the inner
 			// collar has no independent structural room. The outer retention ring
 			// already carries the throat; suppressing this nested ring prevents two
@@ -1340,7 +1342,8 @@ namespace {
 				&& (maximumCollarRadius < r * 0.90f || nozzleCells > 1))
 				return;
 			const float depth = std::max(engine.nozzleDepth * depthScale, r * 0.07f);
-			const float centerZ = rearZ - depth * (0.72f + zOffset * 0.08f);
+			const float stepZ = static_cast<float>(index) * std::max(r * 0.18f, 0.045f);
+			const float centerZ = rearZ - depth * 0.55f - stepZ;
 			const float collarRadiusLimit = surface == Surface::Engine
 				? maximumCollarRadius * 0.78f
 				: maximumCollarRadius;
@@ -2119,7 +2122,7 @@ namespace {
 			unconstrainedMinorRadius,
 			footprintLimit * 0.84f
 		);
-		const float embed = settings.armorDepth * 0.06f;
+		const float embed = std::max(settings.armorDepth * 0.25f, 0.02f);
 		const Point3 snappedBase = symmetrySnapPoint(attachment.blisterBase);
 		const Point3 apex = symmetrySnapPoint(attachment.lowerTangent);
 		const Point3 apexDelta = apex - snappedBase;

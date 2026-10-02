@@ -657,3 +657,15 @@ TEST_CASE("mount attachment policy rejects degenerate tradeoff weights", "[unit]
 	settings.mountAttachment.preferredTakeoffAngleDegrees = 30.0f;
 	REQUIRE_THROWS_AS(gen_model::spaceship::generate(settings), std::invalid_argument);
 }
+
+TEST_CASE("Generated spaceships do not contain coplanar Z-fighting overlapping faces", "[unit][gen_model][zfighting]")
+{
+	const auto ships = catalog();
+	for (const Settings& settings : ships) {
+		DYNAMIC_SECTION("Ship " << settings.id) {
+			const auto generated = gen_model::spaceship::generate(settings);
+			const auto report = gen_model::spaceship::topology::auditCoplanarZFighting(generated.asset.mesh);
+			CHECK(report.coplanarPairs == 0);
+		}
+	}
+}

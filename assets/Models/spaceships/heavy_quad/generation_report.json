@@ -1,165 +1,165 @@
 {
   "bounds": {
     "maximum": {
-      "x": 3.4000003337860107,
-      "y": 0.8919999599456787,
-      "z": 2.400001049041748
+      "x": 3.200000524520874,
+      "y": 1.0856479406356812,
+      "z": 2.0
     },
-    "maximumRadius": 3.559795379638672,
+    "maximumRadius": 3.36796236038208,
     "minimum": {
-      "x": -3.4000003337860107,
-      "y": -0.6860000491142273,
-      "z": -2.8316149711608887
+      "x": -3.200000524520874,
+      "y": -0.9520000219345093,
+      "z": -2.6185073852539063
     }
   },
   "design": {
-    "availableThrust": 21.689041137695313,
-    "engineVolume": 1.3551995754241943,
-    "fuelVolume": 1.9876261949539185,
+    "availableThrust": 21.3109073638916,
+    "engineVolume": 1.3420896530151367,
+    "fuelVolume": 1.9683982133865356,
     "magazineVolume": 2.3400001525878906,
     "massCenter": {
-      "x": -1.0933071115104553e-09,
-      "y": 0.04014913737773895,
-      "z": -0.7186269760131836
+      "x": -3.311960705687511e-09,
+      "y": 0.03902321681380272,
+      "z": -0.5400677919387817
     },
-    "massProxy": 6.814718723297119,
-    "reactorVolume": 0.5265737771987915,
-    "requiredThrust": 7.155454158782959,
+    "massProxy": 6.748794078826904,
+    "reactorVolume": 0.5236071944236755,
+    "requiredThrust": 7.086233615875244,
     "selectedLayout": "spine_cluster",
     "thrustCenter": {
       "x": 0.0,
-      "y": 0.029015962034463882,
-      "z": -1.750730276107788
+      "y": 0.030901333317160606,
+      "z": -1.4820529222488403
     },
     "weaponBurden": 9.490228652954102
   },
   "material": {
-    "accentCoverage": 0.02995026856660843,
+    "accentCoverage": 0.035231418907642365,
     "normalSlopeMaximum": 0.3433113992214203,
     "normalSlopeMean": 0.02352209761738777,
     "normalSlopeP95": 0.08235294371843338,
-    "secondaryCoverage": 0.237404003739357,
+    "secondaryCoverage": 0.21649423241615295,
     "thermalCoverage": 0.3958391547203064
   },
   "mounts": [
     {
       "attachmentPoint": {
-        "x": 1.590399980545044,
-        "y": 0.23748403787612915,
-        "z": 0.15221625566482544
+        "x": 2.5585598945617676,
+        "y": 0.4830443263053894,
+        "z": 0.6840220093727112
       },
       "directBlister": true,
       "facingErrorDegrees": 0.0,
       "id": "mount_0",
-      "minimumClearance": 0.39369088411331177,
-      "parentCollisionClearance": 0.6384338140487671,
+      "minimumClearance": 0.4645437002182007,
+      "parentCollisionClearance": 1.6485729217529297,
       "resolvedForward": {
         "x": 0.0,
         "y": 0.0,
         "z": 1.0
       },
       "structurallyConnected": true,
-      "supportLength": 0.27827292680740356,
+      "supportLength": 0.2825040817260742,
       "supportThickness": 0.5,
-      "takeoffAngleDegrees": 80.10140991210938
+      "takeoffAngleDegrees": 83.43484497070313
     },
     {
       "attachmentPoint": {
-        "x": -1.590399980545044,
-        "y": 0.23748403787612915,
-        "z": 0.15221625566482544
+        "x": -2.5585598945617676,
+        "y": 0.4830443263053894,
+        "z": 0.6840220093727112
       },
       "directBlister": true,
       "facingErrorDegrees": 0.0,
       "id": "mount_1",
-      "minimumClearance": 0.3936910033226013,
-      "parentCollisionClearance": 0.6384338140487671,
+      "minimumClearance": 0.4645437002182007,
+      "parentCollisionClearance": 1.6485729217529297,
       "resolvedForward": {
         "x": 0.0,
         "y": 0.0,
         "z": 1.0
       },
       "structurallyConnected": true,
-      "supportLength": 0.27827292680740356,
+      "supportLength": 0.2825040817260742,
       "supportThickness": 0.5,
-      "takeoffAngleDegrees": 80.10140991210938
+      "takeoffAngleDegrees": 83.43484497070313
     },
     {
       "attachmentPoint": {
-        "x": 2.657600164413452,
-        "y": 0.08341682702302933,
-        "z": -0.48833638429641724
+        "x": 2.6092000007629395,
+        "y": -0.4129638671875,
+        "z": 0.67437744140625
       },
       "directBlister": true,
       "facingErrorDegrees": 0.0,
       "id": "mount_2",
-      "minimumClearance": 0.3789249658584595,
-      "parentCollisionClearance": 1.5444488525390625,
+      "minimumClearance": 0.21749341487884521,
+      "parentCollisionClearance": 1.5494801998138428,
       "resolvedForward": {
         "x": 0.0,
         "y": 0.0,
         "z": 1.0
       },
       "structurallyConnected": true,
-      "supportLength": 0.24085907638072968,
+      "supportLength": 0.08757078647613525,
       "supportThickness": 0.5,
-      "takeoffAngleDegrees": 82.14505004882813
+      "takeoffAngleDegrees": 84.51338195800781
     },
     {
       "attachmentPoint": {
-        "x": -2.657600164413452,
-        "y": 0.08341682702302933,
-        "z": -0.48833638429641724
+        "x": -2.6092000007629395,
+        "y": -0.4129638671875,
+        "z": 0.67437744140625
       },
       "directBlister": true,
       "facingErrorDegrees": 0.0,
       "id": "mount_3",
-      "minimumClearance": 0.3789249658584595,
-      "parentCollisionClearance": 1.5444488525390625,
+      "minimumClearance": 0.21749332547187805,
+      "parentCollisionClearance": 1.5494801998138428,
       "resolvedForward": {
         "x": 0.0,
         "y": 0.0,
         "z": 1.0
       },
       "structurallyConnected": true,
-      "supportLength": 0.24085907638072968,
+      "supportLength": 0.08757078647613525,
       "supportThickness": 0.5,
-      "takeoffAngleDegrees": 82.14505004882813
+      "takeoffAngleDegrees": 84.51338195800781
     }
   ],
   "resolvedEngines": [
     {
       "center": {
-        "x": -1.424763798713684,
-        "y": 0.02901596389710903,
-        "z": -1.8100955486297607
+        "x": -1.7279999256134033,
+        "y": 0.030901333317160606,
+        "z": -1.5430794954299927
       },
-      "length": 1.3913118839263916,
+      "length": 1.2936369180679321,
       "nozzleCells": 2,
-      "nozzleDepth": 0.24537599086761475,
-      "radius": 0.3957677185535431
+      "nozzleDepth": 0.25224289298057556,
+      "radius": 0.406843364238739
     },
     {
       "center": {
         "x": 0.0,
-        "y": 0.02901596389710903,
-        "z": -1.6320000886917114
+        "y": 0.030901333317160606,
+        "z": -1.3600000143051147
       },
-      "length": 1.3913118839263916,
+      "length": 1.2936369180679321,
       "nozzleCells": 2,
-      "nozzleDepth": 0.24537599086761475,
-      "radius": 0.3957677185535431
+      "nozzleDepth": 0.25224289298057556,
+      "radius": 0.406843364238739
     },
     {
       "center": {
-        "x": 1.424763798713684,
-        "y": 0.02901596389710903,
-        "z": -1.8100955486297607
+        "x": 1.7279999256134033,
+        "y": 0.030901333317160606,
+        "z": -1.5430794954299927
       },
-      "length": 1.3913118839263916,
+      "length": 1.2936369180679321,
       "nozzleCells": 2,
-      "nozzleDepth": 0.24537599086761475,
-      "radius": 0.3957677185535431
+      "nozzleDepth": 0.25224289298057556,
+      "radius": 0.406843364238739
     }
   ],
   "resolvedMounts": [
@@ -178,16 +178,16 @@
       },
       "id": "mount_0",
       "position": {
-        "x": 1.7256876230239868,
-        "y": 0.7275078296661377,
-        "z": 0.2427278757095337
+        "x": 2.6164000034332275,
+        "y": 0.997353196144104,
+        "z": 0.7493076920509338
       },
       "socketHeight": 0.2199999988079071,
       "supportHeight": 0.5,
       "supportRoot": {
-        "x": 1.175687551498413,
-        "y": 0.21750786900520325,
-        "z": 0.21772786974906921
+        "x": 2.0664000511169434,
+        "y": 0.48735323548316956,
+        "z": 0.7243077158927917
       },
       "supportWidth": 0.6000000238418579,
       "traverseHalfAngleDegrees": 8.0,
@@ -208,16 +208,16 @@
       },
       "id": "mount_1",
       "position": {
-        "x": -1.7256876230239868,
-        "y": 0.7275078296661377,
-        "z": 0.2427278757095337
+        "x": -2.6164000034332275,
+        "y": 0.997353196144104,
+        "z": 0.7493076920509338
       },
       "socketHeight": 0.2199999988079071,
       "supportHeight": 0.5,
       "supportRoot": {
-        "x": -1.175687551498413,
-        "y": 0.21750786900520325,
-        "z": 0.21772786974906921
+        "x": -2.0664000511169434,
+        "y": 0.48735323548316956,
+        "z": 0.7243077158927917
       },
       "supportWidth": 0.6000000238418579,
       "traverseHalfAngleDegrees": 8.0,
@@ -238,16 +238,16 @@
       },
       "id": "mount_2",
       "position": {
-        "x": 2.7080001831054688,
-        "y": 0.554122805595398,
-        "z": -0.41064199805259705
+        "x": 2.6164000034332275,
+        "y": -0.7400597333908081,
+        "z": 0.6662226319313049
       },
       "socketHeight": 0.2199999988079071,
       "supportHeight": 0.5,
       "supportRoot": {
-        "x": 2.1580002307891846,
-        "y": 0.04412281513214111,
-        "z": -0.4356420040130615
+        "x": 2.0664000511169434,
+        "y": -0.23005971312522888,
+        "z": 0.6412226557731628
       },
       "supportWidth": 0.6000000238418579,
       "traverseHalfAngleDegrees": 8.0,
@@ -268,23 +268,23 @@
       },
       "id": "mount_3",
       "position": {
-        "x": -2.7080001831054688,
-        "y": 0.554122805595398,
-        "z": -0.41064199805259705
+        "x": -2.6164000034332275,
+        "y": -0.7400597333908081,
+        "z": 0.6662226319313049
       },
       "socketHeight": 0.2199999988079071,
       "supportHeight": 0.5,
       "supportRoot": {
-        "x": -2.1580002307891846,
-        "y": 0.04412281513214111,
-        "z": -0.4356420040130615
+        "x": -2.0664000511169434,
+        "y": -0.23005971312522888,
+        "z": 0.6412226557731628
       },
       "supportWidth": 0.6000000238418579,
       "traverseHalfAngleDegrees": 8.0,
       "turretRadius": 0.25
     }
   ],
-  "settingsFingerprint": 13715875358982230182,
+  "settingsFingerprint": 15793049020977985984,
   "systems": {
     "feedTrunks": 3,
     "fuelHousings": 3,
@@ -292,6 +292,6 @@
     "reactorShields": 1,
     "serviceAccessPanels": 1
   },
-  "triangles": 5560,
-  "vertices": 2830
+  "triangles": 2516,
+  "vertices": 1312
 }

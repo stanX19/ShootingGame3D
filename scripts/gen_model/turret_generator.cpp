@@ -236,56 +236,66 @@ namespace {
 		// Rule 1 & 2 Contract: Main armor pivot sphere at origin (0, 0, 0), radius 1.0f
 		builder.addSphere(Point3{0.0f, 0.0f, 0.0f}, sphereRadius, 10, 14, UV_BASE);
 
-		// Side Trunnion Armor Cheeks (Port & Starboard): Cradles the sphere so it reads as an internal gimbal
+		const float gap = 0.055f;
+
+		// Side Trunnion Armor Cheeks (Port & Starboard): Cradles the sphere at |X| >= sphereRadius + gap
 		const float cheekW = sphereRadius * 0.16f;
 		const float cheekH = sphereRadius * 0.42f;
 		const float cheekL = sphereRadius * 0.72f;
-		const Point3 cheekLeftCenter{-sphereRadius * 0.98f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
-		const Point3 cheekRightCenter{sphereRadius * 0.98f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const float cheekX = sphereRadius + gap + cheekW * 0.5f;
+		const Point3 cheekLeftCenter{-cheekX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const Point3 cheekRightCenter{cheekX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
 		builder.addBox(cheekLeftCenter, Point3{cheekW * 0.5f, cheekH * 0.5f, cheekL * 0.5f}, UV_BODY);
 		builder.addBox(cheekRightCenter, Point3{cheekW * 0.5f, cheekH * 0.5f, cheekL * 0.5f}, UV_BODY);
 
-		// Heavy circular trunnion pivot hub caps
+		// Heavy circular trunnion pivot hub caps on outer faces of cheeks
 		const float hubR = sphereRadius * 0.32f;
-		const Point3 hubLeftInner{-sphereRadius * 1.06f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
-		const Point3 hubLeftOuter{-sphereRadius * 1.15f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
-		const Point3 hubRightInner{sphereRadius * 1.06f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
-		const Point3 hubRightOuter{sphereRadius * 1.15f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const float hubInnerX = cheekX + cheekW * 0.5f + gap;
+		const float hubOuterX = hubInnerX + sphereRadius * 0.09f;
+		const Point3 hubLeftInner{-hubInnerX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const Point3 hubLeftOuter{-hubOuterX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const Point3 hubRightInner{hubInnerX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const Point3 hubRightOuter{hubOuterX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
 		builder.addCylinder(hubLeftInner, hubLeftOuter, hubR, hubR, 12, UV_DETAIL, false, true);
 		builder.addCylinder(hubRightInner, hubRightOuter, hubR, hubR, 12, UV_DETAIL, false, true);
 
 		// Glowing neon indicator hubs on trunnions
-		const Point3 neonHubL1{-sphereRadius * 1.15f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
-		const Point3 neonHubL2{-sphereRadius * 1.17f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
-		const Point3 neonHubR1{sphereRadius * 1.15f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
-		const Point3 neonHubR2{sphereRadius * 1.17f, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const float neonInnerX = hubOuterX + gap;
+		const float neonOuterX = neonInnerX + sphereRadius * 0.02f;
+		const Point3 neonHubL1{-neonInnerX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const Point3 neonHubL2{-neonOuterX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const Point3 neonHubR1{neonInnerX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
+		const Point3 neonHubR2{neonOuterX, sphereRadius * 0.06f, -sphereRadius * 0.04f};
 		builder.addCylinder(neonHubL1, neonHubL2, hubR * 0.55f, hubR * 0.55f, 10, UV_CONDUIT, false, true);
 		builder.addCylinder(neonHubR1, neonHubR2, hubR * 0.55f, hubR * 0.55f, 10, UV_CONDUIT, false, true);
 
-		// BackOfGun (-Z): Substantial rear breech & generator housing (Y >= -0.35f, clear for socket)
+		// BackOfGun (-Z): Substantial rear breech & generator housing at Z <= -sphereRadius - gap
 		const float breechW = sphereRadius * 1.12f;
 		const float breechH = sphereRadius * 0.86f;
-		const float breechL = sphereRadius * 0.90f;
-		const Point3 breechCenter{0.0f, sphereRadius * 0.10f, -sphereRadius * 1.25f};
+		const float breechL = sphereRadius * 0.80f;
+		const float breechZ = -sphereRadius - gap - breechL * 0.5f;
+		const Point3 breechCenter{0.0f, sphereRadius * 0.10f, breechZ};
 		builder.addBox(breechCenter, Point3{breechW * 0.5f, breechH * 0.5f, breechL * 0.5f}, UV_BODY);
 
 		// Dual rear battery/capacitor sponsons flanking breech
 		const float sponsonW = sphereRadius * 0.22f;
 		const float sponsonH = sphereRadius * 0.68f;
 		const float sponsonL = sphereRadius * 0.74f;
-		const Point3 sponLeftCenter{-breechW * 0.5f - sponsonW * 0.40f, sphereRadius * 0.10f, -sphereRadius * 1.22f};
-		const Point3 sponRightCenter{breechW * 0.5f + sponsonW * 0.40f, sphereRadius * 0.10f, -sphereRadius * 1.22f};
+		const float sponX = breechW * 0.5f + gap + sponsonW * 0.5f;
+		const Point3 sponLeftCenter{-sponX, sphereRadius * 0.10f, breechZ};
+		const Point3 sponRightCenter{sponX, sphereRadius * 0.10f, breechZ};
 		builder.addBox(sponLeftCenter, Point3{sponsonW * 0.5f, sponsonH * 0.5f, sponsonL * 0.5f}, UV_DETAIL);
 		builder.addBox(sponRightCenter, Point3{sponsonW * 0.5f, sponsonH * 0.5f, sponsonL * 0.5f}, UV_DETAIL);
 
 		// Top radiator heat sink ribs with illuminated conduit channels on breech
-		const Point3 ribCenter{0.0f, breechCenter.y + breechH * 0.5f + sphereRadius * 0.05f, breechCenter.z};
+		const float ribY = breechCenter.y + breechH * 0.5f + gap + sphereRadius * 0.05f;
+		const Point3 ribCenter{0.0f, ribY, breechCenter.z};
 		builder.addBox(ribCenter, Point3{breechW * 0.35f, sphereRadius * 0.05f, breechL * 0.38f}, UV_CONDUIT);
 
 		// Twin rear exhaust dump nozzles
 		const float exhaustR = sphereRadius * 0.17f;
-		const float exhaustEndZ = breechCenter.z - breechL * 0.5f - sphereRadius * 0.25f;
-		const float exhaustStartZ = breechCenter.z - breechL * 0.5f;
+		const float exhaustStartZ = breechCenter.z - breechL * 0.5f - gap;
+		const float exhaustEndZ = exhaustStartZ - sphereRadius * 0.25f;
 		const Point3 exLStart{-breechW * 0.26f, sphereRadius * 0.10f, exhaustStartZ};
 		const Point3 exLEnd{-breechW * 0.26f, sphereRadius * 0.10f, exhaustEndZ};
 		const Point3 exRStart{breechW * 0.26f, sphereRadius * 0.10f, exhaustStartZ};
@@ -296,63 +306,70 @@ namespace {
 
 	void buildBasicShooter(MeshBuilder& builder, const gen_model::turret::Settings& settings, gen_model::turret::GenerationReport& report) {
 		const float bRad = settings.baseRadius;
+		const float gap = 0.055f;
 
 		buildPivotBallWithDetails(builder, bRad);
 
-		// FrontOfGun (+Z): Chunky armored mantlet receiver cowl
+		// FrontOfGun (+Z): Chunky armored mantlet receiver cowl starting at Z = bRad + gap
 		const float mantletW = bRad * 1.24f;
 		const float mantletH = bRad * 0.98f;
 		const float mantletL = bRad * 0.62f;
-		const Point3 mantletCenter{0.0f, bRad * 0.06f, bRad * 0.72f};
+		const float mantletZ = bRad + gap + mantletL * 0.5f;
+		const Point3 mantletCenter{0.0f, bRad * 0.06f, mantletZ};
 		builder.addBox(mantletCenter, Point3{mantletW * 0.5f, mantletH * 0.5f, mantletL * 0.5f}, UV_BODY);
 
-		// Heavy trunnion bushing collar
+		// Heavy trunnion bushing collar starting at mantlet front face
 		const float barrelR = settings.barrelRadius;
 		const float barrelLen = settings.barrelLength;
-		const float barrelStartZ = mantletCenter.z + mantletL * 0.5f;
-		const float barrelEndZ = barrelStartZ + barrelLen;
-
-		const Point3 collarStart{0.0f, 0.0f, barrelStartZ - bRad * 0.04f};
-		const Point3 collarEnd{0.0f, 0.0f, barrelStartZ + bRad * 0.28f};
-		builder.addCylinder(collarStart, collarEnd, barrelR * 1.70f, barrelR * 1.55f, 14, UV_DETAIL, false, true);
+		const float collarStartZ = mantletZ + mantletL * 0.5f + gap;
+		const float collarLen = bRad * 0.28f;
+		const float collarEndZ = collarStartZ + collarLen;
+		builder.addCylinder(Point3{0.0f, 0.0f, collarStartZ}, Point3{0.0f, 0.0f, collarEndZ}, barrelR * 1.70f, barrelR * 1.55f, 14, UV_DETAIL, false, true);
 
 		// Stepped shroud enclosing the base of the elongated barrel
 		const float shroudLen = barrelLen * 0.28f;
-		const Point3 shroudCenter{0.0f, 0.0f, collarEnd.z + shroudLen * 0.5f};
+		const float shroudStartZ = collarEndZ + gap;
+		const float shroudEndZ = shroudStartZ + shroudLen;
+		const Point3 shroudCenter{0.0f, 0.0f, shroudStartZ + shroudLen * 0.5f};
 		builder.addBox(shroudCenter, Point3{barrelR * 1.35f, barrelR * 1.15f, shroudLen * 0.5f}, UV_BODY);
 
 		// Longitudinal energy rails running along top & bottom of shroud
-		const Point3 railTopCenter{0.0f, barrelR * 1.20f, shroudCenter.z};
-		const Point3 railBottomCenter{0.0f, -barrelR * 1.20f, shroudCenter.z};
+		const float railY = barrelR * 1.15f + gap + barrelR * 0.07f;
+		const Point3 railTopCenter{0.0f, railY, shroudCenter.z};
+		const Point3 railBottomCenter{0.0f, -railY, shroudCenter.z};
 		builder.addBox(railTopCenter, Point3{barrelR * 0.26f, barrelR * 0.07f, shroudLen * 0.48f}, UV_CONDUIT);
 		builder.addBox(railBottomCenter, Point3{barrelR * 0.26f, barrelR * 0.07f, shroudLen * 0.48f}, UV_CONDUIT);
 
 		// Dual heavy hydraulic recoil pistons flanking the shroud
 		const float pistonR = barrelR * 0.30f;
-		const float pistonOffset = barrelR * 1.55f;
-		const Point3 pLeftStart{-pistonOffset, 0.0f, barrelStartZ};
-		const Point3 pLeftEnd{-pistonOffset, 0.0f, collarEnd.z + shroudLen * 0.85f};
-		const Point3 pRightStart{pistonOffset, 0.0f, barrelStartZ};
-		const Point3 pRightEnd{pistonOffset, 0.0f, collarEnd.z + shroudLen * 0.85f};
+		const float pistonOffset = barrelR * 1.70f + gap + pistonR;
+		const Point3 pLeftStart{-pistonOffset, 0.0f, collarStartZ};
+		const Point3 pLeftEnd{-pistonOffset, 0.0f, shroudStartZ + shroudLen * 0.85f};
+		const Point3 pRightStart{pistonOffset, 0.0f, collarStartZ};
+		const Point3 pRightEnd{pistonOffset, 0.0f, shroudStartZ + shroudLen * 0.85f};
 		builder.addCylinder(pLeftStart, pLeftEnd, pistonR, pistonR, 10, UV_DETAIL, true, true);
 		builder.addCylinder(pRightStart, pRightEnd, pistonR, pistonR, 10, UV_DETAIL, true, true);
 
 		// Sleek elongated main barrel tube (centered at X=0, Y=0)
-		const Point3 barrelCoreStart{0.0f, 0.0f, collarEnd.z + shroudLen * 0.70f};
-		const Point3 barrelCoreEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.10f};
-		builder.addCylinder(barrelCoreStart, barrelCoreEnd, barrelR, barrelR, 14, UV_BARREL, false, false);
+		const float barrelCoreStart = shroudEndZ + gap;
+		const float barrelEndZ = collarStartZ + barrelLen;
+		const float brakeLen = barrelLen * 0.10f;
+		const Point3 barrelCoreStartPt{0.0f, 0.0f, barrelCoreStart};
+		const Point3 barrelCoreEndPt{0.0f, 0.0f, barrelEndZ - brakeLen - gap};
+		builder.addCylinder(barrelCoreStartPt, barrelCoreEndPt, barrelR, barrelR, 14, UV_BARREL, false, false);
 
 		// Cylindrical heavy muzzle brake with glowing emitter ring & prominent deep bore
-		const Point3 brakeStart{0.0f, 0.0f, barrelEndZ - barrelLen * 0.10f};
-		const Point3 brakeEnd{0.0f, 0.0f, barrelEndZ};
-		builder.addCylinder(brakeStart, brakeEnd, barrelR * 1.40f, barrelR * 1.36f, 14, UV_DETAIL, false, false);
+		const Point3 brakeStartPt{0.0f, 0.0f, barrelEndZ - brakeLen};
+		const Point3 brakeEndPt{0.0f, 0.0f, barrelEndZ};
+		builder.addCylinder(brakeStartPt, brakeEndPt, barrelR * 1.40f, barrelR * 1.36f, 14, UV_DETAIL, false, false);
 
-		// Illuminated conduit ring encircling muzzle brake
-		const Point3 emitterRingStart{0.0f, 0.0f, barrelEndZ - barrelLen * 0.07f};
-		const Point3 emitterRingEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.03f};
-		builder.addCylinder(emitterRingStart, emitterRingEnd, barrelR * 1.44f, barrelR * 1.44f, 14, UV_CONDUIT, false, false);
+		// Illuminated conduit ring encircling muzzle brake (radius clearance >= gap + 0.01f)
+		const Point3 emitterRingStart{0.0f, 0.0f, barrelEndZ - brakeLen * 0.70f};
+		const Point3 emitterRingEnd{0.0f, 0.0f, barrelEndZ - brakeLen * 0.30f};
+		const float emitterRingR = barrelR * 1.40f + gap + 0.01f;
+		builder.addCylinder(emitterRingStart, emitterRingEnd, emitterRingR, emitterRingR, 14, UV_CONDUIT, false, false);
 
-		builder.addMuzzleBore(brakeEnd, Point3{0.0f, 0.0f, 1.0f}, barrelR * 1.36f, barrelR * 0.72f, barrelLen * 0.25f, 14, UV_DETAIL, UV_BORE);
+		builder.addMuzzleBore(brakeEndPt, Point3{0.0f, 0.0f, 1.0f}, barrelR * 1.36f, barrelR * 0.72f, barrelLen * 0.25f, 14, UV_DETAIL, UV_BORE);
 
 		report.pivotPosition = Point3{0.0f, 0.0f, 0.0f};
 		report.muzzlePosition = Point3{0.0f, 0.0f, barrelEndZ};
@@ -360,59 +377,65 @@ namespace {
 
 	void buildHeavyMgRifle(MeshBuilder& builder, const gen_model::turret::Settings& settings, gen_model::turret::GenerationReport& report) {
 		const float bRad = settings.baseRadius;
+		const float gap = 0.055f;
 
 		buildPivotBallWithDetails(builder, bRad);
 
-		// FrontOfGun (+Z): Heavy precision rifle receiver block
+		// FrontOfGun (+Z): Heavy precision rifle receiver block starting at Z = bRad + gap
 		const float recW = bRad * 1.10f;
 		const float recH = bRad * 0.92f;
 		const float recL = bRad * 0.88f;
-		const Point3 recCenter{0.0f, bRad * 0.08f, bRad * 0.72f};
+		const float recZ = bRad + gap + recL * 0.5f;
+		const Point3 recCenter{0.0f, bRad * 0.08f, recZ};
 		builder.addBox(recCenter, Point3{recW * 0.5f, recH * 0.5f, recL * 0.5f}, UV_BODY);
 
 		// Port-side rotary ammunition drum
 		const float drumRadius = bRad * 0.52f;
 		const float drumThickness = bRad * 0.32f;
-		const Point3 drumCenter{-recW * 0.5f - drumThickness * 0.55f, bRad * 0.04f, recCenter.z - recL * 0.10f};
+		const float chuteLen = bRad * 0.16f;
+		const float drumX = -recW * 0.5f - gap - chuteLen - gap - drumThickness * 0.5f;
+		const Point3 drumCenter{drumX, bRad * 0.04f, recCenter.z - recL * 0.10f};
 		const Point3 drumA{drumCenter.x - drumThickness * 0.5f, drumCenter.y, drumCenter.z};
 		const Point3 drumB{drumCenter.x + drumThickness * 0.5f, drumCenter.y, drumCenter.z};
 		builder.addCylinder(drumA, drumB, drumRadius, drumRadius, 14, UV_DETAIL, true, true);
 
 		// Ammo feed chute bridging drum to receiver
-		const Point3 chuteCenter{-recW * 0.5f - drumThickness * 0.20f, bRad * 0.04f, recCenter.z - recL * 0.05f};
-		builder.addBox(chuteCenter, Point3{drumThickness * 0.30f, bRad * 0.18f, bRad * 0.22f}, UV_DETAIL);
+		const float chuteCenterX = -recW * 0.5f - gap - chuteLen * 0.5f;
+		const Point3 chuteCenter{chuteCenterX, bRad * 0.04f, recCenter.z - recL * 0.05f};
+		builder.addBox(chuteCenter, Point3{(chuteLen - 2.0f * gap) * 0.5f, bRad * 0.18f, bRad * 0.22f}, UV_DETAIL);
 
 		// Starboard auxiliary power cell
-		const Point3 cellCenter{recW * 0.5f + bRad * 0.14f, bRad * 0.08f, recCenter.z};
+		const float cellX = recW * 0.5f + gap + bRad * 0.14f;
+		const Point3 cellCenter{cellX, bRad * 0.08f, recCenter.z};
 		builder.addBox(cellCenter, Point3{bRad * 0.14f, bRad * 0.32f, bRad * 0.35f}, UV_BODY);
-		const Point3 cellNeonCenter{cellCenter.x + bRad * 0.14f, cellCenter.y, cellCenter.z};
+		const Point3 cellNeonCenter{cellCenter.x + bRad * 0.14f + gap + bRad * 0.02f, cellCenter.y, cellCenter.z};
 		builder.addBox(cellNeonCenter, Point3{bRad * 0.02f, bRad * 0.22f, bRad * 0.25f}, UV_CONDUIT);
 
 		// Firing port collar centered at X=0, Y=0
 		const float barrelR = settings.barrelRadius;
 		const float barrelLen = settings.barrelLength;
-		const float barrelStartZ = recCenter.z + recL * 0.5f;
-		const Point3 portStart{0.0f, 0.0f, barrelStartZ - bRad * 0.04f};
-		const Point3 portEnd{0.0f, 0.0f, barrelStartZ + bRad * 0.22f};
-		builder.addCylinder(portStart, portEnd, barrelR * 1.85f, barrelR * 1.70f, 14, UV_DETAIL, false, true);
+		const float barrelStartZ = recZ + recL * 0.5f + gap;
+		const float portEndZ = barrelStartZ + bRad * 0.22f;
+		builder.addCylinder(Point3{0.0f, 0.0f, barrelStartZ}, Point3{0.0f, 0.0f, portEndZ}, barrelR * 1.70f, barrelR * 1.55f, 14, UV_DETAIL, false, true);
 
 		// Heavy perforated cylindrical thermal cooling shroud (covers first section of barrel)
 		const float shroudLen = barrelLen * 0.44f;
 		const float shroudR = barrelR * 1.62f;
-		const Point3 shroudStart{0.0f, 0.0f, portEnd.z};
-		const Point3 shroudEnd{0.0f, 0.0f, portEnd.z + shroudLen};
+		const Point3 shroudStart{0.0f, 0.0f, portEndZ + gap};
+		const Point3 shroudEnd{0.0f, 0.0f, portEndZ + gap + shroudLen};
 		builder.addCylinder(shroudStart, shroudEnd, shroudR, shroudR * 0.94f, 14, UV_BODY, false, true);
 
 		// Longitudinal cyan energy conduit rails running atop and below cooling shroud
-		const Point3 spineCenter{0.0f, shroudR * 1.04f, portEnd.z + shroudLen * 0.5f};
-		const Point3 bellyCenter{0.0f, -shroudR * 1.04f, portEnd.z + shroudLen * 0.5f};
+		const float spineY = shroudR + gap + barrelR * 0.08f;
+		const Point3 spineCenter{0.0f, spineY, portEndZ + gap + shroudLen * 0.5f};
+		const Point3 bellyCenter{0.0f, -spineY, portEndZ + gap + shroudLen * 0.5f};
 		builder.addBox(spineCenter, Point3{barrelR * 0.24f, barrelR * 0.08f, shroudLen * 0.46f}, UV_CONDUIT);
 		builder.addBox(bellyCenter, Point3{barrelR * 0.24f, barrelR * 0.08f, shroudLen * 0.46f}, UV_CONDUIT);
 
 		// Long exposed fluted sniper barrel extending out of shroud
 		const float barrelEndZ = barrelStartZ + barrelLen;
-		const Point3 innerBarrelStart{0.0f, 0.0f, portEnd.z + shroudLen * 0.85f};
-		const Point3 innerBarrelEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.08f};
+		const Point3 innerBarrelStart{0.0f, 0.0f, shroudEnd.z + gap};
+		const Point3 innerBarrelEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.08f - gap};
 		builder.addCylinder(innerBarrelStart, innerBarrelEnd, barrelR, barrelR, 14, UV_BARREL, false, false);
 
 		// Stepped cylindrical double-baffle muzzle brake (unobscured, unclipped)
@@ -422,8 +445,9 @@ namespace {
 		builder.addCylinder(brakeStart, brakeMid, barrelR * 1.40f, barrelR * 1.36f, 14, UV_DETAIL, false, false);
 		builder.addCylinder(brakeMid, brakeEnd, barrelR * 1.36f, barrelR * 1.32f, 14, UV_DETAIL, false, false);
 
-		// Neon cyan accent ring between brake baffles
-		builder.addCylinder(brakeMid - Point3{0, 0, barrelLen * 0.01f}, brakeMid + Point3{0, 0, barrelLen * 0.01f}, barrelR * 1.42f, barrelR * 1.42f, 14, UV_CONDUIT, false, false);
+		// Neon cyan accent ring between brake baffles (radius clearance >= gap + 0.01f)
+		const float mgRingR = barrelR * 1.40f + gap + 0.01f;
+		builder.addCylinder(brakeMid - Point3{0, 0, barrelLen * 0.01f}, brakeMid + Point3{0, 0, barrelLen * 0.01f}, mgRingR, mgRingR, 14, UV_CONDUIT, false, false);
 
 		// Prominent, 100% visible deep circular bore cavity
 		builder.addMuzzleBore(brakeEnd, Point3{0.0f, 0.0f, 1.0f}, barrelR * 1.32f, barrelR * 0.72f, barrelLen * 0.22f, 14, UV_DETAIL, UV_BORE);
@@ -434,58 +458,65 @@ namespace {
 
 	void buildLazerDeletor(MeshBuilder& builder, const gen_model::turret::Settings& settings, gen_model::turret::GenerationReport& report) {
 		const float bRad = settings.baseRadius;
+		const float gap = 0.055f;
 
 		buildPivotBallWithDetails(builder, bRad);
 
-		// FrontOfGun (+Z): Heavy particle beam receiver block
+		// FrontOfGun (+Z): Heavy particle beam receiver block starting at Z = bRad + gap
 		const float recW = bRad * 1.20f;
 		const float recH = bRad * 0.96f;
-		const float recL = bRad * 0.90f;
-		const Point3 recCenter{0.0f, bRad * 0.06f, bRad * 0.74f};
+		const float recL = bRad * 0.86f;
+		const float recZ = bRad + gap + recL * 0.5f;
+		const Point3 recCenter{0.0f, bRad * 0.06f, recZ};
 		builder.addBox(recCenter, Point3{recW * 0.5f, recH * 0.5f, recL * 0.5f}, UV_BODY);
 
 		// Dual heavy beam capacitor banks flanking the receiver (Port & Starboard)
 		const float capW = bRad * 0.28f;
 		const float capH = bRad * 0.76f;
 		const float capL = bRad * 0.88f;
-		const Point3 capLeftCenter{-recW * 0.5f - capW * 0.45f, bRad * 0.06f, recCenter.z - recL * 0.05f};
-		const Point3 capRightCenter{recW * 0.5f + capW * 0.45f, bRad * 0.06f, recCenter.z - recL * 0.05f};
+		const float capX = recW * 0.5f + gap + capW * 0.5f;
+		const Point3 capLeftCenter{-capX, bRad * 0.06f, recCenter.z - recL * 0.05f};
+		const Point3 capRightCenter{capX, bRad * 0.06f, recCenter.z - recL * 0.05f};
 		builder.addBox(capLeftCenter, Point3{capW * 0.5f, capH * 0.5f, capL * 0.5f}, UV_DETAIL);
 		builder.addBox(capRightCenter, Point3{capW * 0.5f, capH * 0.5f, capL * 0.5f}, UV_DETAIL);
 
 		// Glowing green neon capacitor indicator strips
-		const Point3 capLeftNeon{-recW * 0.5f - capW * 0.92f, bRad * 0.06f, capLeftCenter.z};
-		const Point3 capRightNeon{recW * 0.5f + capW * 0.92f, bRad * 0.06f, capRightCenter.z};
+		const float capNeonX = capX + capW * 0.5f + gap + bRad * 0.02f;
+		const Point3 capLeftNeon{-capNeonX, bRad * 0.06f, capLeftCenter.z};
+		const Point3 capRightNeon{capNeonX, bRad * 0.06f, capRightCenter.z};
 		builder.addBox(capLeftNeon, Point3{bRad * 0.02f, bRad * 0.28f, bRad * 0.36f}, UV_CONDUIT);
 		builder.addBox(capRightNeon, Point3{bRad * 0.02f, bRad * 0.28f, bRad * 0.36f}, UV_CONDUIT);
 
 		// Continuous Uninterrupted High-Velocity Passage (NO SEGMENTED RINGS)
 		const float barrelR = settings.barrelRadius;
 		const float barrelLen = settings.barrelLength;
-		const float barrelStartZ = recCenter.z + recL * 0.5f;
+		const float barrelStartZ = recZ + recL * 0.5f + gap;
 		const float barrelEndZ = barrelStartZ + barrelLen;
 
 		// Central cylindrical beam acceleration core pipe
 		const Point3 coreStart{0.0f, 0.0f, barrelStartZ};
-		const Point3 coreEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.06f};
+		const Point3 coreEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.06f - gap};
 		builder.addCylinder(coreStart, coreEnd, barrelR, barrelR, 14, UV_BARREL, false, false);
 
 		// Upper Continuous Longitudinal Acceleration Rail (uninterrupted from breech to tip)
 		const float railSpan = barrelLen * 0.92f;
-		const Point3 railTopArmCenter{0.0f, barrelR * 1.30f, barrelStartZ + railSpan * 0.5f};
+		const float railArmY = barrelR + gap + barrelR * 0.16f;
+		const Point3 railTopArmCenter{0.0f, railArmY, barrelStartZ + railSpan * 0.5f};
 		builder.addBox(railTopArmCenter, Point3{barrelR * 0.34f, barrelR * 0.16f, railSpan * 0.5f}, UV_BODY);
-		const Point3 railTopNeonCenter{0.0f, barrelR * 1.46f, barrelStartZ + railSpan * 0.5f};
+		const float railNeonY = railArmY + barrelR * 0.16f + gap + barrelR * 0.05f;
+		const Point3 railTopNeonCenter{0.0f, railNeonY, barrelStartZ + railSpan * 0.5f};
 		builder.addBox(railTopNeonCenter, Point3{barrelR * 0.16f, barrelR * 0.05f, railSpan * 0.49f}, UV_CONDUIT);
 
 		// Lower Continuous Longitudinal Acceleration Rail (uninterrupted from breech to tip)
-		const Point3 railBottomArmCenter{0.0f, -barrelR * 1.30f, barrelStartZ + railSpan * 0.5f};
+		const Point3 railBottomArmCenter{0.0f, -railArmY, barrelStartZ + railSpan * 0.5f};
 		builder.addBox(railBottomArmCenter, Point3{barrelR * 0.34f, barrelR * 0.16f, railSpan * 0.5f}, UV_BODY);
-		const Point3 railBottomNeonCenter{0.0f, -barrelR * 1.46f, barrelStartZ + railSpan * 0.5f};
+		const Point3 railBottomNeonCenter{0.0f, -railNeonY, barrelStartZ + railSpan * 0.5f};
 		builder.addBox(railBottomNeonCenter, Point3{barrelR * 0.16f, barrelR * 0.05f, railSpan * 0.49f}, UV_CONDUIT);
 
 		// Longitudinal Side Heat-Sink Ventilation Fins (flanking acceleration core)
-		const Point3 finLeftCenter{-barrelR * 1.05f, 0.0f, barrelStartZ + railSpan * 0.5f};
-		const Point3 finRightCenter{barrelR * 1.05f, 0.0f, barrelStartZ + railSpan * 0.5f};
+		const float finX = barrelR + gap + barrelR * 0.06f;
+		const Point3 finLeftCenter{-finX, 0.0f, barrelStartZ + railSpan * 0.5f};
+		const Point3 finRightCenter{finX, 0.0f, barrelStartZ + railSpan * 0.5f};
 		builder.addBox(finLeftCenter, Point3{barrelR * 0.06f, barrelR * 0.45f, railSpan * 0.46f}, UV_DETAIL);
 		builder.addBox(finRightCenter, Point3{barrelR * 0.06f, barrelR * 0.45f, railSpan * 0.46f}, UV_DETAIL);
 
@@ -494,10 +525,11 @@ namespace {
 		const Point3 headEnd{0.0f, 0.0f, barrelEndZ};
 		builder.addCylinder(headStart, headEnd, barrelR * 1.35f, barrelR * 1.25f, 14, UV_DETAIL, false, false);
 
-		// Glowing emerald green aperture ring
+		// Glowing emerald green aperture ring (radius clearance >= gap + 0.01f)
 		const Point3 apRingStart{0.0f, 0.0f, barrelEndZ - barrelLen * 0.04f};
 		const Point3 apRingEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.015f};
-		builder.addCylinder(apRingStart, apRingEnd, barrelR * 1.40f, barrelR * 1.40f, 14, UV_CONDUIT, false, false);
+		const float apRingR = barrelR * 1.35f + gap + 0.01f;
+		builder.addCylinder(apRingStart, apRingEnd, apRingR, apRingR, 14, UV_CONDUIT, false, false);
 
 		// Deep hollow energy emitter bore cavity
 		builder.addMuzzleBore(headEnd, Point3{0.0f, 0.0f, 1.0f}, barrelR * 1.25f, barrelR * 0.75f, barrelLen * 0.22f, 14, UV_CONDUIT, UV_BORE);
@@ -508,21 +540,24 @@ namespace {
 
 	void buildLazerShotgun(MeshBuilder& builder, const gen_model::turret::Settings& settings, gen_model::turret::GenerationReport& report) {
 		const float bRad = settings.baseRadius;
+		const float gap = 0.055f;
 
 		buildPivotBallWithDetails(builder, bRad);
 
-		// FrontOfGun (+Z): Heavy angular shotgun receiver
+		// FrontOfGun (+Z): Heavy angular shotgun receiver starting at Z = bRad + gap
 		const float recW = bRad * 1.25f;
 		const float recH = bRad * 0.90f;
 		const float recL = bRad * 0.75f;
-		const Point3 recCenter{0.0f, bRad * 0.04f, bRad * 0.72f};
+		const float recZ = bRad + gap + recL * 0.5f;
+		const Point3 recCenter{0.0f, bRad * 0.04f, recZ};
 		builder.addBox(recCenter, Point3{recW * 0.5f, recH * 0.5f, recL * 0.5f}, UV_BODY);
 
 		// Dual lateral plasma expansion chambers (Port & Starboard)
 		const float expR = bRad * 0.36f;
 		const float expLen = bRad * 0.30f;
-		const Point3 expLeftCenter{-recW * 0.5f - expLen * 0.5f, bRad * 0.04f, recCenter.z};
-		const Point3 expRightCenter{recW * 0.5f + expLen * 0.5f, bRad * 0.04f, recCenter.z};
+		const float expX = recW * 0.5f + gap + expLen * 0.5f;
+		const Point3 expLeftCenter{-expX, bRad * 0.04f, recCenter.z};
+		const Point3 expRightCenter{expX, bRad * 0.04f, recCenter.z};
 		const Point3 expLeftA{expLeftCenter.x - expLen * 0.5f, expLeftCenter.y, expLeftCenter.z};
 		const Point3 expLeftB{expLeftCenter.x + expLen * 0.5f, expLeftCenter.y, expLeftCenter.z};
 		const Point3 expRightA{expRightCenter.x - expLen * 0.5f, expRightCenter.y, expRightCenter.z};
@@ -530,30 +565,31 @@ namespace {
 		builder.addCylinder(expLeftA, expLeftB, expR, expR, 12, UV_DETAIL, true, true);
 		builder.addCylinder(expRightA, expRightB, expR, expR, 12, UV_DETAIL, true, true);
 
-		// Glowing green expansion indicator rings
-		const Point3 expLNeon1{expLeftA.x - bRad * 0.01f, expLeftA.y, expLeftA.z};
-		const Point3 expLNeon2{expLeftA.x + bRad * 0.03f, expLeftA.y, expLeftA.z};
-		const Point3 expRNeon1{expRightB.x - bRad * 0.03f, expRightB.y, expRightB.z};
-		const Point3 expRNeon2{expRightB.x + bRad * 0.01f, expRightB.y, expRightB.z};
+		// Glowing green expansion indicator rings on outer cylinder caps
+		const Point3 expLNeon1{expLeftA.x - gap - bRad * 0.03f, expLeftA.y, expLeftA.z};
+		const Point3 expLNeon2{expLeftA.x - gap, expLeftA.y, expLeftA.z};
+		const Point3 expRNeon1{expRightB.x + gap, expRightB.y, expRightB.z};
+		const Point3 expRNeon2{expRightB.x + gap + bRad * 0.03f, expRightB.y, expRightB.z};
 		builder.addCylinder(expLNeon1, expLNeon2, expR * 0.65f, expR * 0.65f, 10, UV_CONDUIT, true, true);
 		builder.addCylinder(expRNeon1, expRNeon2, expR * 0.65f, expR * 0.65f, 10, UV_CONDUIT, true, true);
 
 		// 5-Barrel 3D Conical Diverging Cluster
 		const float barrelLen = settings.barrelLength;
-		const float barrelStartZ = recCenter.z + recL * 0.5f;
+		const float barrelStartZ = recZ + recL * 0.5f + gap + 0.015f;
 		const float barrelEndZ = barrelStartZ + barrelLen;
 
 		// Central Primary Projector Barrel (centered at X=0, Y=0)
 		const float centerR = 0.30f;
 		const Point3 centerStart{0.0f, 0.0f, barrelStartZ};
-		const Point3 centerEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.06f};
+		const Point3 centerEnd{0.0f, 0.0f, barrelEndZ - barrelLen * 0.06f - gap};
 		builder.addCylinder(centerStart, centerEnd, centerR, centerR, 12, UV_BARREL, false, false);
 
 		// 4 Satellite Diverging Projector Barrels (Top, Bottom, Port, Starboard)
-		// Diverging outward at a conical angle from rStart to rEnd
+		// Clearance between center barrel (radius 0.30) and satellite (radius 0.22) >= 0.055f:
+		// rStart >= 0.30 + 0.22 + 0.055 + 0.01 = 0.585f
 		const float satR = 0.22f;
-		const float rStart = 0.34f;
-		const float rEnd = 0.74f;
+		const float rStart = 0.585f;
+		const float rEnd = 0.79f;
 
 		const Point3 satStarts[4] = {
 			Point3{0.0f, rStart, barrelStartZ},
@@ -563,36 +599,26 @@ namespace {
 		};
 
 		const Point3 satEnds[4] = {
-			Point3{0.0f, rEnd, barrelEndZ - barrelLen * 0.06f},
-			Point3{0.0f, -rEnd, barrelEndZ - barrelLen * 0.06f},
-			Point3{-rEnd, 0.0f, barrelEndZ - barrelLen * 0.06f},
-			Point3{rEnd, 0.0f, barrelEndZ - barrelLen * 0.06f}
+			Point3{0.0f, rEnd, barrelEndZ - barrelLen * 0.06f - gap - 0.03f},
+			Point3{0.0f, -rEnd, barrelEndZ - barrelLen * 0.06f - gap - 0.03f},
+			Point3{-rEnd, 0.0f, barrelEndZ - barrelLen * 0.06f - gap - 0.03f},
+			Point3{rEnd, 0.0f, barrelEndZ - barrelLen * 0.06f - gap - 0.03f}
 		};
 
 		for (int i = 0; i < 4; ++i) {
 			builder.addCylinder(satStarts[i], satEnds[i], satR, satR, 12, UV_BARREL, false, false);
 		}
 
-		// Conical Cluster Retaining Clamps holding the diverging bundle together
-		const float clampZ1 = barrelStartZ + barrelLen * 0.30f;
-		const float clampZ2 = barrelStartZ + barrelLen * 0.68f;
-
-		// Clamp 1
-		builder.addCylinder(Point3{0.0f, 0.0f, clampZ1 - bRad * 0.08f}, Point3{0.0f, 0.0f, clampZ1 + bRad * 0.08f}, 0.76f, 0.76f, 14, UV_DETAIL, true, true);
-		builder.addCylinder(Point3{0.0f, 0.0f, clampZ1 - bRad * 0.04f}, Point3{0.0f, 0.0f, clampZ1 + bRad * 0.04f}, 0.80f, 0.80f, 14, UV_CONDUIT, false, false);
-
-		// Clamp 2 (flared wider to follow cone)
-		builder.addCylinder(Point3{0.0f, 0.0f, clampZ2 - bRad * 0.08f}, Point3{0.0f, 0.0f, clampZ2 + bRad * 0.08f}, 0.94f, 0.94f, 14, UV_DETAIL, true, true);
-		builder.addCylinder(Point3{0.0f, 0.0f, clampZ2 - bRad * 0.04f}, Point3{0.0f, 0.0f, clampZ2 + bRad * 0.04f}, 0.98f, 0.98f, 14, UV_CONDUIT, false, false);
-
 		// 5 Distinct Flared Muzzle Chokes with 100% Visible Deep Bores
-		// Central Muzzle Bore
-		const Point3 cChokeStart{0.0f, 0.0f, barrelEndZ - barrelLen * 0.06f};
+		const float chokeLen = barrelLen * 0.06f;
+		const float boreDepthCenter = chokeLen * 0.75f;
+		const float boreDepthSat = chokeLen * 0.75f;
+
+		const Point3 cChokeStart{0.0f, 0.0f, barrelEndZ - chokeLen};
 		const Point3 cChokeEnd{0.0f, 0.0f, barrelEndZ};
 		builder.addCylinder(cChokeStart, cChokeEnd, centerR * 1.25f, centerR * 1.20f, 12, UV_DETAIL, false, false);
-		builder.addMuzzleBore(cChokeEnd, Point3{0.0f, 0.0f, 1.0f}, centerR * 1.20f, centerR * 0.72f, barrelLen * 0.20f, 12, UV_CONDUIT, UV_BORE);
+		builder.addMuzzleBore(cChokeEnd, Point3{0.0f, 0.0f, 1.0f}, centerR * 1.20f, centerR * 0.72f, boreDepthCenter, 12, UV_CONDUIT, UV_BORE);
 
-		// 4 Satellite Muzzle Bores (angled along respective cone vectors)
 		const Point3 muzzleFinalCenters[4] = {
 			Point3{0.0f, rEnd, barrelEndZ},
 			Point3{0.0f, -rEnd, barrelEndZ},
@@ -601,11 +627,10 @@ namespace {
 		};
 
 		for (int i = 0; i < 4; ++i) {
-			const Point3 chokeStart = satEnds[i];
+			const Point3 chokeStart = Point3{satEnds[i].x, satEnds[i].y, barrelEndZ - chokeLen};
 			const Point3 chokeEnd = muzzleFinalCenters[i];
-			const Point3 coneDir = normalize(chokeEnd - satStarts[i]);
 			builder.addCylinder(chokeStart, chokeEnd, satR * 1.28f, satR * 1.22f, 10, UV_DETAIL, false, false);
-			builder.addMuzzleBore(chokeEnd, coneDir, satR * 1.22f, satR * 0.70f, barrelLen * 0.16f, 10, UV_CONDUIT, UV_BORE);
+			builder.addMuzzleBore(chokeEnd, Point3{0.0f, 0.0f, 1.0f}, satR * 1.22f, satR * 0.70f, boreDepthSat, 10, UV_CONDUIT, UV_BORE);
 		}
 
 		report.pivotPosition = Point3{0.0f, 0.0f, 0.0f};

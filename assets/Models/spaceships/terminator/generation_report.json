@@ -9,7 +9,7 @@
     "minimum": {
       "x": -7.617000102996826,
       "y": -3.700000047683716,
-      "z": -4.779019832611084
+      "z": -4.859274387359619
     }
   },
   "design": {
@@ -1625,6 +1625,6 @@
     "reactorShields": 1,
     "serviceAccessPanels": 1
   },
-  "triangles": 8860,
-  "vertices": 4640
+  "triangles": 8284,
+  "vertices": 4352
 }

@@ -402,7 +402,7 @@ int main() {
 		systems::DelayedDamage{}.update(context, dt);
 		systems::HpCleanup{}.update(context, dt);
 		systems::HpRegen{}.update(context, dt);
-		systems::SpawnTrailParticles{}.update(context, dt);
+		systems::UpdateTrails{}.update(context, dt);
 
 		// Realtime UI Overlay
 		if (state == BenchmarkState::WARMUP) {

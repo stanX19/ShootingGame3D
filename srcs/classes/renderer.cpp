@@ -151,6 +151,7 @@ void Renderer::render(float dt, const Camera3D &camera)
 
 	handleLightSource();
 	drawEntitiesBatched();
+	drawTrails();
 	drawBoundaryWarning();
 	drawEnergyShield();
 	drawDebug();
@@ -158,15 +159,131 @@ void Renderer::render(float dt, const Camera3D &camera)
 	EndMode3D();
 }
 
+namespace {
+	struct RibbonPoint {
+		Vector3 left;
+		Vector3 right;
+		Color color;
+	};
+
+	inline void emitRibbonTriangles(
+		const effect::TrailNode *nodes,
+		std::size_t count,
+		float startWidth,
+		float endWidth,
+		Color baseColor,
+		const Camera3D &camera
+	) {
+		if (count < 2) return;
+
+		RibbonPoint pts[12];
+		const std::size_t n = count;
+
+		for (std::size_t i = 0; i < n; ++i)
+		{
+			const auto &node = nodes[i];
+			Vector3 forward;
+			if (i == 0) {
+				forward = Vector3Subtract(node.pos, nodes[1].pos);
+			} else if (i == n - 1) {
+				forward = Vector3Subtract(nodes[n - 2].pos, node.pos);
+			} else {
+				forward = Vector3Subtract(nodes[i - 1].pos, nodes[i + 1].pos);
+			}
+
+			// Strict NaN protection: handle zero forward vectors (newly spawned / stationary entities)
+			const float fwdLenSq = Vector3LengthSqr(forward);
+			Vector3 toCam = Vector3Subtract(camera.position, node.pos);
+			Vector3 side;
+			if (fwdLenSq > 1e-6f) {
+				side = Vector3CrossProduct(forward, toCam);
+				if (Vector3LengthSqr(side) < 1e-4f) {
+					side = Vector3CrossProduct(forward, camera.up);
+				}
+			}
+			if (Vector3LengthSqr(side) < 1e-6f) {
+				side = Vector3CrossProduct(Vector3Subtract(camera.target, camera.position), camera.up);
+			}
+			const float sideLen = Vector3Length(side);
+			side = (sideLen > 1e-5f) ? Vector3Scale(side, 1.0f / sideLen) : Vector3{1.0f, 0.0f, 0.0f};
+
+			const float t = static_cast<float>(i) / static_cast<float>(n - 1);
+			const float halfWidth = (startWidth * (1.0f - t) + endWidth * t) * 0.5f;
+			const Vector3 offset = Vector3Scale(side, halfWidth);
+
+			const unsigned char alpha = static_cast<unsigned char>(std::clamp(baseColor.a * node.alpha, 0.0f, 255.0f));
+			pts[i].color = Color{baseColor.r, baseColor.g, baseColor.b, alpha};
+			pts[i].left = Vector3Add(node.pos, offset);
+			pts[i].right = Vector3Subtract(node.pos, offset);
+		}
+
+		for (std::size_t i = 0; i < n - 1; ++i)
+		{
+			// Triangle 1: left[i], right[i], right[i+1]
+			rlColor4ub(pts[i].color.r, pts[i].color.g, pts[i].color.b, pts[i].color.a);
+			rlVertex3f(pts[i].left.x, pts[i].left.y, pts[i].left.z);
+
+			rlColor4ub(pts[i].color.r, pts[i].color.g, pts[i].color.b, pts[i].color.a);
+			rlVertex3f(pts[i].right.x, pts[i].right.y, pts[i].right.z);
+
+			rlColor4ub(pts[i + 1].color.r, pts[i + 1].color.g, pts[i + 1].color.b, pts[i + 1].color.a);
+			rlVertex3f(pts[i + 1].right.x, pts[i + 1].right.y, pts[i + 1].right.z);
+
+			// Triangle 2: left[i], right[i+1], left[i+1]
+			rlColor4ub(pts[i].color.r, pts[i].color.g, pts[i].color.b, pts[i].color.a);
+			rlVertex3f(pts[i].left.x, pts[i].left.y, pts[i].left.z);
+
+			rlColor4ub(pts[i + 1].color.r, pts[i + 1].color.g, pts[i + 1].color.b, pts[i + 1].color.a);
+			rlVertex3f(pts[i + 1].right.x, pts[i + 1].right.y, pts[i + 1].right.z);
+
+			rlColor4ub(pts[i + 1].color.r, pts[i + 1].color.g, pts[i + 1].color.b, pts[i + 1].color.a);
+			rlVertex3f(pts[i + 1].left.x, pts[i + 1].left.y, pts[i + 1].left.z);
+		}
+	}
+}
+
 void Renderer::drawTrails()
 {
-	auto trailView = m_context.registry.view<physics::Position, effect::Trail>();
-	for (auto entity : trailView)
+	rlDisableDepthMask();
+	rlSetBlendMode(BLEND_ADDITIVE);
+	rlBegin(RL_TRIANGLES);
+
+	// 1. Single-emitter trails (Bullets and Missiles)
+	auto simpleView = m_context.registry.view<const effect::HasSimpleTrail>();
+	for (auto entity : simpleView)
 	{
-		const physics::Position &p = trailView.get<physics::Position>(entity);
-		const effect::Trail &t = trailView.get<effect::Trail>(entity);
-		drawTrailBetween(p.value, p.prevValue, t.rad, t.color);
+		const auto &trail = simpleView.get<const effect::HasSimpleTrail>(entity);
+		if (trail.count < 2) continue;
+		if (!m_currentFrustum.isSphereInside(trail.nodes[0].pos, 50.0f)) continue;
+		drawSimpleRibbon(trail);
 	}
+
+	// 2. Multi-emitter trails (Spaceship Thrusters)
+	auto multiView = m_context.registry.view<const effect::HasMultiTrail>();
+	for (auto entity : multiView)
+	{
+		const auto &trail = multiView.get<const effect::HasMultiTrail>(entity);
+		for (std::size_t e = 0; e < trail.emitterCount; ++e) {
+			const auto &emitter = trail.emitters[e];
+			if (emitter.count < 2) continue;
+			if (!m_currentFrustum.isSphereInside(emitter.nodes[0].pos, 50.0f)) continue;
+			drawMultiRibbon(emitter, trail);
+		}
+	}
+
+	rlEnd();
+	rlSetBlendMode(BLEND_ALPHA);
+	rlEnableDepthMask();
+}
+
+void Renderer::drawSimpleRibbon(const effect::HasSimpleTrail &trail)
+{
+	emitRibbonTriangles(trail.nodes, trail.count, trail.width, trail.endWidth, trail.color, m_camera);
+}
+
+void Renderer::drawMultiRibbon(const effect::HasMultiTrail::Emitter &emitter, const effect::HasMultiTrail &trail)
+{
+	emitRibbonTriangles(emitter.nodes, emitter.count, emitter.width, trail.endWidth, trail.color, m_camera);
 }
 
 void Renderer::drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color)
@@ -223,8 +340,10 @@ void Renderer::drawEntityModel(const physics::Position &pos, const render::Rende
 
 void Renderer::drawEntitiesBatched()
 {
-	for (auto &[key, transforms] : m_instancedBatches) {
-		transforms.clear();
+	for (auto &batch : m_modelBatches) {
+		for (auto &grp : batch.groups) {
+			grp.transforms.clear();
+		}
 	}
 
 	auto view = m_context.registry.view<physics::Position, render::RenderBody>(entt::exclude<render::tag::SkyBox>);
@@ -248,7 +367,28 @@ void Renderer::drawEntitiesBatched()
 			continue;
 
 		const bool isShaded = m_context.registry.all_of<render::tag::Shaded>(entity);
-		const BatchKey key{body.modelID, body.color, isShaded};
+		if (body.modelID >= m_modelBatches.size()) {
+			m_modelBatches.resize(body.modelID + 1);
+		}
+
+		const uint64_t key = (static_cast<uint64_t>(body.color.r) << 24)
+			| (static_cast<uint64_t>(body.color.g) << 16)
+			| (static_cast<uint64_t>(body.color.b) << 8)
+			| static_cast<uint64_t>(body.color.a)
+			| (isShaded ? (1ULL << 32) : 0ULL);
+
+		auto &batch = m_modelBatches[body.modelID];
+		ModelInstanceGroup *targetGroup = nullptr;
+		for (auto &grp : batch.groups) {
+			if (grp.key == key) {
+				targetGroup = &grp;
+				break;
+			}
+		}
+		if (targetGroup == nullptr) {
+			batch.groups.push_back(ModelInstanceGroup{key, body.color, isShaded, {}});
+			targetGroup = &batch.groups.back();
+		}
 
 		const float shrink = 1.0f;
 		const Vector3 renderScale = body.scale * Vector3{shrink, shrink, strech.strech};
@@ -261,8 +401,9 @@ void Renderer::drawEntitiesBatched()
 				MatrixTranslate(position.x, position.y, position.z)
 			)
 		);
-		m_instancedBatches[key].push_back(mat);
+		targetGroup->transforms.push_back(mat);
 	}
+
 	auto hasNormalMap = [](const Model &model) {
 		for (int i = 0; i < model.materialCount; i++) {
 			if (model.materials[i].maps != nullptr && model.materials[i].maps[MATERIAL_MAP_NORMAL].texture.id > 0) {
@@ -272,65 +413,73 @@ void Renderer::drawEntitiesBatched()
 		return false;
 	};
 
-	for (const auto &[key, transforms] : m_instancedBatches)
+	for (size_t modelId = 0; modelId < m_modelBatches.size(); ++modelId)
 	{
-		if (transforms.empty())
+		const auto &batch = m_modelBatches[modelId];
+		if (batch.groups.empty())
 			continue;
 
-		Model &model = m_context.modelManager.getModel(key.modelId);
+		Model &model = m_context.modelManager.getModel(modelId);
 		const Matrix modelTransform = model.transform; // Read-only, model.transform is never mutated!
+		const bool normalMapFound = hasNormalMap(model);
 
-		const bool useInstancing = (transforms.size() > 1) &&
-			((key.shaded && m_instancedLightedShader.id > 0) || (!key.shaded && m_instancedShader.id > 0));
-
-		// If single instance or unsupported instanced shader, draw standard way
-		if (!useInstancing)
+		for (const auto &grp : batch.groups)
 		{
-			const Shader activeShader = key.shaded ? m_lightedShader : m_defaultShader;
-			if (key.shaded) {
-				const int normalMapAvailable = hasNormalMap(model) ? 1 : 0;
-				SetShaderValue(m_lightedShader, m_normalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
+			if (grp.transforms.empty())
+				continue;
+
+			const bool useInstancing = (grp.transforms.size() > 1) &&
+				((grp.shaded && m_instancedLightedShader.id > 0) || (!grp.shaded && m_instancedShader.id > 0));
+
+			// If single instance or unsupported instanced shader, draw standard way
+			if (!useInstancing)
+			{
+				const Shader activeShader = grp.shaded ? m_lightedShader : m_defaultShader;
+				if (grp.shaded) {
+					const int normalMapAvailable = normalMapFound ? 1 : 0;
+					SetShaderValue(m_lightedShader, m_normalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
+				}
+
+				for (int i = 0; i < model.materialCount; i++) {
+					model.materials[i].shader = activeShader;
+					model.materials[i].maps[MATERIAL_MAP_DIFFUSE].color = grp.color;
+				}
+
+				for (const Matrix &mat : grp.transforms)
+				{
+					const Matrix finalMat = MatrixMultiply(modelTransform, mat);
+					for (int m = 0; m < model.meshCount; m++) {
+						DrawMesh(model.meshes[m], model.materials[model.meshMaterial[m]], finalMat);
+					}
+				}
+				continue;
+			}
+
+			// Fast-path: Instanced batch rendering for multiple instances (both shaded and unshaded)
+			const Shader activeShader = grp.shaded ? m_instancedLightedShader : m_instancedShader;
+			if (grp.shaded) {
+				const int normalMapAvailable = normalMapFound ? 1 : 0;
+				SetShaderValue(m_instancedLightedShader, m_instancedNormalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
 			}
 
 			for (int i = 0; i < model.materialCount; i++) {
 				model.materials[i].shader = activeShader;
-				model.materials[i].maps[MATERIAL_MAP_DIFFUSE].color = key.color;
+				model.materials[i].maps[MATERIAL_MAP_DIFFUSE].color = grp.color;
 			}
 
-			for (const Matrix &mat : transforms)
-			{
-				const Matrix finalMat = MatrixMultiply(modelTransform, mat);
-				for (int m = 0; m < model.meshCount; m++) {
-					DrawMesh(model.meshes[m], model.materials[model.meshMaterial[m]], finalMat);
-				}
+			m_tempTransformBuffer.resize(grp.transforms.size());
+			for (size_t idx = 0; idx < grp.transforms.size(); ++idx) {
+				m_tempTransformBuffer[idx] = MatrixMultiply(modelTransform, grp.transforms[idx]);
 			}
-			continue;
-		}
 
-		// Fast-path: Instanced batch rendering for multiple instances (both shaded and unshaded)
-		const Shader activeShader = key.shaded ? m_instancedLightedShader : m_instancedShader;
-		if (key.shaded) {
-			const int normalMapAvailable = hasNormalMap(model) ? 1 : 0;
-			SetShaderValue(m_instancedLightedShader, m_instancedNormalMapAvailableLoc, &normalMapAvailable, SHADER_UNIFORM_INT);
-		}
-
-		for (int i = 0; i < model.materialCount; i++) {
-			model.materials[i].shader = activeShader;
-			model.materials[i].maps[MATERIAL_MAP_DIFFUSE].color = key.color;
-		}
-
-		m_tempTransformBuffer.resize(transforms.size());
-		for (size_t idx = 0; idx < transforms.size(); ++idx) {
-			m_tempTransformBuffer[idx] = MatrixMultiply(modelTransform, transforms[idx]);
-		}
-
-		for (int m = 0; m < model.meshCount; m++) {
-			DrawMeshInstanced(
-				model.meshes[m],
-				model.materials[model.meshMaterial[m]],
-				m_tempTransformBuffer.data(),
-				static_cast<int>(transforms.size())
-			);
+			for (int m = 0; m < model.meshCount; m++) {
+				DrawMeshInstanced(
+					model.meshes[m],
+					model.materials[model.meshMaterial[m]],
+					m_tempTransformBuffer.data(),
+					static_cast<int>(grp.transforms.size())
+				);
+			}
 		}
 	}
 }

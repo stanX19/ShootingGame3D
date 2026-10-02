@@ -61,7 +61,7 @@ private:
     systems::DelayedDamage m_systemDelayedDamage;
     systems::HpCleanup m_systemHpCleanup;
     systems::HpRegen m_systemHpRegen;
-    systems::SpawnTrailParticles m_systemSpawnTrailParticles;
+    systems::UpdateTrails m_systemUpdateTrails;
 
     void inputControls([[maybe_unused]] float dt, EngineState &nextState);
 };

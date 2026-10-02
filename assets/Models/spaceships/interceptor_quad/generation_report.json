@@ -1,13 +1,13 @@
 {
   "bounds": {
     "maximum": {
-      "x": 4.427999973297119,
+      "x": 4.428999900817871,
       "y": 0.7023999691009521,
       "z": 3.1000001430511475
     },
-    "maximumRadius": 4.798995494842529,
+    "maximumRadius": 4.798699378967285,
     "minimum": {
-      "x": -4.427999973297119,
+      "x": -4.428999900817871,
       "y": -0.5759999752044678,
       "z": -3.1000001430511475
     }
@@ -273,7 +273,7 @@
       "turretRadius": 0.25
     }
   ],
-  "settingsFingerprint": 6834190496393240748,
+  "settingsFingerprint": 18096251614321195064,
   "systems": {
     "feedTrunks": 2,
     "fuelHousings": 2,
@@ -281,6 +281,6 @@
     "reactorShields": 1,
     "serviceAccessPanels": 1
   },
-  "triangles": 5476,
-  "vertices": 2798
+  "triangles": 5316,
+  "vertices": 2718
 }

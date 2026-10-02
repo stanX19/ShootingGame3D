@@ -17,36 +17,6 @@
 
 namespace spaceship::factory {
 
-namespace {
-
-effect::SpawnsTrailParticles makeShipTrailParticles(
-	const std::vector<EnginePoint>& engines,
-	float bodyScale
-) {
-	if (engines.size() > effect::SpawnsTrailParticles::maxSpawnLocations)
-		throw std::invalid_argument(
-			"SPACESHIP: engine count exceeds trail spawn capacity"
-		);
-
-	effect::SpawnsTrailParticles result{};
-	result.spawnCount = static_cast<std::uint8_t>(engines.size());
-	result.radius = 0.3f * bodyScale;
-	result.lifespan = 0.1f;
-	result.color = SKYBLUE;
-	for (std::size_t index = 0; index < engines.size(); ++index) {
-		const EnginePoint& engine = engines[index];
-		result.spawnLocations[index] = Vector3{
-			engine.center.x,
-			engine.center.y,
-			engine.center.z
-				- engine.length * 0.5f
-				- engine.nozzleDepth
-		};
-	}
-	return result;
-}
-
-} // namespace
 
 entt::entity SpawnedSpaceship::turret(std::size_t index) const {
 	if (index >= turrets.size())
@@ -137,10 +107,23 @@ SpawnedSpaceship spawnConfiguredSpaceship(
 	context.registry.emplace<render::tag::Shaded>(assembly.entity);
 	context.registry.emplace<render::tag::RotationSyncModel>(assembly.entity);
 	context.registry.emplace<effect::tag::DropDebris>(assembly.entity);
-	context.registry.emplace<effect::SpawnsTrailParticles>(
-		assembly.entity,
-		makeShipTrailParticles(geometry.engines, geometry.bodyScale)
-	);
+	effect::HasMultiTrail shipTrail;
+	shipTrail.maxNodes = 10;
+	shipTrail.maxAge = 0.35f;
+	shipTrail.minDistance = 1.5f;
+	shipTrail.endWidth = 0.0f;
+	shipTrail.color = SKYBLUE;
+	shipTrail.emitterCount = static_cast<std::uint8_t>(std::min(geometry.engines.size(), effect::HasMultiTrail::MAX_EMITTERS));
+	for (std::size_t i = 0; i < shipTrail.emitterCount; ++i) {
+		const auto &engine = geometry.engines[i];
+		shipTrail.emitters[i].localOffset = Vector3{
+			engine.center.x,
+			engine.center.y,
+			engine.center.z - engine.length * 0.5f - engine.nozzleDepth
+		};
+		shipTrail.emitters[i].width = std::max(0.15f, engine.radius * 2.0f);
+	}
+	context.registry.emplace<effect::HasMultiTrail>(assembly.entity, shipTrail);
 
 	assembly.turrets.reserve(geometry.mounts.size());
 

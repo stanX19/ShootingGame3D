@@ -141,7 +141,7 @@ test-manual:
 	fi
 	@$(MAKE) --no-print-directory $(TESTBINDIR)/manual/$(TEST)
 	@echo "Running $(TESTBINDIR)/manual/$(TEST)..."
-	@./$(TESTBINDIR)/manual/$(TEST)
+	@$(RUN_DRIVER_ENV) ./$(TESTBINDIR)/manual/$(TEST)
 
 all_test: test
 

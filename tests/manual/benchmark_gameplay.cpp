@@ -56,7 +56,7 @@ namespace {
 		SYS_DELAYED_DAMAGE,
 		SYS_HP_CLEANUP,
 		SYS_HP_REGEN,
-		SYS_SPAWN_TRAIL_PARTICLES,
+		SYS_UPDATE_TRAILS,
 
 		SYS_COUNT
 	};
@@ -149,7 +149,7 @@ namespace {
 		metrics[SYS_DELAYED_DAMAGE].name = "delayedDamage";
 		metrics[SYS_HP_CLEANUP].name = "hpCleanup";
 		metrics[SYS_HP_REGEN].name = "hpRegen";
-		metrics[SYS_SPAWN_TRAIL_PARTICLES].name = "spawnTrailParticles";
+		metrics[SYS_UPDATE_TRAILS].name = "updateTrails";
 	}
 
 	void resetMetrics(SystemMetric (&metrics)[SYS_COUNT]) {
@@ -247,7 +247,7 @@ int main() {
 	systems::DelayedDamage sysDelayedDamage;
 	systems::HpCleanup sysHpCleanup;
 	systems::HpRegen sysHpRegen;
-	systems::SpawnTrailParticles sysSpawnTrailParticles;
+	systems::UpdateTrails sysUpdateTrails;
 
 	SystemMetric metrics[SYS_COUNT];
 	initMetricNames(metrics);
@@ -382,7 +382,7 @@ int main() {
 		runProfiled<SYS_DELAYED_DAMAGE>(metrics, isProfiling, [&]() { sysDelayedDamage.update(context, dt); });
 		runProfiled<SYS_HP_CLEANUP>(metrics, isProfiling, [&]() { sysHpCleanup.update(context, dt); });
 		runProfiled<SYS_HP_REGEN>(metrics, isProfiling, [&]() { sysHpRegen.update(context, dt); });
-		runProfiled<SYS_SPAWN_TRAIL_PARTICLES>(metrics, isProfiling, [&]() { sysSpawnTrailParticles.update(context, dt); });
+		runProfiled<SYS_UPDATE_TRAILS>(metrics, isProfiling, [&]() { sysUpdateTrails.update(context, dt); });
 
 		// Entity metric capture during profiling
 		if (isProfiling) {
@@ -394,7 +394,7 @@ int main() {
 			s.collisionBodyCount = context.registry.storage<CollisionBody>().size();
 			s.renderBodyCount = context.registry.storage<RenderBody>().size();
 			s.lifespanCount = context.registry.storage<Lifespan>().size();
-			s.trailCount = context.registry.storage<SpawnsTrailParticles>().size();
+			s.trailCount = context.registry.storage<effect::HasSimpleTrail>().size() + context.registry.storage<effect::HasMultiTrail>().size();
 			samples.push_back(s);
 		}
 

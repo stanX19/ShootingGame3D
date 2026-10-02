@@ -1,10 +1,10 @@
 {
   "id": "lazer_shotgun",
   "archetype": "lazer_shotgun",
-  "vertexCount": 1116,
-  "triangleCount": 1356,
-  "boundingRadius": 5.68515,
-  "boundingHeight": 1.00782,
-  "muzzlePosition": {"x": 0, "y": 0, "z": 5.595},
+  "vertexCount": 1000,
+  "triangleCount": 1188,
+  "boundingRadius": 6.46226,
+  "boundingHeight": 1.05782,
+  "muzzlePosition": {"x": 0, "y": 0, "z": 6.375},
   "pivotPosition": {"x": 0, "y": 0, "z": 0}
 }

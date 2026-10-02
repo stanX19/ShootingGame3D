@@ -70,7 +70,7 @@ namespace systems
 	class AsteroidRespawn : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class CleanOutOfBound : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 	class SyncModelRotation : public BaseSystem { public: void update(GameContext &context, float dt) override; };
-	class SpawnTrailParticles : public BaseSystem { public: void update(GameContext &context, float dt) override; };
+	class UpdateTrails : public BaseSystem { public: void update(GameContext &context, float dt) override; };
 
 	class HudWarning : public BaseSystem
 	{

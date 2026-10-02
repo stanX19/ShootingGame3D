@@ -100,16 +100,14 @@ namespace
 		context.templateReg.emplace<Damage>(missile, Damage{bodyDamage});
 		context.templateReg.emplace<RenderBody>(missile, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(missile, missileBound * -1, missileBound);
-		context.templateReg.emplace<SpawnsTrailParticles>(
-			missile,
-			SpawnsTrailParticles{
-				{{Vector3{0.0f, 0.0f, 0.0f}}},
-				1,
-				rad * 0.5f,
-				0.5f,
-				SKYBLUE
-			}
-		);
+		effect::HasSimpleTrail missileTrail;
+		missileTrail.maxNodes = 8;
+		missileTrail.maxAge = 0.30f;
+		missileTrail.minDistance = 1.0f;
+		missileTrail.width = rad * 0.8f;
+		missileTrail.endWidth = 0.0f;
+		missileTrail.color = ORANGE;
+		context.templateReg.emplace<effect::HasSimpleTrail>(missile, missileTrail);
 		context.templateReg.emplace<Rotation>(missile);
 		context.templateReg.emplace<physics::tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);

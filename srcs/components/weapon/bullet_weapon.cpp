@@ -24,6 +24,39 @@ namespace
 		return baseColor;
 	}
 
+	Color parseConfigColor(const nlohmann::json &j, Color defaultColor)
+	{
+		if (j.is_array() && j.size() >= 3) {
+			return Color{
+				static_cast<unsigned char>(j[0].get<int>()),
+				static_cast<unsigned char>(j[1].get<int>()),
+				static_cast<unsigned char>(j[2].get<int>()),
+				static_cast<unsigned char>(j.size() > 3 ? j[3].get<int>() : 255)
+			};
+		}
+		if (j.is_string()) {
+			const std::string s = j.get<std::string>();
+			if (s == "gray" || s == "GRAY") return GRAY;
+			if (s == "white" || s == "WHITE") return WHITE;
+			if (s == "yellow" || s == "YELLOW") return YELLOW;
+			if (s == "orange" || s == "ORANGE") return ORANGE;
+			if (s == "skyblue" || s == "SKYBLUE") return SKYBLUE;
+			if (s == "red" || s == "RED") return RED;
+			if (s == "green" || s == "GREEN") return GREEN;
+			if (s == "blue" || s == "BLUE") return BLUE;
+		}
+		return defaultColor;
+	}
+
+	Color getBulletTrailColor(const GameConfig &globalCfg)
+	{
+		const auto bulletSec = globalCfg.getSection("weapons.bullet");
+		if (bulletSec.contains("trailColor")) {
+			return parseConfigColor(bulletSec["trailColor"], GRAY);
+		}
+		return GRAY;
+	}
+
 	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_BULLET_SHOOT)
 	{
 		context.registry.emplace_or_replace<weapon::tag::IsWeapon>(entity);
@@ -47,6 +80,13 @@ namespace
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f);
 		context.templateReg.emplace<DisappearBound>(bullet, bulletBound * -1, bulletBound);
 		context.templateReg.emplace<sound::HitSound>(bullet, sound::RANDOM_BULLET_HIT, 0.4f);
+		effect::HasSimpleTrail bulletTrail;
+		bulletTrail.maxNodes = 2;
+		bulletTrail.maxAge = 0.05f;
+		bulletTrail.width = 0.15f;
+		bulletTrail.endWidth = 0.0f;
+		bulletTrail.color = getBulletTrailColor(cfg);
+		context.templateReg.emplace<effect::HasSimpleTrail>(bullet, bulletTrail);
 		return bullet;
 	}
 

@@ -86,6 +86,7 @@ namespace gen_model {
 			if (asset.mesh.positions.empty() || asset.mesh.triangles.empty() || asset.texture.rgba.empty() || asset.normalMap.rgba.empty()) {
 				throw std::invalid_argument("Cannot write an empty model asset");
 			}
+			spaceship::topology::requireNoCoplanarZFighting(asset.mesh);
 			std::filesystem::create_directories(outputDirectory);
 			if (basename.empty()) {
 				throw std::invalid_argument("Model asset basename cannot be empty");

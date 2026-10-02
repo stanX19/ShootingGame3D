@@ -3,8 +3,8 @@
   "archetype": "heavy_mg_rifle",
   "vertexCount": 844,
   "triangleCount": 910,
-  "boundingRadius": 7.98313,
+  "boundingRadius": 8.81095,
   "boundingHeight": 1,
-  "muzzlePosition": {"x": 0, "y": 0, "z": 7.96},
+  "muzzlePosition": {"x": 0, "y": 0, "z": 8.79},
   "pivotPosition": {"x": 0, "y": 0, "z": 0}
 }
