@@ -17,6 +17,8 @@
 #include <iostream>
 
 namespace weapon {
+	void emplaceConfiguredWeapon(GameContext &context, entt::entity entity, const nlohmann::json &def);
+
 	void emplaceGenericBullet(GameContext &context, entt::entity entity, const GameConfig& cfg);
 	void emplaceGenericLazer(GameContext &context, entt::entity entity, const GameConfig& cfg);
 	void emplaceGenericMissile(GameContext &context, entt::entity entity, const GameConfig& cfg);

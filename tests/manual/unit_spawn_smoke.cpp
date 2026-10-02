@@ -25,9 +25,9 @@ int main() {
 	context.config.setString("loadout.shipId", "fighter");
 	context.config.setStringArray(
 		"loadout.turretWeapons",
-		std::vector<std::string>(4, "bullet.basic")
+		std::vector<std::string>(4, "basic")
 	);
-	context.config.setString("loadout.specialWeapon", "missile.basic");
+	context.config.setString("loadout.specialWeapon", "missileBasic");
 
 	const entt::entity player = spawnPlayer(context, Vector3{0.0f, 0.0f, 0.0f});
 	const auto* playerBody = context.registry.try_get<RenderBody>(player);
@@ -55,7 +55,7 @@ int main() {
 	context.config.setString("loadout.shipId", "elite");
 	context.config.setStringArray(
 		"loadout.turretWeapons",
-		std::vector<std::string>(2, "bullet.basic")
+		std::vector<std::string>(2, "basic")
 	);
 	const entt::entity selectedPlayer =
 		spawnPlayer(context, Vector3{0.0f, 0.0f, 0.0f});

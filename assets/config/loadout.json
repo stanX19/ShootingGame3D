@@ -1,10 +1,10 @@
 {
     "shipId": "interceptor_quad",
-    "specialWeapon": "missile.basic",
+    "specialWeapon": "flares",
     "turretWeapons": [
-        "lazer.machineGun",
-        "lazer.machineGun",
-        "missile.torpedo",
-        "missile.torpedo"
+        "lazerMachineGun",
+        "lazerMachineGun",
+        "torpedo",
+        "torpedo"
     ]
 }

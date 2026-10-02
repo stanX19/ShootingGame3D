@@ -24,7 +24,7 @@ unit::Loadout makePlayerLoadout(
 	std::size_t mountCount
 ) {
 	unit::Loadout loadout;
-	loadout.turretWeapons.resize(mountCount, "bullet.basic");
+	loadout.turretWeapons.resize(mountCount, "basic");
 	for (std::size_t index = 0; index < mountCount; ++index) {
 		if (index < context.config.loadout.turretWeapons.size()
 			&& !context.config.loadout.turretWeapons[index].empty())
@@ -32,7 +32,7 @@ unit::Loadout makePlayerLoadout(
 				context.config.loadout.turretWeapons[index];
 	}
 	loadout.specialWeapon = context.config.loadout.specialWeapon.empty()
-		? "missile.basic"
+		? "missileBasic"
 		: context.config.loadout.specialWeapon;
 	return loadout;
 }

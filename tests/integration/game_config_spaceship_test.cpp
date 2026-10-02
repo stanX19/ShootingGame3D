@@ -128,10 +128,10 @@ TEST_CASE("GameConfig preserves dotted reads and scoped subconfigs", "[integrati
 	GameConfig config;
 	config.init(kConfigRoots);
 
-	CHECK(config.getFloat("weapons.missile.weapons.nuke.instantRadius", 0.0f)
+	CHECK(config.getFloat("weapons.weapons.nuke.instantRadius", 0.0f)
 		== Catch::Approx(5.0f));
 	const SubGameConfig nuke =
-		config.getSubConfig("weapons.missile.weapons.nuke");
+		config.getSubConfig("weapons.weapons.nuke");
 	CHECK(nuke.getFloat("instantRadius", 0.0f) == Catch::Approx(5.0f));
 	CHECK(config.getSection("loadout").is_object());
 }

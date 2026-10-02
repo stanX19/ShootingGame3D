@@ -22,9 +22,7 @@ namespace {
 
 
 bool isKnownWeapon(const GameContext& context, std::string_view id) {
-	return !id.empty()
-		&& context.weaponRegistry.getAllWeaponsMap().find(std::string(id))
-			!= context.weaponRegistry.getAllWeaponsMap().end();
+	return !id.empty() && context.weaponRegistry.hasWeapon(std::string(id));
 }
 
 std::size_t mountCount(
@@ -182,7 +180,7 @@ SpawnedUnit spawnConfiguredUnit(
 			"turret",
 			index,
 			params.loadout.turretWeapons[index],
-			"bullet.basic"
+			"basic"
 		);
 		if (weaponId.empty())
 			continue;
@@ -198,7 +196,7 @@ SpawnedUnit spawnConfiguredUnit(
 		"special",
 		0,
 		params.loadout.specialWeapon,
-		"missile.basic"
+		"missileBasic"
 	);
 	if (!specialWeaponId.empty()) {
 		context.weaponRegistry.emplaceWeaponById(
@@ -225,7 +223,7 @@ entt::entity spawnUnit(
 		"basic",
 		GetRandomValue(0, 1000)
 	);
-	loadout.specialWeapon = "missile.basic";
+	loadout.specialWeapon = "missileBasic";
 	return spawnEnemyWithLoadout(
 		context,
 		"basic",
@@ -244,7 +242,7 @@ entt::entity spawnFighterUnit(
 	const int seed = GetRandomValue(0, 1000);
 	unit::Loadout loadout;
 	loadout.turretWeapons = randomTurretLoadout(context, "fighter", seed);
-	loadout.specialWeapon = "missile.basic";
+	loadout.specialWeapon = "missileBasic";
 	return spawnEnemyWithLoadout(
 		context,
 		"fighter",
@@ -324,8 +322,8 @@ entt::entity spawnMothershipUnit(
 		seed
 	);
 	for (std::size_t index = 4; index < loadout.turretWeapons.size(); ++index)
-		loadout.turretWeapons[index] = "bullet.basic";
-	loadout.specialWeapon = "missile.flares";
+		loadout.turretWeapons[index] = "basic";
+	loadout.specialWeapon = "flares";
 	return spawnEnemyWithLoadout(
 		context,
 		"mothership",
@@ -344,7 +342,7 @@ entt::entity spawnInterceptorQuadUnit(
 	const int seed = GetRandomValue(0, 1000);
 	unit::Loadout loadout;
 	loadout.turretWeapons = randomTurretLoadout(context, "interceptor_quad", seed);
-	loadout.specialWeapon = "missile.basic";
+	loadout.specialWeapon = "missileBasic";
 	return spawnEnemyWithLoadout(
 		context,
 		"interceptor_quad",
@@ -363,7 +361,7 @@ entt::entity spawnHeavyQuadUnit(
 	const int seed = GetRandomValue(0, 1000);
 	unit::Loadout loadout;
 	loadout.turretWeapons = randomTurretLoadout(context, "heavy_quad", seed);
-	loadout.specialWeapon = "missile.basic";
+	loadout.specialWeapon = "missileBasic";
 	return spawnEnemyWithLoadout(
 		context,
 		"heavy_quad",

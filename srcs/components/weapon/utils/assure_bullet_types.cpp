@@ -5,6 +5,8 @@
 #include "components/spaceship.hpp"
 #include "components/faction.hpp"
 #include "components/combat.hpp"
+#include "components/effect.hpp"
+#include "components/render.hpp"
 
 void weapon::utils::assureBulletTypes(entt::registry &registry) {
 	entt_utils::assureTypes<
@@ -26,8 +28,10 @@ void weapon::utils::assureBulletTypes(entt::registry &registry) {
 		sound::HitSound,
 		sound::ShootSound,
 		sound::DeathSound,
-		effect::SpawnsTrailParticles,
+		effect::HasSimpleTrail,
+		effect::HasMultiTrail,
 		physics::Rotation,
+		physics::RotationVelocity,
 		physics::tag::VelocitySyncRot,
 		spaceship::MoveTarget,
 		spaceship::tag::AIMoveControl,

@@ -11,65 +11,94 @@ namespace weapon
 	void WeaponRegistry::init(const GameConfig &globalCfg)
 	{
 		registerPredefinedFunctions();
-
-		parseWeaponsOfType(globalCfg, "bullet");
-		parseWeaponsOfType(globalCfg, "lazer");
-		parseWeaponsOfType(globalCfg, "missile");
+		parseAllWeapons(globalCfg);
 	}
 
 	void WeaponRegistry::registerPredefinedFunctions()
 	{
-		m_predefinedFunctions["bullet.basic"] = emplaceWeaponBasic;
-		m_predefinedFunctions["bullet.sniper"] = emplaceWeaponSniper;
-		m_predefinedFunctions["bullet.burstSniper"] = emplaceWeaponBurstSniper;
-		m_predefinedFunctions["bullet.machineGun"] = emplaceWeaponMachineGun;
-		m_predefinedFunctions["bullet.shotgun"] = emplaceWeaponShotgun;
-		m_predefinedFunctions["bullet.bigBall"] = emplaceWeaponBigBall;
+		m_predefinedFunctions["basic"] = emplaceWeaponBasic;
+		m_predefinedFunctions["sniper"] = emplaceWeaponSniper;
+		m_predefinedFunctions["burstSniper"] = emplaceWeaponBurstSniper;
+		m_predefinedFunctions["machineGun"] = emplaceWeaponMachineGun;
+		m_predefinedFunctions["shotgun"] = emplaceWeaponShotgun;
+		m_predefinedFunctions["bigBall"] = emplaceWeaponBigBall;
 
-		m_predefinedFunctions["lazer.basic"] = emplaceWeaponLazerBasic;
-		m_predefinedFunctions["lazer.machineGun"] = emplaceWeaponLazerMachineGun;
-		m_predefinedFunctions["lazer.deletor"] = emplaceWeaponLazerDeletor;
-		m_predefinedFunctions["lazer.shotgun"] = emplaceWeaponLazerShotgun;
+		m_predefinedFunctions["lazerBasic"] = emplaceWeaponLazerBasic;
+		m_predefinedFunctions["lazerMachineGun"] = emplaceWeaponLazerMachineGun;
+		m_predefinedFunctions["deletor"] = emplaceWeaponLazerDeletor;
+		m_predefinedFunctions["lazerShotgun"] = emplaceWeaponLazerShotgun;
 
-		m_predefinedFunctions["missile.basic"] = emplaceWeaponMissileBasic;
-		m_predefinedFunctions["missile.swarm"] = emplaceWeaponMissileSwarm;
-		m_predefinedFunctions["missile.torpedo"] = emplaceWeaponMissileTorpedo;
-		m_predefinedFunctions["missile.nuke"] = emplaceWeaponMissileNuke;
-		m_predefinedFunctions["missile.sniper"] = emplaceWeaponMissileSniper;
-		m_predefinedFunctions["missile.flares"] = emplaceWeaponMissileFlares;
+		m_predefinedFunctions["missileBasic"] = emplaceWeaponMissileBasic;
+		m_predefinedFunctions["swarm"] = emplaceWeaponMissileSwarm;
+		m_predefinedFunctions["torpedo"] = emplaceWeaponMissileTorpedo;
+		m_predefinedFunctions["nuke"] = emplaceWeaponMissileNuke;
+		m_predefinedFunctions["missileSniper"] = emplaceWeaponMissileSniper;
+		m_predefinedFunctions["flares"] = emplaceWeaponMissileFlares;
 	}
 
-	void WeaponRegistry::parseWeaponsOfType(const GameConfig &globalCfg, const std::string &category)
+	nlohmann::json WeaponRegistry::resolveDefinition(
+		const std::string &id,
+		const nlohmann::json &templates,
+		const nlohmann::json &weapons,
+		std::unordered_set<std::string> &visited,
+		int depth
+	) const {
+		if (depth > 8 || !visited.insert(id).second) {
+			return nlohmann::json::object();
+		}
+
+		nlohmann::json raw = nlohmann::json::object();
+		if (templates.is_object() && templates.contains(id)) {
+			raw = templates[id];
+		} else if (weapons.is_object() && weapons.contains(id)) {
+			raw = weapons[id];
+		} else {
+			return nlohmann::json::object();
+		}
+
+		nlohmann::json merged = raw;
+		if (raw.contains("template") && raw["template"].is_string()) {
+			const std::string parentId = raw["template"].get<std::string>();
+			nlohmann::json parentResolved = resolveDefinition(parentId, templates, weapons, visited, depth + 1);
+			parentResolved.update(merged);
+			merged = parentResolved;
+		} else if (!raw.contains("template") && id != "bullet" && id != "missile" && id != "lazer") {
+			nlohmann::json baseResolved = resolveDefinition("bullet", templates, weapons, visited, depth + 1);
+			baseResolved.update(merged);
+			merged = baseResolved;
+		}
+
+		return merged;
+	}
+
+	void WeaponRegistry::parseAllWeapons(const GameConfig &globalCfg)
 	{
-		nlohmann::json section = globalCfg.getSection("weapons." + category + ".weapons");
-		if (section.is_null() || !section.is_object())
+		const nlohmann::json weaponsSection = globalCfg.getSection("weapons.weapons");
+		const nlohmann::json templatesSection = globalCfg.getSection("weapons.templates");
+		if (weaponsSection.is_null() || !weaponsSection.is_object())
 			return;
 
-		for (auto &[key, value] : section.items())
+		for (auto &[key, value] : weaponsSection.items())
 		{
-			std::string id = category + "." + key;
+			std::unordered_set<std::string> visited;
+			nlohmann::json resolved = resolveDefinition(key, templatesSection, weaponsSection, visited, 0);
 
-			SubGameConfig subCfg = globalCfg.getSubConfig("weapons." + category + ".weapons." + key);
-			std::string name = subCfg.getString("name", "Unknown " + category);
-			bool isSpecial = subCfg.getBool("isSpecial", false);
+			const std::string templateType = resolved.value("template", "bullet");
+			const std::string name = resolved.value("name", key);
+			const bool isSpecial = resolved.value("isSpecial", false);
 
-			WeaponEmplaceFunc func;
-			auto it = m_predefinedFunctions.find(id);
-			if (it != m_predefinedFunctions.end())
-			{
-				func = it->second;
-			}
-			else
-			{
-				if (category == "bullet")
-					func = emplaceGenericBullet;
-				else if (category == "lazer")
-					func = emplaceGenericLazer;
-				else if (category == "missile")
-					func = emplaceGenericMissile;
-			}
+			WeaponData data{
+				key,
+				name,
+				templateType,
+				isSpecial,
+				[resolved](GameContext &context, entt::entity entity, const GameConfig &) {
+					emplaceConfiguredWeapon(context, entity, resolved);
+				},
+				resolved
+			};
 
-			m_allWeapons[id] = {id, name, category, isSpecial, func};
+			m_allWeapons[key] = data;
 		}
 	}
 
@@ -176,26 +205,40 @@ namespace weapon
 		emplaceWeaponById(context, entity, chosenId);
 	}
 
+	bool WeaponRegistry::hasWeapon(const std::string& id) const
+	{
+		return m_allWeapons.find(id) != m_allWeapons.end()
+			|| m_predefinedFunctions.find(id) != m_predefinedFunctions.end();
+	}
+
+	const WeaponData* WeaponRegistry::getWeaponData(const std::string& id) const
+	{
+		auto it = m_allWeapons.find(id);
+		return (it != m_allWeapons.end()) ? &it->second : nullptr;
+	}
+
 	void WeaponRegistry::emplaceWeaponById(GameContext& context, entt::entity entity, const std::string& id) const
 	{
 		auto it = m_allWeapons.find(id);
-		if (it != m_allWeapons.end())
-		{
-			const std::string type = it->second.type;
-			const std::string subId = id.substr(id.find('.') + 1);
-			const SubGameConfig subCfg = context.config.getSubConfig("weapons." + type + ".weapons." + subId);
-			it->second.emplaceFunc(context, entity, subCfg);
+		if (it == m_allWeapons.end()) {
+			auto predIt = m_predefinedFunctions.find(id);
+			if (predIt != m_predefinedFunctions.end()) {
+				predIt->second(context, entity, context.config);
+			}
+			return;
+		}
 
-			const std::string turretRef = subCfg.getString("turretRef", "");
-			if (!turretRef.empty() && context.registry.all_of<render::tag::AimDirectionSyncModel>(entity))
+		it->second.emplaceFunc(context, entity, context.config);
+
+		const std::string turretRef = it->second.resolvedJson.value("turretRef", "");
+		if (!turretRef.empty() && context.registry.all_of<render::tag::AimDirectionSyncModel>(entity))
+		{
+			const std::string defaultModel = context.config.getString("turrets.default", "assets/Models/turrets/basic_shooter/turret_basic_shooter.obj");
+			const std::string modelPath = context.config.getString("turrets.turrets." + turretRef + ".modelPath", defaultModel);
+			auto* renderBody = context.registry.try_get<render::RenderBody>(entity);
+			if (renderBody != nullptr)
 			{
-				const std::string defaultModel = context.config.getString("turrets.default", "assets/Models/turrets/basic_shooter/turret_basic_shooter.obj");
-				const std::string modelPath = context.config.getString("turrets.turrets." + turretRef + ".modelPath", defaultModel);
-				auto* renderBody = context.registry.try_get<render::RenderBody>(entity);
-				if (renderBody != nullptr)
-				{
-					renderBody->modelID = context.modelManager.loadModel(modelPath);
-				}
+				renderBody->modelID = context.modelManager.loadModel(modelPath);
 			}
 		}
 	}

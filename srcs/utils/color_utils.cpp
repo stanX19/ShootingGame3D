@@ -1,6 +1,10 @@
 #include "color_utils.hpp"
+#include "game_config.hpp"
+#include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <iostream>
+#include <unordered_map>
 
 Color colorRevert(Color a)
 {
@@ -11,11 +15,6 @@ Color colorRevert(Color a)
 	result.a = (unsigned char)(a.a);
 	return result;
 }
-
-#include "game_config.hpp"
-#include <algorithm>
-#include <cctype>
-#include <unordered_map>
 
 Color color_utils::parseColor(const nlohmann::json &j, Color defaultColor)
 {
@@ -77,12 +76,18 @@ Color color_utils::getWeaponColor(
 		return parseColor(weaponJson[key], defaultColor);
 	}
 
-	// 2. Category-level default
+	// 2. Template-level default
+	const auto templateSection = globalCfg.getSection("weapons.templates." + category);
+	if (templateSection.contains(key)) {
+		return parseColor(templateSection[key], defaultColor);
+	}
+
+	// 3. Category-level default (legacy)
 	const auto categorySection = globalCfg.getSection("weapons." + category);
 	if (categorySection.contains(key)) {
 		return parseColor(categorySection[key], defaultColor);
 	}
 
-	// 3. Fallback
+	// 4. Fallback
 	return defaultColor;
 }

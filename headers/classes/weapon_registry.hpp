@@ -7,7 +7,10 @@
 struct GameContext;
 #include <vector>
 #include <map>
+#include <unordered_map>
+#include <unordered_set>
 #include <functional>
+#include "json.hpp"
 
 namespace weapon {
 
@@ -19,6 +22,7 @@ struct WeaponData {
     std::string type;
     bool isSpecial;
     WeaponEmplaceFunc emplaceFunc;
+    nlohmann::json resolvedJson;
 };
 
 class WeaponRegistry {
@@ -30,6 +34,9 @@ public:
 
     const std::map<std::string, WeaponData>& getAllWeaponsMap() const { return m_allWeapons; }
     
+    bool hasWeapon(const std::string& id) const;
+    const WeaponData* getWeaponData(const std::string& id) const;
+
     // Helpers to get specific lists (e.g. for menus or specific spawners)
     std::vector<std::string> getWeaponIdsByType(const std::string& type) const;
     std::vector<std::string> getSpecialWeaponIds() const;
@@ -48,7 +55,14 @@ private:
     std::map<std::string, WeaponData> m_allWeapons;
 
     void registerPredefinedFunctions();
-    void parseWeaponsOfType(const GameConfig& globalCfg, const std::string& category);
+    void parseAllWeapons(const GameConfig& globalCfg);
+    nlohmann::json resolveDefinition(
+        const std::string &id,
+        const nlohmann::json &templates,
+        const nlohmann::json &weapons,
+        std::unordered_set<std::string> &visited,
+        int depth
+    ) const;
     std::string getRandomWeaponId(bool special, int value) const;
 };
 

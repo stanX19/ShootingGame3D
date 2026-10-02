@@ -203,10 +203,9 @@ void GameHangar::prepareTurretButton(
 	const std::string &currentId =
 		m_context.config.loadout.turretWeapons[index];
 	std::string name = "None";
-	const auto &weapons = m_context.weaponRegistry.getAllWeaponsMap();
-	const auto weapon = weapons.find(currentId);
-	if (weapon != weapons.end())
-		name = weapon->second.name;
+	const auto *weapon = m_context.weaponRegistry.getWeaponData(currentId);
+	if (weapon != nullptr)
+		name = weapon->name;
 	m_turretButtons[index].setBounds(bounds);
 	m_turretButtons[index].setText(
 		"Weapon " + std::to_string(index + 1) + ": " + name);
@@ -217,8 +216,8 @@ void GameHangar::resetShipLoadout()
 	const std::size_t mountCount = selectedMountCount();
 	m_context.config.setStringArray(
 		"loadout.turretWeapons",
-		std::vector<std::string>(mountCount, "bullet.basic"));
-	m_context.config.setString("loadout.specialWeapon", "missile.basic");
+		std::vector<std::string>(mountCount, "basic"));
+	m_context.config.setString("loadout.specialWeapon", "missileBasic");
 	m_turretButtons.resize(mountCount);
 	m_turretList.resetScroll();
 }
@@ -310,10 +309,10 @@ void GameHangar::drawUI(EngineState &nextState)
 		std::string name = "None";
 		if (!currentId.empty())
 		{
-			const auto &map = m_context.weaponRegistry.getAllWeaponsMap();
-			if (map.find(currentId) != map.end())
+			const auto *weapon = m_context.weaponRegistry.getWeaponData(currentId);
+			if (weapon != nullptr)
 			{
-				name = map.at(currentId).name;
+				name = weapon->name;
 			}
 		}
 		std::string fullText = label + ": " + name;
