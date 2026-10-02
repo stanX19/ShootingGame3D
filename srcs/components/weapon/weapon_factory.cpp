@@ -25,9 +25,17 @@ using namespace spaceship;
 using namespace identity;
 using namespace effect;
 
-namespace weapon {
-
 namespace {
+
+constexpr std::string_view DEFAULT_MODEL_PREFIX = "default:";
+
+constexpr std::uint32_t hashString(std::string_view str) {
+	std::uint32_t hash = 2166136261u;
+	for (const char c : str) {
+		hash = (hash ^ static_cast<std::uint8_t>(c)) * 16777619u;
+	}
+	return hash;
+}
 
 float getFloatDef(const nlohmann::json &j, const std::string &key, float defaultVal) {
 	if (j.contains(key) && j[key].is_number()) {
@@ -83,7 +91,8 @@ void assembleTurretComponents(
 	context.registry.emplace_or_replace<weapon::tag::IsWeapon>(entity);
 	context.registry.emplace_or_replace<AimTarget>(entity);
 	Vector3 initialAim = Vector3UnitZ;
-	if (const auto *rot = context.registry.try_get<Rotation>(entity)) {
+	const auto *rot = context.registry.try_get<Rotation>(entity);
+	if (rot != nullptr) {
 		initialAim = getForwardVector(rot->value);
 	}
 	context.registry.emplace_or_replace<AimDirection>(entity, AimDirection{initialAim});
@@ -101,33 +110,57 @@ void assembleTurretComponents(
 	}
 	context.registry.emplace_or_replace<sound::ShootSound>(entity, shootSoundId, 0.5f);
 
-	if (float cooldown = getFloatDef(def, "cooldown", 0.0f); cooldown > 0.0f) {
+	const float cooldown = getFloatDef(def, "cooldown", 0.0f);
+	if (cooldown > 0.0f) {
 		context.registry.emplace_or_replace<WeaponCooldown>(entity, WeaponCooldown{cooldown});
 	}
 
-	if (int ammo = getIntDef(def, "ammo", 0); ammo > 0) {
+	const int ammo = getIntDef(def, "ammo", 0);
+	if (ammo > 0) {
 		const float initialAmmo = getFloatDef(def, "initialAmmo", static_cast<float>(ammo));
 		context.registry.emplace_or_replace<Ammo>(entity, Ammo{initialAmmo, static_cast<float>(ammo)});
-		if (float ammoRegen = getFloatDef(def, "ammoRegen", 0.0f); ammoRegen > 0.0f) {
+		const float ammoRegen = getFloatDef(def, "ammoRegen", 0.0f);
+		const float reloadTime = getFloatDef(def, "reloadTime", 0.0f);
+		if (ammoRegen > 0.0f) {
 			context.registry.emplace_or_replace<AmmoRegen>(entity, AmmoRegen{ammoRegen});
-		} else if (float reloadTime = getFloatDef(def, "reloadTime", 0.0f); reloadTime > 0.0f) {
+		} else if (reloadTime > 0.0f) {
 			context.registry.emplace_or_replace<AmmoReload>(entity, AmmoReload{reloadTime});
 		}
 	}
 
-	if (float chargeTime = getFloatDef(def, "chargeTime", 0.0f); chargeTime > 0.0f) {
-		Color chargeColor = getColorDef(def, "chargeColor", ColorAlpha(getColorDef(def, "color", WHITE), 0.5f));
+	const float chargeTime = getFloatDef(def, "chargeTime", 0.0f);
+	if (chargeTime > 0.0f) {
+		const Color defaultChargeColor = ColorAlpha(getColorDef(def, "color", WHITE), 0.5f);
+		const Color chargeColor = getColorDef(def, "chargeColor", defaultChargeColor);
 		context.registry.emplace_or_replace<ChargedWeapon>(entity, ChargedWeapon{chargeTime, chargeColor});
 	}
 
-	if (float extendFireReq = getFloatDef(def, "extendFireRequest", 0.0f); extendFireReq > 0.0f) {
+	const float extendFireReq = getFloatDef(def, "extendFireRequest", 0.0f);
+	if (extendFireReq > 0.0f) {
 		context.registry.emplace_or_replace<ExtendFireRequest>(entity, ExtendFireRequest{extendFireReq});
 	}
-	if (float extendFireDur = getFloatDef(def, "extendFireDuration", 0.0f); extendFireDur > 0.0f) {
+	const float extendFireDur = getFloatDef(def, "extendFireDuration", 0.0f);
+	if (extendFireDur > 0.0f) {
 		context.registry.emplace_or_replace<ExtendFireDuration>(entity, ExtendFireDuration{extendFireDur});
 	}
 
 	context.registry.emplace_or_replace<WeaponName>(entity, getStringDef(def, "name", "Weapon"));
+}
+
+static t_model_id resolveDefaultPrimitive(ModelManager &modelManager, std::string_view key) {
+	switch (hashString(key)) {
+	case hashString("sphere"):
+		return modelManager.createSphere(8, 8);
+	case hashString("cube"):
+	case hashString("box"):
+		return modelManager.createCube(2.0f, 2.0f, 2.0f);
+	case hashString("cylinder"):
+		return modelManager.createCylinder(16, 1.0f, 2.0f);
+	case hashString("plane"):
+		return modelManager.createPlane(2.0f, 2.0f);
+	default:
+		return modelManager.createSphere(8, 8);
+	}
 }
 
 t_model_id resolveProjectileModel(
@@ -135,17 +168,9 @@ t_model_id resolveProjectileModel(
 	const nlohmann::json &def
 ) {
 	const std::string customPath = getStringDef(def, "modelPath", "");
-	if (customPath == "default:sphere") {
-		return context.modelManager.createSphere(8, 8);
-	}
-	if (customPath == "default:cube") {
-		return context.modelManager.createCube(2.0f, 2.0f, 2.0f);
-	}
-	if (customPath == "default:cylinder") {
-		return context.modelManager.createCylinder(16, 1.0f, 2.0f);
-	}
-	if (customPath == "default:plane") {
-		return context.modelManager.createPlane(2.0f, 2.0f);
+	if (customPath.rfind(DEFAULT_MODEL_PREFIX.data(), 0) == 0) {
+		const std::string_view key = std::string_view(customPath).substr(DEFAULT_MODEL_PREFIX.size());
+		return resolveDefaultPrimitive(context.modelManager, key);
 	}
 	if (!customPath.empty()) {
 		if (def.contains("modelCenterOffset") || def.contains("modelScale") || def.contains("modelRotationAxis")) {
@@ -242,26 +267,12 @@ void assembleProjectileTrail(
 	);
 }
 
-entt::entity assembleProjectileTemplate(
+static void assembleProjectileTags(
 	GameContext &context,
-	const nlohmann::json &def
+	entt::entity bullet,
+	const nlohmann::json &def,
+	float radius
 ) {
-	const auto &cfg = context.config;
-	const float arenaBound = cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2.0f;
-	const Vector3 disappearBound = {arenaBound, arenaBound, arenaBound};
-
-	const entt::entity bullet = context.templateReg.create();
-	const float radius = getFloatDef(def, "radius", 0.05f);
-	const float hp = getFloatDef(def, "hp", 1.0f);
-	const float mass = getFloatDef(def, "mass", 0.0f);
-	const float baseDmg = getFloatDef(def, "baseDamage", 25.0f);
-	const float dmgMult = getFloatDef(def, "damageMultiplier", 1.0f);
-	const float damage = getFloatDef(def, "damage", baseDmg * dmgMult);
-	const float lifespan = getFloatDef(def, "lifespan", 10.0f) * getFloatDef(def, "lifespanMultiplier", 1.0f);
-	const Color color = getColorDef(def, "color", WHITE);
-
-	const t_model_id modelId = resolveProjectileModel(context, def);
-
 	if (getBoolDef(def, "isBullet", true)) {
 		context.templateReg.emplace_or_replace<weapon::tag::Bullet>(bullet);
 	}
@@ -283,6 +294,65 @@ entt::entity assembleProjectileTemplate(
 	if (getBoolDef(def, "deathSound", false)) {
 		context.templateReg.emplace_or_replace<sound::DeathSound>(bullet, sound::RANDOM_EXPLOSION, std::min(1.0f, radius * 0.5f));
 	}
+}
+
+static void assembleProjectileKinematics(
+	GameContext &context,
+	entt::entity bullet,
+	const nlohmann::json &def,
+	float radius
+) {
+	const float modelStretch = getFloatDef(def, "modelStretch", 0.0f);
+	if (getBoolDef(def, "lazerStretch", false)) {
+		context.templateReg.emplace_or_replace<ModelStrech>(bullet, ModelStrech{1.0f / (2.0f * radius)});
+	} else if (modelStretch > 0.0f) {
+		context.templateReg.emplace_or_replace<ModelStrech>(bullet, ModelStrech{modelStretch / (radius * 2.0f)});
+	} else if (getBoolDef(def, "bulletStretch", false)) {
+		context.templateReg.emplace_or_replace<ModelStrech>(bullet, ModelStrech{1.0f});
+	}
+
+	const float rotVel = getFloatDef(def, "rotationVelocity", 0.0f);
+	if (std::abs(rotVel) > 1e-4f) {
+		context.templateReg.emplace_or_replace<Rotation>(bullet);
+		context.templateReg.emplace_or_replace<RotationVelocity>(bullet, QuaternionFromAxisAngle(Vector3UnitY, rotVel));
+	}
+
+	const float turnSpeed = getFloatDef(def, "turnSpeed", 0.0f);
+	const bool isHoming = getBoolDef(def, "homing", false);
+	if (turnSpeed > 0.0f || isHoming) {
+		assembleProjectileGuidance(context, bullet, def, turnSpeed);
+	}
+
+	const float accel = getFloatDef(def, "acceleration", 0.0f);
+	if (accel > 0.0f) {
+		context.templateReg.emplace_or_replace<ScalarAcceleration>(bullet, ScalarAcceleration{accel});
+	}
+
+	if (getBoolDef(def, "targetable", false)) {
+		context.templateReg.emplace_or_replace<combat::tag::Targetable>(bullet);
+	}
+}
+
+entt::entity assembleProjectileTemplate(
+	GameContext &context,
+	const nlohmann::json &def
+) {
+	const auto &cfg = context.config;
+	const float arenaBound = cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2.0f;
+	const Vector3 disappearBound = {arenaBound, arenaBound, arenaBound};
+
+	const entt::entity bullet = context.templateReg.create();
+	const float radius = getFloatDef(def, "radius", 0.05f);
+	const float hp = getFloatDef(def, "hp", 1.0f);
+	const float mass = getFloatDef(def, "mass", 0.0f);
+	const float baseDmg = getFloatDef(def, "baseDamage", 25.0f);
+	const float dmgMult = getFloatDef(def, "damageMultiplier", 1.0f);
+	const float damage = getFloatDef(def, "damage", baseDmg * dmgMult);
+	const float lifespan = getFloatDef(def, "lifespan", 10.0f) * getFloatDef(def, "lifespanMultiplier", 1.0f);
+	const Color color = getColorDef(def, "color", WHITE);
+
+	const t_model_id modelId = resolveProjectileModel(context, def);
+	assembleProjectileTags(context, bullet, def, radius);
 
 	context.templateReg.emplace_or_replace<HP>(bullet, HP{hp});
 	context.templateReg.emplace_or_replace<Damage>(bullet, Damage{damage});
@@ -303,31 +373,7 @@ entt::entity assembleProjectileTemplate(
 	}
 	context.templateReg.emplace_or_replace<sound::HitSound>(bullet, hitSoundId, 0.4f);
 
-	if (getBoolDef(def, "lazerStretch", false)) {
-		context.templateReg.emplace_or_replace<ModelStrech>(bullet, ModelStrech{1.0f / (2.0f * radius)});
-	} else if (float modelStretch = getFloatDef(def, "modelStretch", 0.0f); modelStretch > 0.0f) {
-		context.templateReg.emplace_or_replace<ModelStrech>(bullet, ModelStrech{modelStretch / (radius * 2.0f)});
-	} else if (getBoolDef(def, "bulletStretch", false)) {
-		context.templateReg.emplace_or_replace<ModelStrech>(bullet, ModelStrech{1.0f});
-	}
-
-	if (float rotVel = getFloatDef(def, "rotationVelocity", 0.0f); std::abs(rotVel) > 1e-4f) {
-		context.templateReg.emplace_or_replace<Rotation>(bullet);
-		context.templateReg.emplace_or_replace<RotationVelocity>(bullet, QuaternionFromAxisAngle(Vector3UnitY, rotVel));
-	}
-
-	if (float turnSpeed = getFloatDef(def, "turnSpeed", 0.0f); turnSpeed > 0.0f || getBoolDef(def, "homing", false)) {
-		assembleProjectileGuidance(context, bullet, def, turnSpeed);
-	}
-
-	if (float accel = getFloatDef(def, "acceleration", 0.0f); accel > 0.0f) {
-		context.templateReg.emplace_or_replace<ScalarAcceleration>(bullet, ScalarAcceleration{accel});
-	}
-
-	if (getBoolDef(def, "targetable", false)) {
-		context.templateReg.emplace_or_replace<combat::tag::Targetable>(bullet);
-	}
-
+	assembleProjectileKinematics(context, bullet, def, radius);
 	assembleProjectileDeathEffects(context, bullet, def, radius);
 	assembleProjectileTrail(context, bullet, def);
 
@@ -336,7 +382,7 @@ entt::entity assembleProjectileTemplate(
 
 } // namespace
 
-void emplaceConfiguredWeapon(
+void weapon::emplaceConfiguredWeapon(
 	GameContext &context,
 	entt::entity entity,
 	const nlohmann::json &def
@@ -359,5 +405,3 @@ void emplaceConfiguredWeapon(
 	context.registry.emplace_or_replace<Weapon>(entity, weapon);
 	assembleTurretComponents(context, entity, def);
 }
-
-} // namespace weapon

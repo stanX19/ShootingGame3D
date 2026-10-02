@@ -22,7 +22,7 @@ Every ECS component belongs to a cohesive domain header under `headers/component
 | `anchor.hpp` | `anchor` | `PositionAnchor`, `RotationAnchor`, `DeathAnchor` | `GetVelOnAnchorDeath` | Parent-relative attachment and hierarchy. |
 | `score.hpp` | `score` | `Score`, `ScoreParent`, `KilledScore` | *(none)* | Scoring progression, attribution, and kill bounties. |
 | `lifetime.hpp` | `lifetime` | `Lifespan`, `DisappearBound` | *(none)* | Temporal duration and spatial arena boundary cleanup. |
-| `effect.hpp` | `effect` | `ExplodeOnDeath`, `InstantDamageOnDeath`, `SpawnsTrailParticles`, `Trail` | `DropDebris` | Visual FX, debris, trails, and death explosions. |
+| `effect.hpp` | `effect` | `ExplodeOnDeath`, `InstantDamageOnDeath`, `HasSimpleTrail`, `HasMultiTrail`, `Trail` | `DropDebris` | Visual FX, debris, procedural ribbon trails, and death explosions. |
 | `faction.hpp` | `faction` | `Faction`, `FacVal`, constants (`FAC_NONE`, `FAC_BLUE`, `FAC_RED`, `FAC_BULLET`, `FAC_ASTEROID`) | *(none)* | Faction allegiances and friend-or-foe queries. |
 | `camera.hpp` | `camera` | `UnitCamera`, `CameraPOV`, `emplaceUnitCameraBasic()` | *(none)* | Camera POV configuration and camera tracking state. |
 | `sound.hpp` | `sound` | `HitSound`, `ShootSound`, `DeathSound` | *(none)* | Sound FX event triggers for weapons, hits, and deaths. |

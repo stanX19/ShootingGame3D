@@ -1,10 +1,8 @@
 {
-    "shipId": "interceptor_quad",
-    "specialWeapon": "flares",
+    "shipId": "fastElite",
+    "specialWeapon": "swarm",
     "turretWeapons": [
-        "lazerMachineGun",
-        "lazerMachineGun",
-        "torpedo",
-        "torpedo"
+        "shotgun",
+        "shotgun"
     ]
 }

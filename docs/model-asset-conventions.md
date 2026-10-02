@@ -45,6 +45,16 @@ and tapered aft pressure volume around the resolved nozzle cells. This keeps a
 fighter's paired nacelles, a spine cluster, and a capital side-block bank
 visibly distinct while preserving the same unit-radius runtime contract.
 
+## Procedural Primitive Models (`default:<primitive>`)
+
+Weapons and visual props can specify procedural geometric primitives in configuration via the `default:<primitive>` URI scheme instead of external 3D file paths:
+- `default:sphere`: GenMeshSphere with nominal radius `1.0f`.
+- `default:cube` (or `default:box`): GenMeshCube with side length `2.0f` spanning `[-1.0, 1.0]`.
+- `default:cylinder`: GenMeshCylinder with radius `1.0f` and height `2.0f`.
+- `default:plane`: GenMeshPlane with width `2.0f` and length `2.0f`.
+
+All procedural primitives conform strictly to the mandatory nominal unit radius of `1.0f` centered at `(0, 0, 0)`. The game engine scales them uniformly via `RenderBody.scale` and projectile `radius`.
+
 ## Collision proxy conventions
 
 A `.collision.obj` is a CPU-side physics/query asset, not a render LOD. It may be much simpler than the visual model and should contain only surfaces that matter to gameplay. Its use is explicit: a caller loads the collision model and adds `CollisionBodyModel` to the entity. The presence of a companion file alone does not opt an entity into mesh-based collision.

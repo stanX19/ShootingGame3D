@@ -22,6 +22,7 @@ Now the mainloop runs in a single thread. But when the time comes, we will decou
 Before broad exploration, read [docs/project-context.md](docs/project-context.md). Follow [docs/development-protocols.md](docs/development-protocols.md) for planning, approval, implementation, testing, and recovery.
 
 For model or asset pipeline work, read [docs/model-asset-conventions.md](docs/model-asset-conventions.md). 1.0f radius is the unified contract of all 3D models in this game, only game code can scale models afterwards.
+For weapon design, configuration, and projectile invariants, read [weapon designer handbook](docs/weapon-creation-handbook.md).
 For procedural model design, implementation, benchmarking, and screenshot QC, read [procedural model generation workflow](docs/workflows/procedural-model-generation.md).
 For asteroid asset work and repeated-render benchmarks, also read [procedural asteroid generator and rendering evidence rules](docs/specs/procedural-asteroid-and-wsl-rendering.md)
 For ECS component domains, contracts, and tag conventions, read [docs/components.md](docs/components.md).
