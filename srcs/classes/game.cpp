@@ -61,6 +61,7 @@ EngineState Game::run() {
         m_systemEntityAnchor.update(m_context, dt);
         m_systemEntityTransformation.update(m_context, dt);
         m_systemSyncModelRotation.update(m_context, dt);
+        m_systemUpdateTrails.update(m_context, dt);
         
         m_systemDetectEntityCollision.update(m_context, dt);
         m_context.dispatcher.update();
@@ -85,7 +86,6 @@ EngineState Game::run() {
         m_systemDelayedDamage.update(m_context, dt);
         m_systemHpCleanup.update(m_context, dt);
         m_systemHpRegen.update(m_context, dt);
-        m_systemUpdateTrails.update(m_context, dt);
 
         inputControls(dt, nextState);
     }

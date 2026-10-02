@@ -1,8 +1,10 @@
 {
-    "shipId": "fastElite",
+    "shipId": "interceptor_quad",
     "specialWeapon": "missile.basic",
     "turretWeapons": [
-        "bullet.basic",
-        "bullet.basic"
+        "lazer.machineGun",
+        "lazer.machineGun",
+        "missile.torpedo",
+        "missile.torpedo"
     ]
 }

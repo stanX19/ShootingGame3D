@@ -34,6 +34,7 @@ entt::entity spawnInterceptorQuadUnit(GameContext& context, const Vector3& pos, 
 entt::entity spawnHeavyQuadUnit(GameContext& context, const Vector3& pos, faction::Faction faction);
 entt::entity spawnPlayer(GameContext& context);
 entt::entity spawnPlayer(GameContext& context, Vector3 pos);
+entt::entity spawnDeadBody(GameContext& context, entt::entity dyingEntity);
 
 void spawnDebris(
 	GameContext& context,

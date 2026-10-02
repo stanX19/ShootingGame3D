@@ -65,6 +65,7 @@ public:
 	float ARENA_SIZE = 2000.0f;
 	int COMBAT_DIST = 1000;
 	int UNIT_COUNT = 4;
+	float deathBodyLifespan = 0.35f;
 
 	struct KillAttr {
 		float assistThresholdPct = 0.30f;

@@ -320,6 +320,7 @@ int main() {
 
 		runProfiled<SYS_ENERGY_SHIELD>(metrics, isProfiling, [&]() { sysEnergyShield.update(context, dt); });
 		runProfiled<SYS_SYNC_MODEL_ROTATION>(metrics, isProfiling, [&]() { sysSyncModelRotation.update(context, dt); });
+		runProfiled<SYS_UPDATE_TRAILS>(metrics, isProfiling, [&]() { sysUpdateTrails.update(context, dt); });
 		runProfiled<SYS_CAMERA_FOLLOW_PLAYER>(metrics, isProfiling, [&]() { sysCameraFollowPlayer.update(context, dt); });
 		runProfiled<SYS_HUD_WARNING>(metrics, isProfiling, [&]() { sysHudWarning.update(context, dt); });
 		runProfiled<SYS_HUD_MANAGER_UPDATE>(metrics, isProfiling, [&]() {
@@ -382,7 +383,6 @@ int main() {
 		runProfiled<SYS_DELAYED_DAMAGE>(metrics, isProfiling, [&]() { sysDelayedDamage.update(context, dt); });
 		runProfiled<SYS_HP_CLEANUP>(metrics, isProfiling, [&]() { sysHpCleanup.update(context, dt); });
 		runProfiled<SYS_HP_REGEN>(metrics, isProfiling, [&]() { sysHpRegen.update(context, dt); });
-		runProfiled<SYS_UPDATE_TRAILS>(metrics, isProfiling, [&]() { sysUpdateTrails.update(context, dt); });
 
 		// Entity metric capture during profiling
 		if (isProfiling) {

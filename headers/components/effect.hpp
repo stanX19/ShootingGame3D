@@ -47,16 +47,20 @@ struct InstantDamageOnDeath
 	float radius = 0.0f;
 };
 
-struct TrailNode {
-	Vector3 pos = Vector3Zeros;
-	float alpha = 1.0f;
-	float age = 0.0f;
-};
+namespace trail {
+	struct Node {
+		Vector3 pos = Vector3Zeros;
+		float alpha = 1.0f;
+		float age = 0.0f;
+	};
+}
+
+using TrailNode = trail::Node;
 
 struct HasSimpleTrail {
 	static constexpr std::size_t MAX_NODES = 8;
 
-	TrailNode nodes[MAX_NODES]{};
+	trail::Node nodes[MAX_NODES]{};
 	std::uint8_t count = 0;
 	std::uint8_t maxNodes = 2; // 2 for Bullet Tracers, 8 for Missiles
 
@@ -67,6 +71,21 @@ struct HasSimpleTrail {
 	Color color = GRAY;
 	Vector3 lastRecordedPos = Vector3Zeros;
 	bool hasLastRecordedPos = false;
+
+	HasSimpleTrail() = default;
+	HasSimpleTrail(
+		float width,
+		Color color = GRAY,
+		float maxAge = 0.05f,
+		std::uint8_t maxNodes = 2,
+		float minDistance = 1.0f,
+		float endWidth = 0.0f
+	) : maxNodes(maxNodes),
+		maxAge(maxAge),
+		minDistance(minDistance),
+		width(width),
+		endWidth(endWidth),
+		color(color) {}
 };
 
 struct HasMultiTrail {
@@ -74,7 +93,7 @@ struct HasMultiTrail {
 	static constexpr std::size_t MAX_EMITTERS = 8;
 
 	struct Emitter {
-		TrailNode nodes[MAX_NODES]{};
+		trail::Node nodes[MAX_NODES]{};
 		std::uint8_t count = 0;
 		Vector3 localOffset = Vector3Zeros; // Nozzle offset in local space
 		float width = 0.3f;                 // Nozzle-specific width
@@ -90,6 +109,26 @@ struct HasMultiTrail {
 	float minDistance = 1.5f;   // Distance threshold before dropping next breadcrumb
 	float endWidth = 0.0f;      // Width at tail
 	Color color = SKYBLUE;
+
+	HasMultiTrail() = default;
+	HasMultiTrail(
+		Color color,
+		float maxAge = 0.35f,
+		std::uint8_t maxNodes = 10,
+		float minDistance = 1.5f,
+		float endWidth = 0.0f
+	) : maxNodes(maxNodes),
+		maxAge(maxAge),
+		minDistance(minDistance),
+		endWidth(endWidth),
+		color(color) {}
+
+	void addEmitter(const Vector3 &localOffset, float width) {
+		if (emitterCount >= MAX_EMITTERS) return;
+		emitters[emitterCount].localOffset = localOffset;
+		emitters[emitterCount].width = width;
+		emitterCount++;
+	}
 };
 
 using HasTrails = HasSimpleTrail;
@@ -136,5 +175,9 @@ using ::effect::TrailNode;
 using ::effect::HasSimpleTrail;
 using ::effect::HasMultiTrail;
 using ::effect::HasTrails;
+
+namespace trail {
+using ::effect::trail::Node;
+}
 
 #endif // COMPONENTS_EFFECT_HPP

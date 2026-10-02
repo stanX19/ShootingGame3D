@@ -1,5 +1,6 @@
 #include "weapons.hpp"
 #include "utils.hpp"
+#include "utils/color_utils.hpp"
 #include "components/faction.hpp"
 #include "components/sound.hpp"
 #include "components/identity.hpp"
@@ -19,42 +20,9 @@ namespace tag = ::tag;
 
 namespace
 {
-	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = WHITE)
+	Color getWeaponRenderColor(const GameConfig &cfg, const GameConfig &globalCfg, const std::string &category, Color defaultColor = WHITE)
 	{
-		return baseColor;
-	}
-
-	Color parseConfigColor(const nlohmann::json &j, Color defaultColor)
-	{
-		if (j.is_array() && j.size() >= 3) {
-			return Color{
-				static_cast<unsigned char>(j[0].get<int>()),
-				static_cast<unsigned char>(j[1].get<int>()),
-				static_cast<unsigned char>(j[2].get<int>()),
-				static_cast<unsigned char>(j.size() > 3 ? j[3].get<int>() : 255)
-			};
-		}
-		if (j.is_string()) {
-			const std::string s = j.get<std::string>();
-			if (s == "gray" || s == "GRAY") return GRAY;
-			if (s == "white" || s == "WHITE") return WHITE;
-			if (s == "yellow" || s == "YELLOW") return YELLOW;
-			if (s == "orange" || s == "ORANGE") return ORANGE;
-			if (s == "skyblue" || s == "SKYBLUE") return SKYBLUE;
-			if (s == "red" || s == "RED") return RED;
-			if (s == "green" || s == "GREEN") return GREEN;
-			if (s == "blue" || s == "BLUE") return BLUE;
-		}
-		return defaultColor;
-	}
-
-	Color getBulletTrailColor(const GameConfig &globalCfg)
-	{
-		const auto bulletSec = globalCfg.getSection("weapons.bullet");
-		if (bulletSec.contains("trailColor")) {
-			return parseConfigColor(bulletSec["trailColor"], GRAY);
-		}
-		return GRAY;
+		return color_utils::getWeaponColor(cfg, globalCfg, category, "color", defaultColor);
 	}
 
 	void emplaceBulletWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_BULLET_SHOOT)
@@ -67,7 +35,7 @@ namespace
 
 	constexpr float DEFAULT_MASS = 0.0f;
 	
-	entt::entity createBulletTemplate(GameContext &context)
+	entt::entity createBulletTemplate(GameContext &context, const GameConfig &weaponCfg)
 	{
 		const auto &cfg = context.config;
 		const Vector3 bulletBound = {cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2, cfg.ARENA_SIZE + cfg.COMBAT_DIST * 2};
@@ -80,13 +48,9 @@ namespace
 		context.templateReg.emplace<ModelStrech>(bullet, 1.0f);
 		context.templateReg.emplace<DisappearBound>(bullet, bulletBound * -1, bulletBound);
 		context.templateReg.emplace<sound::HitSound>(bullet, sound::RANDOM_BULLET_HIT, 0.4f);
-		effect::HasSimpleTrail bulletTrail;
-		bulletTrail.maxNodes = 2;
-		bulletTrail.maxAge = 0.05f;
-		bulletTrail.width = 0.15f;
-		bulletTrail.endWidth = 0.0f;
-		bulletTrail.color = getBulletTrailColor(cfg);
-		context.templateReg.emplace<effect::HasSimpleTrail>(bullet, bulletTrail);
+
+		const Color trailColor = color_utils::getWeaponColor(weaponCfg, cfg, "bullet", "trailColor", GRAY);
+		context.templateReg.emplace<effect::HasSimpleTrail>(bullet, 0.15f, trailColor, 0.05f, 2, 0.5f);
 		return bullet;
 	}
 
@@ -124,12 +88,12 @@ void weapon::emplaceGenericBullet(GameContext &context, entt::entity entity, con
 
 	t_model_id model = getBulletModel(context);
 
-	entt::entity bulletTemplate = createBulletTemplate(context);
+	entt::entity bulletTemplate = createBulletTemplate(context, cfg);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getWeaponRenderColor(cfg, context.config, "bullet", WHITE), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 
 	Weapon weapon{bulletTemplate};
@@ -173,12 +137,12 @@ void weapon::emplaceWeaponMachineGun(GameContext &context, entt::entity entity, 
 
 	t_model_id model = getBulletModel(context);
 
-	entt::entity bulletTemplate = createBulletTemplate(context);
+	entt::entity bulletTemplate = createBulletTemplate(context, cfg);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getWeaponRenderColor(cfg, context.config, "bullet", WHITE), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 
 	Weapon weapon{bulletTemplate};
@@ -218,12 +182,12 @@ void weapon::emplaceWeaponShotgun(GameContext &context, entt::entity entity, con
 
 	t_model_id model = getBulletModel(context);
 
-	entt::entity bulletTemplate = createBulletTemplate(context);
+	entt::entity bulletTemplate = createBulletTemplate(context, cfg);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getWeaponRenderColor(cfg, context.config, "bullet", WHITE), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 	context.templateReg.emplace_or_replace<ModelStrech>(bulletTemplate, ModelStrech{modelStretch / (radius * 2)});
 
@@ -262,25 +226,24 @@ void weapon::emplaceWeaponBigBall(GameContext &context, entt::entity entity, con
 	float chargeTime = cfg.getFloat("chargeTime", 1.0f);
 
 	t_model_id model = context.modelManager.loadModel("assets/Models/asteroid/asteroid_ceres.glb", Vector3{0.36f, 0.36f, 0.38f}, Vector3UnitZ, Vector3{0.5f, 0.75f, 0.5f});
-
-	entt::entity bulletTemplate = createBulletTemplate(context);
+	entt::entity bulletTemplate = createBulletTemplate(context, cfg);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getWeaponRenderColor(cfg, context.config, "bullet", WHITE), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 	context.templateReg.emplace<Rotation>(bulletTemplate);
 	context.templateReg.emplace<RotationVelocity>(bulletTemplate, QuaternionFromAxisAngle(Vector3UnitY, PI));
-	context.templateReg.emplace<SpawnsTrailParticles>(
+	context.templateReg.emplace_or_replace<effect::HasSimpleTrail>(
 		bulletTemplate,
-		SpawnsTrailParticles{
-			{{Vector3{0.0f, 0.0f, 0.0f}}},
-			1,
-			radius / 2.0f,
-			1.0f,
-			GRAY
-		}
+		effect::HasSimpleTrail(
+			radius * 0.5f,
+			color_utils::getWeaponColor(cfg, context.config, "bullet", "trailColor", GRAY),
+			0.25f,
+			8,
+			1.0f
+		)
 	);
 	context.templateReg.erase<ModelStrech>(bulletTemplate);
 
@@ -318,12 +281,12 @@ void weapon::emplaceWeaponSniper(GameContext &context, entt::entity entity, cons
 
 	t_model_id model = getBulletModel(context);
 
-	entt::entity bulletTemplate = createBulletTemplate(context);
+	entt::entity bulletTemplate = createBulletTemplate(context, cfg);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getWeaponRenderColor(cfg, context.config, "bullet", WHITE), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 
 	Weapon weapon{bulletTemplate};
@@ -359,12 +322,12 @@ void weapon::emplaceWeaponBurstSniper(GameContext &context, entt::entity entity,
 
 	t_model_id model = getBulletModel(context);
 
-	entt::entity bulletTemplate = createBulletTemplate(context);
+	entt::entity bulletTemplate = createBulletTemplate(context, cfg);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getWeaponRenderColor(cfg, context.config, "bullet", WHITE), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 
 	Weapon weapon{bulletTemplate};
@@ -402,12 +365,12 @@ void weapon::emplaceWeaponBasic(GameContext &context, entt::entity entity, const
 
 	t_model_id model = getBulletModel(context);
 
-	entt::entity bulletTemplate = createBulletTemplate(context);
+	entt::entity bulletTemplate = createBulletTemplate(context, cfg);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<Damage>(bulletTemplate, Damage{baseDamage * damageMultiplier});
 	context.templateReg.emplace<Mass>(bulletTemplate, cfg.getFloat("mass", DEFAULT_MASS));
 	context.templateReg.emplace<CollisionBody>(bulletTemplate, CollisionBody{radius});
-	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getColor(context, entity), radius});
+	context.templateReg.emplace<RenderBody>(bulletTemplate, RenderBody{model, getWeaponRenderColor(cfg, context.config, "bullet", WHITE), radius});
 	context.templateReg.emplace<Lifespan>(bulletTemplate, Lifespan{lifespan});
 
 	Weapon weapon{bulletTemplate};

@@ -34,7 +34,6 @@ private:
 	Shader m_instancedShader{};
 	Shader m_instancedLightedShader{};
 	
-	Model m_trailModel{};
 	int m_lightPosLoc = 0;
 	int m_lightColorLoc = 0;
 	int m_ambientStrengthLoc = 0;
@@ -69,9 +68,6 @@ private:
 	bool isEntityVisible(entt::entity entity, const physics::Position &pos, const render::RenderBody &body, StrechDat &strech) const;
 	void drawEntityModel(const physics::Position &pos, const render::RenderBody &body, StrechDat strech = {1.0f, {0,0,0}});
 	void drawTrails();
-	void drawSimpleRibbon(const effect::HasSimpleTrail &trail);
-	void drawMultiRibbon(const effect::HasMultiTrail::Emitter &emitter, const effect::HasMultiTrail &trail);
-	void drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color);
 	void drawEntitiesBatched();
 	void drawEntitiesWithShader();
 	void drawEntitiesWithSkyboxShader();

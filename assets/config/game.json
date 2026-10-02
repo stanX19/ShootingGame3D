@@ -2,6 +2,7 @@
 	"arenaSize": 2500,
 	"combatDist": 1750,
 	"unitCount": 4,
+	"deathBodyLifespan": 0.35,
 	"killAttr": {
 		"assistThresholdPct": 0.30,
 		"assistWindowSeconds": 10.0,

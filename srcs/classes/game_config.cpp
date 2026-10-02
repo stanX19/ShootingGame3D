@@ -73,6 +73,7 @@ void GameConfig::initConstants() {
 	ARENA_SIZE = getFloat("game.arenaSize", 2000.0f);
 	COMBAT_DIST = getInt("game.combatDist", 1000);
 	UNIT_COUNT = getInt("game.unitCount", 4);
+	deathBodyLifespan = getFloat("game.deathBodyLifespan", 0.35f);
 
 	killAttr.assistThresholdPct = getFloat("game.killAttr.assistThresholdPct", 0.30f);
 	killAttr.assistWindowSeconds = getFloat("game.killAttr.assistWindowSeconds", 10.0f);

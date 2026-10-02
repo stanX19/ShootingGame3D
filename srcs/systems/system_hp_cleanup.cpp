@@ -51,22 +51,7 @@ void systems::HpCleanup::update(GameContext &context, [[maybe_unused]] float dt)
 			spawnInstantDamage(context, posPtr->value, *instantDamagePtr, parent);
 		}
 
-		auto simpleTrailPtr = context.registry.try_get<effect::HasSimpleTrail>(entity);
-		if (simpleTrailPtr && simpleTrailPtr->count > 0 && simpleTrailPtr->maxNodes > 2) {
-			auto dummy = context.registry.create();
-			context.registry.emplace<effect::HasSimpleTrail>(dummy, *simpleTrailPtr);
-			context.registry.emplace<Lifespan>(dummy, simpleTrailPtr->maxAge);
-			context.registry.emplace<tag::PostDeath>(dummy);
-		}
-
-		auto multiTrailPtr = context.registry.try_get<effect::HasMultiTrail>(entity);
-		if (multiTrailPtr && multiTrailPtr->emitterCount > 0) {
-			auto dummy = context.registry.create();
-			context.registry.emplace<effect::HasMultiTrail>(dummy, *multiTrailPtr);
-			context.registry.emplace<Lifespan>(dummy, multiTrailPtr->maxAge);
-			context.registry.emplace<tag::PostDeath>(dummy);
-		}
-
+		spawnDeadBody(context, entity);
 		context.registry.destroy(entity);
 	}
 }

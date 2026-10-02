@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include "draw_utils.hpp"
 #include "components/faction.hpp"
 #include "rlgl.h"
 #include <iostream>
@@ -92,10 +93,6 @@ void Renderer::loadShaderWithFallback()
 		m_instancedLightedShader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(m_instancedLightedShader, "mvp");
 		m_instancedLightedShader.locs[SHADER_LOC_VERTEX_INSTANCE_TX] = GetShaderLocationAttrib(m_instancedLightedShader, "instanceTransform");
 	}
-
-	// create a unit cone mesh (height = 1, base radius = 1) for trails
-	const t_model_id trailModelID = m_context.modelManager.loadModel("assets/Models/Trail/trail.glb");
-	m_trailModel = m_context.modelManager.getModel(trailModelID);
 }
 
 void Renderer::setupShaderUniforms()
@@ -159,93 +156,11 @@ void Renderer::render(float dt, const Camera3D &camera)
 	EndMode3D();
 }
 
-namespace {
-	struct RibbonPoint {
-		Vector3 left;
-		Vector3 right;
-		Color color;
-	};
-
-	inline void emitRibbonTriangles(
-		const effect::TrailNode *nodes,
-		std::size_t count,
-		float startWidth,
-		float endWidth,
-		Color baseColor,
-		const Camera3D &camera
-	) {
-		if (count < 2) return;
-
-		RibbonPoint pts[12];
-		const std::size_t n = count;
-
-		for (std::size_t i = 0; i < n; ++i)
-		{
-			const auto &node = nodes[i];
-			Vector3 forward;
-			if (i == 0) {
-				forward = Vector3Subtract(node.pos, nodes[1].pos);
-			} else if (i == n - 1) {
-				forward = Vector3Subtract(nodes[n - 2].pos, node.pos);
-			} else {
-				forward = Vector3Subtract(nodes[i - 1].pos, nodes[i + 1].pos);
-			}
-
-			// Strict NaN protection: handle zero forward vectors (newly spawned / stationary entities)
-			const float fwdLenSq = Vector3LengthSqr(forward);
-			Vector3 toCam = Vector3Subtract(camera.position, node.pos);
-			Vector3 side;
-			if (fwdLenSq > 1e-6f) {
-				side = Vector3CrossProduct(forward, toCam);
-				if (Vector3LengthSqr(side) < 1e-4f) {
-					side = Vector3CrossProduct(forward, camera.up);
-				}
-			}
-			if (Vector3LengthSqr(side) < 1e-6f) {
-				side = Vector3CrossProduct(Vector3Subtract(camera.target, camera.position), camera.up);
-			}
-			const float sideLen = Vector3Length(side);
-			side = (sideLen > 1e-5f) ? Vector3Scale(side, 1.0f / sideLen) : Vector3{1.0f, 0.0f, 0.0f};
-
-			const float t = static_cast<float>(i) / static_cast<float>(n - 1);
-			const float halfWidth = (startWidth * (1.0f - t) + endWidth * t) * 0.5f;
-			const Vector3 offset = Vector3Scale(side, halfWidth);
-
-			const unsigned char alpha = static_cast<unsigned char>(std::clamp(baseColor.a * node.alpha, 0.0f, 255.0f));
-			pts[i].color = Color{baseColor.r, baseColor.g, baseColor.b, alpha};
-			pts[i].left = Vector3Add(node.pos, offset);
-			pts[i].right = Vector3Subtract(node.pos, offset);
-		}
-
-		for (std::size_t i = 0; i < n - 1; ++i)
-		{
-			// Triangle 1: left[i], right[i], right[i+1]
-			rlColor4ub(pts[i].color.r, pts[i].color.g, pts[i].color.b, pts[i].color.a);
-			rlVertex3f(pts[i].left.x, pts[i].left.y, pts[i].left.z);
-
-			rlColor4ub(pts[i].color.r, pts[i].color.g, pts[i].color.b, pts[i].color.a);
-			rlVertex3f(pts[i].right.x, pts[i].right.y, pts[i].right.z);
-
-			rlColor4ub(pts[i + 1].color.r, pts[i + 1].color.g, pts[i + 1].color.b, pts[i + 1].color.a);
-			rlVertex3f(pts[i + 1].right.x, pts[i + 1].right.y, pts[i + 1].right.z);
-
-			// Triangle 2: left[i], right[i+1], left[i+1]
-			rlColor4ub(pts[i].color.r, pts[i].color.g, pts[i].color.b, pts[i].color.a);
-			rlVertex3f(pts[i].left.x, pts[i].left.y, pts[i].left.z);
-
-			rlColor4ub(pts[i + 1].color.r, pts[i + 1].color.g, pts[i + 1].color.b, pts[i + 1].color.a);
-			rlVertex3f(pts[i + 1].right.x, pts[i + 1].right.y, pts[i + 1].right.z);
-
-			rlColor4ub(pts[i + 1].color.r, pts[i + 1].color.g, pts[i + 1].color.b, pts[i + 1].color.a);
-			rlVertex3f(pts[i + 1].left.x, pts[i + 1].left.y, pts[i + 1].left.z);
-		}
-	}
-}
-
 void Renderer::drawTrails()
 {
 	rlDisableDepthMask();
 	rlSetBlendMode(BLEND_ADDITIVE);
+	rlDisableBackfaceCulling();
 	rlBegin(RL_TRIANGLES);
 
 	// 1. Single-emitter trails (Bullets and Missiles)
@@ -255,7 +170,7 @@ void Renderer::drawTrails()
 		const auto &trail = simpleView.get<const effect::HasSimpleTrail>(entity);
 		if (trail.count < 2) continue;
 		if (!m_currentFrustum.isSphereInside(trail.nodes[0].pos, 50.0f)) continue;
-		drawSimpleRibbon(trail);
+		draw_utils::drawSimpleTrail(trail, m_camera);
 	}
 
 	// 2. Multi-emitter trails (Spaceship Thrusters)
@@ -267,35 +182,14 @@ void Renderer::drawTrails()
 			const auto &emitter = trail.emitters[e];
 			if (emitter.count < 2) continue;
 			if (!m_currentFrustum.isSphereInside(emitter.nodes[0].pos, 50.0f)) continue;
-			drawMultiRibbon(emitter, trail);
+			draw_utils::drawMultiTrailEmitter(emitter, trail, m_camera);
 		}
 	}
 
 	rlEnd();
+	rlEnableBackfaceCulling();
 	rlSetBlendMode(BLEND_ALPHA);
 	rlEnableDepthMask();
-}
-
-void Renderer::drawSimpleRibbon(const effect::HasSimpleTrail &trail)
-{
-	emitRibbonTriangles(trail.nodes, trail.count, trail.width, trail.endWidth, trail.color, m_camera);
-}
-
-void Renderer::drawMultiRibbon(const effect::HasMultiTrail::Emitter &emitter, const effect::HasMultiTrail &trail)
-{
-	emitRibbonTriangles(emitter.nodes, emitter.count, emitter.width, trail.endWidth, trail.color, m_camera);
-}
-
-void Renderer::drawTrailBetween(const Vector3 &head, const Vector3 &tail, float rad, Color color)
-{
-	const Vector3 dir = head - tail;
-	const float len = Vector3Length(dir);
-	const Vector3 mid = tail + dir * len;
-
-	Vector3 axisOut;
-	float angleOut;
-	QuaternionToAxisAngle(vector3ToRotation(dir), &axisOut, &angleOut);
-	DrawModelEx(m_trailModel, mid, axisOut, angleOut * RAD2DEG, (Vector3){rad, rad, len}, color);
 }
 
 void Renderer::handleLightSource()

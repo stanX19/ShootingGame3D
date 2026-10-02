@@ -1,5 +1,6 @@
 #include "weapons.hpp"
 #include "utils.hpp"
+#include "utils/color_utils.hpp"
 #include "components/sound.hpp"
 #include "components/effect.hpp"
 #include "game_config.hpp"
@@ -21,11 +22,6 @@ namespace
 	const Color BASE_COLOR = GRAY;
 	const Color NUKE_EXPLOSION_COLOR = {0, 255, 255, 255};
 	constexpr float DEFAULT_MASS = 5.0f;
-
-	Color getColor([[maybe_unused]] GameContext &context, [[maybe_unused]] entt::entity entity, Color baseColor = BASE_COLOR)
-	{
-		return baseColor;
-	}
 
 	void emplaceMissileWeaponCommon(GameContext &context, entt::entity entity, sound::Id shootSoundId = sound::RANDOM_MISSILE_SHOOT)
 	{
@@ -85,7 +81,7 @@ namespace
 		);
 	}
 
-	entt::entity createMissileTemplate(GameContext &context, float rad, Color color, float mass)
+	entt::entity createMissileTemplate(GameContext &context, const GameConfig &weaponCfg, float rad, float mass)
 	{
 		const auto &cfg = context.config;
 		const float arenaSize = cfg.getFloat("game.arenaSize", 2000.0f);
@@ -95,19 +91,22 @@ namespace
 
 		entt::entity missile = context.templateReg.create();
 		const t_model_id model = context.modelManager.loadModel("assets/Models/missile/missile.glb");
+		const Color color = color_utils::getWeaponColor(weaponCfg, cfg, "missile", "color", BASE_COLOR);
+		const Color trailColor = color_utils::getWeaponColor(weaponCfg, cfg, "missile", "trailColor", ORANGE);
+
 		context.templateReg.emplace<render::tag::VelocitySyncModelRot>(missile);
 		context.templateReg.emplace<CollisionBody>(missile, CollisionBody{rad});
 		context.templateReg.emplace<Damage>(missile, Damage{bodyDamage});
 		context.templateReg.emplace<RenderBody>(missile, RenderBody{model, color, rad});
 		context.templateReg.emplace<DisappearBound>(missile, missileBound * -1, missileBound);
-		effect::HasSimpleTrail missileTrail;
-		missileTrail.maxNodes = 8;
-		missileTrail.maxAge = 0.30f;
-		missileTrail.minDistance = 1.0f;
-		missileTrail.width = rad * 0.8f;
-		missileTrail.endWidth = 0.0f;
-		missileTrail.color = ORANGE;
-		context.templateReg.emplace<effect::HasSimpleTrail>(missile, missileTrail);
+		context.templateReg.emplace<effect::HasSimpleTrail>(
+			missile,
+			rad * 0.8f,
+			trailColor,
+			0.30f,
+			8,
+			1.0f
+		);
 		context.templateReg.emplace<Rotation>(missile);
 		context.templateReg.emplace<physics::tag::VelocitySyncRot>(missile);
 		context.templateReg.emplace<MoveTarget>(missile);
@@ -145,7 +144,7 @@ void weapon::emplaceGenericMissile(GameContext &context, entt::entity entity, co
 	float cooldown = cfg.getFloat("cooldown", 1.0f);
 	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
-	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	entt::entity bulletTemplate = createMissileTemplate(context, cfg, radius, mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
@@ -196,7 +195,7 @@ void weapon::emplaceWeaponMissileBasic(GameContext &context, entt::entity entity
 	float cooldown = cfg.getFloat("cooldown", 1.0f);
 	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
-	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	entt::entity bulletTemplate = createMissileTemplate(context, cfg, radius, mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage);
 	context.templateReg.emplace<ScalarAcceleration>(bulletTemplate, ScalarAcceleration{acceleration});
@@ -237,7 +236,7 @@ void weapon::emplaceWeaponMissileSwarm(GameContext &context, entt::entity entity
 	float extendFireRequest = cfg.getFloat("extendFireRequest", 2.0f);
 	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
-	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	entt::entity bulletTemplate = createMissileTemplate(context, cfg, radius, mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	emplaceMissileDeathEffects(
 		context,
@@ -283,7 +282,7 @@ void weapon::emplaceWeaponMissileTorpedo(GameContext &context, entt::entity enti
 	float speedMultiplier = cfg.getFloat("speedMultiplier", 2.0f);
 	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
-	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	entt::entity bulletTemplate = createMissileTemplate(context, cfg, radius, mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
@@ -322,7 +321,7 @@ void weapon::emplaceWeaponMissileNuke(GameContext &context, entt::entity entity,
 	float reloadTime = cfg.getFloat("reloadTime", 30.0f);
 	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
-	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	entt::entity bulletTemplate = createMissileTemplate(context, cfg, radius, mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	emplaceMissileDeathEffects(context, bulletTemplate, cfg, radius, instantDamage, NUKE_EXPLOSION_COLOR);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
@@ -356,7 +355,7 @@ void weapon::emplaceWeaponMissileSniper(GameContext &context, entt::entity entit
 	float spreadAngle = cfg.getFloat("spreadAngle", 0.0f);
 	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
-	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	entt::entity bulletTemplate = createMissileTemplate(context, cfg, radius, mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	emplaceMissileDeathEffects(
 		context,
@@ -399,21 +398,11 @@ void weapon::emplaceWeaponMissileFlares(GameContext &context, entt::entity entit
 	float extendFireRequest = cfg.getFloat("extendFireRequest", 1.0f);
 	float mass = cfg.getFloat("mass", DEFAULT_MASS);
 
-	entt::entity bulletTemplate = createMissileTemplate(context, radius, getColor(context, entity), mass);
+	entt::entity bulletTemplate = createMissileTemplate(context, cfg, radius, mass);
 	context.templateReg.emplace<HP>(bulletTemplate, HP{hp});
 	context.templateReg.emplace<combat::tag::Targetable>(bulletTemplate);
 	context.templateReg.emplace<TurnSpeed>(bulletTemplate, TurnSpeed{turnSpeed});
 	context.templateReg.emplace_or_replace<Lifespan>(bulletTemplate, Lifespan{baseLifespan * lifespanMultiplier});
-	context.templateReg.emplace_or_replace<SpawnsTrailParticles>(
-		bulletTemplate,
-		SpawnsTrailParticles{
-			{{Vector3{0.0f, 0.0f, 0.0f}}},
-			1,
-			radius,
-			0.5f,
-			ORANGE
-		}
-	);
 
 	Weapon weapon{bulletTemplate};
 	weapon.bulletData.spreadSin = std::sin(spreadAngle);

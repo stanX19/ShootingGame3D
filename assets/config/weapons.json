@@ -2,6 +2,7 @@
 	"bullet": {
 		"baseDamage": 25,
 		"baseSpeed": 1000,
+		"color": [255, 255, 255, 255],
 		"effectiveRangeMultiplier": 2,
 		"trailColor": [130, 130, 130, 255],
 		"weapons": {
@@ -158,6 +159,8 @@
 	"missile": {
 		"baseSpeed": 100,
 		"bodyDamage": 2.5,
+		"color": [130, 130, 130, 255],
+		"trailColor": [255, 161, 0, 255],
 		"effectiveRangeMultiplier": 5,
 		"instantDamage": 250,
 		"lifespan": 20,
@@ -250,12 +253,12 @@
 			"torpedo": {
 				"name": "Torpedo",
 				"turretRef": "basic_shooter",
-				"ammo": 8,
+				"ammo": 20,
 				"cooldown": 0.1,
 				"explosionDamage": 50,
 				"explosionFinalRadius": 1.5,
 				"explosionStartRadius": 0.075,
-				"extendFireRequest": 2.5,
+				"extendFireRequest": 0.25,
 				"hp": 1,
 				"instantDamage": 125,
 				"instantRadius": 0.075,
