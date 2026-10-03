@@ -1,8 +1,10 @@
 {
-    "shipId": "fastElite",
-    "specialWeapon": "swarm",
+    "shipId": "heavy_quad",
+    "specialWeapon": "missileBasic",
     "turretWeapons": [
-        "shotgun",
-        "shotgun"
+        "torpedo",
+        "torpedo",
+        "torpedo",
+        "torpedo"
     ]
 }

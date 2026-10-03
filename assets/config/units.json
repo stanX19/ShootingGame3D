@@ -108,7 +108,7 @@
 				"shieldRegen": 25.0,
 				"damage": 500.0,
 				"maxSpeed": 70.0,
-				"turnSpeed": 0.5,
+				"turnSpeed": 1.0,
 				"mass": 100000.0,
 				"score": 0,
 				"killedScore": 2000
